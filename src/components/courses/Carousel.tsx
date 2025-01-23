@@ -25,7 +25,7 @@ const CarouselComp = () => {
   }
   return (
     <div className="className='w-[90%] mx-auto flex flex-col justify-center items-center'">
-      <Carousel responsive={responsive} centerMode={true} containerClass="container"    additionalTransfrom={0}
+      <Carousel className="" responsive={responsive} centerMode={true} containerClass="container"    additionalTransfrom={0}
    arrows
    dotListClass=""
    draggable

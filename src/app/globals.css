@@ -166,3 +166,16 @@ html {
   -moz-box-shadow: 0px 0px 5px 5px #0099E0;
   box-shadow: 0px 0px 5px 5px #0099E0;
 }
+
+button.react-multiple-carousel__arrow.react-multiple-carousel__arrow--right{
+  background-color: white;
+}
+button.react-multiple-carousel__arrow--right::before {
+  color: black;
+}
+button.react-multiple-carousel__arrow.react-multiple-carousel__arrow--left{
+  background-color: white;
+}
+button.react-multiple-carousel__arrow--left::before {
+  color: black;
+}
