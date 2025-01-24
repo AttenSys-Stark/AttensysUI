@@ -70,12 +70,12 @@ const CourseFormLanding = (prop: any) => {
           <LandingPage />
         </div>
       )
-      case "course-home-landing-page":
-        return (
-          <div className="h-auto w-full bg-[#F5F7FA]">
-            <LandingPage />
-          </div>
-        )
+    case "course-home-landing-page":
+      return (
+        <div className="h-auto w-full bg-[#F5F7FA]">
+          <LandingPage />
+        </div>
+      )
     default:
       return <>hey</>
   }

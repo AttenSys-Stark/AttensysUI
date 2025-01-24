@@ -1,6 +1,5 @@
-import React from "react"
+import React, { useState } from "react"
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
-import Dropdown from "../Dropdown"
 import Image from "next/image"
 import free from "@/assets/free.svg"
 import paid from "@/assets/paid.svg"
@@ -10,6 +9,11 @@ import { useRouter } from "next/navigation"
 
 const MainFormView4 = () => {
   const router = useRouter()
+  const [selectedPricing, setSelectedPricing] = useState("")
+  const [formErrors, setFormErrors] = useState({
+    coursePricing: false,
+  })
+
   const pricing = [
     {
       sym: free,
@@ -22,6 +26,14 @@ const MainFormView4 = () => {
       desc: "Set a price that reflects the value of your content",
     },
   ]
+
+  const handlePricingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedPricing(event.target.value)
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+  }
 
   return (
     <div className="flex">
@@ -57,9 +69,12 @@ const MainFormView4 = () => {
           </div>
 
           <div className="mx-4 sm:ml-24 sm:mr-96 mt-12">
-            <form action="CourseSetup5">
+            <form onSubmit={handleSubmit}>
               <div className="my-12">
-                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor="coursePricing"
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Course Pricing
                 </label>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px] my-2">
@@ -76,22 +91,41 @@ appropriately can help attract the right audience while providing a fair return 
                         <div className="flex content-start">
                           <Image src={item.sym} alt={item.cost} />
                           <div className="mx-4">
-                            <p className="font-semibold text-[16px] leading-[31px] text-[#333333]">{item.cost}</p>
-                            <p className="font-normal text-[13px] text-[#2D3A4B] leading-[21px]">{item.desc} </p>
+                            <p className="font-semibold text-[16px] leading-[31px] text-[#333333]">
+                              {item.cost}
+                            </p>
+                            <p className="font-normal text-[13px] text-[#2D3A4B] leading-[21px]">
+                              {item.desc}{" "}
+                            </p>
                           </div>
                         </div>
 
                         <div className="p-1 rounded-xl absolute right-4 top-4">
-                          <input type="checkbox" name="xxw" id="" />
+                          <input
+                            type="radio"
+                            name="coursePricing"
+                            value={item.cost}
+                            checked={selectedPricing === item.cost}
+                            onChange={handlePricingChange}
+                            required
+                          />
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
+                {formErrors.coursePricing && (
+                  <p className="text-red-500 text-sm">
+                    Please select a pricing option.
+                  </p>
+                )}
               </div>
 
               <div className="my-16">
-                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor=""
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Promo and Discount
                 </label>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
@@ -116,9 +150,6 @@ appropriately can help attract the right audience while providing a fair return 
                   <button
                     className="rounded-xl bg-[#4A90E2] px-12 sm:px-48 py-3 text-white"
                     type="submit"
-                    onClick={(e) =>
-                      handleCreateCourse(e, "courseSetup5", router)
-                    }
                   >
                     Save and Proceed
                   </button>

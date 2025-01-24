@@ -3,26 +3,25 @@ import Previous from "./previous"
 
 const CourseForm = (props: any) => {
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   const handleCheckboxChange = (id: string) => {
     setSelectedGoal(id)
+    setError(null)
   }
 
-  const handleNext = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (
+    event:
+      | React.FormEvent<HTMLFormElement>
+      | React.MouseEvent<HTMLButtonElement>,
+  ) => {
     event.preventDefault()
-    if (!selectedGoal) {
-      alert("Please select a course goal")
-      return
-    }
-    props.onSubmit?.(selectedGoal)
-  }
 
-  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
     if (!selectedGoal) {
-      alert("Please select a course goal")
+      setError("Please select a course goal")
       return
     }
+
     props.onSubmit?.(selectedGoal)
   }
 
@@ -36,7 +35,7 @@ const CourseForm = (props: any) => {
           What is the primary goal of your course?
         </h1>
       </div>
-      <form onSubmit={handleNext} action="create-a-course">
+      <form onSubmit={handleSubmit} action="create-a-course">
         <div className="bg-white px-12 py-16 rounded-2xl flex flex-col justify-center w-[524px] mx-auto">
           <div className="flex">
             <input
@@ -47,7 +46,10 @@ const CourseForm = (props: any) => {
               checked={selectedGoal === "goal1"}
               onChange={() => handleCheckboxChange("goal1")}
             />
-            <label className="block my-5 ml-3 text-[#333333] text-[18px] font-medium leading-[22px]">
+            <label
+              htmlFor="goal1"
+              className="block my-5 ml-3 text-[#333333] text-[18px] font-medium leading-[22px]"
+            >
               Helping people build skills for their job
             </label>
           </div>
@@ -55,12 +57,14 @@ const CourseForm = (props: any) => {
           <div className="flex">
             <input
               type="checkbox"
-              className="required:border-red-500 indeterminate:bg-gray-300"
               id="goal2"
               checked={selectedGoal === "goal2"}
               onChange={() => handleCheckboxChange("goal2")}
             />
-            <label className="block my-5 ml-3 text-[#333333] text-[18px] font-medium leading-[22px]">
+            <label
+              htmlFor="goal2"
+              className="block my-5 ml-3 text-[#333333] text-[18px] font-medium leading-[22px]"
+            >
               Giving a certificate for completing the course
             </label>
           </div>
@@ -68,12 +72,14 @@ const CourseForm = (props: any) => {
           <div className="flex">
             <input
               type="checkbox"
-              className="required:border-red-500 indeterminate:bg-gray-300"
               id="goal3"
               checked={selectedGoal === "goal3"}
               onChange={() => handleCheckboxChange("goal3")}
             />
-            <label className="block my-5 ml-3 text-[#333333] text-[18px] font-medium leading-[22px]">
+            <label
+              htmlFor="goal3"
+              className="block my-5 ml-3 text-[#333333] text-[18px] font-medium leading-[22px]"
+            >
               Sharing knowledge about a hobby or interest
             </label>
           </div>
@@ -81,20 +87,26 @@ const CourseForm = (props: any) => {
           <div className="flex">
             <input
               type="checkbox"
-              className="required:border-red-500 indeterminate:bg-gray-300"
               id="goal4"
               checked={selectedGoal === "goal4"}
               onChange={() => handleCheckboxChange("goal4")}
             />
-            <label className="block my-5 ml-3 text-[#333333] text-[18px] font-medium leading-[22px]">
+            <label
+              htmlFor="goal4"
+              className="block my-5 ml-3 text-[#333333] text-[18px] font-medium leading-[22px]"
+            >
               Teaching new ideas or concepts in a field
             </label>
           </div>
+
+          {error && (
+            <div className="text-red-500 text-center mb-4">{error}</div>
+          )}
         </div>
 
         <div className="text-center">
           <button
-            onClick={handleButtonClick}
+            onClick={handleSubmit}
             className="bg-[#4A90E2] w-[350px] rounded-xl py-3 mt-12 mb-44 text-white"
             type="submit"
           >

@@ -9,8 +9,7 @@ import Image from "next/image"
 import Switch from "react-switch"
 import Lectures from "../Lectures"
 import CourseSideBar from "./SideBar"
-import { MdOutlineDiamond } from "react-icons/md";
-
+import { MdOutlineDiamond } from "react-icons/md"
 
 const MainFormView5 = () => {
   const [isActivated, setIsActivated] = useState(false)
@@ -58,10 +57,10 @@ const MainFormView5 = () => {
           <div className="block sm:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] px-5 items-center">
             <div className="flex items-center">
               <div className="px-8 border-r border-blue-100">
-                 <IoMdArrowBack
-                                  onClick={() => history.back()}
-                                  className="cursor-pointer"
-                                />
+                <IoMdArrowBack
+                  onClick={() => history.back()}
+                  className="cursor-pointer"
+                />
               </div>
               <p className="text-[#4A90E2] text-xl font-bold">
                 Preview & Publish
@@ -79,14 +78,20 @@ const MainFormView5 = () => {
             <div className="block sm:grid grid-cols-2 gap-4">
               {/* Course Image */}
               <div className="w-[368px] h-[238px] rounded-xl">
-                <Image src={video} alt="hero" className="h-full w-full object-cover rounded-xl" />
+                <Image
+                  src={video}
+                  alt="hero"
+                  className="h-full w-full object-cover rounded-xl"
+                />
               </div>
 
               {/* Course information */}
               <div>
                 {/* field */}
                 <div className="mb-3 order-first">
-                  <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">Technology | Web Development</p>
+                  <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">
+                    Technology | Web Development
+                  </p>
                 </div>
 
                 <h4 className="text-[19px] text-[#333333] leading-[34px] font-bold my-2 ">
@@ -102,12 +107,16 @@ const MainFormView5 = () => {
                 </div>
 
                 <div className="bg-[#5801A9] py-2 text-white w-[200px]  text-center mt-6 mb-3 Sm:w-[50%] rounded-lg">
-                  <p className="text-[14px] font-extrabold leading-[22px]">Tech Innovators Academy</p>
+                  <p className="text-[14px] font-extrabold leading-[22px]">
+                    Tech Innovators Academy
+                  </p>
                 </div>
 
                 <div className="flex space-x-3 items-center">
-                <MdOutlineDiamond color="#333333"/>
-                  <p className="text-[#333333] text-[14px] font-medium leading-[22px]">Difficulty level : Elementary</p>
+                  <MdOutlineDiamond color="#333333" />
+                  <p className="text-[#333333] text-[14px] font-medium leading-[22px]">
+                    Difficulty level : Elementary
+                  </p>
                 </div>
               </div>
             </div>
@@ -120,7 +129,9 @@ const MainFormView5 = () => {
               <div className="">
                 <div>
                   <div className="flex justify-between sm:w-[30%] mt-5">
-                    <h4 className="font-semibold text-[18px] leading-[31px] text-[#333333]">Certification for this course</h4>
+                    <h4 className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                      Certification for this course
+                    </h4>
 
                     <Switch
                       onChange={handleSwitch}
@@ -134,7 +145,9 @@ const MainFormView5 = () => {
                       className="mx-2"
                     />
                   </div>
-                  <p className="text-[#333333] text-[14px] font-normal leading-[22px]">After completion students will be issued certification</p>
+                  <p className="text-[#333333] text-[14px] font-normal leading-[22px]">
+                    After completion students will be issued certification
+                  </p>
                 </div>
                 <div className="mt-12 mb-24">
                   <form action="course-landing-page" method="post">
