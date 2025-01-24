@@ -28,6 +28,7 @@
     "@starknet-io/types-js": "^0.7.7",
     "@starknet-react/chains": "3.0.0-beta.2",
     "@starknet-react/core": "3.0.0-beta.2",
+    "@yudiel/react-qr-scanner": "^2.1.0",
     "axios": "^1.7.9",
     "buffer": "^6.0.3",
     "chart.js": "^2.9.4",
