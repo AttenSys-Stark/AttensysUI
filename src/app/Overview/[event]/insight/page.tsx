@@ -50,7 +50,7 @@ const InsightPage = () => {
                     alt="Event"
                     width={49}
                     height={49}
-                    className="w-[49px] h-[49px] rounded-lg"
+                    className="w-[35px] h-[35px] md:w-[49px] md:h-[49px] rounded-lg"
                    />
                 </div>
               </div>
@@ -97,10 +97,9 @@ const InsightPage = () => {
         <Image 
           src={jackImage} 
           alt="Event"  
-          // className="w-19 h-16 md:w-19 md:h-19 rounded-lg bg-yellow-100"
           width={196}
           height={184}
-          className="w-[196px] h-[184px] rounded-tl-[15px] rounded-tr-none rounded-br-none rounded-bl-none object-cover"
+          className="w-[120px] h-[120px] md:w-[196px] md:h-[184px] rounded-tl-[15px] object-cover"
         />
 
           <h1 className="text-3xl font-bold mt-7 text-gray-300">Event Name</h1>

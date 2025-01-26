@@ -46,7 +46,7 @@ const GuestListPage = () => {
                      alt="Event"
                      width={49}
                      height={49}
-                     className="w-[49px] h-[49px] rounded-lg"
+                     className="w-[35px] h-[35px] md:w-[49px] md:h-[49px] rounded-lg"
                    />
                  </div>
                </div>
