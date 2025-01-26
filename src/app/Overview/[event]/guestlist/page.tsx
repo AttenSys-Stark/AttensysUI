@@ -1,11 +1,21 @@
 "use client"
 import React from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname} from 'next/navigation';
 
 const GuestListPage = () => {
     const params = useParams();
     const event = params.event;
+    const pathname = usePathname();
+    
+     const getLinkStyle = (path: string) => {
+      const isActive = pathname === path;
+      return `px-8 py-5 text-sm ${
+        isActive 
+        ? "border-b-2 border-purple-600 text-purple-600" 
+        : "hover:text-gray-900"
+      }`;
+    };
   return (
     <div className="min-h-screen bg-gray-100 mt-14 overflow-x-hidden">
       {/* Navigation */}
@@ -40,31 +50,31 @@ const GuestListPage = () => {
         <div className="bg-gray-100 border-b">
             <div className="max-w-[1200px] mx-auto px-6">
                 <div className="flex overflow-x-auto whitespace-nowrap">
-                    <Link
-                    href={`/Overview/${params.event}/insight`}
-                    className="px-8 py-5 text-sm hover:text-gray-900" 
-                    >
-                    Insights
-                    </Link>
-                    <Link
-                    href={`/Overview/${params.event}/guestlist`}
-                    className="px-8 py-5 border-b-2 border-purple-600 text-purple-600 text-sm" 
-                    >
-                    Guests list  
-                    </Link>
-                    <Link
-                    href={`/Overview/${params.event}/attendance`}
-                    className="px-8 py-5 text-sm hover:text-gray-900"
-                    >
-                    Attendance
-                    </Link>
-                    <Link
-                    href={`/Overview/${params.event}/sponsorship`}
-                    className="px-8 py-5 text-sm hover:text-gray-900 flex items-center"
-                    >
-                    Sponsorship
-                    <span className="ml-1 text-red-500">•</span>
-                    </Link>
+                <Link 
+             href={`/Overview/${params.event}/insight`}
+             className={getLinkStyle(`/Overview/${params.event}/insight`)}
+           >
+             Insights
+           </Link>
+           <Link 
+             href={`/Overview/${params.event}/guestlist`}
+             className={getLinkStyle(`/Overview/${params.event}/guestlist`)}
+           >
+             Guests list
+           </Link>
+           <Link 
+             href={`/Overview/${params.event}/attendance`}
+             className={getLinkStyle(`/Overview/${params.event}/attendance`)}
+           >
+             Attendance
+           </Link>
+           <Link 
+             href={`/Overview/${params.event}/sponsorship`}
+             className={`${getLinkStyle(`/Overview/${params.event}/sponsorship`)} flex items-center`}
+           >
+             Sponsorship
+             <span className="ml-1 text-red-500">•</span>
+           </Link>
                 </div>
             </div>
         </div>
