@@ -1,6 +1,7 @@
 "use client"
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams, usePathname } from 'next/navigation';
 
 const SponsorshipPage = () => {
@@ -18,32 +19,38 @@ const SponsorshipPage = () => {
 
  return (
    <div className="min-h-screen bg-gray-100 mt-14 overflow-x-hidden">
-     <nav className="bg-gray-100 border-b top-16 z-40 overflow-x-auto">
-       <div className="max-w-[1200px] mx-auto px-6">
-         <div className="flex items-center justify-between py-3">
-           <div className="flex items-center space-x-2 md:space-x-4">
-             <button className="flex items-center gap-2 text-sm hover:text-gray-900">
-               <span>◯</span> Discover
-             </button>
-             <span className="text-gray-300">|</span>
-             <button className="flex items-center gap-2 text-sm hover:text-gray-900">
-               <span>📁</span> My events
-             </button>
-             <span className="text-gray-300">|</span>
-             <span className="text-sm">Event name</span>
-           </div>
-           <div className="flex items-center space-x-4">
-             <button className="text-purple-600 text-sm flex items-center hover:text-purple-700">
-               ✏️ Edit Event
-             </button>
-             <button className="px-4 py-1.5 bg-gray-900 text-white rounded-lg text-sm flex items-center hover:bg-gray-800">
-               Event Page ↗
-             </button>
-             <div className="w-8 h-8 rounded-full bg-gray-200" />
-           </div>
-         </div>
-       </div>
-     </nav>
+        <nav className="bg-gray-100 border-b top-16 z-40 overflow-x-auto">
+            <div className="max-w-[1200px] mx-auto px-6">
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center space-x-2 md:space-x-4">
+                   <button className="flex items-center gap-2 text-sm hover:text-gray-900">
+                     <span>◯</span> Discover
+                   </button>
+                   <span className="text-gray-300">|</span>
+                   <button className="flex items-center gap-2 text-sm hover:text-gray-900">
+                     <span>📁</span> My events
+                   </button>
+                   <span className="text-gray-300">|</span>
+                   <span className="text-sm">Event name</span>
+                </div>
+                <div className="flex items-center space-x-4">
+                   <button className="text-purple-600 text-sm flex items-center hover:text-purple-700">
+                     ✏️ Edit Event
+                   </button>
+                   <button className="px-4 py-1.5 bg-gray-900 text-white rounded-lg text-sm flex items-center hover:bg-gray-800">
+                     Event Page ↗
+                   </button>
+                   <Image
+                     src="/Overview/[event]/img/icon.png"
+                     alt="Event"
+                     width={49}
+                     height={49}
+                     className="w-[49px] h-[49px] rounded-lg"
+                   />
+                </div>
+              </div>
+            </div>
+        </nav>
 
      <div className="bg-gray-100 border-b">
        <div className="max-w-[1200px] mx-auto px-6">

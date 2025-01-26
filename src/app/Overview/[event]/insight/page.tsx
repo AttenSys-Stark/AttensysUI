@@ -1,6 +1,10 @@
 "use client"
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import nftImage from '../img/nft.png';
+import jackImage from '@/app/overview/[event]/img/jack.png';
+
 import { useParams, usePathname} from 'next/navigation';
 
 const InsightPage = () => {
@@ -20,36 +24,38 @@ const InsightPage = () => {
   return (
     <div className="min-h-screen bg-gray-100 mt-14 overflow-x-hidden">
       {/* Navigation */}
-      <nav className="bg-gray-100 border-b top-16 z-40 overflow-x-auto">
-        <div className="max-w-[1200px] mx-auto px-6">
-          <div className="flex items-center justify-between py-3">
-            <div className="flex items-center space-x-2 md:space-x-4">
-              <button className="flex items-center gap-2 text-sm hover:text-gray-900">
-                <span>◯</span> Discover
-              </button>
-              <span className="text-gray-300">|</span>
-              <button className="flex items-center gap-2 text-sm hover:text-gray-900">
-                <span>📁</span> My events
-              </button>
-              <span className="text-gray-300">|</span>
-              <span className="text-sm">Event name</span>
+          <nav className="bg-gray-100 border-b top-16 z-40 overflow-x-auto">
+            <div className="max-w-[1200px] mx-auto px-6">
+              <div className="flex items-center justify-between py-3">
+                <div className="flex items-center space-x-2 md:space-x-4">
+                   <button className="flex items-center gap-2 text-sm hover:text-gray-900">
+                     <span>◯</span> Discover
+                   </button>
+                   <span className="text-gray-300">|</span>
+                   <button className="flex items-center gap-2 text-sm hover:text-gray-900">
+                     <span>📁</span> My events
+                   </button>
+                   <span className="text-gray-300">|</span>
+                   <span className="text-sm">Event name</span>
+                </div>
+                <div className="flex items-center space-x-4">
+                   <button className="text-purple-600 text-sm flex items-center hover:text-purple-700">
+                     ✏️ Edit Event
+                   </button>
+                   <button className="px-4 py-1.5 bg-gray-900 text-white rounded-lg text-sm flex items-center hover:bg-gray-800">
+                     Event Page ↗
+                   </button>
+                   <Image
+                    src="/Overview/[event]/img/icon.png"
+                    alt="Event"
+                    width={49}
+                    height={49}
+                    className="w-[49px] h-[49px] rounded-lg"
+                   />
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <button className="text-purple-600 text-sm flex items-center hover:text-purple-700">
-                ✏️ Edit Event
-              </button>
-              <button className="px-4 py-1.5 bg-gray-900 text-white rounded-lg text-sm flex items-center hover:bg-gray-800">
-                Event Page ↗
-              </button>
-                <img 
-                src="/api/placeholder/96/96"                        //add original img ================
-                alt="Event" 
-                className="w-16 h-16 md:w-10 md:h-10 rounded-lg mb-3 bg-yellow-100"
-                />
-            </div>
-          </div>
-        </div>
-      </nav>
+          </nav>
 
       {/* Tabs */}
       <div className="bg-gray-100 border-b">
@@ -88,11 +94,15 @@ const InsightPage = () => {
       <main className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8 py-6">
         {/* Event Profile */}
         <div className="mb-8">
-          <img 
-            src="/api/placeholder/96/96"                            //add original img ================
-            alt="Event" 
-            className="w-10 h-10 md:w-16 md:h-16 rounded-lg bg-yellow-100"
-          />
+        <Image 
+          src={jackImage} 
+          alt="Event"  
+          // className="w-19 h-16 md:w-19 md:h-19 rounded-lg bg-yellow-100"
+          width={196}
+          height={184}
+          className="w-[196px] h-[184px] rounded-tl-[15px] rounded-tr-none rounded-br-none rounded-bl-none object-cover"
+        />
+
           <h1 className="text-3xl font-bold mt-7 text-gray-300">Event Name</h1>
           <p className="text-gray-900 text-lg mt-7 mb-2">Event Registration</p>
         </div>
