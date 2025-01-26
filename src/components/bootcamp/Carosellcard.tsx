@@ -29,7 +29,7 @@ const Carosellcard: React.FC<CarousellCardProp> = (props) => {
   return (
     <div
       onClick={() => handleActionClick(props.action)}
-      className={`relative ${`h-[${props.height}] w-[${props.width}]`} rounded-2xl mx-auto overflow-hidden cursor-pointer`}
+      className={`relative ${`h-[${props.height}] w-[${props.width}]`} rounded-2xl md:mx-auto overflow-hidden cursor-pointer`}
     >
       {/* Background Image */}
       <Image

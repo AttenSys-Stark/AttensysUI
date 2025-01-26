@@ -37,37 +37,43 @@ const Userbootcamps = () => {
     return (
     <div className='h-[448px] w-[90%] mx-auto flex flex-col items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl py-8 mt-8'>
         <div className='h-[50px] w-full border-b-[1px] border-b-[#D9D9D9] px-10 flex justify-between'>
-            <h1 className='text-[25px] leading-[31px] text-[#333333] font-semibold'>Bootcamps</h1>
+            <h1 className='text-[15px] md:text-[25px] leading-[31px] text-[#333333] font-semibold'>Bootcamps</h1>
             <IoIosArrowDropdown className='h-[35px] w-[35px] text-[#6B6D6E]' />
             
         </div>
-        <div className='w-[90%] mx-auto flex flex-col justify-center items-center'>
-        <Carousel responsive={responsive} centerMode={false} containerClass="container" className='mt-6'  renderArrowsWhenDisabled={false}
-   additionalTransfrom={0}
-   arrows
-   dotListClass=""
-   draggable
-   focusOnSelect={false}
-   infinite
-   itemClass=""
-   keyBoardControl
-   minimumTouchDrag={80}
-   autoPlay={true} // Enables auto-scrolling
-   autoPlaySpeed={3000}
-   >
-           {caroselldata.map((data, index) => (
+        <div className='w-[30%] gap-4 md:w-[90%] mx-auto flex flex-col justify-start items-start'>
+          <Carousel responsive={responsive} centerMode={false} containerClass="container" className='mt-6'  renderArrowsWhenDisabled={false}
+            additionalTransfrom={0}
+            arrows={window.innerWidth > 464}
+            dotListClass=""
+            draggable
+            focusOnSelect={false}
+            infinite
+            itemClass=""
+            keyBoardControl
+            minimumTouchDrag={80}
+            autoPlay={window.innerWidth >= 464 ? true : false} // Enables auto-scrolling
+            autoPlaySpeed={3000}
+          >
+              {caroselldata.map((data, index) => (
+                  <div className='h-fit w-fit'>
                     <Carosellcard
-                    key={index}
+                        key={index}
                         name={data.name} 
                         time={data.time}
                         flier={data.flier}
                         logo={data.logo}
-                       action="Ongoing"
-                        height='300px'
-                        width='300px'
+                        action="Ongoing"
+                        height={window.innerWidth < 464 ? '120px': '300px'}
+                        width={window.innerWidth < 464 ? '120px': '300px'}
                     />
-                ))}
-                    </Carousel>
+                    <div className={`${window.innerWidth >= 464 ? 'hidden': 'flex'} gap-3`}>
+                      <p>So</p>
+                      <p>Manage bootcamp</p>
+                    </div>
+                  </div>
+                    ))}
+          </Carousel>
         </div>
                            
     </div>
