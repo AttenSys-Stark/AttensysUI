@@ -1,8 +1,11 @@
 "use client"
 import React from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 const GuestListPage = () => {
+    const params = useParams();
+    const event = params.event;
   return (
     <div className="min-h-screen bg-gray-100 mt-14 overflow-x-hidden">
       {/* Navigation */}
@@ -38,25 +41,25 @@ const GuestListPage = () => {
             <div className="max-w-[1200px] mx-auto px-6">
                 <div className="flex overflow-x-auto whitespace-nowrap">
                     <Link
-                    href="/Overview/sample-event/insight"
+                    href={`/Overview/${params.event}/insight`}
                     className="px-8 py-5 text-sm hover:text-gray-900" 
                     >
                     Insights
                     </Link>
                     <Link
-                    href="/Overview/sample-event/guestlist"
+                    href={`/Overview/${params.event}/guestlist`}
                     className="px-8 py-5 border-b-2 border-purple-600 text-purple-600 text-sm" 
                     >
                     Guests list  
                     </Link>
                     <Link
-                    href={`/Overview/sample-event/attendance`}
+                    href={`/Overview/${params.event}/attendance`}
                     className="px-8 py-5 text-sm hover:text-gray-900"
                     >
                     Attendance
                     </Link>
                     <Link
-                    href={`/Overview/sample-event/sponsorship`}
+                    href={`/Overview/${params.event}/sponsorship`}
                     className="px-8 py-5 text-sm hover:text-gray-900 flex items-center"
                     >
                     Sponsorship
@@ -132,7 +135,7 @@ const GuestListPage = () => {
                     <td className="px-4 py-3">
                       <input type="checkbox" className="rounded" />
                     </td>
-                    <td className="px-4 py-3 text-sm text-purple-600">John Richard</td>
+                    <td className="px-4 py-3 text-sm text-purple-600">Akinbola Kehinde</td>
                     <td className="px-4 py-3 text-sm">1Lbd7...ZnX71</td>
                     <td className="px-4 py-3">
                       <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">
