@@ -5,7 +5,7 @@ import Highlightcard from "./Highlightcard"
 
 const Highlight = () => {
   return (
-    <div className="mt-24 sm:h-[400px] sm:w-[87%] mx-auto block sm:flex justify-center sm:space-x-6 items-center sm:overflow-hidden mb-20">
+    <div className="mt-24 min-:h-[400px] sm:w-[87%] mx-auto justify-items-center flex flex-wrap justify-between items-center mb-20 gap-5">
       {HighlightData.map((data, index) => {
         return (
           <Highlightcard

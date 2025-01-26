@@ -24,10 +24,10 @@ const Createevents = () => {
 
   return (
     <div
-      className={`bg-[url('/hero_asset.png')] h-[389px] w-[100%] sm:w-[90%] sm:mx-auto sm:rounded-xl flex items-center`}
+      className={`bg-[url('/hero_asset.png')] bg-center bg-no-repeat bg-cover h-[389px] w-[100%] sm:w-[90%] sm:mx-auto sm:rounded-xl flex items-center`}
     >
-      <div className="w-[100%] sm:w-[80%] mx-auto h-[250px] px-12 sm:px-0">
-        <h1 className="text-[30.19px] font-bold text-[#FFFFFF] leading-[39px] sm:w-[450px]">
+      <div className="w-[100%] sm:w-[80%] h-[250px] px-6 sm:px-12">
+        <h1 className="text-[30px] sm:text-[30.19px] font-bold text-[#FFFFFF] leading-7 sm:leading-[39px] sm:w-[450px]">
           Create{" "}
           <span className="bg-gradient-to-r from-[#9B51E0] via-[#9B51E0] to-[#4A90E2] text-transparent bg-clip-text">
             events,
@@ -35,11 +35,11 @@ const Createevents = () => {
           <br />
           send out invitations, and effortlessly track attendance
         </h1>
-        <p className="text-[17px] text-[#FFFFFF] leading-[22px] font-light py-4 sm:w-[571px]">
+        <p className="text-[17px] text-[#FFFFFF] leading-[22px] font-light py-4 sm:w-[571px] hidden sm:block">
           Simplifying certificate issuance, attendance tracking, and online
           course management for schools, organizations, and event managers.
         </p>
-        <Button className="flex rounded-lg bg-[#a01b73] py-2 px-4 lg:h-[50px] items-center lg:w-[230px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700 justify-center">
+        <Button className="flex rounded-lg bg-[#a01b73] py-[16px] px-[22px] lg:h-[50px] items-center lg:w-[230px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700 justify-center mt-16 sm:mt-0">
           <div className="flex space-x-4 items-center font-semibold text-[16px]">
             {CreateorExplorestat ? (
               <Image src={discover} alt="discover" className="mr-2" />
