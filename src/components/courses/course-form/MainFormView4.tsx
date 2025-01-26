@@ -6,6 +6,7 @@ import paid from "@/assets/paid.svg"
 import CourseSideBar from "./SideBar"
 import { handleCreateCourse } from "@/utils/helpers"
 import { useRouter } from "next/navigation"
+import Stepper from "@/components/Stepper"
 
 const MainFormView4 = () => {
   const router = useRouter()
@@ -37,18 +38,21 @@ const MainFormView4 = () => {
 
   return (
     <div className="flex">
-      <div className="hidden sm:block">
+      <div className="hidden lg:block">
         <CourseSideBar />
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
-          <p className="text-sm text-white text-center py-2">
+          <p className="text-[13px]/[145%] md:text-sm text-white text-center py-2">
             Your course creation progress saves automatically, but feel free to
             also save your progress manually
           </p>
         </div>
 
+        <div className="lg:hidden w-full flex justify-center mt-[58px] mb-[79px]">
+          <Stepper currentStep={4} />
+        </div>
         <div className="">
           <div className="block sm:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] px-5 items-center">
             <div className="flex items-center">
@@ -67,9 +71,10 @@ const MainFormView4 = () => {
               Save progress
             </button>
           </div>
-
           <div className="mx-4 sm:ml-24 sm:mr-96 mt-12">
             <form onSubmit={handleSubmit}>
+          <div className="mx-4 sm:ml-24 lg:mr-96 mt-12">
+            <form action="CourseSetup5">
               <div className="my-12">
                 <label
                   htmlFor="coursePricing"
@@ -85,12 +90,15 @@ appropriately can help attract the right audience while providing a fair return 
                   {pricing.map((item, id) => (
                     <div
                       key={id}
-                      className="relative border border-3 border-black mr-12 px-5 py-10 rounded-xl sm:my-0 my-8"
+                      className="relative border border-3 border-black mr-12 px-5 py-5 rounded-xl sm:my-0 my-8"
                     >
                       <div className="fle ">
                         <div className="flex content-start">
-                          <Image src={item.sym} alt={item.cost} />
+                          <div>
+                            <Image src={item.sym} alt={item.cost} width={30} />
+                          </div>
                           <div className="mx-4">
+
                             <p className="font-semibold text-[16px] leading-[31px] text-[#333333]">
                               {item.cost}
                             </p>
@@ -109,6 +117,15 @@ appropriately can help attract the right audience while providing a fair return 
                             onChange={handlePricingChange}
                             required
                           />
+
+                            <p className="font-semibold text-base leading-[31px] text-[#333333]">{item.cost}</p>
+                            <p className="font-normal text-[13px]/[145%] text-[#2D3A4B]">{item.desc} </p>
+                          </div>
+                        </div>
+
+                        <div className="p-1 rounded-xl absolute right-5 top-3">
+                          <input type="checkbox" name="xxw" id="" />
+
                         </div>
                       </div>
                     </div>
@@ -120,15 +137,9 @@ appropriately can help attract the right audience while providing a fair return 
                   </p>
                 )}
               </div>
-
-              <div className="my-16">
-                <label
-                  htmlFor=""
-                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
-                >
                   Promo and Discount
                 </label>
-                <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
+                <p className="font-normal text-[13px]/[145%] md:text-[14px] mt-5 text-[#2D3A4B] leading-[21px]">
                   Promotional pricing is a great way to create urgency and
                   increase the visibility of your course, helping you reach a
                   wider audience while rewarding early sign-ups.
@@ -137,9 +148,9 @@ appropriately can help attract the right audience while providing a fair return 
                   <input
                     type="text"
                     placeholder="Create Promo Code"
-                    className="rounded-xl flex-1 mr-4 bg-white text-[#2d3a4b] border-[#c0c0c0] border-[1px] py-2 pl-10"
+                    className="rounded-[5px] flex-1 h-[52px] mr-4 bg-white text-[#2d3a4b] border-[#c0c0c0] border-[1px] py-2 pl-10 w-full md:w-auto"
                   />
-                  <button className="rounded-xl bg-white font-normal text-[13px] text-[#2D3A4B] leading-[21px] border-[#d0d5dd] border-[1px]  py-3 px-6">
+                  <button className="rounded-[5px] bg-white font-normal h-[55px] text-[13px] text-[#2D3A4B] leading-[21px] border-[#d0d5dd] mt-5 sm:mt-0 border-[1px]  py-3 px-6">
                     + Add Promo Code
                   </button>
                 </div>
@@ -148,7 +159,7 @@ appropriately can help attract the right audience while providing a fair return 
               <div className="my-12">
                 <div className="mt-12 mb-24">
                   <button
-                    className="rounded-xl bg-[#4A90E2] px-12 sm:px-48 py-3 text-white"
+                    className="rounded-lg bg-[#4A90E2] px-12 py-3 text-white w-full md:max-w-[350px]"
                     type="submit"
                   >
                     Save and Proceed

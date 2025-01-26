@@ -112,7 +112,7 @@ const Myevents = (props: any) => {
   const boiler = () => {
     return (
       <>
-        <div className="block sm:flex justify-between w-[75%] mx-auto h-[100px] items-center py-4 sm:py-0">
+        <div className="block sm:flex justify-between sm:w-[90%] mx-auto  h-[100px] items-center px-5 md:px-0 py-4 sm:py-0">
           <h1 className="text-[20px] leading-[39px] font-bold text-[#FFFFFF]">
             My Events
           </h1>
@@ -145,8 +145,8 @@ const Myevents = (props: any) => {
         }
         return (
           <>
-            <div className="h-full sm:w-[70%] mx-auto block sm:flex justify-between py-16">
-              <div className="sm:w-[60%]">
+            <div className="h-full sm:w-[85%] mx-auto flex justify-between py-16 flex-col md:flex-row">
+              <div className="w-full md:w-[60%]">
                 <div className="flex space-x-4 items-center">
                   <div className="w-[6px] sm:h-[69px] bg-[#9B51E0]"></div>
                   <div>
@@ -158,7 +158,26 @@ const Myevents = (props: any) => {
                     </p>
                   </div>
                 </div>
-
+                <div className="md:w-[50%] flex flex-col justify-center w-[90%] mx-auto space-y-8 md:hidden">
+                  <h1 className="text-[24px] font-bold text-start text-[#FFFFFF] mt-8">
+                    Add an event design
+                  </h1>
+                  <div className="h-[394.44px] bg-[#3F3E58] border-[#DCDCDC] border-[1px] rounded-xl flex justify-center items-center w-full">
+                    <Image
+                      src={add}
+                      alt="add"
+                      onClick={handleImageClick}
+                      className="cursor-pointer"
+                    />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/jpeg, image/jpg, image/png"
+                      onChange={handleFileChange}
+                      style={{ display: "none" }} // Hide the input
+                    />
+                  </div>
+                </div>
                 <div className="w-full max-w-lg px-4">
                   <Input
                     className={clsx(
@@ -232,7 +251,7 @@ const Myevents = (props: any) => {
                 </div>
               </div>
 
-              <div className="sm:w-[50%] flex flex-col justify-center items-center space-y-8">
+              <div className="md:w-[50%] flex-col justify-center items-center space-y-8 hidden md:flex">
                 <h1 className="w-[422px] text-[24px] font-bold leading-[39px] text-[#FFFFFF]">
                   Add an event design
                 </h1>
@@ -253,11 +272,17 @@ const Myevents = (props: any) => {
                 </div>
                 <Button
                   onClick={handleCreateEventButton}
-                  className="flex rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[422px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700 justify-center"
+                  className="rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[422px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700 justify-center hidden md:flex"
                 >
                   Create an Event
                 </Button>
               </div>
+              <Button
+                onClick={handleCreateEventButton}
+                className="flex rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[422px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700 justify-center md:hidden w-[90%] mt-10 mx-auto"
+              >
+                Create an Event
+              </Button>
             </div>
           </>
         )
@@ -315,7 +340,7 @@ const Myevents = (props: any) => {
         return (
           <>
             {boiler()};
-            <div className="sm:h-[508px] sm:overflow-y-auto ">
+            <div className="sm:h-[508px] sm:overflow-y-auto md:px-24">
               {data.map((dataitem, index) => (
                 <Eventcard
                   key={index}
@@ -339,17 +364,17 @@ const Myevents = (props: any) => {
           <>
             {boiler()};
             {!Regstat && !existingeventStat && (
-              <div className="h-[400px] w-[70%] flex flex-col mx-auto items-center justify-center mt-5">
+              <div className="h-[400px] sm:w-[70%] flex flex-col mx-auto items-center justify-center mt-5">
                 <Image src={calenderimage} alt="calendar" className="mb-10" />
-                <p className="mb-10 text-[16px] text-[#FFFFFF] leading-[22px] font-light w-[320px] text-center">
-                  You have not created an event.{" "}
+                <p className="mb-10 text-[16px] text-[#FFFFFF] leading-[22px] font-light text-center">
+                  You have not created an event.
                   <span className="font-bold">
                     How about we get you started?
                   </span>
                 </p>
                 <Button
                   onClick={handleCreateEventClick}
-                  className="hidden lg:flex rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[170px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+                  className="flex rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[170px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
                 >
                   <div className="flex space-x-4 items-center font-semibold text-[16px]">
                     <Image src={ticket} alt="ticket" className="mr-2" />
@@ -394,7 +419,10 @@ const Myevents = (props: any) => {
   }, [])
 
   return (
-    <div style={{ height }} className="w-[100%] bg-event-gradient my-8 h-[100%]">
+    <div
+      // style={{ height }}
+      className="w-[100%] bg-event-gradient my-8 "
+    >
       {renderContent()}
     </div>
   )

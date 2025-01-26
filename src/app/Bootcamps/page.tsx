@@ -1,30 +1,36 @@
 "use client"
-import React, { useEffect } from 'react'
-import Coursedropdown from '@/components/courses/Coursedropdown'
-import { useRouter } from 'next/router';
-import { useParams } from 'next/navigation';
-import { coursestatusAtom,bootcampdropdownstatus ,connectorAtom,
+import React, { useEffect } from "react"
+import { useRouter } from "next/router"
+import { useParams } from "next/navigation"
+import {
+  coursestatusAtom,
+  bootcampdropdownstatus,
+  connectorAtom,
   connectorDataAtom,
-  walletStarknetkitNextAtom, } from "@/state/connectedWalletStarknetkitNext"
+  walletStarknetkitNextAtom,
+} from "@/state/connectedWalletStarknetkitNext"
 import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
 import { RESET } from "jotai/utils"
 import { connect, disconnect } from "starknetkit"
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
 
+import Coursedropdown from '@/components/courses/Coursedropdown'
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown"
 import { useAtom, useSetAtom } from "jotai"
-import BootcampLanding from '@/components/bootcamp/BootcampLanding';
+import BootcampLanding from "@/components/bootcamp/BootcampLanding"
 
 const Index = () => {
-    const [status, setstatus] = useAtom(coursestatusAtom); 
-  const [bootcampdropstat, setbootcampdropstat] = useAtom(bootcampdropdownstatus)
+  const [courseDropdown, setCourseDropdown] = useAtom(coursestatusAtom)
+  const [bootcampDropdown, setBootcampDropdown] = useAtom(
+    bootcampdropdownstatus,
+  )
   const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
   const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
   const setConnectorData = useSetAtom(connectorDataAtom)
   const setConnector = useSetAtom(connectorAtom)
 
   const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-  
+
   useEffect(() => {
     setWalletLatest(RESET)
     setWalletNext(RESET)
@@ -58,23 +64,25 @@ const Index = () => {
       autoConnect()
     }
   }, [wallet])
-  
-  
   const handlePageClick = () => {
-    setbootcampdropstat(false);
-    setstatus(false);
-};
+    setBootcampDropdown(false)
+    setCourseDropdown(false)
+  }
   return (
     <div onClick={handlePageClick}>
-        {status && (<div className='fixed inset-0 bg-black opacity-5 backdrop-blur-sm'></div>)}
-       {bootcampdropstat && (<div className='fixed inset-0 bg-black opacity-5 backdrop-blur-sm'></div>)}
-       <div onClick={(e) => e.stopPropagation()} >
+      {courseDropdown && (
+        <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
+      )}
+      {bootcampDropdown && (
+        <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
+      )}
+      <div onClick={(e) => e.stopPropagation()}>
         <Coursedropdown />
-        </div>
-        <div onClick={(e) => e.stopPropagation()} > 
+      </div>
+      <div onClick={(e) => e.stopPropagation()}>
         <Bootcampdropdown />
-        </div>
-        <BootcampLanding />
+      </div>
+      <BootcampLanding />
     </div>
   )
 }

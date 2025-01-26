@@ -25,17 +25,17 @@ const CourseForm3 = (props: any) => {
     props.onSubmit?.(selectedGoal)
   }
   return (
-    <div className="relative mx-10 md:mx-auto w-auto md:w-5/12 pt-16">
-      <div className="hidden sm:block">
+    <div className="relative mx-10 md:mx-auto w-auto md:w-3/4 lg:w-5/12 pt-16">
+      <div className="hidden lg:block">
         <Previous />
       </div>
-      <div>
-        <h1 className="mb-12 font-bold text-[26px] text-[#333333] text-center">
+      <div className="flex items-center w-full justify-center">
+        <h1 className="mb-12 font-semibold text-[17px] md:text-[26px] text-[#333333] text-center w-[266px] md:w-full">
           Do you already have a plan for what your course will cover?
         </h1>
       </div>
-      <form onSubmit={handleSubmit} action="CourseSetup">
-        <div className=" bg-white px-12 py-16 rounded-2xl flex flex-col justify-center w-[524px] mx-auto">
+      <form action="CourseSetup">
+        <div className=" bg-white px-5 md:px-12 py-9 md:py-16 rounded-2xl flex flex-col gap-5 md:gap-6 justify-center w-full max-w-[524px] mx-auto">
           <div className="flex">
             <input
               type="checkbox"
@@ -48,7 +48,7 @@ const CourseForm3 = (props: any) => {
               checked={selectedGoal === "vehicle1"}
               onChange={() => handleCheckboxChange("vehicle1")}
             />
-            <label className="block my-5 ml-3  text-[#333333] text-[18px] font-medium leading-[22px]">
+            <label className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]">
               Yes, I have a complete course plan
             </label>
           </div>
@@ -64,7 +64,7 @@ const CourseForm3 = (props: any) => {
               checked={selectedGoal === "vehicle2"}
               onChange={() => handleCheckboxChange("vehicle2")}
             />
-            <label className="block my-5 ml-3  text-[#333333] text-[18px] font-medium leading-[22px]">
+            <label className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]">
               I have a rough plan, but it needs work
             </label>
           </div>
@@ -80,7 +80,7 @@ const CourseForm3 = (props: any) => {
               checked={selectedGoal === "vehicle3"}
               onChange={() => handleCheckboxChange("vehicle3")}
             />
-            <label className="block my-5 ml-3  text-[#333333] text-[18px] font-medium leading-[22px]">
+            <label className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]">
               I have some ideas but no clear plan yet
             </label>
           </div>
@@ -97,7 +97,7 @@ const CourseForm3 = (props: any) => {
               checked={selectedGoal === "vehicle4"}
               onChange={() => handleCheckboxChange("vehicle4")}
             />
-            <label className="block my-5 ml-3  text-[#333333] text-[18px] font-medium leading-[22px]">
+            <label className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]">
               I need help organizing the course
             </label>
           </div>
@@ -107,13 +107,13 @@ const CourseForm3 = (props: any) => {
         </div>
 
         <div className="text-center">
-          <button className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] w-[350px] rounded-xl  py-3 text-xs md:text-base mt-12 mb-44 text-white">
+          <button className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] w-full max-w-[350px] rounded-xl  py-3 text-xs md:text-base mt-12 mb-44 text-white">
             Setup my course
           </button>
         </div>
       </form>
 
-      <div className="block absolute left-[35%] bottom-36 sm:hidden">
+      <div className="block absolute left-[35%] bottom-36 lg:hidden">
         <Previous />
       </div>
     </div>

@@ -69,7 +69,7 @@ const Index = () => {
 };
 
   return (
-    <div onClick={handlePageClick}>
+    <div className='overflow-x-hidden' onClick={handlePageClick}>
        {status && (<div className='fixed inset-0 bg-black opacity-5 backdrop-blur-sm'></div>)}
        {bootcampdropstat && (<div className='fixed inset-0 bg-black opacity-5 backdrop-blur-sm'></div>)}
        <div onClick={(e) => e.stopPropagation()} >

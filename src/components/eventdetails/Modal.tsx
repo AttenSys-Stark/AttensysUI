@@ -34,7 +34,7 @@ export default function Modal(prop: any) {
   <div className="fixed inset-0 z-10 overflow-y-auto">
     <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
       <DialogPanel
-        className="relative h-[700px] w-[1024px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl sm:my-8"
+        className="relative h-auto pb-8  md:h-[700px] w-[100%] md:w-[90%] lg:w-[1024px] transform overflow-hidden rounded-lg bg-white text-left shadow-xl sm:my-8"
       >
         <div className='px-16 flex justify-end pt-10 cursor-pointer' onClick={() => {setOpen(false); setModalstatus(false); setOrguploadStat(true);  setConfirmationStat(false); setsuccessstat(false)}}>
           <Image src={cancel} alt='cancel'  />

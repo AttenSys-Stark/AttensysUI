@@ -20,7 +20,7 @@ const Allevents = () => {
     }
   return (
     <div className='h-[1300px] sm:bg-[#f5f8fa] w-full flex items-center'>
-        <div className='w-[80%] h-[90%] mx-auto space-y-6 overflow-y-scroll scrollbar-hide'>
+        <div className='w-[95%] sm:w-[80%] h-[90%] mx-auto space-y-6 overflow-y-scroll scrollbar-hide'>
             <div className='flex space-x-4'>
                         <div className='border-[0.81px] border-[#2D3A4B] w-[140px] h-[48px] rounded-2xl flex items-center justify-center'>
                             <h1 className='text-[#2D3A4B] text-[16px] font-bold leading-[31px]'>All Event</h1>
@@ -30,7 +30,7 @@ const Allevents = () => {
                             <h1 className='text-[#2D3A4B] text-[16px] font-bold leading-[31px]'>Price</h1>
                         </div>
                 </div>
-            <div className='flex flex-wrap gap-7'>
+            <div className='flex flex-wrap lg:grid lg:grid-cols-2 gap-7'>
                 {allEventData.slice(0, visibleEvents).map((data, index) =>{
                     return  <AlleventCard onClick={() => handleEventClick(data)}  key={index} name={data.name} hall={data.hall} city={data.city} date={data.date} time={data.time} fee={data.fee} image={data.image} />
                 })}

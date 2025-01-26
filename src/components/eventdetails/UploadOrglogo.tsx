@@ -46,10 +46,10 @@ const UploadOrglogo = () => {
 
 
   return (
-    <div className="flex px-16 space-x-4 mt-4">
-    <div className='w-[50%] space-y-8'>
+    <div className="flex md:px-16  mx-auto md:space-x-16 mt-4 md:flex-row flex-col md:w-[90%] w-[90%] ">
+    <div className=' space-y-8 '>
         <h1 className='text-[#2D3A4B] text-[18px] font-semibold leading-[26px]'>Organization Logo</h1>
-        <div className="w-[342px] h-[320px] bg-[#3F3E58] border-[#DCDCDC] border-[1px] rounded-xl flex justify-center items-center">
+        <div className="md:w-[342px] w-[100%] h-[261px] md:h-[320px] bg-[#3F3E58] border-[#DCDCDC] border-[1px] rounded-xl flex justify-center items-center">
                         <Image src={add} alt="add"  onClick={handleImageClick} className="cursor-pointer" />
                         <input
                             ref={fileInputRef}
@@ -66,8 +66,8 @@ const UploadOrglogo = () => {
           </div>
     </div>
 
-    <div className='w-[50%] space-y-6'>
-        <h1 className='text-[#2D3A4B] text-[16px] font-normal leading-[23px]'>Organization Name </h1>
+    <div className='md:w-[50%] space-y-6'>
+        <h1 className='text-[#2D3A4B] pt-6 text-[16px] font-normal leading-[23px]'>Organization Name </h1>
         <div className="w-full max-w-lg">
                     <Field>
                         <Input
@@ -83,7 +83,7 @@ const UploadOrglogo = () => {
 
           <div className="w-full max-w-lg">
                 <div className={clsx(
-                            'flex justify-between h-[55px] border-[2px] border-[#9B51E0] w-full rounded-lg bg-white/5 py-1.5 px-8 text-[#9B51E0] items-center',
+                            'flex justify-between md:h-[55px] border-[2px] border-[#9B51E0] w-full rounded-lg bg-white/5 py-1.5 px-8 text-[#9B51E0] items-center',
                             'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25')}>
                             <h1 className='text-[14px] font-medium leading-[16px]'>0x5c956e61...de5232dc11</h1>
                             <Image src={checkmark} alt='check' />
@@ -112,7 +112,7 @@ const UploadOrglogo = () => {
                   </div>
         </div>
 
-                  <Button onClick={handleNext} className="hidden justify-center lg:flex rounded-lg bg-[#4A90E2] px-4 lg:h-[50px] items-center lg:w-full text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
+                  <Button onClick={handleNext} className=" justify-center lg:flex rounded-lg bg-[#4A90E2] px-4 h-[50px] items-center w-full text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700 ">
                             <div>Send funds</div>
                         </Button>  
 
