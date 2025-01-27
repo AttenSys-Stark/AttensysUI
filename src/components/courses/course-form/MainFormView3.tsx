@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
 import Dropdown from "../Dropdown"
 import Image from "next/image"
@@ -12,21 +12,55 @@ import CourseSideBar from "./SideBar"
 import { handleCreateCourse } from "@/utils/helpers"
 import { useRouter } from "next/navigation"
 import { Button } from "@headlessui/react"
-import Stepper from "@/components/Stepper"
 
 const MainFormView3 = () => {
   const router = useRouter()
+  const [lectureTitle, setLectureTitle] = useState('')
+  const [lectureDescription, setLectureDescription] = useState('')
+  const [titleError, setTitleError] = useState('')
+  const [descriptionError, setDescriptionError] = useState('')
+
   const handleBrowsefiles = () => {
     //@todo handle file upload logic
     console.log("click")
   }
+
+  const validateForm = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    let isValid = true;
+
+    // Validate Lecture Title
+    if (!lectureTitle.trim()) {
+      setTitleError('Lecture title is required');
+      isValid = false;
+    } else {
+      setTitleError('');
+    }
+
+    // Validate Lecture Description
+    if (!lectureDescription.trim()) {
+      setDescriptionError('Lecture description is required');
+      isValid = false;
+    } else {
+      setDescriptionError('');
+    }
+
+    // If form is not valid, prevent submission
+    if (!isValid) {
+      return false;
+    }
+
+    // Proceed with course creation if valid
+    handleCreateCourse(e as unknown as React.MouseEvent<HTMLFormElement>, "courseSetup4", router);
+  }
+
   return (
     <div className="flex items-stretch">
-      <div className="hidden lg:block">
+      <div className="hidden sm:block">
         <CourseSideBar />
       </div>
 
-      <div className="flex-1 w-full">
+      <div className="flex-1">
         <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
           <p className="text-sm text-white text-center py-2">
             Your course creation progress saves automatically, but feel free to
@@ -34,10 +68,7 @@ const MainFormView3 = () => {
           </p>
         </div>
 
-        <div className="lg:hidden w-full flex justify-center mt-[58px] mb-[79px]">
-          <Stepper currentStep={3} />
-        </div>
-        <div className="w-full">
+        <div className="min-w-full w-[100%] ">
           <div className="block sm:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] px-5 items-center">
             <div className="flex items-center">
               <div className="px-4 sm:px-8 border-r border-blue-100">
@@ -56,49 +87,37 @@ const MainFormView3 = () => {
             </button>
           </div>
 
-          <div className="mx-5 md:mx-10  mt-12">
-            <form action="CourseSetup4">
+          <div className="mx-10  mt-12">
+            <form action="CourseSetup4" onSubmit={validateForm}>
               <div className="my-12 w-full">
-                <label
-                  htmlFor=""
-                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
-                >
+                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
                   Course Image
                 </label>
-                <p className="font-normal mt-2 text-[13px]/[145%] md:text-[14px] text-[#2D3A4B] md:leading-[21px]">
+                <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
                   {`This is the creative section of your course creation. Your course landing page is crucial to your success on Attensys. 
 You want to make sure your creative is very catchy.`}
                 </p>
-                <div className="block sm:flex flex-col lg:flex-row items-start my-4">
+                <div className="block sm:flex items-start my-4">
                   <div className="bg-[#DCDCDC] flex-1 p-4 sm:p-16 rounded-xl">
                     <div className="bg-white p-2 sm:p-14 text-center border-dotted rounded border-2 border-[#D0D5DD]  content-center text-xs ">
                       <div className="mx-auto w-[15%]">
                         <Image src={upload} alt="uplaod" />
                       </div>
 
-                      <div className="my-3 text-base md:text-sm">
+                      <div className="my-3">
                         <p>
                           <span className="text-[#4A90E2]">
                             Click to upload
                           </span>{" "}
                           or drag and drop
                         </p>
-                        <p className="text-[13px] text-[#98A2B3]">
-                          SVG, PNG, JPG or GIF (max. 800x400px)
-                        </p>
+                        <p>SVG, PNG, JPG or GIF (max. 800x400px)</p>
                       </div>
 
                       <div>
-                        <div className="flex items-center gap-2 w-full">
-                          <div className="h-px w-full bg-[#F0F2F5]" />
-                          <p className="text-[10.65px] md:text-[8px]">OR</p>
-                          <div className="h-px w-full bg-[#F0F2F5]" />
-                        </div>
+                        <p>OR</p>
 
-                        <Button
-                          className="rounded-[6px] bg-[#9B51E0] px-4 md:px-12 py-2 md:py-3 text-white my-3"
-                          onClick={handleBrowsefiles}
-                        >
+                        <Button className="rounded bg-[#9B51E0] px-12 py-3 text-white my-3"   onClick={handleBrowsefiles}>
                           Browse Files
                         </Button>
                       </div>
@@ -106,42 +125,31 @@ You want to make sure your creative is very catchy.`}
                   </div>
 
                   <div className="text-sm sm:mx-6 flex-1 ">
-                    <p className="font-semibold lg:hidden text-[18px] leading-[31px] text-[#333333] mt-[38px] mb-[18px]">
-                      Upload thumbnail
-                    </p>
-                    <div className="bg-white w-full md:w-[350px] p-8 text-center border-dotted rounded-xl border-2 border-[#D0D5DD] flex flex-col justify-center content-center">
-                      <div className="w-auto mx-auto">
+                    <div className="bg-white sm:w-[50%] lg:w-[350px] p-8 text-center border-dotted rounded-xl border-2 border-[#D0D5DD] flex flex-col justify-center content-center">
+                      <div className="w-[15%] mx-auto">
                         <Image src={upload} alt="uplaod" width={30} />
                       </div>
 
                       <div className="my-4">
-                        <p className="text-xs md:text-[8px]">
+                        <p className="text-[8px]">
                           <span className="text-[#4A90E2]">
                             Click to upload
                           </span>{" "}
                           or drag and drop
                         </p>
-                        <p className="text-[10.6px] md:text-[7.5px] text-[#98A2B3]">
-                          SVG, PNG, JPG or GIF (max. 800x400px)
-                        </p>
+                        <p className="text-[9px]">SVG, PNG, JPG or GIF (max. 800x400px)</p>
                       </div>
 
                       <div className="my-2">
-                        <div className="flex items-center gap-2 w-full">
-                          <div className="h-px w-full bg-[#F0F2F5]" />
-                          <p className="text-[10.65px] md:text-[8px]">OR</p>
-                          <div className="h-px w-full bg-[#F0F2F5]" />
-                        </div>
+                        <p className="text-[8px]">OR</p>
 
-                        <Button className="rounded-[6px] bg-[#9B51E0] px-4 md:px-12 text-xs py-2 md:py-3 text-white my-3">
+                        <Button className="rounded bg-[#9B51E0] px-4 py-1 my-4 text-white text-[8px]">
                           Browse Files
                         </Button>
                       </div>
                     </div>
-                    <div className="hidden lg:block py-5 w-full sm:w-1/2 lg:w-[350px]">
-                      <p className="font-semibold text-[18px] leading-[31px] text-[#333333] py-3">
-                        Upload thumbnail
-                      </p>
+                    <div className="py-5 sm:w-1/2 lg:w-[350px]">
+                      <p className="font-semibold text-[18px] leading-[31px] text-[#333333] py-3">Upload thumbnail</p>
                       <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
                         Upload your course image here. It must meet our course
                         image quality standards to be accepted. Important
@@ -154,9 +162,7 @@ You want to make sure your creative is very catchy.`}
               </div>
 
               <div className="my-12">
-                <p className="font-semibold text-[18px] leading-[31px] text-[#333333] my-3">
-                  Course Curriculum
-                </p>
+                <p className="font-semibold text-[18px] leading-[31px] text-[#333333] my-3">Course Curriculum</p>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
                   AttenSys allows you to structure your course with multiple
                   videos under one course. Each section can include several
@@ -166,10 +172,8 @@ You want to make sure your creative is very catchy.`}
                   course.
                 </p>
                 <div className="my-12">
-                  <p className="font-semibold text-[18px] leading-[31px] text-[#333333] my-3 pl-5">
-                    Tips
-                  </p>
-                  <ul className="list-disc text-[14px] text-[#2D3A4B] leading-[21px] w-full max-w-[800px] px-8">
+                  <p className="font-semibold text-[18px] leading-[31px] text-[#333333] my-3">Tips</p>
+                  <ul className="list-disc text-[14px] text-[#2D3A4B] leading-[21px] w-[800px] ml-4">
                     <li className="py-2">
                       Aim to keep each video between 5 to 10 minutes. Shorter
                       videos are easier for students to follow and help them
@@ -191,76 +195,88 @@ You want to make sure your creative is very catchy.`}
                 </div>
               </div>
 
-              <div className="my-10 md:my-12">
-                <Button className="rounded-xl bg-[#9b51e052] px-7 py-2.5 text-sm  text-[#2d3a4b]">
-                  <span className="text-2xl/[0px]">+</span> Add New Lecture
+              <div className="my-12">
+                <Button className="rounded-xl bg-[#9b51e052] px-12 py-4  text-[#2d3a4b]">
+                  + Add New Lecture
                 </Button>
 
-                {/* Upload page */}
-                <div className="my-4 bg-[#9b51e01a] py-9 md:py-12 px-5 md:px-12 border md:rounded-xl mt-[71px] -mx-5 md:mx-0">
-                  <div className="flex bg-white p-5 rounded-[5px] my-3">
+                <div className="my-4 bg-[#9b51e01a] p-12 border rounded-xl">
+                  <div className="flex bg-white p-5 rounded-xl my-3">
                     <p className="font-medium mr-3 text-[16px]">Lecture 3:</p>
-                    <input
-                      placeholder="Class Title e.g UI/UX Basics"
-                      className="w-auto lg:w-[80%]"
-                    />
+                    <div className="w-[90%]">
+                      <input
+                        placeholder="Class Title e.g UI/UX Basics"
+                        className={`w-full ${titleError ? 'border-red-500 border-2' : ''}`}
+                        value={lectureTitle}
+                        onChange={(e) => {
+                          setLectureTitle(e.target.value)
+                          setTitleError('')
+                        }}
+                      />
+                      {titleError && (
+                        <p className="text-red-500 text-sm mt-1">{titleError}</p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex bg-white p-5 rounded-[5px] my-3">
+
+                  <div className="flex bg-white p-5 rounded-xl my-3">
                     <p className="font-medium mr-3 text-[16px]">Description:</p>
-                    <textarea
-                      name=""
-                      id=""
-                      className="w-[100%]"
-                      placeholder="Class description (optional)"
-                    ></textarea>
+                    <div className="w-[100%]">
+                      <textarea
+                        className={`w-full ${descriptionError ? 'border-red-500 border-2' : ''}`}
+                        placeholder="Class description (optional)"
+                        value={lectureDescription}
+                        onChange={(e) => {
+                          setLectureDescription(e.target.value)
+                          setDescriptionError('')
+                        }}
+                      ></textarea>
+                      {descriptionError && (
+                        <p className="text-red-500 text-sm mt-1">{descriptionError}</p>
+                      )}
+                    </div>
                   </div>
-                  <div className="bg-white p-5 rounded-[5px] my-3 text-center content-center w-[100%] flex flex-col justify-center">
+
+                  <div className="bg-white p-5 rounded-xl my-3 text-center content-center w-[100%] flex flex-col justify-center">
                     <div className="w-[15%] mx-auto flex justify-center">
                       <Image src={upload_other} alt="uplaod" />
                     </div>
-                    <p className="text-[14px] font-normal text-[#353535] mt-2 leading-[22px]">
+                    <p className="text-[14px] font-normal text-[#353535] leading-[22px]">
                       <span className="text-[#A020F0]">Click to upload</span> or
                       drag and drop
                     </p>
-                    <p className="text-[14px] font-normal text-[#353535] leading-[22px] mt-1">
-                      (Max. File size: 500 MB)
-                    </p>
+                    <p className="text-[14px] font-normal text-[#353535] leading-[22px]">SVG, PNG, JPG or GIF (max. 800x400px)</p>
                   </div>
                 </div>
               </div>
 
               <div className="my-12">
-                {/* Item section */}
-                <div className="my-4 bg-[#9b51e01a] py-9 md:py-12 px-5 md:px-12 border -mx-5 md:mx-0 md:rounded-xl">
-                  <div className="flex justify-between bg-white p-5 rounded-[5px] my-3">
+                <div className="my-4 bg-[#9b51e01a] p-12 border rounded-xl">
+                  <div className="flex justify-between bg-white p-5 rounded-xl my-3">
                     <div className="flex items-center">
                       <p className="font-medium mr-3 text-[16px]">Lecture 3:</p>
-                      <p className="text-[16px] font-normal text-[#353535] leading-[31px]">
-                        UI/UX Introductory Concepts
-                      </p>
+                      <p className="text-[16px] font-normal text-[#353535] leading-[31px]">UI/UX Introductory Concepts</p>
                     </div>
 
-                    <div className="bg-green flex items-center">
+                    <div className="bg-green">
                       <Image src={tick_circle} alt="tick" />
                     </div>
                   </div>
-                  <div className="flex justify-between items-center bg-white p-5 rounded-[5px] my-3">
+                  <div className="flex justify-between items-center bg-white p-5 rounded-xl my-3">
                     <div className="flex items-center">
-                      <p className="font-medium mr-3 text-[16px]">
-                        Description:
-                      </p>
+                      <p className="font-medium mr-3 text-[16px]">Description:</p>
                       <p className="text-[16px] font-normal text-[#353535] leading-[31px]">
-                        {`Figma class - It’s uses, function, extraction, export etc..`}
+                        {`Figma class - It's uses, function, extraction, export etc..`}
                         .
                       </p>
                     </div>
 
-                    <div className="flex items-center">
+                    <div className="">
                       <Image src={tick_circle} alt="tick" />
                     </div>
                   </div>
 
-                  <div className=" bg-white p-5 rounded-[5px] my-3">
+                  <div className=" bg-white p-5 rounded-xl my-3">
                     <div className="flex justify-between items-center">
                       <div className="flex items-start space-x-4">
                         <div>
@@ -268,12 +284,8 @@ You want to make sure your creative is very catchy.`}
                         </div>
 
                         <div className="mx-3">
-                          <p className="text-[16px] font-medium text-[#353535] leading-[20px]">
-                            Figma
-                          </p>
-                          <p className="text-[11px] font-normal text-[#353535] leading-[20px]">
-                            200mb
-                          </p>
+                          <p className="text-[16px] font-medium text-[#353535] leading-[20px]">Figma</p>
+                          <p className="text-[11px] font-normal text-[#353535] leading-[20px]">200mb</p>
                         </div>
                       </div>
 
@@ -282,26 +294,23 @@ You want to make sure your creative is very catchy.`}
                       </div>
                     </div>
                     <div className="flex justify-between flex-1 items-center">
-                      <div className="p-1.5 my-2 bg-green-500 w-[100%] rounded-xl  mr-3"></div>
+                      <div className="p-3 my-2 bg-green-500 w-[100%] rounded-xl  mr-3"></div>
                       <p>100%</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-12 mb-4 w-full">
+                <div className="mt-12 mb-24">
                   <button
-                    className="rounded-lg bg-[#4A90E2] px-8 py-[15px] text-white w-full md:max-w-[350px]"
+                    className="rounded-xl bg-[#4A90E2] px-48 py-3 text-white"
                     type="submit"
-                    onClick={(e) =>
-                      handleCreateCourse(e, "courseSetup4", router)
-                    }
                   >
-                    Almost there!
+                    Almost there
                   </button>
                 </div>
 
-                <div className="w-full flex justify-center pb-[74px]">
-                  <button className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black">
+                <div className="mt-6 mb-24">
+                  <button className="block sm:hidden bg-[#c5d322]  text-xs px-12 py-3 rounded text-black">
                     Save progress
                   </button>
                 </div>
