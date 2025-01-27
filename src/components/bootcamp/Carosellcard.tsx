@@ -41,7 +41,7 @@ const Carosellcard: React.FC<CarousellCardProp> = (props) => {
       {/* Action Button */}
       <Button
         onClick={() => handleActionClick(props.action)}
-        className="hidden absolute top-3 right-6 justify-center lg:flex rounded-lg bg-[#9B51E0] text-[#FFFCFC] py-2 px-4 lg:h-[50px] items-center lg:w-[90px] text-sm data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+        className="absolute top-3 right-6 justify-center lg:flex rounded-lg bg-[#9B51E0] text-[#FFFCFC] py-2 px-4 lg:h-[50px] items-center lg:w-[90px] text-sm data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
       >
         <div>{props.action}</div>
       </Button>
