@@ -11,14 +11,17 @@ type MobileBootcampCardProps = {
     action: string
     height: string
     width: string
+    onClick?: () => void
 }
 
 export default function MobileBootcampCard (props: MobileBootcampCardProps) {
 
-    const { name, time, flier, logo, action, height, width } = props
+    const { name, time, flier, logo, action, height, width, onClick } = props
 
     return (
-        <div style={{}} className={`relative h-[${height}] w-[${width}] rounded-2xl mx-0 md:mx-auto overflow-hidden cursor-pointer`}>
+        <div style={{}} className={`relative h-[${height}] w-[${width}] rounded-2xl mx-0 md:mx-auto overflow-hidden cursor-pointer`}
+            onClick={onClick}
+        >
 
             <Image 
                 src={flier}
