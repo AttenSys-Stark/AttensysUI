@@ -84,7 +84,7 @@ const Registered = () => {
         </div>
         <div className='flex flex-wrap gap-x-3 gap-y-3 justify-start px-3 py-5 items-start sm:hidden'>
           {regcaroselldata.slice(0, 3).map((data, index) => (
-            <div className='flex flex-col items-center gap-2' key={index}>
+            <div key={index} className='flex flex-col items-center gap-2'>
               <MobileBootcampCard
                   name={data.name} 
                   time={data.time}
