@@ -66,59 +66,62 @@ const Guestlist = () => {
   }
 
   return (
-    <div className="h-auto w-full pb-10">
-      <div className="h-[150px] w-[80%] mx-auto bg-[#FFFFFF] rounded-lg flex justify-between items-center  px-16">
-        <div className="">
-          <p className="text-[#2D3A4B] text-[16px] font-medium leading-[18px]">
-            Your Guests
-          </p>
-          <h1 className="text-[#9B51E0] text-[29.7px] font-bold leading-[68.91px] opacity-40">
-            39
-          </h1>
-        </div>
-        <div className="w-[1px] h-[80%] bg-[#9696966E]"></div>
-        <div>
-          <p className="text-[#2D3A4B] text-[16px] font-medium leading-[18px]">
-            Approved attendance
-          </p>
-          <h1 className="text-[#9B51E0] text-[29.7px] font-bold leading-[68.91px] opacity-40">
-            31
-          </h1>
-        </div>
-        <div className="w-[1px]  h-[80%] bg-[#9696966E]"></div>
-        <div>
-          <p className="text-[#2D3A4B] text-[16px] font-medium leading-[18px]">
-            Disapproved attendance
-          </p>
-          <h1 className="text-[#9B51E0] text-[29.7px] font-bold leading-[68.91px] opacity-40">
-            3
-          </h1>
-        </div>
-        <div className="w-[1px]  h-[80%] bg-[#9696966E]"></div>
-        <div>
-          <p className="text-[#2D3A4B] text-[16px] font-medium leading-[18px]">
-            Pending Attendance
-          </p>
-          <h1 className="text-[#9B51E0] text-[29.7px] font-bold leading-[68.91px] opacity-40">
-            10
-          </h1>
+    <div className="h-auto w-full pb-4 sm:pb-6 md:pb-10">
+      {/* Stats section */}
+      <div className="h-auto sm:h-[150px] w-[95%] md:w-[80%] mx-auto bg-[#FFFFFF] rounded-lg overflow-x-auto">
+        <div className="flex min-w-[800px] sm:min-w-0 justify-between items-center px-4 sm:px-8 md:px-16 py-4 sm:py-0">
+          <div className="text-center sm:text-left">
+            <p className="text-[#2D3A4B] text-[14px] sm:text-[16px] font-medium leading-[18px]">
+              Your Guests
+            </p>
+            <h1 className="text-[#9B51E0] text-[24px] sm:text-[29.7px] font-bold leading-[40px] sm:leading-[68.91px] opacity-40">
+              39
+            </h1>
+          </div>
+          <div className="w-[1px] h-[80%] bg-[#9696966E]"></div>
+          <div>
+            <p className="text-[#2D3A4B] text-[14px] sm:text-[16px] font-medium leading-[18px]">
+              Approved attendance
+            </p>
+            <h1 className="text-[#9B51E0] text-[24px] sm:text-[29.7px] font-bold leading-[40px] sm:leading-[68.91px] opacity-40">
+              31
+            </h1>
+          </div>
+          <div className="w-[1px] h-[80%] bg-[#9696966E]"></div>
+          <div>
+            <p className="text-[#2D3A4B] text-[14px] sm:text-[16px] font-medium leading-[18px]">
+              Disapproved attendance
+            </p>
+            <h1 className="text-[#9B51E0] text-[24px] sm:text-[29.7px] font-bold leading-[40px] sm:leading-[68.91px] opacity-40">
+              3
+            </h1>
+          </div>
+          <div className="w-[1px] h-[80%] bg-[#9696966E]"></div>
+          <div>
+            <p className="text-[#2D3A4B] text-[14px] sm:text-[16px] font-medium leading-[18px]">
+              Pending Attendance
+            </p>
+            <h1 className="text-[#9B51E0] text-[24px] sm:text-[29.7px] font-bold leading-[40px] sm:leading-[68.91px] opacity-40">
+              10
+            </h1>
+          </div>
         </div>
       </div>
 
-      <div className="h-[930px] w-[80%] mx-auto bg-[#FFFFFF] mt-4 rounded-lg">
-        <div className="flex justify-between px-16 pt-10">
-          <h1 className="text-[18px] font-medium leading-[22px]  text-[#333333] mt-2">
+      <div className="min-h-screen sm:h-[930px] w-[95%] md:w-[80%] mx-auto bg-[#FFFFFF] mt-4 rounded-lg">
+        <div className="flex flex-col sm:flex-row justify-between px-4 sm:px-8 md:px-16 pt-6 sm:pt-10 gap-4">
+          <h1 className="text-[16px] sm:text-[18px] font-medium leading-[22px] text-[#333333]">
             Guest list
           </h1>
-          <div className="flex space-x-8">
-            <div className="relative w-[550px] lclg:w-[380px]">
+          <div className="flex flex-col sm:flex-row gap-4 sm:space-x-8">
+            <div className="relative w-full sm:w-[380px] md:w-[550px]">
               <Input
                 name="search by address"
                 type="text"
-                placeholder="        Search guest, wallet address, role..."
+                placeholder="Search guest, wallet address, role..."
                 value={searchValue}
                 onChange={handleChange}
-                className="w-[90%] clg:w-[70%] lclg:w-[90%] p-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
+                className="w-full p-2 border border-gray-300 rounded-xl"
               />
               {!searchValue && (
                 <svg
@@ -137,32 +140,34 @@ const Guestlist = () => {
                 </svg>
               )}
             </div>
-            <Button className=" hidden lg:flex rounded-lg bg-[#4A90E21F] py-2 px-4 lg:h-[42px] items-center lg:w-[125px] text-sm text-[#5801A9] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
-              <div className="flex space-x-4 items-center font-semibold text-[16px]">
-                <Image src={downlaod} alt="ticket" className="mr-2" />
-              </div>
-              <div className="text-[11px]">Download</div>
-            </Button>
-
-            <Button className="hidden lg:flex rounded-lg bg-[#4A90E21F] py-2 px-4 lg:h-[42px] items-center lg:w-[90px] text-sm text-[#5801A9] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
-              <div className="flex space-x-4 items-center font-semibold text-[16px]">
-                <Image src={filter} alt="ticket" className="mr-2" />
-              </div>
-              <div className="text-[11px]">Filter</div>
-            </Button>
+            <div className="flex gap-2">
+              <Button className="flex-1 sm:flex rounded-lg bg-[#4A90E21F] py-2 px-4 h-[42px] items-center justify-center">
+                <div className="flex items-center gap-2">
+                  <Image src={downlaod} alt="download" className="w-4 h-4" />
+                  <span className="text-[11px] text-[#5801A9]">Download</span>
+                </div>
+              </Button>
+              <Button className="flex-1 sm:flex rounded-lg bg-[#4A90E21F] py-2 px-4 h-[42px] items-center justify-center">
+                <div className="flex items-center gap-2">
+                  <Image src={filter} alt="filter" className="w-4 h-4" />
+                  <span className="text-[11px] text-[#5801A9]">Filter</span>
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
-        <div className="w-[92%] mx-auto mt-6 h-[750px]">
-          <table className="w-full border-separate border-spacing-y-3 ">
+
+        <div className="w-[95%] sm:w-[92%] mx-auto mt-6 overflow-x-auto">
+          <table className="w-full min-w-[800px] border-separate border-spacing-y-3">
             <thead>
-              <tr className="h-[56px] text-[14px] bg-[#9B51E052] font-normal text-[#5801A9] leading-[19.79px]">
+              <tr className="h-[46px] sm:h-[56px] text-[12px] sm:text-[14px] bg-[#9B51E052] font-normal text-[#5801A9] leading-[19.79px]">
                 <th className="w-[50px] px-4 rounded-tl-xl rounded-bl-xl">
-                  <Image src={check} alt="ticket" />
+                  <Image src={check} alt="check" />
                 </th>
-                <th className=" text-center font-light">Name</th>
-                <th className=" text-center font-light">Address</th>
-                <th className=" text-center font-light">Status</th>
-                <th className=" text-center font-light">Role</th>
+                <th className="text-center font-light">Name</th>
+                <th className="text-center font-light">Address</th>
+                <th className="text-center font-light">Status</th>
+                <th className="text-center font-light">Role</th>
                 <th className="text-center font-light">Reg date</th>
                 <th className="text-center font-light rounded-tr-xl rounded-br-xl">
                   Actions
@@ -184,12 +189,11 @@ const Guestlist = () => {
           </table>
         </div>
 
-        {/* Pagination Controls */}
-        <div className="flex justify-center space-x-2 mt-4">
+        <div className="flex justify-center space-x-1 sm:space-x-2 mt-4 px-2 sm:px-4 overflow-x-auto">
           <button
             onClick={goToPreviousPage}
             disabled={currentPage === 1}
-            className="px-4 py-2 border-[#D0D5DD] border-[1px] rounded disabled:opacity-50"
+            className="px-2 sm:px-4 py-2 border-[#D0D5DD] border-[1px] rounded disabled:opacity-50"
           >
             {"<"}
           </button>
@@ -202,17 +206,20 @@ const Guestlist = () => {
               <button
                 key={index}
                 onClick={() => goToPage(page)}
-                className={`px-4 py-2 rounded text-[14px] ${currentPage == page ? "bg-none text-[#000000] border-[#F56630] border-[1px]" : "bg-none text-[#000000]"}`}
+                className={`px-2 sm:px-4 py-2 rounded text-[14px] ${
+                  currentPage == page
+                    ? "bg-none text-[#000000] border-[#F56630] border-[1px]"
+                    : "bg-none text-[#000000]"
+                }`}
               >
                 {page}
               </button>
             ),
           )}
-
           <button
             onClick={goToNextPage}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 border-[#D0D5DD] border-[1px] text-[20px] rounded disabled:opacity-50"
+            className="px-2 sm:px-4 py-2 border-[#D0D5DD] border-[1px] rounded disabled:opacity-50"
           >
             {">"}
           </button>
