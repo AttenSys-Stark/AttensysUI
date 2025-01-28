@@ -82,15 +82,19 @@ const Organizationtabs = () => {
                     <h1 className='text-[18px] leading-[22px] text-[#333333] font-semibold'>Permissions and Access</h1>
                     <Image src={drop} alt='drop' />   
                 </div>
-                <div className='text-[12px] text-[#5801A9] border-t border-b border-[#5801A9] sm:hidden text-center'>
+                <div className='text-[14px] py-3 text-[#5801A9] border-t border-b border-[#5801A9] sm:hidden text-center'>
                     Show More 
+                    <span>&#8595;</span>
                 </div>
                    {PermissionsStat && <Permissions />}
             </div>
             <div className='-ml-5'>
-                <div onClick={handleregistered} className='h-[78px] bg-[#FFFFFF] rounded-t-xl flex items-center border-[1px] border-[#BCBCBC] justify-between px-10'>
+                <div onClick={handleregistered} className='hidden h-[78px] bg-[#FFFFFF] rounded-t-xl sm:flex items-center border-[1px] border-[#BCBCBC] justify-between px-10'>
                     <h1 className='text-[18px] leading-[22px] text-[#333333] font-semibold'>Registered students (3789)</h1>
                     <Image src={drop} alt='drop' />
+                </div>
+                <div className='border border-b-[#5801A9] text-[#5801A9] flex sm:hidden py-2 my-2'>
+                    Registered students (3789)
                 </div>
                 {RegisteredStat && <Registered />}
             </div>

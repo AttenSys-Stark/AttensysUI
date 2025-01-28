@@ -6,9 +6,9 @@ import Image from 'next/image'
 const Registered = () => {
   return (
     <div className='h-auto w-full flex flex-col items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-b-xl pt-3'>
-    <table className="w-full border-collapse hidden sm:block">
+    <table className="w-full border-collapse hidden sm:flex sm:flex-col">
         <thead className=''>
-          <tr className="border-b border-gray-300 h-[40px]">
+          <tr className="border-b border-gray-300 h-[40px] w-fit">
             <th className="text-left px-4 text-[14px] leading-[22px] font-bold text-[#333333]">Email</th>
             <th className="text-left  px-4 text-[14px] leading-[22px] font-bold text-[#333333]">Wallet Address</th>
             <th className="text-left px-4 text-[14px] leading-[22px] font-bold text-[#333333]">  Registered bootcamps</th>
@@ -58,6 +58,7 @@ const Registered = () => {
                 )
               })
             }
+            {/* Include Pagination somewhere in this mapping */}
       </tbody>
     </table>
   </div>

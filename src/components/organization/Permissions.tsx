@@ -40,8 +40,8 @@ const Permissions = () => {
         {
           permisiondata.map((data, index) => {
             return (
-              <div key={index} className='flex flex-col justify-center bg-white border border-[#F7F7F7] my-2 rounded-lg px-4 py-2 w-full'>
-                <div className='flex items-start justify-between py-3 gap-5'>
+              <div key={index} className='flex flex-col justify-center bg-white border border-[#F7F7F7] my-2 rounded-lg w-full'>
+                <div className='flex items-start justify-between py-3 px-4 gap-5'>
                   <div className='flex flex-col gap-3 items-start'>
                     <p className='text-[14px]'>{data.email}</p>
                     <p className='text-[12px] text-[#A666E3]'>{data.address}</p>
@@ -57,7 +57,7 @@ const Permissions = () => {
                   </div>
                 </div>
 
-                <div className='flex justify-between border-t '>
+                <div className='flex justify-between border border-t-[#333333] px-4 py-2'>
                   <div className='flex gap-2 items-center text-[12px]'>
                     <IoSettingsSharp className='text-[#2D3A4B] text-[14px]' />
                     <h1 className='leading-[22px] font-medium text-[#333333]'>Manage bootcamp</h1>
