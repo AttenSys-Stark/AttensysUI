@@ -68,8 +68,8 @@ const Organizationtabs = () => {
                     <h1 className='text-[14px] md:text-[18px] leading-[22px] text-[#333333] font-semibold sm:hidden'>Bootcamps</h1>
                     <div className='flex space-x-7 items-center'>
                             <div onClick={handleCreateOverlay} className='flex space-x-1 text-[#5801A9] items-center cursor-pointer'>
-                            <FaPlus className='h-[14px] w-[14px]' />
-                            <h1 className='text-[14px] md:text-[14px] font-medium leading-[19px] underline'>Create bootcamp</h1>
+                                <FaPlus className='h-[14px] w-[14px]' />
+                                <h1 className='text-[14px] md:text-[14px] font-medium leading-[19px] underline'>Create bootcamp</h1>
                             </div>
                             <Image src={drop} alt='drop' onClick={handlemybootcamp} className='cursor-pointer hidden sm:block' />
                     </div>
