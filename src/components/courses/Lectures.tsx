@@ -14,7 +14,7 @@ interface LectureData {
 
 const Lectures = ({ lectures }: LectureData) => {
   return (
-    <div className="block sm:grid grid-cols-2 gap-4">
+    <div className="block lg:grid grid-cols-2 gap-4">
       <div className="lg:py-6 sm:py-12  order-last sm:order-first">
         <h2 className="block sm:hidden">Lectures in this course (2)</h2>
         {lectures.map((item, id) => (
@@ -35,7 +35,7 @@ const Lectures = ({ lectures }: LectureData) => {
         ))}
       </div>
 
-      <div className="mt-12">
+      <div className="lg:mt-12 md:mt-0 mt-12">
         <div className="  text-[#333333] text-[14px] font-light leading-[22px]">
           <p>
             {`  This course provides a foundational understanding of web

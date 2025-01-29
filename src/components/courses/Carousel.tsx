@@ -6,7 +6,6 @@ import { CardWithLink } from "./Cards"
 const CarouselComp = () => {
   const responsive = {
     superLargeDesktop: {
-      // the naming can be any, depends on you.
       breakpoint: { max: 4000, min: 3000 },
       items: 3,
     },
@@ -21,27 +20,46 @@ const CarouselComp = () => {
     mobile: {
       breakpoint: { max: 820, min: 0 },
       items: 1,
+      partialVisibilityGutter: 30,
     },
   }
+
   return (
-    <div className="className='w-[90%] mx-auto flex flex-col justify-center items-center'">
-      <Carousel responsive={responsive} centerMode={true} containerClass="container"    additionalTransfrom={0}
-   arrows
-   dotListClass=""
-   draggable
-   focusOnSelect={false}
-   infinite
-   itemClass=""
-   keyBoardControl
-   minimumTouchDrag={80}
-   autoPlay={true} // Enables auto-scrolling
-   autoPlaySpeed={3000}>
-        <CardWithLink />
-        <CardWithLink />
-        <CardWithLink />
-        <CardWithLink />
-        <CardWithLink />
-      </Carousel>
+    <div className="w-full flex justify-center items-center bg-gray-100 py-6">
+      {/* Wrapper to change layout based on screen size */}
+      <div className="w-[95%] max-w-[1200px]">
+        {/* Show Carousel on larger screens, vertical stacking on mobile */}
+        <div className="hidden sm:block">
+          <Carousel
+            responsive={responsive}
+            centerMode={true}
+            containerClass="carousel-container"
+            arrows
+            draggable
+            infinite
+            keyBoardControl
+            autoPlay
+            autoPlaySpeed={3000}
+            itemClass="px-2"
+            minimumTouchDrag={80}
+          >
+            <CardWithLink />
+            <CardWithLink />
+            <CardWithLink />
+            <CardWithLink />
+            <CardWithLink />
+          </Carousel>
+        </div>
+
+        {/* Vertical Layout for Mobile */}
+        <div className=" sm:hidden flex flex-col space-y-4 items-center">
+          <CardWithLink />
+          <CardWithLink />
+          <CardWithLink />
+          <CardWithLink />
+          <CardWithLink />
+        </div>
+      </div>
     </div>
   )
 }
