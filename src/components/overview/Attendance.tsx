@@ -1,5 +1,5 @@
 import { Button, Input } from "@headlessui/react"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import scan from "@/assets/scan.svg"
 import Image from "next/image"
 import check from "@/assets/check.svg"
@@ -7,12 +7,21 @@ import { attendanceData } from "@/constants/data"
 import AttendanceList from "./AttendanceList"
 import { Scanner } from "@yudiel/react-qr-scanner"
 import { IDetectedBarcode } from "@yudiel/react-qr-scanner"
+import { QRCodeSVG } from 'qrcode.react'
 
 const Attendance = () => {
   const [searchValue, setSearchValue] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [showScanner, setShowScanner] = useState<boolean>(false)
+  const [isMobile, setIsMobile] = useState(false)
   const itemsPerPage = 4
+
+  useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+    }
+    checkDevice()
+  }, [])
   // Calculate total pages
   const totalPages = Math.ceil(attendanceData.length / itemsPerPage)
 
@@ -73,6 +82,38 @@ const Attendance = () => {
     if (detectedCodes && detectedCodes.length > 0) {
       window.location.href = "/"
     }
+  }
+
+  //----------------------QR Code Generator--------------------------------
+  const renderScannerContent = () => {
+    if (!showScanner) {
+      return (
+        <Image
+          src={scan}
+          alt="scan"
+          onClick={() => setShowScanner(true)}
+          className="cursor-pointer"
+        />
+      )
+    }
+
+    if (isMobile) {
+      return (
+        <div className="w-[230px] h-[220px] rounded-xl overflow-hidden">
+          <Scanner onScan={handleScan} />
+        </div>
+      )
+    }
+
+    return (
+      <div className="w-[230px] h-[220px] flex items-center justify-center bg-white">
+        <QRCodeSVG 
+          value="http://localhost:3000/Overview/sample-event/attendance"
+          size={200}
+          level="H"
+        />
+      </div>
+    )
   }
 
   return (
@@ -151,18 +192,7 @@ const Attendance = () => {
 
         <div className="h-[300px] w-full mt-6 flex items-center justify-center">
           <div className="w-[235px] h-[224px] border-[3px] border-[#4A90E2] rounded-xl mx-auto flex justify-center items-center">
-            {showScanner ? (
-              <div className="w-[230px] h-[220px] rounded-xl overflow-hidden">
-                <Scanner onScan={handleScan} />
-              </div>
-            ) : (
-              <Image
-                src={scan}
-                alt="scan"
-                onClick={() => setShowScanner(true)}
-                className="cursor-pointer"
-              />
-            )}
+          {renderScannerContent()}
           </div>
         </div>
         <h1 className="mt-6 text-[18px] font-medium text-[#333333] leading-[22px] w-[92%] mx-auto">
