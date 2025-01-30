@@ -6,8 +6,8 @@ import { IoIosRemoveCircleOutline } from 'react-icons/io';
 
 const Permissions = () => {
   return (
-    <div className='h-auto w-full flex flex-col items-center sm:bg-[#FFFFFF] sm:border-[1px] border-[#D9D9D9] rounded-b-xl pt-3'>
-      <table className="w-full border-collapse hidden sm:block">
+    <div className='h-auto w-full flex flex-col items-center md:bg-[#FFFFFF] sm:border-[1px] border-[#D9D9D9] rounded-b-xl pt-3'>
+      <table className="w-full border-collapse hidden md:block">
         <thead className=''>
           <tr className="border-b border-gray-300 h-[40px] text-[14px] text-[#333333]">
             <th className="text-left px-4 leading-[22px] font-bold">Email</th>
@@ -36,7 +36,7 @@ const Permissions = () => {
             })}
         </tbody>
       </table>
-      <div className='flex flex-col gap-5 sm:hidden'>
+      <div className='flex flex-col gap-5 md:hidden w-full md:w-5/6 px-4'>
         {
           permisiondata.map((data, index) => {
             return (

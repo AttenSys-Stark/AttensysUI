@@ -46,7 +46,7 @@ const Organizationtabs = () => {
 
   return (
     <div className='h-auto w-full md:w-[90%] mx-auto flex mt-8 space-x-10 pb-12'>
-        <div className='h-auto w-[30%] space-y-3 hidden sm:block'>
+        <div className='h-auto w-[30%] space-y-3 hidden md:block'>
             <div className='h-[62px] bg-[#FFFFFF] rounded-xl flex items-center border-[1px] border-[#BCBCBC] space-x-3 px-10'>
                 <Image src={threevert} alt='line' />
                 <h1 className='text-[14px] leading-[19px] font-bold text-[#2D3A4B]'>Bootcamps</h1>
@@ -78,22 +78,22 @@ const Organizationtabs = () => {
             </div>
 
             <div className='-ml-5'>
-                <div onClick={handlePermission} className='h-[78px] sm:bg-[#FFFFFF] rounded-t-xl hidden sm:flex items-center border-[1px] border-[#BCBCBC] justify-between px-10'>
+                <div onClick={handlePermission} className='h-[78px] sm:bg-[#FFFFFF] rounded-t-xl hidden md:flex items-center border-[1px] border-[#BCBCBC] justify-between px-10'>
                     <h1 className='text-[18px] leading-[22px] text-[#333333] font-semibold'>Permissions and Access</h1>
                     <Image src={drop} alt='drop' />   
                 </div>
-                <div className='text-[14px] py-3 text-[#5801A9] border-t border-b border-[#5801A9] sm:hidden text-center'>
+                <div className='text-[14px] py-3 text-[#5801A9] border-t border-b border-[#5801A9] md:hidden text-center' onClick={handlePermission}>
                     Show More 
                     <span>&#8595;</span>
                 </div>
                    {PermissionsStat && <Permissions />}
             </div>
             <div className='-ml-5'>
-                <div onClick={handleregistered} className='hidden h-[78px] bg-[#FFFFFF] rounded-t-xl sm:flex items-center border-[1px] border-[#BCBCBC] justify-between px-10'>
+                <div onClick={handleregistered} className='hidden h-[78px] bg-[#FFFFFF] rounded-t-xl md:flex items-center border-[1px] border-[#BCBCBC] justify-between px-10'>
                     <h1 className='text-[18px] leading-[22px] text-[#333333] font-semibold'>Registered students (3789)</h1>
                     <Image src={drop} alt='drop' />
                 </div>
-                <div className='border border-b-[#5801A9] text-[#5801A9] flex sm:hidden py-2 my-2'>
+                <div className='border border-b-[#5801A9] text-[#5801A9] flex md:hidden py-2 my-2' onClick={handleregistered}>
                     Registered students (3789)
                 </div>
                 {RegisteredStat && <Registered />}

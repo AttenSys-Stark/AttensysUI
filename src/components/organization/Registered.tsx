@@ -6,7 +6,7 @@ import Image from 'next/image'
 const Registered = () => {
   return (
     <div className='h-auto w-full flex flex-col items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-b-xl pt-3'>
-    <table className="w-full border-collapse hidden sm:flex sm:flex-col">
+    <table className="w-full border-collapse hidden md:flex md:flex-col">
         <thead className=''>
           <tr className="border-b border-gray-300 h-[40px] w-fit">
             <th className="text-left px-4 text-[14px] leading-[22px] font-bold text-[#333333]">Email</th>
@@ -33,7 +33,7 @@ const Registered = () => {
       </tbody>
     </table>
     
-    <table className='sm:hidden w-full border-collapse text-[12px] text-[#A666E3]'>
+    <table className='md:hidden w-full border-collapse text-[12px] text-[#A666E3]'>
       <thead>
         <tr>
           <th className='text-left px-4 text-[12px] leading-[22px]'>Name</th>

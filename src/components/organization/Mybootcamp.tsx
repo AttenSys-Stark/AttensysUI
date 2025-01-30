@@ -39,7 +39,7 @@ const Mybootcamp = () => {
  
     return (
     <div className='h-auto w-full flex flex-col items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-b-xl py-8'>
-        <div className='w-[100%] mx-auto sm:flex flex-col items-center -z-0 hidden'>
+        <div className='w-[100%] mx-auto md:flex flex-col items-center -z-0 hidden'>
           <Carousel responsive={responsive} centerMode={false} containerClass="container"  renderArrowsWhenDisabled={false}
             additionalTransfrom={0}
             arrows
@@ -68,9 +68,9 @@ const Mybootcamp = () => {
             ))}
           </Carousel>
         </div>
-        <div className='flex flex-wrap gap-x-3 gap-y-3 justify-start px-3 py-5 items-center sm:hidden'>
+        <div className='flex flex-wrap gap-x-3 gap-y-3 justify-start px-3 py-5 items-center md:hidden'>
           {caroselldata.slice(0, 3).map((data, index) => (
-            <div className='flex flex-col items-center gap-2'>
+            <div className='flex flex-col items-center gap-2' key={index}>
               <MobileBootcampCard
                   key={index}
                   name={data.name} 
