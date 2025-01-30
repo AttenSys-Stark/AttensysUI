@@ -62,7 +62,7 @@ const Registered = () => {
 
   return (
     <div className='h-auto w-full flex flex-col items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-b-xl pt-3'>
-    <table className="w-full border-collapse hidden md:flex md:flex-col">
+    <table className="w-full border-collapse hidden lg:flex lg:flex-col">
         <thead className=''>
           <tr className="border-b border-gray-300 h-[40px] w-fit">
             <th className="text-left px-4 text-[14px] leading-[22px] font-bold text-[#333333]">Email</th>
@@ -89,7 +89,7 @@ const Registered = () => {
       </tbody>
     </table>
     
-    <table className='md:hidden w-full border-collapse text-[12px] text-[#A666E3]'>
+    <table className='lg:hidden w-full border-collapse text-[12px] text-[#A666E3]'>
       <thead>
         <tr>
           <th className='text-left px-4 text-[12px] leading-[22px]'>Name</th>
@@ -115,41 +115,41 @@ const Registered = () => {
           )
         })
       }
-      {/* Pagination Controls */}
-        <div className="flex justify-center space-x-2 pb-4 pt-10">
-          <button
-            onClick={goToPreviousPage}
-            disabled={currentPage === 1}
-            className="px-4 py-1.5 border-[#D0D5DD] border-[1px] rounded disabled:opacity-50"
-          >
-            {"<"}
-          </button>
-          {generatePageNumbers().map((page, index) =>
-            page == "..." ? (
-              <span key={index} className="px-2 text-base mt-2">
-                ...
-              </span>
-            ) : (
-              <button
-                key={index}
-                onClick={() => goToPage(page)}
-                className={`px-4 py-1.5 rounded text-[14px] ${currentPage == page ? "bg-none text-[#000000] border-[#9B51E0] border-[1px]" : "bg-none text-[#000000]"}`}
-              >
-                {page}
-              </button>
-            ),
-          )}
-
-          <button
-            onClick={goToNextPage}
-            disabled={currentPage === totalPages}
-            className="px-4 py-1.5 border-[#D0D5DD] border-[1px] text-sm rounded disabled:opacity-50"
-          >
-            {">"}
-          </button>
-        </div>
       </tbody>
     </table>
+    {/* Pagination Controls */}
+    <div className="flex justify-center space-x-2 pb-4 pt-10">
+        <button
+          onClick={goToPreviousPage}
+          disabled={currentPage === 1}
+          className="px-4 py-1.5 border-[#D0D5DD] border-[1px] rounded disabled:opacity-50"
+        >
+          {"<"}
+        </button>
+        {generatePageNumbers().map((page, index) =>
+          page == "..." ? (
+            <span key={index} className="px-2 text-base mt-2">
+              ...
+            </span>
+          ) : (
+            <button
+              key={index}
+              onClick={() => goToPage(page)}
+              className={`px-4 py-1.5 rounded text-[14px] ${currentPage == page ? "bg-none text-[#000000] border-[#9B51E0] border-[1px]" : "bg-none text-[#000000]"}`}
+            >
+              {page}
+            </button>
+          ),
+        )}
+
+        <button
+          onClick={goToNextPage}
+          disabled={currentPage === totalPages}
+          className="px-4 py-1.5 border-[#D0D5DD] border-[1px] text-sm rounded disabled:opacity-50"
+        >
+          {">"}
+        </button>
+      </div>
   </div>
   )
 }

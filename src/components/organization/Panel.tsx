@@ -20,7 +20,7 @@ const Panel = () => {
           Toggle to switch between multiple organizations
         </h1>
       </div>
-      <div className="h-fit md:h-[400px] w-full md:bg-[#FFFFFF] rounded-lg md:border md:border-[#B0B0B0] mt-8 flex flex-col-reverse md:flex-col gap-8">
+      <div className="h-fit md:h-[600px] w-full md:bg-[#FFFFFF] rounded-lg md:border md:border-[#B0B0B0] mt-8 flex flex-col-reverse lg:flex-col gap-8">
         <div className="bg-[#FFFFFF] border border-[#B0B0B0]">
             <div className="h-[80px] flex justify-between px-5 items-center">
             <div className="flex space-x-2 items-center border-[1px] border-[#6B6D6E] rounded-lg h-[42px] w-[230px] justify-center ">
@@ -31,14 +31,14 @@ const Panel = () => {
             </div>
             <Image src={drop} alt="dropdown" />
             </div>
-            <div className="h-fit md:h-[150px] border-t-[1px] border-b-[1px] border-[#B0B0B0] flex flex-col md:flex-row justify-center py-4 md:justify-between text-[11px] md:text-[14px] text-[#333333] leading-[22px] font-medium">
-                <div className="w-full md:w-[33%] md:border-r-[1px] border-[#B0B0B0] px-8 flex flex-col justify-center md:space-y-4 gap-2 my-2">
-                    <div className="flex justify-between">
+            <div className="min-h-[fit] md:h-fit lg:min-h-[150px] border-t-[1px] border-b-[1px] border-[#B0B0B0] flex flex-col lg:flex-row justify-center py-4 lg:justify-between text-[11px] md:text-[14px] text-[#333333] leading-[22px] font-medium">
+                <div className="w-full lg:w-[33%] lg:border-r-[1px] border-[#B0B0B0] px-8 sm:px-2 lg:px-8 sm:text-[12px] lg:text-[14px] flex flex-col justify-center lg:space-y-4 gap-2 my-2">
+                    <div className="flex flex-row lg:flex-col lg:justify-between justify-start gap-2">
                         <div className="space-x-2 flex items-center">
                             <CiCircleInfo className="text-[18px]" />
                             <h1>Key : </h1>
                         </div>
-                        <h1>
+                        <h1 className="">
                             Addressss{" "}
                             <span className="text-[#9B51E0]">
                              (0x5c956e61...de5232dc11)
@@ -46,17 +46,17 @@ const Panel = () => {
                         </h1>
                     </div>
 
-                    <div className="flex justify-between">
-                    <div className="space-x-2 flex items-center">
-                        <CiCircleInfo className="text-[18px]" />
-                        <h1>Status : </h1>
-                    </div>
-                    <div className="h-[30px] w-[64px] text-[#115E2C] bg-[#C4FFA2] flex items-center justify-center rounded-lg">
-                        Verified
-                    </div>
+                    <div className="flex lg:justify-between justify-start gap-2">
+                      <div className="space-x-2 flex items-center">
+                          <CiCircleInfo className="text-[18px]" />
+                          <h1>Status : </h1>
+                      </div>
+                      <div className="h-[30px] w-[64px] text-[#115E2C] bg-[#C4FFA2] flex items-center justify-center rounded-lg">
+                          Verified
+                      </div>
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="flex lg:justify-between justify-start gap-2">
                     <div className="space-x-2 flex items-center">
                         <CiCircleInfo className="text-[18px]" />
                         <h1>Organization : </h1>
@@ -65,8 +65,8 @@ const Panel = () => {
                     </div>
                 </div>
 
-                <div className="w-full md:w-[33%] md:border-r-[1px] border-[#B0B0B0] px-8 flex flex-col justify-center md:space-y-4 gap-2 mb-2">
-                    <div className="flex justify-between">
+                <div className="w-full lg:w-[33%] lg:border-r-[1px] border-[#B0B0B0] px-8 sm:px-2 lg:px-8 sm:text-[12px] lg:text-[14px] flex flex-col justify-center lg:space-y-4 gap-2 mb-2">
+                    <div className="flex lg:justify-between justify-start gap-2">
                     <div className="space-x-2 flex items-center">
                         <CiCircleInfo className="text-[18px]" />
                         <h1>Courses : </h1>
@@ -76,7 +76,7 @@ const Panel = () => {
                     </h1>
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="flex lg:justify-between justify-start gap-2">
                     <div className="space-x-2 flex items-center">
                         <CiCircleInfo className="text-[18px]" />
                         <h1>Tutors : </h1>
@@ -86,7 +86,7 @@ const Panel = () => {
                     </h1>
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="flex lg:justify-between justify-start gap-2">
                     <div className="space-x-2 flex items-center">
                         <CiCircleInfo className="text-[18px]" />
                         <h1>Certifications Issued : </h1>
@@ -97,8 +97,8 @@ const Panel = () => {
                     </div>
                 </div>
 
-                <div className="w-full md:w-[33%] px-8 flex flex-col md:my-6 md:space-y-4 mb-2 gap-2">
-                    <div className="flex justify-between">
+                <div className="w-full lg:w-[33%] px-8 sm:px-2 lg:px-8 sm:text-[12px] lg:text-[14px] flex flex-col lg:my-6 lg:space-y-4 mb-2 gap-2">
+                    <div className="flex lg:justify-between justify-start gap-2">
                     <div className="space-x-2 flex items-center">
                         <CiCircleInfo className="text-[18px]" />
                         <h1>Created :  </h1>
@@ -106,7 +106,7 @@ const Panel = () => {
                     <h1>11 Oct, 2024 | 10:25 PM</h1>
                     </div>
 
-                    <div className="flex justify-between">
+                    <div className="flex lg:justify-between justify-start gap-2">
                     <div className="space-x-2 flex items-center">
                         <CiCircleInfo className="text-[18px]" />
                         <h1>Total registered student : </h1>
@@ -118,7 +118,7 @@ const Panel = () => {
                 </div>
             </div>
         </div>
-        <div className="px-8 space-y-6 flex flex-col mt-6">
+        <div className="px-8 space-y-6 flex flex-col mt-3 lg:mt-6">
           <div className="space-x-2 flex items-center text-[14px] text-[#333333] leading-[22px] font-medium">
             <CiCircleInfo className="text-[18px]" />
             <h1>Organization info </h1>

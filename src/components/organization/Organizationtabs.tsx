@@ -46,7 +46,7 @@ const Organizationtabs = () => {
 
   return (
     <div className='h-auto w-full md:w-[90%] mx-auto flex mt-8 space-x-10 pb-12'>
-        <div className='h-auto w-[30%] space-y-3 hidden md:block'>
+        <div className='h-auto w-[30%] space-y-3 hidden lg:block'>
             <div className='h-[62px] bg-[#FFFFFF] rounded-xl flex items-center border-[1px] border-[#BCBCBC] space-x-3 px-10'>
                 <Image src={threevert} alt='line' />
                 <h1 className='text-[14px] leading-[19px] font-bold text-[#2D3A4B]'>Bootcamps</h1>
@@ -61,7 +61,7 @@ const Organizationtabs = () => {
             </div>
         </div>
 
-        <div className='h-auto w-full mx-auto md:w-[70%] space-y-3'>
+        <div className='h-auto w-[90%] mx-auto lg:w-[70%] space-y-3'>
             <div className='-ml-5'>
                 <div className='h-[78px] bg-[#FFFFFF] rounded-t-xl flex items-center border-[1px] border-[#BCBCBC] justify-between px-10'>
                     <h1 className='text-[14px] md:text-[18px] leading-[22px] text-[#333333] font-semibold hidden sm:block'>My Bootcamps</h1>
