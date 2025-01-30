@@ -283,10 +283,10 @@ const Create = ({ height }: { height: number | null }) => {
       }}
     >
       <div className="h-full flex">
-        <div className="w-[35%] h-full bg-[#07070733] hidden sm:block"></div>
+        <div className="w-[35%] h-full bg-[#07070733] hidden md:block"></div>
 
         <div
-          className={`w-[100%] sm:w-[65%] h-full bg-[#FFFFFF] overflow-y-scroll`}
+          className={`w-[100%] md:w-[65%] h-full bg-[#FFFFFF] overflow-y-scroll`}
         >
           <div className="w-[100%] h-[10px] bg-bootcreate-gradient"></div>
           <div className="w-[90%] mx-auto flex justify-between mt-5">
@@ -583,7 +583,7 @@ const Create = ({ height }: { height: number | null }) => {
                   Upload Bootcamp creative
                 </h1>
 
-                <div className="flex flex-col sm:flex-row md:space-x-16">
+                <div className="flex flex-col md:flex-row md:space-x-16 items-center justify-center">
                   <div className="h-[316px] w-[90%] mx-auto md:w-[459px] mt-3 rounded-lg bg-[#DCDCDC] flex justify-center items-center">
                     <div className="h-[246px] w-[400px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-3 flex flex-col items-center justify-center">
                       <Image src={cloud} alt="upload" />
@@ -595,6 +595,7 @@ const Create = ({ height }: { height: number | null }) => {
                         SVG, PNG, JPG or GIF (max. 800x400px)
                       </p>
                       <Image src={dividers} alt="divider" className="mt-7" />
+
                       <input
                         ref={logoInputRef}
                         type="file"
@@ -610,8 +611,9 @@ const Create = ({ height }: { height: number | null }) => {
                       </Button>
                     </div>
                   </div>
+
                   <div className="mt-3 space-y-2 mx-auto w-[90%]">
-                    <div className="h-[166px] w-fit md:w-[251px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-0 flex flex-col items-center justify-center">
+                    <div className="h-[166px] w-full md:w-[251px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-0 flex flex-col items-center justify-center">
                       <Image src={cloud} alt="upload" />
                       <h1 className="text-[8px] text-[#475367] font-light leading-[20px]">
                         <span className="text-[#4A90E2]">Click to upload</span>{" "}

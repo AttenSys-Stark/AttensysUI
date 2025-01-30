@@ -83,8 +83,10 @@ const Organizationtabs = () => {
                     <Image src={drop} alt='drop' />   
                 </div>
                 <div className='text-[14px] py-3 text-[#5801A9] border-t border-b border-[#5801A9] md:hidden text-center' onClick={handlePermission}>
-                    Show More 
-                    <span>&#8595;</span>
+                    <p>
+                        Show More 
+                        <span>&#8595;</span>
+                    </p>
                 </div>
                    {PermissionsStat && <Permissions />}
             </div>

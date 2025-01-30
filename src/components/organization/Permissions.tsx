@@ -2,6 +2,7 @@ import React from 'react'
 import { IoSettingsSharp } from "react-icons/io5";
 import { permisiondata } from '@/constants/data';
 import { IoIosRemoveCircleOutline } from 'react-icons/io';
+import { ImBooks } from "react-icons/im";
 
 
 const Permissions = () => {
@@ -37,6 +38,10 @@ const Permissions = () => {
         </tbody>
       </table>
       <div className='flex flex-col gap-5 md:hidden w-full md:w-5/6 px-4'>
+      <div className='flex gap-2 text-md items-center justify-start w-full border-b-2 mt-5'>
+        <ImBooks className='text-[#9B51E0] text-2xl'/>
+        <p>Permissions and Access</p>
+      </div>
         {
           permisiondata.map((data, index) => {
             return (

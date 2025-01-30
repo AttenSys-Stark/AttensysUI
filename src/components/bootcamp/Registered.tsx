@@ -10,6 +10,7 @@ import { IoMdPerson } from "react-icons/io";
 import { useRouter } from 'next/navigation';
 import MobileBootcampCard from './MobileBootcampCard'
 import { FcSettings } from 'react-icons/fc'
+import { ImBooks } from "react-icons/im";
 
 
 const Registered = () => {
@@ -45,7 +46,12 @@ const Registered = () => {
     return (
     <div className='h-[448px] w-[90%] mx-auto flex flex-col items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl py-8 mt-8'>
         <div className='h-[50px] w-full border-b-[1px] border-b-[#D9D9D9] px-10 flex justify-between items-center'>
-          <h1 className='text-[11px] md:text-[25px] leading-[31px] text-[#333333] font-semibold border-b-2 border-[#4A90E2]'>Registered Bootcamps</h1>
+          <div className='flex items-center gap-2 text-[11px] sm:text-[14px] md:text-[25px] leading-[31px] text-[#333333] font-semibold border-b-2 border-[#4A90E2]'>
+            <span>
+              <ImBooks className='text-[#9B51E0] text-2xl'/>
+            </span>
+            Registered Bootcamps
+          </div>
           <div className='flex space-x-3 items-center'>
             <div className='flex items-center justify-center space-x-2 text-[#5801A9] cursor-pointer' onClick={handlegotomybootcamp}>
               <IoMdPerson />
