@@ -63,7 +63,8 @@ const MainFormView2 = () => {
                     className="w-auto sm:w-[70%] h-[55px] py-2 px-6 border border-gray-300 rounded md:rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
                     placeholder="e.g A laptop."
                   />
-                  <button className="rounded md:rounded-[6px] py-2 px-4 h-[41px] md:h-[55px] min-w-max font-normal min-w-[119px] md:min-w-fit text-[#2D3A4B] leading-[21px] border-2 p-1 ml-2 md:ml-5 text-[13px] sm:text-base bg-white">
+
+                  <button className="rounded md:rounded-[6px] py-2 px-4 h-[41px] md:h-[55px] min-w-max font-normal md:min-w-fit text-[#2D3A4B] leading-[21px] border-2 p-1 ml-2 md:ml-5 text-[13px] sm:text-base bg-white">
                     <span className="text-xl leading-none">+</span> Add Item
                   </button>
                 </div>
@@ -133,6 +134,6 @@ Professionals looking to enhance their skills in [Specific Area].`}
       </div>
     </div>
   )
-}
 
+}
 export default MainFormView2

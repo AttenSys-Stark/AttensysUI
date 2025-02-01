@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
 import Dropdown from "../Dropdown"
 import { skills, levelOptions } from "@/constants/data"
@@ -9,6 +9,83 @@ import Stepper from "@/components/Stepper"
 
 const MainFormView = () => {
   const router = useRouter()
+  const [formData, setFormData] = useState({
+    courseName: "",
+    courseDescription: "",
+    courseCategory: "",
+    difficultyLevel: "",
+  })
+  const [errors, setErrors] = useState<{
+    courseName?: string
+    courseDescription?: string
+    difficultyLevel?: string
+  }>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {}
+
+    if (!formData.courseName.trim()) {
+      newErrors.courseName = "Course name is required"
+    }
+
+    if (!formData.courseDescription.trim()) {
+      newErrors.courseDescription = "Course description is required"
+    }
+
+    if (!formData.difficultyLevel) {
+      newErrors.difficultyLevel = "Difficulty level is required"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+    // Clear error when user starts typing
+    if (errors[name as keyof typeof errors]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }))
+    }
+  }
+
+  const handleDropdownChange = (name: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+    if (errors[name as keyof typeof errors]) {
+      setErrors((prev) => ({
+        ...prev,
+        [name]: "",
+      }))
+    }
+  }
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    e.preventDefault()
+
+    if (!validateForm()) {
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      handleCreateCourse("courseSetup2", router, formData)
+    } catch (error) {
+      console.error("Error submitting form:", error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div className="block sm:flex">
@@ -40,16 +117,20 @@ const MainFormView = () => {
               </p>
             </div>
 
-            <button className="hidden sm:block bg-[#c5d322] px-7 py-3 rounded text-black">
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="hidden sm:block bg-[#c5d322] px-7 py-3 rounded text-black"
+            >
               Save progress
             </button>
           </div>
 
           <div className="mx-6 sm:ml-24 mt-12">
-            <form action="CourseSetup2">
+            <form onSubmit={handleSubmit}>
               <div className="my-12">
                 <label
-                  htmlFor=""
+                  htmlFor="courseName"
                   className="font-semibold text-[18px] leading-[31px] text-[#333333]"
                 >
                   Course Name
@@ -60,20 +141,33 @@ const MainFormView = () => {
                 </p>
                 <div className="flex items-center my-4 space-x-4">
                   <input
-                    type="input"
-                    className="w-[100%] h-[55px] sm:w-[80%] px-6 border border-gray-300 rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
+                    type="text"
+                    id="courseName"
+                    name="courseName"
+                    value={formData.courseName || ""}
+                    onChange={handleInputChange}
+                    className={`w-[100%] h-[55px] sm:w-[80%] px-6 border rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400 ${
+                      errors.courseName ? "border-red-500" : "border-gray-300"
+                    }`}
                     placeholder="Course name e.g DApp development, Design basics..."
                   />
                   <input
                     type="checkbox"
+                    checked={!!formData.courseName}
+                    readOnly
                     className="appearance-none w-[23px] h-[23px] hidden md:block rounded-full border-[1px] border-[#C5D322] checked:bg-[#C5D322] checked:border-[#C5D322] required:border-red-500 checked:before:content-['✔'] checked:before:absolute checked:before:top-[3px] checked:before:left-[6px] checked:before:text-white checked:before:text-[10px] relative"
                   />
                 </div>
+                {errors.courseName && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.courseName}
+                  </p>
+                )}
               </div>
 
               <div className="my-12">
                 <label
-                  htmlFor=""
+                  htmlFor="courseDescription"
                   className="font-semibold text-[18px] leading-[31px] text-[#333333]"
                 >
                   Course Description
@@ -83,57 +177,85 @@ const MainFormView = () => {
                 </p>
                 <div className="flex items-start my-4 space-x-4">
                   <textarea
-                    id="message"
-                    className="block px-2.5 pb-64 py-3 w-[100%] sm:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-[6px] border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    id="courseDescription"
+                    name="courseDescription"
+                    value={formData.courseDescription || ""}
+                    onChange={handleInputChange}
+                    className={`block px-2.5 pb-64 py-3 w-[100%] sm:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-[6px] border focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.courseDescription
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    }`}
                     placeholder="a little bit about your course......"
                   ></textarea>
                   <input
                     type="checkbox"
+                    checked={!!formData.courseDescription}
+                    readOnly
                     className="appearance-none w-[23px] h-[23px] hidden md:block rounded-full border-[1px] border-[#C5D322] checked:bg-[#C5D322] checked:border-[#C5D322] required:border-red-500 checked:before:content-['✔'] checked:before:absolute checked:before:top-[3px] checked:before:left-[6px] checked:before:text-white checked:before:text-[10px] relative"
                   />
                 </div>
+                {errors.courseDescription && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.courseDescription}
+                  </p>
+                )}
               </div>
 
               <div className="my-12">
                 <label
-                  htmlFor=""
+                  htmlFor="courseCategory"
                   className="font-semibold text-[18px] leading-[31px] text-[#333333]"
                 >
                   Course category
                 </label>
                 <div className="my-4 flex items-start w-full max-w-[556px] h-[55px]">
-                  <Dropdown options={skills} />
+                  <Dropdown
+                    options={skills}
+                    value={formData.courseCategory || ""}
+                    onChange={(value: string) =>
+                      handleDropdownChange("courseCategory", value)
+                    }
+                  />
                 </div>
               </div>
 
               <div className="my-12 w-full">
                 <label
-                  htmlFor=""
+                  htmlFor="difficultyLevel"
                   className="font-medium text-[18px] leading-[31px] text-[#333333]"
                 >
                   Select the difficulty level (Beginner, Intermediate, Advanced,
                   All levels)
                 </label>
                 <div className="my-4 flex items-start w-full max-w-[556px] h-[55px]">
-                  <Dropdown options={levelOptions} />
+                  <Dropdown
+                    options={levelOptions}
+                    value={formData.difficultyLevel || ""}
+                    onChange={(value: string) =>
+                      handleDropdownChange("difficultyLevel", value)
+                    }
+                  />
                 </div>
 
                 <div className="mt-12 mb-5 w-full">
                   <button
-                    className="bg-[#4A90E2] px-48 rounded-lg py-[15px] text-white w-full max-w-[350px]"
+                    className="bg-[#4A90E2] px-48 rounded-lg py-[15px] text-white w-full max-w-[350px] disabled:opacity-50"
                     type="submit"
-                    // onClick={handleNext}
-                    onClick={(e) =>
-                      handleCreateCourse(e, "courseSetup2", router)
-                    }
+                    disabled={isSubmitting}
                   >
-                    Next
+                    {isSubmitting ? "Submitting..." : "Next"}
                   </button>
                 </div>
 
                 <div className="w-full flex justify-center pb-[74px]">
-                  <button className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black">
-                    Save progress
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black disabled:opacity-50"
+                  >
+                    {isSubmitting ? "Saving..." : "Save progress"}
                   </button>
                 </div>
               </div>

@@ -1,13 +1,26 @@
-import React from "react"
+import React, { useState } from "react"
 import Previous from "./previous"
 
 const CourseForm = (props: any) => {
+  const [selectedGoal, setSelectedGoal] = useState<string | null>(null)
+  const [showError, setShowError] = useState(false)
+
+  const handleCheckboxChange = (id: string) => {
+    setSelectedGoal(id)
+    setShowError(false)
+  }
+
   const handleNext = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
+    if (!selectedGoal) {
+      setShowError(true)
+      return
+    }
   }
+
   return (
-    <div className="relative mx-10 md:mx-auto w-auto md:w-3/4 lg:w-5/12 pt-16 ">
-      <div className="hidden lg:block">
+    <div className="relative mx-10 md:mx-auto w-auto md:w-5/12 pt-16 ">
+      <div className="hidden sm:block">
         <Previous />
       </div>
       <div className="flex items-center w-full justify-center">
@@ -23,37 +36,43 @@ const CourseForm = (props: any) => {
               min="2"
               max="5"
               className="required:border-red-500 indeterminate:bg-gray-300"
-              id="vehicle1"
-              name="vehicle1"
-              value="Bike"
+              id="goal1"
+              name="courseGoal"
+              checked={selectedGoal === "goal1"}
+              onChange={() => handleCheckboxChange("goal1")}
+              required
             />
             <label className="block my-2 md:my-3 ml-3 text-[#333333] text-xs md:text-[18px] font-medium leading-[22px]">
               Helping people build skills for their job
             </label>
           </div>
+
           <div className="flex">
             <input
               type="checkbox"
               min="2"
               max="5"
               className="required:border-red-500 indeterminate:bg-gray-300"
-              id="vehicle1"
-              name="vehicle1"
-              value="Bike"
+              id="goal2"
+              checked={selectedGoal === "goal2"}
+              onChange={() => handleCheckboxChange("goal2")}
+              required
             />
             <label className="block my-2 md:my-3 ml-3 text-[#333333] text-xs md:text-[18px] font-medium leading-[22px]">
               Giving a certificate for completing the course
             </label>
           </div>
+
           <div className="flex">
             <input
               type="checkbox"
               min="2"
               max="5"
               className="required:border-red-500 indeterminate:bg-gray-300"
-              id="vehicle1"
-              name="vehicle1"
-              value="Bike"
+              id="goal3"
+              checked={selectedGoal === "goal3"}
+              onChange={() => handleCheckboxChange("goal3")}
+              required
             />
             <label className="block my-2 md:my-3 ml-3 text-[#333333] text-xs md:text-[18px] font-medium leading-[22px]">
               Sharing knowledge about a hobby or interest
@@ -66,19 +85,26 @@ const CourseForm = (props: any) => {
               min="2"
               max="5"
               className="required:border-red-500 indeterminate:bg-gray-300"
-              id="vehicle1"
-              name="vehicle1"
-              value="Bike"
+              id="goal4"
+              checked={selectedGoal === "goal4"}
+              onChange={() => handleCheckboxChange("goal4")}
+              required
             />
             <label className="block my-2 md:my-3 ml-3 text-[#333333] text-xs md:text-[18px] font-medium leading-[22px]">
               Teaching new ideas or concepts in a field
             </label>
           </div>
+
+          {showError && (
+            <p className="text-red-500 text-sm mt-2">
+              Please select a course goal
+            </p>
+          )}
         </div>
 
-        <div className="text-center w-full">
+        <div className="text-center">
           <button
-            onSubmit={handleNext}
+            onClick={handleNext}
             className="bg-[#4A90E2] w-full max-w-[350px] rounded-xl  py-3 mt-12 mb-44 text-white"
             type="submit"
           >
@@ -86,8 +112,8 @@ const CourseForm = (props: any) => {
           </button>
         </div>
       </form>
-    
-      <div className="block absolute left-[35%] bottom-36 lg:hidden">
+
+      <div className="block absolute left-[35%] bottom-36 sm:hidden">
         <Previous />
       </div>
     </div>
