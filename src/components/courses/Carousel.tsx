@@ -24,18 +24,23 @@ const CarouselComp = () => {
     },
   }
   return (
-    <div className="className='w-[90%] mx-auto flex flex-col justify-center items-center'">
-      <Carousel responsive={responsive} centerMode={true} containerClass="container"    additionalTransfrom={0}
-   arrows
-   dotListClass=""
-   draggable
-   focusOnSelect={false}
-   infinite
-   itemClass=""
-   keyBoardControl
-   minimumTouchDrag={80}
-   autoPlay={true} // Enables auto-scrolling
-   autoPlaySpeed={3000}>
+    <div className="hidden w-full mx-auto lg:flex flex-col justify-center items-center">
+      <Carousel 
+        className="course-carousel" 
+        responsive={responsive} 
+        centerMode={true} 
+        containerClass="container" 
+        additionalTransfrom={0}
+        arrows
+        dotListClass=""
+        draggable
+        focusOnSelect={false}
+        infinite
+        itemClass="carousel-item-custom"
+        keyBoardControl
+        minimumTouchDrag={80}
+        autoPlay={true}
+        autoPlaySpeed={3000}>
         <CardWithLink />
         <CardWithLink />
         <CardWithLink />

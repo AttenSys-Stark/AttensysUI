@@ -15,23 +15,23 @@ const MyCertifications = () => {
 
   if (selected == "" || selected == "All NFTs") {
     return (
-      <div className=" sm:flex sm:flex-row sm:mx-20 my-8">
+      <div className="lg:flex max-w-screen-2xl xl:mx-auto">
         <UserSideBar
           page={page}
           selected={selected}
           setSelected={setSelected}
         />
 
-        <div className="w-full sm:mx-20 my-12 ">
+        <div className="w-full sm:mx-auto px-4 my-12 ">
           {certContent.map((item, i) => (
             <div key={i} className="w-[100%]">
               <h1 className="text-[#A01B9B] font-bold text-2xl">
                 {item.heading} ({item.no})
               </h1>
 
-              <div className="grid lg:grid-cols-3 md:grid-cols-4 lclg:grid-cols-2 gap-8 my-6 ">
+              <div className="grid sm:grid-cols-2 xl:grid-cols-3 md:gap-y-8 md:gap-x-3 my-6 ">
                 {item.certificates.map((cert, j) => (
-                  <div key={j} className="bg-[#FFFFFF] rounded-xl shadow-lg my-4 sm:my-0 w-[300px]">
+                  <div key={j} className="bg-[#FFFFFF] rounded-xl shadow-lg my-4 sm:my-0 w-full ">
                     <div className="relative">
                       <Image
                         src={cert.img}
@@ -59,7 +59,7 @@ const MyCertifications = () => {
                       </div>
 
                       <div>
-                        <p className="text-[9px] text-[#333333] font-medium leading-[15px]">{cert.nft_description}</p>
+                        <p className="text-[9px] lg:text-[10px] text-[#333333] font-medium leading-[15px]">{cert.nft_description}</p>
                       </div>
                     </div>
                   </div>
@@ -114,7 +114,7 @@ const MyCertifications = () => {
                       </div>
 
                       <div>
-                        <p className="text-[9px] text-[#333333] font-medium leading-[15px]">{cert.nft_description}</p>
+                        <p className="text-[9px] lg:text-[10px] text-[#333333] font-medium leading-[15px]">{cert.nft_description}</p>
                       </div>
                     </div>
                   </div>

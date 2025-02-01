@@ -1,16 +1,13 @@
 import React, { useState } from "react"
-import { FaPlay } from "@react-icons/all-files/fa/FaPlay"
 import Image from "next/image"
 import { FaUserGraduate } from "@react-icons/all-files/fa/FaUserGraduate"
 import Switch from "react-switch"
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar"
-import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck"
-import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond"
-import { BsDot } from "@react-icons/all-files/bs/BsDot"
-import timing from "@/assets/timing.svg"
 import StarRating from "../bootcamp/StarRating"
-import { HiOutlineBadgeCheck } from "react-icons/hi";
-
+import play from "@/assets/play.svg"
+import replay from "@/assets/replay.svg"
+import bdot from "@/assets/Bdot.svg"
+import diamond from "@/assets/diamond.svg"
+import certificationBadge from "@/assets/certification_badge.svg"
 
 interface ItemProps {
   no: number
@@ -98,8 +95,8 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({ item, selected }) => {
               </p>
             </div>
             
-            <div className="px-12 flex space-x-12 items-center">
-            <div className="h-[164px] w-[254px] rounded-xl">
+            <div className="px-5 xl:px-12 flex gap-8 xl:gap-0 flex-col w-full xl:flex-row xl:space-x-12 items-center">
+            <div className="w-full h-auto xl:h-[164px] xl:w-[254px] rounded-xl">
               <Image
                 src={item.url}
                 alt="video"
@@ -107,55 +104,53 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({ item, selected }) => {
                 className="object-cover h-full w-full rounded-xl"
               />
             </div>
-            <div className="flex-1 mx-8 sm:mx-0">
+            <div className="flex-1 w-full lg:mx-6 sm:mx-0">
               <div>
-                <h4 className="text-2xl font-medium leading-[22px] text-[#2D3A4B]">{item.title}</h4>
+                <h4 className="text-[20px] font-medium leading-[22px] text-[#2D3A4B]">{item.title}</h4>
 
                 {/* video prop */}
-                <div className="block sm:flex items-center my-3">
-                  <div className="flex items-center space-x-3">
-                    <FaPlay color="#A01B9B" />
+                <div className="text-[#2D3A4B] flex flex-wrap items-center gap-3 my-3">
+                  <div className="flex items-center gap-x-2">
+                    <Image src={play} alt="" height={12} width={12} />
                     <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">Total play time: {item.playTime}</p>
                   </div>
-                  <div className="flex items-center ml-0 sm:ml-5 my-3 sm:my-0">
+                  <div className="flex items-center gap-x-2 ">
                     <p className="hidden sm:block">|</p>
-                    <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0 sm:mx-8">
-                      Created by: <span className="text-[#A01B9B]">You</span>
+                    <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0">
+                      Created by: <span className="text-[#A01B9B]">you</span>
                     </p>
                   </div>
-                  <div className="flex items-center ml-0 sm:ml-5 my-3 sm:my-0">
-                    <BsDot color="#A01B9B" width={50} />
-                    <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0 sm:mx-2">
+                  <div className="flex items-center gap-x-2">
+                    <Image src={bdot} alt="" height={12} width={12} />
+                    <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0">
                       <span className="text-[#A01B9B]">4</span> Lectures
                     </p>
                   </div>
                 </div>
 
-                <div className="block sm:flex items-center my-3">
-                  <div className="flex items-center space-x-3">
-                    <Image src={timing} alt="time" className="h-[18px] w-[18px]" />
+                <div className="text-[#2D3A4B] flex flex-wrap gap-4 items-center my-3">
+                  <div className="flex items-center gap-x-2">
+                    <Image src={replay} alt="time" width={16} height={16} className="" />
                     <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">Last updated 10|10|2024</p>
                   </div>
-                  <div className="flex items-center space-x-3 my-3 sm:my-0 mx-0 sm:mx-16">
-                    <GrDiamond color="#A01B9B" />
+                  <div className="flex items-center gap-x-2">
+                    <Image src={diamond} alt="" height={18} width={18} />
                     <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">Difficulty level: {item.level}</p>
                   </div>
                 </div>
 
 
                 {/* rating and num of students */}
-                <div className="block sm:flex  items-center my-3">
-                  <div className="flex items-center space-x-6">
+                <div className="text-[#2D3A4B] flex flex-wrap gap-5 items-center my-3">
+                  <div className="flex items-center gap-x-2">
                     <StarRating totalStars={5}  starnumber={4} />
                     <p className="font-medium text-[13px] text-[#2D3A4B] leading-[16px]">{item.stars} students</p>
                   </div>
 
-                  <div className="flex items-center space-x-3 mx-0 sm:mx-12 my-3 sm:my-0">
-                    <div>
-                      <HiOutlineBadgeCheck color="#A01B9B" className="h-[18px] w-[18px]"  />
-                    </div>
-                    <p className="font-medium text-[13px] text-[#2D3A4B] leading-[16px]">Certificate issued:</p>
-                    <p className="ml-5 font-medium text-[13px] text-[#2D3A4B] leading-[16px]">
+                  <div className="flex items-center gap-2 mx-0 sm:my-0">
+                    <Image src={certificationBadge} alt="" height={18} width={18} />
+                    <p className="font-medium text-[13px] mr-1 text-[#2D3A4B] leading-[16px]">Certificate issued:</p>
+                    <p className="font-medium text-[13px] text-[#2D3A4B] leading-[16px]">
                       <span className="text-[#A01B9B]">
                         {item.certificate}{" "}
                       </span>
