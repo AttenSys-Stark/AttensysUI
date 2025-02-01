@@ -14,7 +14,7 @@ const Heading = () => {
         alt="shake" 
         className="w-full h-full object-cover" 
       />
-      <div className="h-[189px] w-[189px] rounded-full absolute z-20 bottom-[-25%] left-12">
+      <div className="h-[150px] lg:h-[189px] w-[150px] lg:w-[189px] rounded-full absolute z-20 bottom-[-25%] left-12">
         <Image 
           src={companylogo} 
           alt="logo" 

@@ -44,7 +44,7 @@ const Registered = () => {
       }
  
     return (
-    <div className='h-[448px] w-[90%] mx-auto flex flex-col items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl py-8 mt-8'>
+    <div className='h-[448px] w-[90%] mx-auto flex flex-col items-start md:items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl py-8 mt-8'>
         <div className='h-[50px] w-full border-b-[1px] border-b-[#D9D9D9] px-10 flex justify-between items-center'>
           <div className='flex items-center gap-2 text-[11px] sm:text-[14px] md:text-[25px] leading-[31px] text-[#333333] font-semibold border-b-2 border-[#4A90E2]'>
             <span>

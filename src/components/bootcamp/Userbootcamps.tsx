@@ -38,7 +38,7 @@ const Userbootcamps = () => {
       };
  
     return (
-    <div className='h-fit md:h-[448px] w-[90%] mx-auto flex flex-col items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl py-8 mt-8'>
+    <div className='h-fit md:h-[448px] w-[90%] mx-auto flex flex-col items-start md:items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl py-8 mt-8'>
         <div className='h-[50px] w-full border-b-[1px] border-b-[#D9D9D9] px-10 flex justify-between'>
             <h1 className='text-[15px] md:text-[25px] leading-[31px] text-[#333333] font-semibold'>Bootcamps</h1>
             <IoIosArrowDropdown className='h-[35px] w-[35px] text-[#6B6D6E]' />
@@ -73,7 +73,7 @@ const Userbootcamps = () => {
           </Carousel>
         </div>
         <div className='flex flex-wrap gap-x-3 gap-y-3 justify-start px-3 py-5 items-center sm:hidden'>
-          {caroselldata.slice(0, 3).map((data, index) => (
+          {caroselldata.slice(0, 2).map((data, index) => (
             <div className='flex flex-col items-center gap-2' key={index}>
               <MobileBootcampCard
                   name={data.name} 

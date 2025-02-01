@@ -5,6 +5,7 @@ import { useAtom } from "jotai"
 import { Button, Field, Input, Label } from "@headlessui/react"
 import clsx from "clsx"
 import TargetCategory from "./TargetCategory"
+import { styled } from '@mui/material/styles'
 import Calendar from "react-calendar"
 import "react-calendar/dist/Calendar.css"
 import { FaRegCalendarAlt } from "react-icons/fa"
@@ -29,6 +30,18 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs, { Dayjs } from "dayjs"
 import { FcCancel } from "react-icons/fc"
 import { pinata } from "../../../utils/config"
+import { TextField } from "@mui/material"
+
+const StyledDatePicker = styled(DatePicker)(({ theme }) => ({
+  "& .MuiInputBase-root": {
+    minWidth: "100px",
+    width: "150px",
+    [theme.breakpoints.up("lg")]: {
+      minWidth: "200px",
+      width: "200px",
+    },
+  },
+}));
 
 const format = "h:mm a"
 const now = moment().hour(0).minute(0)
@@ -408,14 +421,20 @@ const Create = ({ height }: { height: number | null }) => {
                 <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                   Bootcamp Date
                 </h1>
-                <div className="flex flex-wrap md:space-x-4 max-w-full">
+                <div className="flex flex-wrap space-x-2 gap-x-2 md:space-x-4 max-w-full">
                   <>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DemoContainer components={["DatePicker"]}>
-                        <DatePicker
+                        {/* <DatePicker
                           label="Start date"
                           onChange={handleStartdateChange}
-                          className="w-[30px] text-[12px] overflow-x-none"
+                          className="w-[150px] min-w-[100px] lg:min-w-[200px] text-[12px] overflow-x-none"
+                        /> */}
+                        <StyledDatePicker
+                          label="Start Date"
+                          onChange={handleStartdateChange}
+                          // @ts-ignore
+                          renderInput={(params) => <TextField {...params} />}
                         />
                       </DemoContainer>
                     </LocalizationProvider>
@@ -424,10 +443,11 @@ const Create = ({ height }: { height: number | null }) => {
                   <>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DemoContainer components={["DatePicker"]}>
-                        <DatePicker
-                          label="End date"
+                        <StyledDatePicker
+                          label="End Date"
                           onChange={handleEnddateChange}
-                          className="w-[30px] text-[12px] overflow-x-none"
+                          // @ts-ignore
+                          renderInput={(params) => <TextField {...params} />}
                         />
                       </DemoContainer>
                     </LocalizationProvider>
@@ -440,7 +460,7 @@ const Create = ({ height }: { height: number | null }) => {
               <h1 className="text-[12px] sm:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 Bootcamp Time
               </h1>
-              <div className="flex flex-col sm:flex-row sm:space-x-3 items-center">
+              <div className="flex flex-wrap sm:flex-row space-x-3 items-center">
                 <div className="flex flex-col space-y-2">
                   {bootcampTimes.map((component, index) => (
                     <BootcampTime key={index} day={index + 1} />
@@ -449,7 +469,7 @@ const Create = ({ height }: { height: number | null }) => {
                 <div
                   id="add-day"
                   onClick={handleAddDay}
-                  className="hidden sm:flex mt-2 cursor-pointer relative items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[130px] rounded-lg"
+                  className="flex text-nowrap mt-2 cursor-pointer relative items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[130px] rounded-lg"
                 >
                   <FaPlus className="text-[#2D3A4B]" />
                   <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
@@ -460,7 +480,7 @@ const Create = ({ height }: { height: number | null }) => {
                 <div
                   id="add-day"
                   onClick={handleRemoveDay}
-                  className="mt-2 cursor-pointer relative hidden sm:flex items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[150px] rounded-lg"
+                  className="mt-2 text-nowrap cursor-pointer relative flex items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[150px] rounded-lg"
                 >
                   <FcCancel className="text-[#2D3A4B]" />
                   <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
@@ -485,7 +505,7 @@ const Create = ({ height }: { height: number | null }) => {
               <div className="space-y-12 w-[300px]">
                 {bootcampTimes.map((component, index) => (
                   <div key={index}>
-                    <div className="mt-4 flex space-x-2">
+                    <div className="mt-4 flex flex-wrap space-x-2 gap-y-2">
                       <Field>
                         <Input
                           placeholder="Add lecture title"
@@ -493,7 +513,7 @@ const Create = ({ height }: { height: number | null }) => {
                             handleTitleChange(index, e.target.value)
                           }
                           className={clsx(
-                            "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-fit md:w-[395px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                            "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[320px] sm:w-[395px] lg:w-[450px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
                             "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                           )}
                         />
@@ -509,7 +529,7 @@ const Create = ({ height }: { height: number | null }) => {
                       </div>
                     </div>
 
-                    <div className=" mt-4 flex space-x-2 relative">
+                    <div className=" mt-4 flex space-x-2 relative gap-y-2">
                       <div>
                         <Field>
                           <textarea
@@ -518,10 +538,11 @@ const Create = ({ height }: { height: number | null }) => {
                             }
                             placeholder="Add lecture description"
                             className={clsx(
-                              "h-[127px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-fit md:w-[557px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                              "h-[127px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block  w-[320px] sm:w-[395px] lg:w-[450px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
                               "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                             )}
                           />
+                          
                         </Field>
                       </div>
                     </div>

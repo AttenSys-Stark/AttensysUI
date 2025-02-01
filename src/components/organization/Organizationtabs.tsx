@@ -10,6 +10,7 @@ import Registered from './Registered'
 import { FaPlus } from "react-icons/fa6";
 import {createbootcampoverlay} from '@/state/connectedWalletStarknetkitNext'
 import { useAtom } from 'jotai'
+import { ImBooks } from "react-icons/im";
 
 
 
@@ -82,7 +83,12 @@ const Organizationtabs = () => {
                     <h1 className='text-[18px] leading-[22px] text-[#333333] font-semibold'>Permissions and Access</h1>
                     <Image src={drop} alt='drop' />   
                 </div>
-                <div className='text-[14px] py-3 text-[#5801A9] border-t border-b border-[#5801A9] md:hidden text-center' onClick={handlePermission}>
+                <div className='text-[14px] py-3 text-[#5801A9] border-t border-b border-[#5801A9] md:hidden text-center' 
+                    onClick={() => {
+                        handlePermission; 
+                        handleregistered;
+                    }}
+                >
                     <p>
                         Show More 
                         <span>&#8595;</span>
@@ -95,7 +101,12 @@ const Organizationtabs = () => {
                     <h1 className='text-[18px] leading-[22px] text-[#333333] font-semibold'>Registered students (3789)</h1>
                     <Image src={drop} alt='drop' />
                 </div>
-                <div className='border border-b-[#5801A9] text-[#5801A9] flex md:hidden py-2 my-2' onClick={handleregistered}>
+                <div className='border border-b-[#5801A9] text-[#5801A9] flex md:hidden py-2 my-2 items-center gap-2 text-[11px] sm:text-[14px] md:text-[25px] leading-[31px] font-semibold border-b-2 border-[#4A90E2]'
+                    onClick={handleregistered}
+                >
+                    <span>
+                    <ImBooks className='text-[#9B51E0] text-2xl'/>
+                    </span>
                     Registered students (3789)
                 </div>
                 {RegisteredStat && <Registered />}

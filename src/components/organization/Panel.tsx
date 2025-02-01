@@ -118,12 +118,12 @@ const Panel = () => {
                 </div>
             </div>
         </div>
-        <div className="px-8 space-y-6 flex flex-col mt-3 lg:mt-6">
+        <div className="px-1 lg:px-8 space-y-6 flex flex-col mt-3 lg:mt-6">
           <div className="space-x-2 flex items-center text-[14px] text-[#333333] leading-[22px] font-medium">
             <CiCircleInfo className="text-[18px]" />
             <h1>Organization info </h1>
           </div>
-          <p className="w-[95%] text-[14px] text-[#6B6D6E] font-medium">
+          <p className="lg:w-[95%] text-[14px] text-[#6B6D6E] font-medium w-[100%]">
             Blockchain Academy Pro is a leading Web3-focused educational
             organization dedicated to empowering individuals with cutting-edge
             knowledge in blockchain technology, decentralized applications
