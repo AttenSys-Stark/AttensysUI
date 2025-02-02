@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
 import Dropdown from "../Dropdown"
 import Image from "next/image"
@@ -16,10 +16,61 @@ import Stepper from "@/components/Stepper"
 
 const MainFormView3 = () => {
   const router = useRouter()
+  const [lectureTitle, setLectureTitle] = useState("")
+  const [lectureDescription, setLectureDescription] = useState("")
+  const [titleError, setTitleError] = useState("")
+  const [descriptionError, setDescriptionError] = useState("")
+
   const handleBrowsefiles = () => {
     //@todo handle file upload logic
     console.log("click")
   }
+
+  const validateForm = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    let isValid = true
+
+    // Validate Lecture Title
+    if (!lectureTitle.trim()) {
+      setTitleError("Lecture title is required")
+      isValid = false
+    } else {
+      setTitleError("")
+    }
+
+    // Validate Lecture Description
+    if (!lectureDescription.trim()) {
+      setDescriptionError("Lecture description is required")
+      isValid = false
+    } else {
+      setDescriptionError("")
+    }
+
+    // If form is not valid, prevent submission
+    if (!isValid) {
+      return false
+    }
+
+    // Proceed with course creation if valid
+    handleCreateCourse(
+      e as unknown as React.MouseEvent<HTMLFormElement>,
+      "courseSetup4",
+      router,
+    )
+  }
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLectureTitle(e.target.value)
+    if (titleError) setTitleError("")
+  }
+
+  const handleDescriptionChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setLectureDescription(e.target.value)
+    if (descriptionError) setDescriptionError("")
+  }
+
   return (
     <div className="flex items-stretch">
       <div className="hidden lg:block">
@@ -38,6 +89,7 @@ const MainFormView3 = () => {
           <Stepper currentStep={3} />
         </div>
         <div className="w-full">
+          {/* Rest of the existing header code remains unchanged */}
           <div className="block sm:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] px-5 items-center">
             <div className="flex items-center">
               <div className="px-4 sm:px-8 border-r border-blue-100">
@@ -56,8 +108,8 @@ const MainFormView3 = () => {
             </button>
           </div>
 
-          <div className="mx-5 md:mx-10  mt-12">
-            <form action="CourseSetup4">
+          <div className="mx-5 md:mx-10 mt-12">
+            <form onSubmit={validateForm}>
               <div className="my-12 w-full">
                 <label
                   htmlFor=""
@@ -73,7 +125,7 @@ You want to make sure your creative is very catchy.`}
                   <div className="bg-[#DCDCDC] flex-1 p-4 sm:p-16 rounded-xl">
                     <div className="bg-white p-2 sm:p-14 text-center border-dotted rounded border-2 border-[#D0D5DD]  content-center text-xs ">
                       <div className="mx-auto w-[15%]">
-                        <Image src={upload} alt="uplaod" />
+                        <Image src={upload} alt="upload" />
                       </div>
 
                       <div className="my-3 text-base md:text-sm">
@@ -111,7 +163,7 @@ You want to make sure your creative is very catchy.`}
                     </p>
                     <div className="bg-white w-full md:w-[350px] p-8 text-center border-dotted rounded-xl border-2 border-[#D0D5DD] flex flex-col justify-center content-center">
                       <div className="w-auto mx-auto">
-                        <Image src={upload} alt="uplaod" width={30} />
+                        <Image src={upload} alt="upload" width={30} />
                       </div>
 
                       <div className="my-4">
@@ -200,23 +252,41 @@ You want to make sure your creative is very catchy.`}
                 <div className="my-4 bg-[#9b51e01a] py-9 md:py-12 px-5 md:px-12 border md:rounded-xl mt-[71px] -mx-5 md:mx-0">
                   <div className="flex bg-white p-5 rounded-[5px] my-3">
                     <p className="font-medium mr-3 text-[16px]">Lecture 3:</p>
-                    <input
-                      placeholder="Class Title e.g UI/UX Basics"
-                      className="w-auto lg:w-[80%]"
-                    />
+                    <div className="flex-1">
+                      <input
+                        placeholder="Class Title e.g UI/UX Basics"
+                        className={`w-full ${titleError ? "border-red-500 border-2" : ""}`}
+                        value={lectureTitle}
+                        onChange={handleTitleChange}
+                      />
+                      {titleError && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {titleError}
+                        </p>
+                      )}
+                    </div>
                   </div>
+
                   <div className="flex bg-white p-5 rounded-[5px] my-3">
                     <p className="font-medium mr-3 text-[16px]">Description:</p>
-                    <textarea
-                      name=""
-                      id=""
-                      className="w-[100%]"
-                      placeholder="Class description (optional)"
-                    ></textarea>
+                    <div className="w-[100%]">
+                      <textarea
+                        className={`w-full ${descriptionError ? "border-red-500 border-2" : ""}`}
+                        placeholder="Class description"
+                        value={lectureDescription}
+                        onChange={handleDescriptionChange}
+                      ></textarea>
+                      {descriptionError && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {descriptionError}
+                        </p>
+                      )}
+                    </div>
                   </div>
+
                   <div className="bg-white p-5 rounded-[5px] my-3 text-center content-center w-[100%] flex flex-col justify-center">
                     <div className="w-[15%] mx-auto flex justify-center">
-                      <Image src={upload_other} alt="uplaod" />
+                      <Image src={upload_other} alt="upload" />
                     </div>
                     <p className="text-[14px] font-normal text-[#353535] mt-2 leading-[22px]">
                       <span className="text-[#A020F0]">Click to upload</span> or
@@ -240,22 +310,22 @@ You want to make sure your creative is very catchy.`}
                       </p>
                     </div>
 
-                    <div className="bg-green flex items-center">
+                    <div className="bg-green">
                       <Image src={tick_circle} alt="tick" />
                     </div>
                   </div>
-                  <div className="flex justify-between items-center bg-white p-5 rounded-[5px] my-3">
+                  <div className="flex justify-between items-center bg-white p-5 rounded-xl my-3">
                     <div className="flex items-center">
                       <p className="font-medium mr-3 text-[16px]">
                         Description:
                       </p>
                       <p className="text-[16px] font-normal text-[#353535] leading-[31px]">
-                        {`Figma class - It’s uses, function, extraction, export etc..`}
+                        {`Figma class - It's uses, function, extraction, export etc..`}
                         .
                       </p>
                     </div>
 
-                    <div className="flex items-center">
+                    <div className="">
                       <Image src={tick_circle} alt="tick" />
                     </div>
                   </div>
@@ -292,19 +362,16 @@ You want to make sure your creative is very catchy.`}
                   <button
                     className="rounded-lg bg-[#4A90E2] px-8 py-[15px] text-white w-full md:max-w-[350px]"
                     type="submit"
-                    onClick={(e) =>
-                      handleCreateCourse(e, "courseSetup4", router)
-                    }
                   >
                     Almost there!
                   </button>
                 </div>
+              </div>
 
-                <div className="w-full flex justify-center pb-[74px]">
-                  <button className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black">
-                    Save progress
-                  </button>
-                </div>
+              <div className="w-full flex justify-center pb-[74px]">
+                <button className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black">
+                  Save progress
+                </button>
               </div>
             </form>
           </div>
