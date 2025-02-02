@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useRef } from "react"
+import React, { ChangeEvent, useRef, useState } from "react"
 import Image from "next/image"
 import add from "@/assets/add.svg"
 import {
@@ -24,6 +24,14 @@ import { pinata } from "../../../utils/config"
 import backArrow from "../../../public/backArrow.svg"
 
 const Basicinfo = () => {
+  // Add state for validation errors
+  const [errors, setErrors] = useState({
+    organizationName: "",
+    organizationDescription: "",
+    organizationBanner: "",
+    organizationLogo: "",
+  })
+
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const logofileInputRef = useRef<HTMLInputElement | null>(null)
   const router = useRouter()
@@ -53,8 +61,14 @@ const Basicinfo = () => {
         ...prevData, // Spread existing data to retain untouched fields
         organizationBanner: file, // Dynamically update the specific field
       }))
+      // Clear banner error when a valid file is selected
+      setErrors((prev) => ({ ...prev, organizationBanner: "" }))
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).")
+      setErrors((prev) => ({
+        ...prev,
+        organizationBanner:
+          "Please select a valid image file (JPEG, JPG, or PNG).",
+      }))
     }
   }
 
@@ -71,31 +85,72 @@ const Basicinfo = () => {
         ...prevData, // Spread existing data to retain untouched fields
         organizationLogo: file, // Dynamically update the specific field
       }))
+      // Clear logo error when a valid file is selected
+      setErrors((prev) => ({ ...prev, organizationLogo: "" }))
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).")
+      setErrors((prev) => ({
+        ...prev,
+        organizationLogo:
+          "Please select a valid image file (JPEG, JPG, or PNG).",
+      }))
     }
   }
 
   const handlerouting = (prop: string) => {
-    router.push(`/Createorganization/${prop}`)
+    const newErrors = {
+      organizationName: !organizationData.organizationName
+        ? "Organization name is required"
+        : "",
+      organizationDescription: !organizationData.organizationDescription
+        ? "Organization description is required"
+        : "",
+      organizationBanner: !organizationData.organizationBanner
+        ? "Organization banner is required"
+        : "",
+      organizationLogo: !organizationData.organizationLogo
+        ? "Organization logo is required"
+        : "",
+    }
+
+    setErrors(newErrors)
+
+    // Only route if no errors
+    if (Object.values(newErrors).every((error) => error === "")) {
+      router.push(`/Createorganization/${prop}`)
+    }
   }
 
   const handleOrgNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
     setOrganizationData((prevData) => ({
-      ...prevData, // Spread existing data to retain untouched fields
-      organizationName: e.target.value, // Dynamically update the specific field
+      ...prevData,
+      organizationName: newValue,
     }))
-  }
-  const handleOrgDescriptionChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    setOrganizationData((prevData) => ({
-      ...prevData, // Spread existing data to retain untouched fields
-      organizationDescription: e.target.value, // Dynamically update the specific field
+
+    // Clear or set name error based on input
+    setErrors((prev) => ({
+      ...prev,
+      organizationName: !newValue ? "Organization name is required" : "",
     }))
   }
 
-  // console.dir(organizationData, {depth:null})
+  const handleOrgDescriptionChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const newValue = e.target.value
+    setOrganizationData((prevData) => ({
+      ...prevData,
+      organizationDescription: newValue,
+    }))
+
+    // Clear or set description error based on input
+    setErrors((prev) => ({
+      ...prev,
+      organizationDescription: !newValue
+        ? "Organization description is required"
+        : "",
+    }))
+  }
 
   return (
     <div className="lg:space-y-20 space-y-10  ">
@@ -120,6 +175,11 @@ const Basicinfo = () => {
             style={{ display: "none" }} // Hide the input
           />
         </div>
+        {errors.organizationBanner && (
+          <p className="text-red-500 text-sm mt-2">
+            {errors.organizationBanner}
+          </p>
+        )}
       </div>
 
       <div className="lg:flex block space-x-4">
@@ -135,9 +195,15 @@ const Basicinfo = () => {
                 className={clsx(
                   "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block lg:w-[90%] w-full rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
                   "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
+                  errors.organizationName ? "border-red-500" : "",
                 )}
               />
             </Field>
+            {errors.organizationName && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.organizationName}
+              </p>
+            )}
             <p className="text-[14px] w-full text-[#2D3A4B] font-light leading-[23px]">
               Once chosen Organization name will be unchangeable for the next 3
               months{" "}
@@ -155,9 +221,15 @@ const Basicinfo = () => {
                 className={clsx(
                   "h-[246px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block lg:w-[90%] w-full rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
                   "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
+                  errors.organizationDescription ? "border-red-500" : "",
                 )}
               />
             </Field>
+            {errors.organizationDescription && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.organizationDescription}
+              </p>
+            )}
           </div>
 
           <div className="space-y-3">
@@ -186,6 +258,11 @@ const Basicinfo = () => {
                 style={{ display: "none" }} // Hide the input
               />
             </div>
+            {errors.organizationLogo && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.organizationLogo}
+              </p>
+            )}
           </div>
 
           <p className="text-[14px] w-full lg:w-[342px] text-[#2D3A4B] font-light leading-[23px]">
