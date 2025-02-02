@@ -67,8 +67,9 @@ const Guestlist = () => {
 
   return (
     <div className="h-auto w-full pb-10">
-      <div className="h-[150px] w-[80%] mx-auto bg-[#FFFFFF] rounded-lg flex justify-between items-center  px-16">
-        <div className="">
+      {/* Stats section */}
+      <div className="h-auto sm:h-[120px] md:h-[150px] w-[92%] sm:w-[85%] md:w-[80%] mx-auto bg-[#FFFFFF] rounded-lg flex flex-col md:flex-row justify-between items-center px-4 md:px-16 py-6 md:py-0 gap-4 md:gap-0">
+        <div className="text-center md:text-left">
           <p className="text-[#2D3A4B] text-[16px] font-medium leading-[18px]">
             Your Guests
           </p>
@@ -76,8 +77,8 @@ const Guestlist = () => {
             39
           </h1>
         </div>
-        <div className="w-[1px] h-[80%] bg-[#9696966E]"></div>
-        <div>
+        <div className="hidden md:block w-[1px] h-[80%] bg-[#9696966E]"></div>
+        <div className="text-center md:text-left">
           <p className="text-[#2D3A4B] text-[16px] font-medium leading-[18px]">
             Approved attendance
           </p>
@@ -85,8 +86,8 @@ const Guestlist = () => {
             31
           </h1>
         </div>
-        <div className="w-[1px]  h-[80%] bg-[#9696966E]"></div>
-        <div>
+        <div className="hidden md:block w-[1px] h-[80%] bg-[#9696966E]"></div>
+        <div className="text-center md:text-left">
           <p className="text-[#2D3A4B] text-[16px] font-medium leading-[18px]">
             Disapproved attendance
           </p>
@@ -94,8 +95,8 @@ const Guestlist = () => {
             3
           </h1>
         </div>
-        <div className="w-[1px]  h-[80%] bg-[#9696966E]"></div>
-        <div>
+        <div className="hidden md:block w-[1px] h-[80%] bg-[#9696966E]"></div>
+        <div className="text-center md:text-left">
           <p className="text-[#2D3A4B] text-[16px] font-medium leading-[18px]">
             Pending Attendance
           </p>
@@ -105,13 +106,13 @@ const Guestlist = () => {
         </div>
       </div>
 
-      <div className="h-[930px] w-[80%] mx-auto bg-[#FFFFFF] mt-4 rounded-lg">
-        <div className="flex justify-between px-16 pt-10">
-          <h1 className="text-[18px] font-medium leading-[22px]  text-[#333333] mt-2">
+      <div className="h-[930px] w-[92%] sm:w-[85%] md:w-[80%] mx-auto bg-[#FFFFFF] mt-4 rounded-lg">
+        <div className="flex flex-col md:flex-row justify-between px-4 sm:px-8 md:px-16 pt-6 md:pt-10 gap-4 md:gap-0">
+          <h1 className="text-[18px] font-medium leading-[22px] text-[#333333] mt-2">
             Guest list
           </h1>
-          <div className="flex space-x-8">
-            <div className="relative w-[550px] lclg:w-[380px]">
+          <div className="flex flex-col md:flex-row gap-4 md:space-x-8">
+            <div className="relative w-full md:w-[550px] lclg:w-[380px]">
               <Input
                 name="search by address"
                 type="text"
@@ -137,32 +138,35 @@ const Guestlist = () => {
                 </svg>
               )}
             </div>
-            <Button className=" hidden lg:flex rounded-lg bg-[#4A90E21F] py-2 px-4 lg:h-[42px] items-center lg:w-[125px] text-sm text-[#5801A9] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
-              <div className="flex space-x-4 items-center font-semibold text-[16px]">
-                <Image src={downlaod} alt="ticket" className="mr-2" />
-              </div>
-              <div className="text-[11px]">Download</div>
-            </Button>
+            <div className="flex gap-4 md:gap-8">
+              <Button className="flex lg:flex rounded-lg bg-[#4A90E21F] py-2 px-4 lg:h-[42px] items-center w-full md:w-[125px] text-sm text-[#5801A9] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
+                <div className="flex space-x-4 items-center font-semibold text-[16px]">
+                  <Image src={downlaod} alt="ticket" className="mr-2" />
+                </div>
+                <div className="text-[11px]">Download</div>
+              </Button>
 
-            <Button className="hidden lg:flex rounded-lg bg-[#4A90E21F] py-2 px-4 lg:h-[42px] items-center lg:w-[90px] text-sm text-[#5801A9] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
-              <div className="flex space-x-4 items-center font-semibold text-[16px]">
-                <Image src={filter} alt="ticket" className="mr-2" />
-              </div>
-              <div className="text-[11px]">Filter</div>
-            </Button>
+              <Button className="flex lg:flex rounded-lg bg-[#4A90E21F] py-2 px-4 lg:h-[42px] items-center w-full md:w-[90px] text-sm text-[#5801A9] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
+                <div className="flex space-x-4 items-center font-semibold text-[16px]">
+                  <Image src={filter} alt="ticket" className="mr-2" />
+                </div>
+                <div className="text-[11px]">Filter</div>
+              </Button>
+            </div>
           </div>
         </div>
-        <div className="w-[92%] mx-auto mt-6 h-[750px]">
-          <table className="w-full border-separate border-spacing-y-3 ">
+
+        <div className="w-[92%] mx-auto mt-6 h-[750px] overflow-x-auto">
+          <table className="w-full border-separate border-spacing-y-3 min-w-[800px]">
             <thead>
               <tr className="h-[56px] text-[14px] bg-[#9B51E052] font-normal text-[#5801A9] leading-[19.79px]">
                 <th className="w-[50px] px-4 rounded-tl-xl rounded-bl-xl">
                   <Image src={check} alt="ticket" />
                 </th>
-                <th className=" text-center font-light">Name</th>
-                <th className=" text-center font-light">Address</th>
-                <th className=" text-center font-light">Status</th>
-                <th className=" text-center font-light">Role</th>
+                <th className="text-center font-light">Name</th>
+                <th className="text-center font-light">Address</th>
+                <th className="text-center font-light">Status</th>
+                <th className="text-center font-light">Role</th>
                 <th className="text-center font-light">Reg date</th>
                 <th className="text-center font-light rounded-tr-xl rounded-br-xl">
                   Actions
@@ -184,8 +188,7 @@ const Guestlist = () => {
           </table>
         </div>
 
-        {/* Pagination Controls */}
-        <div className="flex justify-center space-x-2 mt-4">
+        <div className="flex justify-center space-x-2 mt-4 pb-4 md:pb-0 overflow-x-auto px-4">
           <button
             onClick={goToPreviousPage}
             disabled={currentPage === 1}
@@ -202,13 +205,16 @@ const Guestlist = () => {
               <button
                 key={index}
                 onClick={() => goToPage(page)}
-                className={`px-4 py-2 rounded text-[14px] ${currentPage == page ? "bg-none text-[#000000] border-[#F56630] border-[1px]" : "bg-none text-[#000000]"}`}
+                className={`px-4 py-2 rounded text-[14px] ${
+                  currentPage == page
+                    ? "bg-none text-[#000000] border-[#F56630] border-[1px]"
+                    : "bg-none text-[#000000]"
+                }`}
               >
                 {page}
               </button>
             ),
           )}
-
           <button
             onClick={goToNextPage}
             disabled={currentPage === totalPages}
