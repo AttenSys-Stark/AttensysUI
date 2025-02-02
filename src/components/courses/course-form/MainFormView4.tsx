@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
 import Dropdown from "../Dropdown"
 import Image from "next/image"
@@ -11,6 +11,18 @@ import Stepper from "@/components/Stepper"
 
 const MainFormView4 = () => {
   const router = useRouter()
+  const [formData, setFormData] = useState({
+    pricingType: "",
+    promoCode: "",
+  })
+
+  const [errors, setErrors] = useState({
+    pricingType: "",
+    promoCode: "",
+  })
+
+  const [promoCodes, setPromoCodes] = useState([])
+
   const pricing = [
     {
       sym: free,
@@ -24,6 +36,76 @@ const MainFormView4 = () => {
     },
   ]
 
+  const handlePricingChange = (cost: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      pricingType: cost,
+    }))
+    setErrors((prev) => ({
+      ...prev,
+      pricingType: "",
+    }))
+  }
+  const handlePromoCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      promoCode: e.target.value,
+    }))
+    setErrors((prev) => ({
+      ...prev,
+      promoCode: "",
+    }))
+  }
+
+  const handleAddPromoCode = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (formData.promoCode.trim()) {
+      setPromoCodes(
+        (prev: string[]) => [...prev, formData.promoCode] as never[],
+      )
+      setFormData((prev) => ({
+        ...prev,
+        promoCode: "",
+      }))
+    }
+  }
+
+  const validateForm = () => {
+    const newErrors: { pricingType: string; promoCode: string } = {
+      pricingType: "",
+      promoCode: "",
+    }
+
+    if (!formData.pricingType) {
+      newErrors.pricingType = "Please select a pricing option"
+    }
+
+    if (!formData.promoCode && promoCodes.length === 0) {
+      newErrors.promoCode = "Please add at least one promo code"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).every(
+      (key) => newErrors[key as keyof typeof newErrors] === "",
+    )
+  }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    if (validateForm()) {
+      handleCreateCourse(
+        e as unknown as React.MouseEvent<HTMLFormElement>,
+        "courseSetup5",
+        router,
+      )
+    }
+  }
+
+  const handleSaveProgress = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault()
+    // Add your save progress logic here
+    console.log("Progress saved")
+  }
   return (
     <div className="flex">
       <div className="hidden lg:block">
@@ -55,15 +137,21 @@ const MainFormView4 = () => {
               </p>
             </div>
 
-            <button className="hidden sm:block bg-[#c5d322] px-7 py-3 rounded text-black">
+            <button
+              onClick={handleSaveProgress}
+              className="hidden sm:block bg-[#c5d322] px-7 py-3 rounded text-black"
+            >
               Save progress
             </button>
           </div>
 
           <div className="mx-4 sm:ml-24 lg:mr-96 mt-12">
-            <form action="CourseSetup5">
+            <form onSubmit={handleSubmit}>
               <div className="my-12">
-                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor=""
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Course Pricing
                 </label>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px] my-2">
@@ -76,28 +164,44 @@ appropriately can help attract the right audience while providing a fair return 
                       key={id}
                       className="relative border border-3 border-black mr-12 px-5 py-5 rounded-xl sm:my-0 my-8"
                     >
-                      <div className="fle ">
+                      <div className="flex">
                         <div className="flex content-start">
                           <div>
                             <Image src={item.sym} alt={item.cost} width={30} />
                           </div>
                           <div className="mx-4">
-                            <p className="font-semibold text-base leading-[31px] text-[#333333]">{item.cost}</p>
-                            <p className="font-normal text-[13px]/[145%] text-[#2D3A4B]">{item.desc} </p>
+                            <p className="font-semibold text-base leading-[31px] text-[#333333]">
+                              {item.cost}
+                            </p>
+                            <p className="font-normal text-[13px]/[145%] text-[#2D3A4B]">
+                              {item.desc}{" "}
+                            </p>
                           </div>
                         </div>
 
                         <div className="p-1 rounded-xl absolute right-5 top-3">
-                          <input type="checkbox" name="xxw" id="" />
+                          <input
+                            type="checkbox"
+                            checked={formData.pricingType === item.cost}
+                            onChange={() => handlePricingChange(item.cost)}
+                          />
                         </div>
                       </div>
                     </div>
                   ))}
                 </div>
+                {errors.pricingType && (
+                  <p className="text-red-500 text-sm mt-2">
+                    {errors.pricingType}
+                  </p>
+                )}
               </div>
 
               <div className="mt-[71px]">
-                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor=""
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Promo and Discount
                 </label>
                 <p className="font-normal text-[13px]/[145%] md:text-[14px] mt-5 text-[#2D3A4B] leading-[21px]">
@@ -122,9 +226,6 @@ appropriately can help attract the right audience while providing a fair return 
                   <button
                     className="rounded-lg bg-[#4A90E2] px-12 py-3 text-white w-full md:max-w-[350px]"
                     type="submit"
-                    onClick={(e) =>
-                      handleCreateCourse(e, "courseSetup5", router)
-                    }
                   >
                     Save and Proceed
                   </button>

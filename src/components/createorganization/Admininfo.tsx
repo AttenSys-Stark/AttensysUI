@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { Button, Field, Input } from "@headlessui/react"
 import clsx from "clsx"
 import { useRouter } from "next/navigation"
@@ -9,11 +9,43 @@ const Admininfo = () => {
   const router = useRouter()
   const [organizationData, setOrganizationData] = useAtom(organzationInitState)
 
-  // console.dir(organizationData, {depth : null})
+  // State for tracking errors
+  const [errors, setErrors] = useState({
+    organizationAdminfullname: "",
+    organizationAminEmail: "",
+    organizationAdminWallet: "",
+  })
 
   const handlerouting = (prop: string) => {
+    // Validate all fields before routing
+    const newErrors = {
+      organizationAdminfullname: !organizationData.organizationAdminfullname
+        ? "Admin name is required"
+        : "",
+      organizationAminEmail: !organizationData.organizationAminEmail
+        ? "Email address is required"
+        : "",
+      organizationAdminWallet: !organizationData.organizationAdminWallet
+        ? "Wallet address is required"
+        : "",
+    }
+
+    setErrors(newErrors)
+
+    // Check if any errors exist
+    const hasErrors = Object.values(newErrors).some((error) => error !== "")
+
+    // Only route if no errors
+    if (!hasErrors) {
+      router.push(`/Createorganization/${prop}`)
+    }
+
     router.push(`/Createorganization/${prop}`)
   }
+  // console.dir(organizationData, {depth : null})
+
+  // const handlerouting = (prop: string) => {
+  // }
   const handleAdminNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOrganizationData((prevData) => ({
       ...prevData, // Spread existing data to retain untouched fields
@@ -26,14 +58,32 @@ const Admininfo = () => {
       ...prevData, // Spread existing data to retain untouched fields
       organizationAminEmail: e.target.value, // Dynamically update the specific field
     }))
+
+    // setOrganizationData((prevData) => ({
+    //   ...prevData,
+    //   organizationAdminfullname: value,
+    // }))
+
+    // Clear error when input changes
+    setErrors((prev) => ({
+      ...prev,
+      organizationAdminfullname: value ? "" : "Admin name is required",
+    }))
   }
 
   const handleWalletAddressChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    const value = e.target.value
     setOrganizationData((prevData) => ({
-      ...prevData, // Spread existing data to retain untouched fields
-      organizationAdminWallet: e.target.value, // Dynamically update the specific field
+      ...prevData,
+      organizationAdminWallet: value,
+    }))
+
+    // Clear error when input changes
+    setErrors((prev) => ({
+      ...prev,
+      organizationAdminWallet: value ? "" : "Wallet address is required",
     }))
   }
 
@@ -51,9 +101,15 @@ const Admininfo = () => {
             className={clsx(
               "h-[45px] sm:h-[55px] border-[1px] sm:border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg py-1.5 px-3 text-sm text-[#667185]",
               "focus:outline-none focus:ring-2 focus:ring-[#9B51E0] focus:border-transparent",
+              errors.organizationAdminfullname && "border-red-500",
             )}
           />
         </Field>
+        {errors.organizationAdminfullname && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.organizationAdminfullname}
+          </p>
+        )}
       </div>
 
       {/* Email Address Section */}
@@ -69,7 +125,8 @@ const Admininfo = () => {
               className={clsx(
                 "h-[45px] sm:h-[55px] border-[1px] sm:border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg py-1.5 px-3 text-sm text-[#667185]",
                 "focus:outline-none focus:ring-2 focus:ring-[#9B51E0] focus:border-transparent",
-                "pr-[130px]", // Space for confirm button
+                "pr-[130px]",
+                errors.organizationAminEmail && "border-red-500", // Space for confirm button
               )}
             />
           </Field>
@@ -77,6 +134,11 @@ const Admininfo = () => {
             Confirm address
           </button>
         </div>
+        {errors.organizationAminEmail && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.organizationAminEmail}
+          </p>
+        )}
       </div>
 
       {/* Wallet Address Section */}
