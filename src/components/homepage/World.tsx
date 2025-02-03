@@ -7,9 +7,9 @@ import Image from 'next/image';
 
 const World = () => {
   return (
-    <div className="w-[90%] mx-auto my-4 lg:flex lg:justify-between lg:items-center sm:h-[500px]">
+    <div className="w-[90%] mx-auto my-4 lg:flex lg:justify-between lg:items-center sm:h-[450px]">
       {/* 📌 Text Section */}
-      <div className="sm:w-[60%] flex items-center">
+      <div className="sm:w-[100%] flex items-center">
         <div className="w-[90%] sm:w-[80%] mx-auto">
           {/* 📌 Title */}
           <h1 className="text-[24px] sm:text-[30px] lg:text-[36px] font-bold text-[#2D3A4B] mb-5">

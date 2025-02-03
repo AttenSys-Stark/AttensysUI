@@ -96,7 +96,7 @@ const Experience = () => {
                 </div>
 
                 <div className='w-[40%] mt-48'>
-                    <p className='w-[490px] h-[156px] text-[24px] font-bold text-[#2D3A4B]'>
+                    <p className='w-[490px] h-[156px] text-[24px] font-bold text-[#2D3A4B] sm1275:w-[400px]'>
                         Our <span className='text-[#4A90E2]'>bootcamps</span> are designed for learners seeking high-impact, career-advancing courses hosted by Industry Leaders
                     </p>
                     <Button className="hidden lg:flex rounded-lg bg-gradient-to-r from-[#9B51E0] to-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[200px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700">

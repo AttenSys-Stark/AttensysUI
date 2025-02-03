@@ -28,7 +28,7 @@ const Eventsection = () => {
         <div className="space-y-5 w-full lg:w-[400px] text-center lg:text-left">
           {/* Text visible only on lg screens or larger */}
           <div className="hidden lg:block">
-            <h1 className="text-[14px] sm:text-[16px] md:text-[17px] lg:text-[17px] text-[#2D3A4B] font-light leading-[20px] sm:leading-[22px] lg:leading-[22px] mx-auto lg:mx-0 w-full lg:w-[485px]">
+            <h1 className="text-[14px] sm:text-[16px] md:text-[17px] lg:text-[17px] text-[#2D3A4B] font-light leading-[20px] sm:leading-[22px] lg:leading-[22px] mx-auto lg:mx-0 w-full lg:w-[485px] sm1275:w-[300px] ">
               The central hub where event organizers can manage all their events, access key statistics, and perform quick actions.
             </h1>
           </div>
