@@ -1,35 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState } from "react"
 
 interface EmailInputProps {
-  onEmailsChange: (emails: string[]) => void;
+  onEmailsChange: (emails: string[]) => void
 }
 
 const Emailinput: React.FC<EmailInputProps> = ({ onEmailsChange }) => {
-  const [inputValue, setInputValue] = useState<string>('');
-  const [emails, setEmails] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState<string>("")
+  const [emails, setEmails] = useState<string[]>([])
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault()
       if (inputValue.trim() && validateEmail(inputValue.trim())) {
-        const newEmails = [...emails, inputValue.trim()];
-        setEmails(newEmails);
-        onEmailsChange(newEmails);
-        setInputValue('');
+        const newEmails = [...emails, inputValue.trim()]
+        setEmails(newEmails)
+        onEmailsChange(newEmails)
+        setInputValue("")
       }
     }
-  };
+  }
 
   const handleRemoveEmail = (index: number) => {
-    const newEmails = emails.filter((_, i) => i !== index);
-    setEmails(newEmails);
-    onEmailsChange(newEmails);
-  };
+    const newEmails = emails.filter((_, i) => i !== index)
+    setEmails(newEmails)
+    onEmailsChange(newEmails)
+  }
 
   const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
 
   return (
     <div className="flex flex-wrap items-center p-2 rounded-md">
@@ -57,7 +57,7 @@ const Emailinput: React.FC<EmailInputProps> = ({ onEmailsChange }) => {
         onKeyDown={handleKeyDown}
       />
     </div>
-  );
-};
+  )
+}
 
-export default Emailinput;
+export default Emailinput

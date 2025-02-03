@@ -41,7 +41,7 @@ const MyCourses = (props: any) => {
       <div className="flex-auto ml-0 lg:ml-5 px-4 my-12 lg:my-0 lg:px-0">
         {coursesDetails.map((item, i) =>
           item && item.tag == selected ? (
-            <CoursesCreated item={item} selected={selected}  key={i} />
+            <CoursesCreated item={item} selected={selected} key={i} />
           ) : null,
         )}
 

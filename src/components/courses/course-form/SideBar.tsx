@@ -59,7 +59,9 @@ const CourseSideBar = () => {
         {courseSetup.map((item, i) => (
           <div key={i} className={`${i == 0 ? "my-2" : "my-12"}`}>
             <div className="border-l-4 border-[#4a90e2] text-[#4a90e2] my-4 pl-6">
-              <h1 className="font-semibold text-[16px] leading-[31px]">{item.head}</h1>
+              <h1 className="font-semibold text-[16px] leading-[31px]">
+                {item.head}
+              </h1>
             </div>
 
             <div>
@@ -71,7 +73,9 @@ const CourseSideBar = () => {
                     // disabled={this.state.disabled}
                     className="appearance-none w-4 h-4 rounded-full border-[1px] border-[#2D3A4B] checked:bg-[#115E2C] checked:border-[#115E2C] required:border-red-500 checked:before:content-['✔'] checked:before:absolute checked:before:top-[-1px] checked:before:left-[3px] checked:before:text-white checked:before:text-[10px] relative"
                   />
-                  <p className="ml-4 text-[#333333] text-[14px] leading-[22px]">{sub}</p>
+                  <p className="ml-4 text-[#333333] text-[14px] leading-[22px]">
+                    {sub}
+                  </p>
                 </div>
               ))}
             </div>

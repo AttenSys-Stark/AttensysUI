@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
-
+import { useEffect, useRef, useState } from "react"
+import { motion } from "framer-motion"
 
 const TrueFocus = ({
   sentence = "True Focus",
@@ -11,54 +10,62 @@ const TrueFocus = ({
   animationDuration = 0.5,
   pauseBetweenAnimations = 1,
 }) => {
-  const words = sentence.split(" ");
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [lastActiveIndex, setLastActiveIndex] = useState(null);
-  const containerRef = useRef(null);
-  const wordRefs = useRef([]);
-  const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const words = sentence.split(" ")
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [lastActiveIndex, setLastActiveIndex] = useState(null)
+  const containerRef = useRef(null)
+  const wordRefs = useRef([])
+  const [focusRect, setFocusRect] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  })
 
   useEffect(() => {
     if (!manualMode) {
-      const interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % words.length);
-      }, (animationDuration + pauseBetweenAnimations) * 1000);
+      const interval = setInterval(
+        () => {
+          setCurrentIndex((prev) => (prev + 1) % words.length)
+        },
+        (animationDuration + pauseBetweenAnimations) * 1000,
+      )
 
-      return () => clearInterval(interval);
+      return () => clearInterval(interval)
     }
-  }, [manualMode, animationDuration, pauseBetweenAnimations, words.length]);
+  }, [manualMode, animationDuration, pauseBetweenAnimations, words.length])
 
   useEffect(() => {
-    if (currentIndex === null || currentIndex === -1) return;
-    if (!wordRefs.current[currentIndex] || !containerRef.current) return;
+    if (currentIndex === null || currentIndex === -1) return
+    if (!wordRefs.current[currentIndex] || !containerRef.current) return
 
     //@ts-ignore
-    const parentRect = containerRef.current.getBoundingClientRect();
-      //@ts-ignore
-    const activeRect = wordRefs.current[currentIndex].getBoundingClientRect();
+    const parentRect = containerRef.current.getBoundingClientRect()
+    //@ts-ignore
+    const activeRect = wordRefs.current[currentIndex].getBoundingClientRect()
 
     setFocusRect({
       x: activeRect.left - parentRect.left,
       y: activeRect.top - parentRect.top,
       width: activeRect.width,
       height: activeRect.height,
-    });
-  }, [currentIndex, words.length]);
+    })
+  }, [currentIndex, words.length])
 
   //@ts-ignore
   const handleMouseEnter = (index) => {
     if (manualMode) {
-      setLastActiveIndex(index);
-      setCurrentIndex(index);
+      setLastActiveIndex(index)
+      setCurrentIndex(index)
     }
-  };
+  }
 
   const handleMouseLeave = () => {
     if (manualMode) {
       //@ts-ignore
-      setCurrentIndex(lastActiveIndex);
+      setCurrentIndex(lastActiveIndex)
     }
-  };
+  }
 
   return (
     <div
@@ -66,15 +73,14 @@ const TrueFocus = ({
       ref={containerRef}
     >
       {words.map((word, index) => {
-        const isActive = index === currentIndex;
+        const isActive = index === currentIndex
         return (
           <span
             key={index}
-              //@ts-ignore
+            //@ts-ignore
             ref={(el) => (wordRefs.current[index] = el)}
             className="relative text-[3rem] font-black cursor-pointer text-[#9B51E0]"
             style={{
-                
               filter: manualMode
                 ? isActive
                   ? `blur(0px)`
@@ -82,7 +88,7 @@ const TrueFocus = ({
                 : isActive
                   ? `blur(0px)`
                   : `blur(${blurAmount}px)`,
-                    //@ts-ignore
+              //@ts-ignore
               "--border-color": borderColor,
               "--glow-color": glowColor,
               transition: `filter ${animationDuration}s ease`,
@@ -92,7 +98,7 @@ const TrueFocus = ({
           >
             {word}
           </span>
-        );
+        )
       })}
 
       <motion.div
@@ -108,7 +114,7 @@ const TrueFocus = ({
           duration: animationDuration,
         }}
         style={{
-              //@ts-ignore
+          //@ts-ignore
           "--border-color": borderColor,
           "--glow-color": glowColor,
         }}
@@ -143,7 +149,7 @@ const TrueFocus = ({
         ></span>
       </motion.div>
     </div>
-  );
-};
+  )
+}
 
-export default TrueFocus;
+export default TrueFocus

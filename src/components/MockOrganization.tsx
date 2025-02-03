@@ -29,7 +29,7 @@ const MockOrganization = () => {
   const setConnectorData = useSetAtom(connectorDataAtom)
   const setConnector = useSetAtom(connectorAtom)
   const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-  
+
   const [inputValue, setInputValue] = useState("")
   const [orgInputValue, setOrgInputValue] = useState("")
   const [classOrgValue, setClassOrgValue] = useState("")
@@ -107,8 +107,8 @@ const MockOrganization = () => {
     const myCall = organizationContract.populate("get_all_org_info", [])
     const res = await organizationContract.get_all_org_info(myCall.calldata)
     if (res != undefined) {
-    //   console.log(res)
-    //   setIsSuccess(true)
+      //   console.log(res)
+      //   setIsSuccess(true)
     }
   }
   const handleGetInstructor = async (
@@ -134,21 +134,25 @@ const MockOrganization = () => {
       const myCall = organizationContract.populate("create_a_class", [
         classOrgValue,
       ])
-      const res = await organizationContract.create_a_class(
-        myCall.calldata,
-      )
+      const res = await organizationContract.create_a_class(myCall.calldata)
       await provider.waitForTransaction(res.transaction_hash)
     } catch (error) {}
   }
 
-  const handleGetInstructorPartOfOrg = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleGetInstructorPartOfOrg = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault()
     organizationContract.connect(wallet?.account)
-    const myCall = organizationContract.populate("get_instructor_part_of_org", [instructorInputValue])
-    const res = await organizationContract.get_instructor_part_of_org(myCall.calldata)
+    const myCall = organizationContract.populate("get_instructor_part_of_org", [
+      instructorInputValue,
+    ])
+    const res = await organizationContract.get_instructor_part_of_org(
+      myCall.calldata,
+    )
     if (res != undefined) {
       console.log(res)
-    //   setIsSuccess(true)
+      //   setIsSuccess(true)
     }
   }
 

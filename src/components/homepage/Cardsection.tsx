@@ -1,8 +1,8 @@
-import React from "react";
-import Image from "next/image";
-import grad from "@/assets/grad.svg";
-import book from "@/assets/book.svg";
-import badge from "@/assets/badge.svg";
+import React from "react"
+import Image from "next/image"
+import grad from "@/assets/grad.svg"
+import book from "@/assets/book.svg"
+import badge from "@/assets/badge.svg"
 
 const Cardsection = () => {
   const data = [
@@ -24,7 +24,7 @@ const Cardsection = () => {
       paragraph:
         "Issue, and verify certificates with ease. Ensure every certificate is authenticated with our blockchain-backed technology.",
     },
-  ];
+  ]
 
   return (
     <div className="mt-4 sm:mt-10 md:mt-12 w-[90%] md:w-[80%] lg:w-[90%] mx-auto flex flex-col sm:flex-row md:flex-col md:items-center lg:flex-row sm:justify-center sm:space-x-6 space-y-6 sm:space-y-0 md:space-y-8 md:px-6">
@@ -49,7 +49,7 @@ const Cardsection = () => {
         </div>
       ))}
     </div>
-  );
-};
+  )
+}
 
-export default Cardsection;
+export default Cardsection

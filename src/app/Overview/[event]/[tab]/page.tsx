@@ -1,24 +1,30 @@
 "use client"
-import React, { useEffect } from 'react'
-import { useParams } from 'next/navigation';
-import { coursestatusAtom,bootcampdropdownstatus ,connectorAtom,
+import React, { useEffect } from "react"
+import { useParams } from "next/navigation"
+import {
+  coursestatusAtom,
+  bootcampdropdownstatus,
+  connectorAtom,
   connectorDataAtom,
-  walletStarknetkitNextAtom, } from "@/state/connectedWalletStarknetkitNext"
+  walletStarknetkitNextAtom,
+} from "@/state/connectedWalletStarknetkitNext"
 import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
 import { RESET } from "jotai/utils"
 import { connect, disconnect } from "starknetkit"
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown"
 import { useAtom, useSetAtom } from "jotai"
-import Coursedropdown from '@/components/courses/Coursedropdown';
-import OverviewLanding from '@/components/overview/OverviewLanding';
+import Coursedropdown from "@/components/courses/Coursedropdown"
+import OverviewLanding from "@/components/overview/OverviewLanding"
 
 const Index = () => {
-  const [status, setstatus] = useAtom(coursestatusAtom); 
-  const [bootcampdropstat, setbootcampdropstat] = useAtom(bootcampdropdownstatus)
-    const params = useParams();
-  const event = params.event;
-  const tab = params.tab;
+  const [status, setstatus] = useAtom(coursestatusAtom)
+  const [bootcampdropstat, setbootcampdropstat] = useAtom(
+    bootcampdropdownstatus,
+  )
+  const params = useParams()
+  const event = params.event
+  const tab = params.tab
 
   const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
   const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
@@ -26,7 +32,7 @@ const Index = () => {
   const setConnector = useSetAtom(connectorAtom)
 
   const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-  
+
   useEffect(() => {
     setWalletLatest(RESET)
     setWalletNext(RESET)
@@ -61,25 +67,27 @@ const Index = () => {
     }
   }, [wallet])
 
-
-   
   const handlePageClick = () => {
-    setbootcampdropstat(false);
-    setstatus(false);
-};
-  
+    setbootcampdropstat(false)
+    setstatus(false)
+  }
+
   console.log(params)
-    return (
-    <div  onClick={handlePageClick}>
-           {status && (<div className='fixed inset-0 bg-black opacity-5 backdrop-blur-sm'></div>)}
-           {bootcampdropstat && (<div className='fixed inset-0 bg-black opacity-5 backdrop-blur-sm'></div>)}
-       <div onClick={(e) => e.stopPropagation()} >
+  return (
+    <div onClick={handlePageClick}>
+      {status && (
+        <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
+      )}
+      {bootcampdropstat && (
+        <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
+      )}
+      <div onClick={(e) => e.stopPropagation()}>
         <Coursedropdown />
-        </div>
-        <div onClick={(e) => e.stopPropagation()} > 
+      </div>
+      <div onClick={(e) => e.stopPropagation()}>
         <Bootcampdropdown />
-        </div>
-        <OverviewLanding eventname={event} tab={tab} />
+      </div>
+      <OverviewLanding eventname={event} tab={tab} />
     </div>
   )
 }

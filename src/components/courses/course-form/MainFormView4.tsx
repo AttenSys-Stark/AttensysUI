@@ -63,7 +63,10 @@ const MainFormView4 = () => {
           <div className="mx-4 sm:ml-24 lg:mr-96 mt-12">
             <form action="CourseSetup5">
               <div className="my-12">
-                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor=""
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Course Pricing
                 </label>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px] my-2">
@@ -82,8 +85,12 @@ appropriately can help attract the right audience while providing a fair return 
                             <Image src={item.sym} alt={item.cost} width={30} />
                           </div>
                           <div className="mx-4">
-                            <p className="font-semibold text-base leading-[31px] text-[#333333]">{item.cost}</p>
-                            <p className="font-normal text-[13px]/[145%] text-[#2D3A4B]">{item.desc} </p>
+                            <p className="font-semibold text-base leading-[31px] text-[#333333]">
+                              {item.cost}
+                            </p>
+                            <p className="font-normal text-[13px]/[145%] text-[#2D3A4B]">
+                              {item.desc}{" "}
+                            </p>
                           </div>
                         </div>
 
@@ -97,7 +104,10 @@ appropriately can help attract the right audience while providing a fair return 
               </div>
 
               <div className="mt-[71px]">
-                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor=""
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Promo and Discount
                 </label>
                 <p className="font-normal text-[13px]/[145%] md:text-[14px] mt-5 text-[#2D3A4B] leading-[21px]">

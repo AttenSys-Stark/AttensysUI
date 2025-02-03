@@ -86,7 +86,7 @@ const CourseForm = (props: any) => {
           </button>
         </div>
       </form>
-    
+
       <div className="block absolute left-[35%] bottom-36 lg:hidden">
         <Previous />
       </div>

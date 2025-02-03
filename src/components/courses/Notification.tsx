@@ -15,10 +15,15 @@ const Notification = () => {
         {notifCategory.map((item, i) => (
           <div key={i} className="">
             <div className="h-[80px] flex items-center w-full">
-            <h4 className="px-12 font-semibold text-[17px] leading-[25px]">{item.read}</h4>
+              <h4 className="px-12 font-semibold text-[17px] leading-[25px]">
+                {item.read}
+              </h4>
             </div>
             {item.msgs.map((msgDisplay, j) => (
-              <div className="py-3 px-5 gap-2 lg:gap-0 lg:px-12 min-h-[75px] border flex items-center" key={j}>
+              <div
+                className="py-3 px-5 gap-2 lg:gap-0 lg:px-12 min-h-[75px] border flex items-center"
+                key={j}
+              >
                 <Image src={msgDisplay.icon} alt="name" />
                 <p className="ml-3 mt-2 lg:mt-0">
                   {msgDisplay.msg}

@@ -1,4 +1,4 @@
-import React from "react";
+import React from "react"
 
 const Mantrasection = () => {
   return (
@@ -9,7 +9,7 @@ const Mantrasection = () => {
         <br /> in course certification
       </h1>
     </div>
-  );
-};
+  )
+}
 
-export default Mantrasection;
+export default Mantrasection

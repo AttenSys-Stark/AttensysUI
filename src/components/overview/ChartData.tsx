@@ -1,12 +1,20 @@
-import React from "react";
-import { Chart, ChartConfiguration } from "chart.js";
+import React from "react"
+import { Chart, ChartConfiguration } from "chart.js"
 
 export default function ChartData() {
   React.useEffect(() => {
     const config: ChartConfiguration = {
       type: "line",
       data: {
-        labels: ["January", "February", "March", "April", "May", "June", "July"],
+        labels: [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+        ],
         datasets: [
           {
             label: new Date().getFullYear().toString(),
@@ -45,43 +53,45 @@ export default function ChartData() {
         scales: {
           xAxes: [
             {
-              display: true, 
+              display: true,
               ticks: {
-                fontColor: "#333333", 
+                fontColor: "#333333",
                 stepSize: 25,
-                beginAtZero: true, 
+                beginAtZero: true,
               },
               gridLines: {
                 display: true,
-                color: "rgba(0, 0, 0, 0.1)", 
+                color: "rgba(0, 0, 0, 0.1)",
               },
             },
           ],
           yAxes: [
             {
-              display: true, 
+              display: true,
               ticks: {
-                fontColor: "#333333", 
-                beginAtZero: true, 
+                fontColor: "#333333",
+                beginAtZero: true,
               },
               gridLines: {
                 display: true,
-                color: "rgba(0, 0, 0, 0.1)"
+                color: "rgba(0, 0, 0, 0.1)",
               },
             },
           ],
         },
       },
-    };
+    }
 
-    const canvas = document.getElementById("line-chart") as HTMLCanvasElement | null;
+    const canvas = document.getElementById(
+      "line-chart",
+    ) as HTMLCanvasElement | null
     if (canvas) {
-      const ctx = canvas.getContext("2d");
+      const ctx = canvas.getContext("2d")
       if (ctx) {
-        (window as any).myLine = new Chart(ctx, config);
+        ;(window as any).myLine = new Chart(ctx, config)
       }
     }
-  }, []);
+  }, [])
 
   return (
     <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-sm rounded bg-white h-[100%]">
@@ -100,5 +110,5 @@ export default function ChartData() {
         </div>
       </div>
     </div>
-  );
+  )
 }

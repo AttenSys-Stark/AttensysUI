@@ -31,7 +31,7 @@ function updateStepsStatus(steps: Step[], step: number): Step[] {
 }
 
 type StepperProps = {
-  currentStep: number;
+  currentStep: number
 }
 
 export default function Stepper({ currentStep }: StepperProps) {

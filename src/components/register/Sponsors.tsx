@@ -15,7 +15,6 @@ const Sponsors = () => {
     <>
       {modal && <Modal status={modal} />}
       <div className="h-auto w-auto px-8 space-y-4 py-2" onClick={handlemodal}>
-        
         <h1 className="text-md text-[#2D3A4B] font-semibold">Sponsors</h1>
 
         <div className="flex space-x-4 lg:space-x-8">
