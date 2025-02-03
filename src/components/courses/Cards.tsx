@@ -18,18 +18,24 @@ export function CardWithLink() {
   const router = useRouter()
   return (
     <div
-      className="mt-6 w-[100%] lg:w-[90%] sm:w-[65%] border-2 rounded-xl shadow-lg pb-8"
+      className="mt-6 w-[100%] lg:w-[95%] border-2 rounded-xl pb-8"
       onClick={(e) => handleCoursehome(e, e.currentTarget.textContent, router)}
     >
       <div className="cursor-pointer">
         <div className="w-full h-[117px] rounded-t-xl">
-        <Image className="object-cover h-full w-full rounded-t-xl" alt="robot" src={robotImg}/>
+          <Image
+            className="object-cover h-full w-full rounded-t-xl"
+            alt="robot"
+            src={robotImg}
+          />
         </div>
-        <div className="flex justify-between mt-6 px-5 ">
+        <div className="flex sm:flex-col md:flex-row justify-between mt-6 px-5 ">
           {/* course prop  */}
           <div className="">
-            <p className="mb-2 font-bold text-[14px] leading-[22px] text-[#333333]">Elementary UI</p>
-            <p className="text-white text-[8px] font-extrabold items-center gap-2  bg-[#5801A9] my-2 rounded p-1">
+            <p className="mb-2 font-bold lg:text-[14px] leading-[22px] text-[#333333]">
+              Elementary UI
+            </p>
+            <p className="text-white text-[12px] font-extrabold items-center gap-2 w-fit  bg-[#5801A9] my-2 rounded p-1">
               Tech Innovators Academy
             </p>
           </div>
@@ -47,7 +53,10 @@ export function CardWithLink() {
         <div className="flex items-center space-x-3">
           {/* rating */}
           <StarRating totalStars={5} starnumber={4} />
-          <p className="text-[14px] text-[#2D3A4B] font-medium leading-[16px]"> <span className="text-[#5801A9]">1220</span> students</p>
+          <p className="text-[14px] text-[#2D3A4B] font-medium leading-[16px]">
+            {" "}
+            <span className="text-[#5801A9]">1220</span> students
+          </p>
         </div>
         <div></div>
         <p className="mt-2 text-[14px] text-[#2D3A4B] leading-[19px] font-light">

@@ -27,8 +27,8 @@ import robotimg from "@/assets/roboy.png"
 import courseImg from "@/assets/videoImg.svg"
 import podcast from "@/assets/Podcast.svg"
 import youtube from "@/assets/youtube.svg"
-import classvid from '@/assets/classtsest.svg'
-import noupload from '@/assets/noupload.svg'
+import classvid from "@/assets/classtsest.svg"
+import noupload from "@/assets/noupload.svg"
 
 import topNotch from "@/assets/topnotch.svg"
 import digital from "@/assets/digital.svg"
@@ -63,13 +63,16 @@ export const notifCategory = [
       {
         icon: free_books,
         msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
-      },  {
+      },
+      {
         icon: free_books,
         msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
-      },  {
+      },
+      {
         icon: free_books,
         msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
-      },  {
+      },
+      {
         icon: free_books,
         msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
       },
@@ -93,13 +96,16 @@ export const notifCategory = [
       {
         icon: certIcon,
         msg: "📅 Live Q&A in [Course Title] starts in 30 minutes! Join to get your questions answered in real time and connect with other learners.",
-      },   {
+      },
+      {
         icon: certIcon,
         msg: "📅 Live Q&A in [Course Title] starts in 30 minutes! Join to get your questions answered in real time and connect with other learners.",
-      },   {
+      },
+      {
         icon: certIcon,
         msg: "📅 Live Q&A in [Course Title] starts in 30 minutes! Join to get your questions answered in real time and connect with other learners.",
-      },   {
+      },
+      {
         icon: certIcon,
         msg: "📅 Live Q&A in [Course Title] starts in 30 minutes! Join to get your questions answered in real time and connect with other learners.",
       },
@@ -227,21 +233,24 @@ export const certContent = [
         author: "Blockchain Africa ‘24",
         nft_description:
           "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
-      },{
+      },
+      {
         img: liveNft,
         cert_name: "Blockchain Africa ‘24",
         recipient: "0x3C4kB...J29",
         author: "Blockchain Africa ‘24",
         nft_description:
           "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
-      },{
+      },
+      {
         img: digital,
         cert_name: "Blockchain Africa ‘24",
         recipient: "0x3C4kB...J29",
         author: "Blockchain Africa ‘24",
         nft_description:
           "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
-      },{
+      },
+      {
         img: liveNft,
         cert_name: "Blockchain Africa ‘24",
         recipient: "0x3C4kB...J29",
@@ -279,7 +288,8 @@ export const certContent = [
         author: "Blockchain Africa ‘24",
         nft_description:
           "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
-      },   {
+      },
+      {
         img: liveNft,
         cert_name: "Blockchain Africa ‘24",
         recipient: "0x3C4kB...J29",
@@ -1877,140 +1887,173 @@ export const favoriteCourseData = [
 
 export const mockkdata = [
   {
-    data : "Ox6G568*** marked an attendance"
-  }, {
-    data : "Ox343G568*** created an event"
-  }, {
-    data : "Ox57568*** got certified by web3 clubs"
-  }, {
-    data : "Ox44368*** just marked an attendance"
-  }, {
-    data : "Ox11168*** web3bridge just created a bootcamp"
-  }, {
-    data : "Ox00968*** marked an event attendance"
-  }, {
-    data : "Oxfdf568*** just created an organization"
-  },{
-    data : "Ox6G568*** marked an attendance"
-  }, {
-    data : "Ox343G568*** created an event"
-  }, {
-    data : "Ox57568*** got certified by web3 clubs"
-  }, {
-    data : "Ox44368*** just marked an attendance"
-  }, {
-    data : "Ox11168*** web3bridge just created a bootcamp"
-  }, {
-    data : "Ox00968*** marked an event attendance"
-  }, {
-    data : "Oxfdf568*** just created an organization"
-  },{
-    data : "Ox6G568*** marked an attendance"
-  }, {
-    data : "Ox343G568*** created an event"
-  }, {
-    data : "Ox57568*** got certified by web3 clubs"
-  }, {
-    data : "Ox44368*** just marked an attendance"
-  }, {
-    data : "Ox11168*** web3bridge just created a bootcamp"
-  }, {
-    data : "Ox00968*** marked an event attendance"
-  }, {
-    data : "Oxfdf568*** just created an organization"
-  },{
-    data : "Ox6G568*** marked an attendance"
-  }, {
-    data : "Ox343G568*** created an event"
-  }, {
-    data : "Ox57568*** got certified by web3 clubs"
-  }, {
-    data : "Ox44368*** just marked an attendance"
-  }, {
-    data : "Ox11168*** web3bridge just created a bootcamp"
-  }, {
-    data : "Ox00968*** marked an event attendance"
-  }, {
-    data : "Oxfdf568*** just created an organization"
-  },{
-    data : "Ox6G568*** marked an attendance"
-  }, {
-    data : "Ox343G568*** created an event"
-  }, {
-    data : "Ox57568*** got certified by web3 clubs"
-  }, {
-    data : "Ox44368*** just marked an attendance"
-  }, {
-    data : "Ox11168*** web3bridge just created a bootcamp"
-  }, {
-    data : "Ox00968*** marked an event attendance"
-  }, {
-    data : "Oxfdf568*** just created an organization"
+    data: "Ox6G568*** marked an attendance",
+  },
+  {
+    data: "Ox343G568*** created an event",
+  },
+  {
+    data: "Ox57568*** got certified by web3 clubs",
+  },
+  {
+    data: "Ox44368*** just marked an attendance",
+  },
+  {
+    data: "Ox11168*** web3bridge just created a bootcamp",
+  },
+  {
+    data: "Ox00968*** marked an event attendance",
+  },
+  {
+    data: "Oxfdf568*** just created an organization",
+  },
+  {
+    data: "Ox6G568*** marked an attendance",
+  },
+  {
+    data: "Ox343G568*** created an event",
+  },
+  {
+    data: "Ox57568*** got certified by web3 clubs",
+  },
+  {
+    data: "Ox44368*** just marked an attendance",
+  },
+  {
+    data: "Ox11168*** web3bridge just created a bootcamp",
+  },
+  {
+    data: "Ox00968*** marked an event attendance",
+  },
+  {
+    data: "Oxfdf568*** just created an organization",
+  },
+  {
+    data: "Ox6G568*** marked an attendance",
+  },
+  {
+    data: "Ox343G568*** created an event",
+  },
+  {
+    data: "Ox57568*** got certified by web3 clubs",
+  },
+  {
+    data: "Ox44368*** just marked an attendance",
+  },
+  {
+    data: "Ox11168*** web3bridge just created a bootcamp",
+  },
+  {
+    data: "Ox00968*** marked an event attendance",
+  },
+  {
+    data: "Oxfdf568*** just created an organization",
+  },
+  {
+    data: "Ox6G568*** marked an attendance",
+  },
+  {
+    data: "Ox343G568*** created an event",
+  },
+  {
+    data: "Ox57568*** got certified by web3 clubs",
+  },
+  {
+    data: "Ox44368*** just marked an attendance",
+  },
+  {
+    data: "Ox11168*** web3bridge just created a bootcamp",
+  },
+  {
+    data: "Ox00968*** marked an event attendance",
+  },
+  {
+    data: "Oxfdf568*** just created an organization",
+  },
+  {
+    data: "Ox6G568*** marked an attendance",
+  },
+  {
+    data: "Ox343G568*** created an event",
+  },
+  {
+    data: "Ox57568*** got certified by web3 clubs",
+  },
+  {
+    data: "Ox44368*** just marked an attendance",
+  },
+  {
+    data: "Ox11168*** web3bridge just created a bootcamp",
+  },
+  {
+    data: "Ox00968*** marked an event attendance",
+  },
+  {
+    data: "Oxfdf568*** just created an organization",
   },
 ]
 
 export const permisiondata = [
   {
-    email : "vladamirocks@gmail.com",
-    address : "0x5c956e61...de5232dc11",
-    access : ["Owner", "Instructor"]
+    email: "vladamirocks@gmail.com",
+    address: "0x5c956e61...de5232dc11",
+    access: ["Owner", "Instructor"],
   },
   {
-    email : "kenzman@gmail.com",
-    address : "0x5c956e61...de5232dc11",
-    access : ["Instructor"]
+    email: "kenzman@gmail.com",
+    address: "0x5c956e61...de5232dc11",
+    access: ["Instructor"],
   },
   {
-    email : "ephraim@gmail.com",
-    address : "0x5c956e61...de5232dc11",
-    access : ["Instructor"]
+    email: "ephraim@gmail.com",
+    address: "0x5c956e61...de5232dc11",
+    access: ["Instructor"],
   },
 ]
 
 export const registereddata = [
   {
-    email : "vladamirocks@gmail.com",
-    address : "0x5c956e61...de5232dc11",
-   registeredbootcamp : 3,
-   certifications : 3,
-   joined: 3,
+    email: "vladamirocks@gmail.com",
+    address: "0x5c956e61...de5232dc11",
+    registeredbootcamp: 3,
+    certifications: 3,
+    joined: 3,
   },
   {
-    email : "kenzman@gmail.com",
-    address : "0x5c956e61...de5232dc11",
-   registeredbootcamp : 2,
-   certifications : 6,
-   joined: 1,
+    email: "kenzman@gmail.com",
+    address: "0x5c956e61...de5232dc11",
+    registeredbootcamp: 2,
+    certifications: 6,
+    joined: 1,
   },
   {
-    email : "ephraim@gmail.com",
-    address : "0x5c956e61...de5232dc11",
-   registeredbootcamp : 3,
-   certifications : 3,
-   joined: 3,
+    email: "ephraim@gmail.com",
+    address: "0x5c956e61...de5232dc11",
+    registeredbootcamp: 3,
+    certifications: 3,
+    joined: 3,
   },
 ]
 
 export const outlineData = [
   {
-    day : 1,
-    views : 301,
-    assignment : 1,
-    resources : 1,
-    attendee : 201,
-    totalreg : 210,
-    boiler : classvid
+    day: 1,
+    views: 301,
+    assignment: 1,
+    resources: 1,
+    attendee: 201,
+    totalreg: 210,
+    boiler: classvid,
   },
   {
-    day : 1,
-    views : 0,
-    assignment : 1,
-    resources : 1,
-    attendee : 0,
-    totalreg : 210,
-    boiler : noupload
+    day: 1,
+    views: 0,
+    assignment: 1,
+    resources: 1,
+    attendee: 0,
+    totalreg: 210,
+    boiler: noupload,
   },
-
 ]
 
 export const regcaroselldata = [

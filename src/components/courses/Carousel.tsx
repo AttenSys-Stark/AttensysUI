@@ -25,41 +25,30 @@ const CarouselComp = () => {
   }
 
   return (
-    <div className="w-full flex justify-center items-center bg-gray-100 py-6">
-      {/* Wrapper to change layout based on screen size */}
-      <div className="w-[95%] max-w-[1200px]">
-        {/* Show Carousel on larger screens, vertical stacking on mobile */}
-        <div className="hidden sm:block">
-          <Carousel
-            responsive={responsive}
-            centerMode={true}
-            containerClass="carousel-container"
-            arrows
-            draggable
-            infinite
-            keyBoardControl
-            autoPlay
-            autoPlaySpeed={3000}
-            itemClass="px-2"
-            minimumTouchDrag={80}
-          >
-            <CardWithLink />
-            <CardWithLink />
-            <CardWithLink />
-            <CardWithLink />
-            <CardWithLink />
-          </Carousel>
-        </div>
-
-        {/* Vertical Layout for Mobile */}
-        <div className=" sm:hidden flex flex-col space-y-4 items-center">
-          <CardWithLink />
-          <CardWithLink />
-          <CardWithLink />
-          <CardWithLink />
-          <CardWithLink />
-        </div>
-      </div>
+    <div className="hidden w-full mx-auto lg:flex flex-col justify-center items-center">
+      <Carousel
+        className="course-carousel"
+        responsive={responsive}
+        centerMode={true}
+        containerClass="container"
+        additionalTransfrom={0}
+        arrows
+        dotListClass=""
+        draggable
+        focusOnSelect={false}
+        infinite
+        itemClass="carousel-item-custom"
+        keyBoardControl
+        minimumTouchDrag={80}
+        autoPlay={true}
+        autoPlaySpeed={3000}
+      >
+        <CardWithLink />
+        <CardWithLink />
+        <CardWithLink />
+        <CardWithLink />
+        <CardWithLink />
+      </Carousel>
     </div>
   )
 }

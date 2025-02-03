@@ -25,24 +25,24 @@ const AccountSection: FC<AccountSectionProps> = ({ address, chainId }) => {
 
   return (
     <>
-        <div
-          onClick={() => {
-            if (address) {
-              navigator.clipboard.writeText(address || "")
-            }
-          }}
-        >
-          Account: {address}
-        </div>
-        <div>
-          Chain:{" "}
-          {!hexChainId
-            ? String(chainId ?? "Unknown")
-            : hexChainId === constants.StarknetChainId.SN_SEPOLIA
-              ? constants.NetworkName.SN_SEPOLIA
-              : constants.NetworkName.SN_MAIN}
-        </div>
-        {/* <Box
+      <div
+        onClick={() => {
+          if (address) {
+            navigator.clipboard.writeText(address || "")
+          }
+        }}
+      >
+        Account: {address}
+      </div>
+      <div>
+        Chain:{" "}
+        {!hexChainId
+          ? String(chainId ?? "Unknown")
+          : hexChainId === constants.StarknetChainId.SN_SEPOLIA
+            ? constants.NetworkName.SN_SEPOLIA
+            : constants.NetworkName.SN_MAIN}
+      </div>
+      {/* <Box
           cursor={lastTxHash ? "pointer" : "default"}
           _hover={{ textDecoration: lastTxHash ? "underline" : "none" }}
           onClick={() => {
@@ -59,7 +59,6 @@ const AccountSection: FC<AccountSectionProps> = ({ address, chainId }) => {
         </Box>
         <Box>Tx status: {lastTxStatus}</Box>
         <Box color="##ff4848">{lastTxError?.toString()}</Box> */}
-
     </>
   )
 }

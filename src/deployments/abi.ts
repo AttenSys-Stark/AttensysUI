@@ -308,7 +308,7 @@ export const attensysCourseAbi = [
     kind: "enum",
     variants: [],
   },
-];
+]
 export const attensysEventAbi = [
   {
     type: "impl",
@@ -646,7 +646,7 @@ export const attensysEventAbi = [
     kind: "enum",
     variants: [],
   },
-];
+]
 export const attensysOrgAbi = [
   {
     type: "impl",
@@ -1078,4 +1078,4 @@ export const attensysOrgAbi = [
     kind: "enum",
     variants: [],
   },
-];
+]

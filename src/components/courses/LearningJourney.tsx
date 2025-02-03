@@ -1,7 +1,7 @@
 import React from "react"
 import ProgressBar from "@ramonak/react-progress-bar"
-import { FaPlay } from "@react-icons/all-files/fa/FaPlay"
 import Image from "next/image"
+import play from "@/assets/play.svg"
 
 interface ItemProps {
   no: number
@@ -59,8 +59,8 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
           ) : null}
 
           <div>
-            <div className="px-12 flex space-x-12 items-center">
-              <div  className="h-[164px] w-[254px] rounded-xl">
+            <div className="px-5 xl:px-12 flex flex-col xl:flex-row space-x-12 items-center">
+              <div className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
                 <Image
                   src={item.url}
                   alt="video"
@@ -69,22 +69,22 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
                 />
               </div>
 
-              <div className="mt-5 mx-8 flex-1">
+              <div className="!ml-0 px-3 xl:px-0 mt-5 xl:!mx-8 flex-1 w-full">
                 <div>
                   <h4 className="text-2xl font-medium leading-[22px] text-[#2D3A4B]">
                     Elementary Crypto Trading
                   </h4>
 
-                  <div className="block sm:flex items-center my-3 ">
-                    <div className="flex items-center space-x-3">
-                      <FaPlay color="#A01B9B" />
+                  <div className="flex flex-wrap xl:flex-nowrap gap-y-2 gap-4 xl:gap-0 items-center my-3 ">
+                    <div className="flex items-center gap-2">
+                      <Image src={play} alt="" height={12} width={12} />
                       <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
                         Total play time: 2 hrs 35 mins
                       </p>
                     </div>
-                    <div className="flex items-center sm:flex mx-0 my-4 sm:my-0 sm:mx-8 ">
+                    <div className="flex items-center gap-2">
                       <p className="hidden sm:block">|</p>
-                      <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0 sm:mx-8">
+                      <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0">
                         Created by:{" "}
                         <span className="underline"> Akinbola Kehinde </span>
                       </p>
@@ -93,11 +93,17 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
                 </div>
 
                 <div className="my-3">
-                  <ProgressBar completed={"58"} height="13px" bgColor="#9B51E0" />
+                  <ProgressBar
+                    completed={"58"}
+                    height="13px"
+                    bgColor="#9B51E0"
+                  />
                 </div>
 
                 <div className="my-3 flex justify-between">
-                  <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">3/6 Lectures completed</p>
+                  <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                    3/6 Lectures completed
+                  </p>
                   <p className="underline text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
                     (8:03 mins)
                   </p>

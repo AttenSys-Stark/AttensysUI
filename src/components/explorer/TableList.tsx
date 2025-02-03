@@ -1,19 +1,19 @@
-import React from "react";
-import Image from "next/image";
-import copy_addr from "@/assets/copy_addr.svg";
-import copy from "copy-to-clipboard";
+import React from "react"
+import Image from "next/image"
+import copy_addr from "@/assets/copy_addr.svg"
+import copy from "copy-to-clipboard"
 
 interface TableListProp {
-  timestamp: string;
-  address: string;
-  status: string;
-  category: string;
+  timestamp: string
+  address: string
+  status: string
+  category: string
 }
 
 const TableList: React.FC<TableListProp> = (props) => {
   const handleCopy = () => {
-    copy(props.address);
-  };
+    copy(props.address)
+  }
 
   const CardView = () => (
     <div className="bg-[#F2F1F1] rounded-2xl border w-full my-3 p-5">
@@ -42,7 +42,7 @@ const TableList: React.FC<TableListProp> = (props) => {
         </p>
       </div>
     </div>
-  );
+  )
 
   const TableRow = () => (
     <tr className="h-[56px] text-[14px] font-normal text-[#5801A9] bg-[#F2F1F1] leading-[19.79px] text-center my-10 rounded-2xl border">
@@ -69,7 +69,7 @@ const TableList: React.FC<TableListProp> = (props) => {
         {props.category}
       </td>
     </tr>
-  );
+  )
 
   return (
     <>
@@ -80,7 +80,7 @@ const TableList: React.FC<TableListProp> = (props) => {
         <TableRow />
       </tbody>
     </>
-  );
-};
+  )
+}
 
-export default TableList;
+export default TableList

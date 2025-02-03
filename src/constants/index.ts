@@ -1,7 +1,5 @@
 import { RpcProvider, constants } from "starknet"
 
-
-
 export const CHAIN_ID =
   process.env.NEXT_PUBLIC_CHAIN_ID === constants.NetworkName.SN_MAIN
     ? constants.NetworkName.SN_MAIN

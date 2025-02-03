@@ -40,8 +40,8 @@ const MainFormView5 = () => {
   ]
 
   return (
-    <div className="sm:flex">
-      <div className="hidden sm:block">
+    <div className="lg:flex">
+      <div className="hidden lg:block">
         <CourseSideBar />
       </div>
 
@@ -70,20 +70,24 @@ const MainFormView5 = () => {
               </p>
             </div>
 
-            <form action="course-landing-page" method="post" className="md:mr-5 lg:mr-0">
+            <form
+              action="course-landing-page"
+              method="post"
+              className="md:mr-5 lg:mr-0"
+            >
               <button className="hidden sm:block bg-[#C5D322] px-7 py-3  rounded text-white">
                 Publish
               </button>
             </form>
           </div>
 
-          <div className="mx-5 lg:mx-24 mt-12">
+          <div className="mx-5 lg:mx-8 mt-12">
             <div className="mb-5 order-first lg:hidden">
               <p className="text-[#5801A9] text-[16px] font-medium leading-[22px] m">
                 Technology | Web Development
               </p>
             </div>
-            <div className="block lg:grid grid-cols-2 gap-4">
+            <div className="block xl:grid grid-cols-2 gap-4">
               {/* Course Image */}
               <div className="lg:w-[368px] h-[238px] rounded-xl md:mb-0 mb-14  ">
                 <Image
@@ -136,7 +140,7 @@ const MainFormView5 = () => {
 
               <div className="">
                 <div>
-                  <div className="flex justify-between lg:w-[30%] mt-5">
+                  <div className="flex justify-between xl:w-[30%] mt-5">
                     <h4 className="font-semibold text-[18px] leading-[31px] text-[#333333]">
                       Certification for this course
                     </h4>

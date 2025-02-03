@@ -14,7 +14,7 @@ interface LectureData {
 
 const Lectures = ({ lectures }: LectureData) => {
   return (
-    <div className="block lg:grid grid-cols-2 gap-4">
+    <div className="block xl:grid grid-cols-2 gap-4">
       <div className="lg:py-6 sm:py-12  order-last sm:order-first">
         <h2 className="block sm:hidden">Lectures in this course (2)</h2>
         {lectures.map((item, id) => (
@@ -29,7 +29,9 @@ const Lectures = ({ lectures }: LectureData) => {
                 </span>
               </h4>
 
-              <p  className="font-light text-[14px] text-[#333333] leading-[22px] h-[68px] w-[236px]">{item.desc}</p>
+              <p className="font-light text-[14px] text-[#333333] leading-[22px] h-[68px] w-[236px]">
+                {item.desc}
+              </p>
             </div>
           </div>
         ))}
@@ -46,7 +48,9 @@ const Lectures = ({ lectures }: LectureData) => {
         </div>
 
         <div className="py-5">
-          <h4 className="font-semibold text-[14px] text-[#333333] leading-[22px]">Student Requirements</h4>
+          <h4 className="font-semibold text-[14px] text-[#333333] leading-[22px]">
+            Student Requirements
+          </h4>
 
           <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
             <li>A computer with internet access</li>
@@ -56,7 +60,10 @@ const Lectures = ({ lectures }: LectureData) => {
         </div>
 
         <div className="py-5">
-          <h4 className="font-semibold text-[14px] text-[#333333] leading-[22px]"> Target Audience</h4>
+          <h4 className="font-semibold text-[14px] text-[#333333] leading-[22px]">
+            {" "}
+            Target Audience
+          </h4>
 
           <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
             <li>Beginners interested in web development</li>

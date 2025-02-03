@@ -12,8 +12,3 @@ export const readFileAsString = (file: File): Promise<string> => {
     reader.readAsText(file)
   })
 }
-
-
-
-
-

@@ -4,9 +4,11 @@ import Coursedropdown from "@/components/courses/Coursedropdown"
 import { useAtom, useSetAtom } from "jotai"
 import {
   coursestatusAtom,
-  bootcampdropdownstatus,connectorAtom,
+  bootcampdropdownstatus,
+  connectorAtom,
   connectorDataAtom,
-  walletStarknetkitNextAtom, } from "@/state/connectedWalletStarknetkitNext"
+  walletStarknetkitNextAtom,
+} from "@/state/connectedWalletStarknetkitNext"
 import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
 import { RESET } from "jotai/utils"
 import { connect, disconnect } from "starknetkit"
@@ -32,7 +34,7 @@ const Index = () => {
   const setConnector = useSetAtom(connectorAtom)
 
   const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-  
+
   useEffect(() => {
     setWalletLatest(RESET)
     setWalletNext(RESET)
@@ -66,7 +68,6 @@ const Index = () => {
       autoConnect()
     }
   }, [wallet])
-
 
   let userId = null
   // const userId = searchParams.get('userId');

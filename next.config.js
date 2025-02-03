@@ -6,20 +6,20 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
-        url: require.resolve('url'),
-      };
+        url: require.resolve("url"),
+      }
 
       config.plugins.push(
         new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
-          resource.request = resource.request.replace(/^node:/, "");
-        })
-      );
+          resource.request = resource.request.replace(/^node:/, "")
+        }),
+      )
 
-      config.plugins.push(new NodePolyfillPlugin());
+      config.plugins.push(new NodePolyfillPlugin())
     }
 
-    return config;
+    return config
   },
-};
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

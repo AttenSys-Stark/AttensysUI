@@ -32,21 +32,17 @@ import { useAtom, useSetAtom } from "jotai"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { handleSubmit } from "@/utils/helpers"
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline"
 
+import ImagenCourses1 from "@/assets/ImagenCourses1.png"
+import ImagenCourses2 from "@/assets/ImagenCourses2.png"
+import ImagenCourses3 from "@/assets/ImagenCourses3.png"
 
-
-import ImagenCourses1 from "@/assets/ImagenCourses1.png";
-import ImagenCourses2 from "@/assets/ImagenCourses2.png";
-import ImagenCourses3 from "@/assets/ImagenCourses3.png";
-
-import Lupa from "@/assets/Lupa.png";
-import PeopleBoot from "@/assets/PeopleBoot.png";
-import ProfilePic from "@/assets/profile_pic.png";
-import LupaPurple from "@/assets/LupaPurple.png";
-import organizationHeader from "@/assets/organizationHeader.png";
-
-
+import Lupa from "@/assets/Lupa.png"
+import PeopleBoot from "@/assets/PeopleBoot.png"
+import ProfilePic from "@/assets/profile_pic.png"
+import LupaPurple from "@/assets/LupaPurple.png"
+import organizationHeader from "@/assets/organizationHeader.png"
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
@@ -72,8 +68,7 @@ const Header = () => {
     bootcampdropdownstatus,
   )
 
-  const [isBootcampsOpen, setIsBootcampsOpen] = useState(false);
-
+  const [isBootcampsOpen, setIsBootcampsOpen] = useState(false)
 
   const handleChange = (event: { target: { value: any } }) => {
     setSearchValue(event.target.value)
@@ -91,14 +86,14 @@ const Header = () => {
       setbootcampdropstat(!bootcampdropstat)
     }
   }
-  const [isCoursesOpen, setIsCoursesOpen] = useState(false);
+  const [isCoursesOpen, setIsCoursesOpen] = useState(false)
 
   useEffect(() => {
-    setWalletLatest(RESET);
-    setWalletNext(RESET);
-    setConnectorData(RESET);
-    setConnector(RESET);
-  }, []);
+    setWalletLatest(RESET)
+    setWalletNext(RESET)
+    setConnectorData(RESET)
+    setConnector(RESET)
+  }, [])
 
   useEffect(() => {
     setWalletLatest(RESET)
@@ -119,7 +114,10 @@ const Header = () => {
               <Link href="/" className="cursor-pointer">
                 <Image alt="Your Company" src={Logo} className="h-8 w-full" />
               </Link>
-              <a href="/Explorer" className="w-[28%] lclg:w-[40%] flex justify-center text-[#9B51E0]">
+              <a
+                href="/Explorer"
+                className="w-[28%] lclg:w-[40%] flex justify-center text-[#9B51E0]"
+              >
                 Use our explorer
               </a>
               <div className="relative w-[550px] lclg:w-[380px]">
@@ -193,11 +191,8 @@ const Header = () => {
                 <ConnectButton />
               )}
             </div>
-
           </div>
         </div>
-
-
 
         {/* 🔹 HEADER FOR MOBILE */}
         <div className="flex justify-between items-center px-4 py-2 lg:hidden">
@@ -230,7 +225,6 @@ const Header = () => {
           </button>
         </div>
 
-
         {/* 🔹 MOBILE MENU DROP-DOWN PANEL */}
         <DisclosurePanel className="lg:hidden bg-white shadow-md">
           <div className="flex flex-col h-full">
@@ -254,12 +248,20 @@ const Header = () => {
                 <>
                   {/* Profile picture */}
 
-                  <Image src={ProfilePic} alt="Profile Picture" width={40} height={40} className="rounded-full" />
+                  <Image
+                    src={ProfilePic}
+                    alt="Profile Picture"
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
 
                   {/* Wallet information */}
 
                   <div>
-                    <p className="font-semibold text-gray-900">{wallet.account.name || "Connected User"}</p>
+                    <p className="font-semibold text-gray-900">
+                      {wallet.account.name || "Connected User"}
+                    </p>
                     <p className="text-[#9B51E0] text-sm">
                       {wallet.account.address
                         ? `${wallet.account.address.slice(0, 6)}...${wallet.account.address.slice(-4)}`
@@ -274,14 +276,19 @@ const Header = () => {
               )}
             </div>
 
-
             {/* 🟢 Navigation */}
 
             <nav className="px-4 space-y-2">
-              <Link href="/" className="block px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
+              <Link
+                href="/"
+                className="block px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+              >
                 Home
               </Link>
-              <Link href="/Explorer" className="block px-3 py-2 text-[#9B51E0] font-semibold hover:bg-gray-200">
+              <Link
+                href="/Explorer"
+                className="block px-3 py-2 text-[#9B51E0] font-semibold hover:bg-gray-200"
+              >
                 Use our explorer
               </Link>
 
@@ -292,35 +299,78 @@ const Header = () => {
                   onClick={() => setIsCoursesOpen(!isCoursesOpen)}
                 >
                   <span>Courses</span>
-                  {isCoursesOpen ? <ChevronUpIcon className="w-5 h-5" /> : <ChevronDownIcon className="w-5 h-5" />}
+                  {isCoursesOpen ? (
+                    <ChevronUpIcon className="w-5 h-5" />
+                  ) : (
+                    <ChevronDownIcon className="w-5 h-5" />
+                  )}
                 </button>
 
                 {isCoursesOpen && (
                   <div className="pl-4 mt-2 space-y-2">
-                    <Link href="/explore-courses" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
-                      <Image src={LupaPurple} alt="Explore Courses" width={20} height={20} className="mr-2" />
+                    <Link
+                      href="/explore-courses"
+                      className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                    >
+                      <Image
+                        src={LupaPurple}
+                        alt="Explore Courses"
+                        width={20}
+                        height={20}
+                        className="mr-2"
+                      />
                       Explore Courses
                     </Link>
 
-                    <Link href="/my-courses" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
-                      <Image src={ImagenCourses2} alt="My Courses" width={20} height={20} className="mr-2" />
+                    <Link
+                      href="/my-courses"
+                      className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                    >
+                      <Image
+                        src={ImagenCourses2}
+                        alt="My Courses"
+                        width={20}
+                        height={20}
+                        className="mr-2"
+                      />
                       My Courses
                     </Link>
 
-                    <Link href="/my-certifications" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
-                      <Image src={ImagenCourses3} alt="My Certifications" width={20} height={20} className="mr-2" />
+                    <Link
+                      href="/my-certifications"
+                      className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                    >
+                      <Image
+                        src={ImagenCourses3}
+                        alt="My Certifications"
+                        width={20}
+                        height={20}
+                        className="mr-2"
+                      />
                       My Certifications
                     </Link>
 
-                    <Link href="/create-course" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
-                      <Image src={ImagenCourses3} alt="Create a Course" width={20} height={20} className="mr-2" />
+                    <Link
+                      href="/create-course"
+                      className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                    >
+                      <Image
+                        src={ImagenCourses3}
+                        alt="Create a Course"
+                        width={20}
+                        height={20}
+                        className="mr-2"
+                      />
                       Create a Course
                     </Link>
                   </div>
                 )}
               </div>
               {/* 📌 Events - Enlace directo */}
-              <Link href="/events" className="block px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
+              <Link
+                href="/events"
+                className="block px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+              >
                 Events
               </Link>
             </nav>
@@ -333,32 +383,59 @@ const Header = () => {
                 onClick={() => setIsBootcampsOpen(!isBootcampsOpen)}
               >
                 <span>Bootcamps</span>
-                {isBootcampsOpen ? <ChevronUpIcon className="w-5 h-5" /> : <ChevronDownIcon className="w-5 h-5" />}
+                {isBootcampsOpen ? (
+                  <ChevronUpIcon className="w-5 h-5" />
+                ) : (
+                  <ChevronDownIcon className="w-5 h-5" />
+                )}
               </button>
 
               {isBootcampsOpen && (
                 <div className="pl-4 mt-2 space-y-2">
-                  <Link href="/explore-bootcamps" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
-                    <Image src={Lupa} alt="Explore Bootcamps" width={20} height={20} className="mr-2" />
+                  <Link
+                    href="/explore-bootcamps"
+                    className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                  >
+                    <Image
+                      src={Lupa}
+                      alt="Explore Bootcamps"
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                    />
                     Explore Bootcamps
                   </Link>
 
-                  <Link href="/explore-bootcamps" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
-                    <Image src={organizationHeader} alt="Explore Bootcamps" width={20} height={20} className="mr-2" />
+                  <Link
+                    href="/explore-bootcamps"
+                    className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                  >
+                    <Image
+                      src={organizationHeader}
+                      alt="Explore Bootcamps"
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                    />
                     Create organization
                   </Link>
 
-                  <Link href="/my-bootcamps" className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200">
-                    <Image src={PeopleBoot} alt="My Bootcamps" width={20} height={20} className="mr-2" />
+                  <Link
+                    href="/my-bootcamps"
+                    className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                  >
+                    <Image
+                      src={PeopleBoot}
+                      alt="My Bootcamps"
+                      width={20}
+                      height={20}
+                      className="mr-2"
+                    />
                     My Bootcamps
                   </Link>
                 </div>
-
               )}
             </div>
-
-
-
 
             {/* 🔹 Connect/Disconnect Wallet button */}
 
@@ -366,13 +443,24 @@ const Header = () => {
               {wallet ? (
                 <button
                   onClick={() => {
-                    disconnect();
-                    setWallet(RESET);
+                    disconnect()
+                    setWallet(RESET)
                   }}
                   className="w-full bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] text-white py-2 rounded-md flex items-center justify-center space-x-2"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-5 w-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25V9m-4.5 0h12m-9 0v9a2.25 2.25 0 0 0 2.25 2.25h3A2.25 2.25 0 0 0 15 18V9m-6 0h6" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="h-5 w-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25V9m-4.5 0h12m-9 0v9a2.25 2.25 0 0 0 2.25 2.25h3A2.25 2.25 0 0 0 15 18V9m-6 0h6"
+                    />
                   </svg>
                   <span>Disconnect Wallet</span>
                 </button>
@@ -382,13 +470,9 @@ const Header = () => {
             </div>
           </div>
         </DisclosurePanel>
-      </Disclosure >
+      </Disclosure>
     </>
   )
-
-
-
-
 }
 
 export default Header
