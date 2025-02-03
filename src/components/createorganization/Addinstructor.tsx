@@ -14,6 +14,7 @@ import { pinata } from "../../../utils/config"
 import { attensysOrgAddress } from "../../deployments/contracts"
 import { attensysOrgAbi } from "../../deployments/abi"
 import { Contract } from "starknet"
+import plus from "../../../public/plus.svg"
 
 import { FileObject } from "pinata"
 const emptyData: FileObject = {
@@ -151,32 +152,19 @@ const Addinstructor = (props: any) => {
   }
 
   return (
-    <div className="h-[500px] w-full flex flex-col items-center space-y-8 py-3">
-      <div className="mx-auto pt-12">
+    <div className="lg:h-[500px] w-full flex flex-col items-center space-y-8 py-3">
+      <div className="mx-auto w-full lg:w-auto pt-12">
         <h1 className="text-[16px] text-[#2D3A4B] font-light leading-[23px]">
           Use commas (,) to seperate instructor emails
         </h1>
-        <div className="flex space-x-3 items-center">
-          <div className="w-[590px] h-[60px] border-[2px] rounded-2xl mt-5">
+        <div className="flex flex-col w-full lg:flex-row justify-center  space-x-3 items-center">
+          <div className="lg:w-[590px] lg:h-[60px] w-full border-[2px] rounded-2xl mt-5">
             <Emailinput onEmailsChange={handleEmailsChange} />
           </div>
-          {/* <Button className='bg-[#4A90E21F] text-[#5801A9] font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5'>
-                            <Image src={cross} alt='drop' className='mr-2'/>
-                            Send invite</Button>    */}
-        </div>
-      </div>
-
-      <div className="mx-auto">
-        <h1 className="text-[16px] text-[#2D3A4B] font-light leading-[23px]">
-          Use commas (,) to seperate wallet addresses
-        </h1>
-        <div className="flex space-x-3 items-center">
-          <div className="w-[590px] h-[60px] border-[2px] rounded-2xl mt-5">
-            <Addressinput onAddressChange={handleAddresssChange} />
-          </div>
-          {/* <Button className='bg-[#4A90E21F] text-[#5801A9] font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5'>
-                            <Image src={cross} alt='drop' className='mr-2'/>
-                            Send invite</Button>    */}
+          <Button className="bg-[#4A90E21F] text-[#5801A9] font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5">
+            <Image src={plus} alt="drop" className="mr-2" />
+            Send invite
+          </Button>
         </div>
       </div>
 
@@ -184,9 +172,9 @@ const Addinstructor = (props: any) => {
         onClick={() => {
           handleMulticall("create-a-bootcamp")
         }}
-        className="w-[342px] h-[47px] flex justify-center items-center text-[#FFFFFF] text-[14px] font-bold leading-[16px] bg-[#4A90E2] rounded-xl"
+        className="w-[342px] h-[47px] mt-8 flex justify-center items-center text-[#FFFFFF] text-[14px] font-bold leading-[16px] bg-[#4A90E2] rounded-xl"
       >
-        {uploading ? "Uploading..." : "Finish"}
+        {uploading ? "Uploading..." : "Create your first course"}
       </Button>
     </div>
   )

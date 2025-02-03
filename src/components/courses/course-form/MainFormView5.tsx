@@ -9,8 +9,7 @@ import Image from "next/image"
 import Switch from "react-switch"
 import Lectures from "../Lectures"
 import CourseSideBar from "./SideBar"
-import { MdOutlineDiamond } from "react-icons/md";
-
+import { MdOutlineDiamond } from "react-icons/md"
 
 const MainFormView5 = () => {
   const [isActivated, setIsActivated] = useState(false)
@@ -41,8 +40,8 @@ const MainFormView5 = () => {
   ]
 
   return (
-    <div className="sm:flex">
-      <div className="hidden sm:block">
+    <div className="lg:flex">
+      <div className="hidden lg:block">
         <CourseSideBar />
       </div>
 
@@ -55,38 +54,56 @@ const MainFormView5 = () => {
         </div>
 
         <div className=" ">
-          <div className="block sm:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] px-5 items-center">
+          <div className="block sm:flex justify-between  my-5 border-t border-b border-[#d1d1d1] lg:px-5 md:px-0  px-5 items-center">
             <div className="flex items-center">
-              <div className="px-8 border-r border-blue-100">
-                 <IoMdArrowBack
-                                  onClick={() => history.back()}
-                                  className="cursor-pointer"
-                                />
+              <div className="md:px-6   border-blue-700">
+                <IoMdArrowBack
+                  onClick={() => history.back()}
+                  className="cursor-pointer text-[#4A90E2] text-2xl "
+                />
               </div>
+
+              <div className="bg-[#4A90E2] h-14 w-1 mr-4 md:mr-8 md:ml-0 ml-2"></div>
+
               <p className="text-[#4A90E2] text-xl font-bold">
                 Preview & Publish
               </p>
             </div>
 
-            <form action="course-landing-page" method="post">
-              <button className="hidden sm:block bg-[#C5D322] px-7 py-3 rounded text-white">
+            <form
+              action="course-landing-page"
+              method="post"
+              className="md:mr-5 lg:mr-0"
+            >
+              <button className="hidden sm:block bg-[#C5D322] px-7 py-3  rounded text-white">
                 Publish
               </button>
             </form>
           </div>
 
-          <div className="mx-12 sm:mx-24 mt-12">
-            <div className="block sm:grid grid-cols-2 gap-4">
+          <div className="mx-5 lg:mx-8 mt-12">
+            <div className="mb-5 order-first lg:hidden">
+              <p className="text-[#5801A9] text-[16px] font-medium leading-[22px] m">
+                Technology | Web Development
+              </p>
+            </div>
+            <div className="block xl:grid grid-cols-2 gap-4">
               {/* Course Image */}
-              <div className="w-[368px] h-[238px] rounded-xl">
-                <Image src={video} alt="hero" className="h-full w-full object-cover rounded-xl" />
+              <div className="lg:w-[368px] h-[238px] rounded-xl md:mb-0 mb-14  ">
+                <Image
+                  src={video}
+                  alt="hero"
+                  className="h-full w-full object-cover rounded-xl border-4 border-[#4A90E2] "
+                />
               </div>
 
               {/* Course information */}
               <div>
                 {/* field */}
-                <div className="mb-3 order-first">
-                  <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">Technology | Web Development</p>
+                <div className="mb-3 order-first hidden lg:block">
+                  <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">
+                    Technology | Web Development
+                  </p>
                 </div>
 
                 <h4 className="text-[19px] text-[#333333] leading-[34px] font-bold my-2 ">
@@ -101,13 +118,17 @@ const MainFormView5 = () => {
                   </p>
                 </div>
 
-                <div className="bg-[#5801A9] py-2 text-white w-[200px]  text-center mt-6 mb-3 Sm:w-[50%] rounded-lg">
-                  <p className="text-[14px] font-extrabold leading-[22px]">Tech Innovators Academy</p>
+                <div className="bg-[#5801A9] md:py-2 py-1 text-white w-[200px]  text-center mt-6 md:mb-3 mb-7 Sm:w-[50%] rounded-lg">
+                  <p className="text-[14px] font-extrabold leading-[22px]">
+                    Tech Innovators Academy
+                  </p>
                 </div>
 
                 <div className="flex space-x-3 items-center">
-                <MdOutlineDiamond color="#333333"/>
-                  <p className="text-[#333333] text-[14px] font-medium leading-[22px]">Difficulty level : Elementary</p>
+                  <MdOutlineDiamond color="#333333" />
+                  <p className="text-[#333333] text-[14px] font-medium leading-[22px]">
+                    Difficulty level : Elementary
+                  </p>
                 </div>
               </div>
             </div>
@@ -119,8 +140,10 @@ const MainFormView5 = () => {
 
               <div className="">
                 <div>
-                  <div className="flex justify-between sm:w-[30%] mt-5">
-                    <h4 className="font-semibold text-[18px] leading-[31px] text-[#333333]">Certification for this course</h4>
+                  <div className="flex justify-between xl:w-[30%] mt-5">
+                    <h4 className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                      Certification for this course
+                    </h4>
 
                     <Switch
                       onChange={handleSwitch}
@@ -134,12 +157,14 @@ const MainFormView5 = () => {
                       className="mx-2"
                     />
                   </div>
-                  <p className="text-[#333333] text-[14px] font-normal leading-[22px]">After completion students will be issued certification</p>
+                  <p className="text-[#333333] text-[14px] font-normal leading-[22px]">
+                    After completion students will be issued certification
+                  </p>
                 </div>
-                <div className="mt-12 mb-24">
+                <div className="mt-12 mb-24 flex md:justify-start justify-center">
                   <form action="course-landing-page" method="post">
                     <button
-                      className="rounded-xl bg-[#4A90E2] px-24 py-3 text-white"
+                      className="rounded-xl bg-[#4A90E2] md:px-24 px-16  py-3 text-white"
                       type="submit"
                     >
                       Save and Publish Course
