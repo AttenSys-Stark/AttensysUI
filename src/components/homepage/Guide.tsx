@@ -5,10 +5,10 @@ import steps from "@/assets/steps.svg";
 
 const Guide = () => {
   return (
-    <div className="sm:h-[410px] w-[100%] py-12 sm:py-0 bg-[#2D3A4B] flex flex-col lg:flex-row items-center justify-center">
+    <div className=" w-[100%] py-12 sm:py-0 bg-[#2D3A4B] flex flex-col lg:flex-row items-center justify-center sm:pb-10">
 
       {/* Main Container */}
-      <div className="w-[90%] mx-auto h-[100%] my-auto flex flex-col sm:flex-row md:flex-row md:items-center md:justify-center lg:space-x-10">
+      <div className="w-[90%] mx-auto h-[100%] my-auto flex flex-col sm:flex-row md:flex-row md:items-center sm:items-center sm:justify-center md:justify-center lg:space-x-10">
 
         {/* 📌 Image Container */}
         <div className="relative flex flex-col sm:flex-row items-center justify-around">
@@ -46,7 +46,7 @@ const Guide = () => {
               {/* First Section */}
               <div className="text-left mt-14">
                 <h1 className="text-white font-bold leading-[37px]">Sign Up</h1>
-                <p className="text-white text-[14px] font-light max-w-[320px]">
+                <p className="text-white text-[14px] font-light">
                   Create an account and get instant access to our dashboard. Whether
                   you&apos;re a school, organization, or event manager, we have the tools for you.
                 </p>
@@ -57,7 +57,7 @@ const Guide = () => {
                 <h1 className="text-white font-bold leading-[37px]">
                   Manage Attendance & Certifications
                 </h1>
-                <p className="text-white text-[14px] font-light max-w-[320px]">
+                <p className="text-white text-[14px] font-light">
                   Automatically track attendance and issue certificates upon course
                   or event completion. Manage everything from one central platform.
                 </p>
@@ -68,7 +68,7 @@ const Guide = () => {
                 <h1 className="text-white font-bold leading-[37px]">
                   Set Up Courses & Events
                 </h1>
-                <p className="text-white text-[14px] font-light max-w-[320px]">
+                <p className="text-white text-[14px] font-light">
                   Add your courses, events, or programs. Customize everything
                   from scheduling to certification rules.
                 </p>
@@ -79,7 +79,7 @@ const Guide = () => {
                 <h1 className="text-white font-bold leading-[37px]">
                   Verify Certificate
                 </h1>
-                <p className="text-white text-[14px] font-light max-w-[320px]">
+                <p className="text-white text-[14px] font-light ">
                   You can now verify certification with as simple as a search button click.
                   Find out all you need with the{" "}
                   <span className="text-[#4A90E2] font-semibold cursor-pointer">

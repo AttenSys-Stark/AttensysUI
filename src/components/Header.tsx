@@ -43,6 +43,7 @@ import PeopleBoot from "@/assets/PeopleBoot.png"
 import ProfilePic from "@/assets/profile_pic.png"
 import LupaPurple from "@/assets/LupaPurple.png"
 import organizationHeader from "@/assets/organizationHeader.png"
+import { courseQuestions } from "@/constants/data"
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
@@ -104,11 +105,14 @@ const Header = () => {
 
   return (
     <>
-      <Disclosure
-        as="nav"
-        className={`${status ? "bg-[#FFFFFF] opacity-80 backdrop-blur-sm" : "bg-[#FFFFFF]"} pt-1 relative z-20 overflow-hidden w-[100%] clg:overflow-hidden clg:w-[98%] lclg:w-[100%] lclg:overflow-hidden ipad:w-[100%] ipad:overflow-hidden mx-auto`}
-      >
-        <div className="hidden sm:flex justify-center items-center sm:px-6 lg:px-8 lg:h-[85px] lg:my-auto clg:w-[100%] w-full">
+<Disclosure
+  as="nav"
+  className={`${status ? "bg-white opacity-80 backdrop-blur-sm" : "bg-white"} 
+    pt-1 relative z-20 overflow-hidden 
+    w-[98%] mx-auto 
+     lclg:w-[100%] clg:w-[98%] xlg:w-[100%]`}
+>
+        <div className="lg:flex hidden sm:hidden justify-center items-center sm:px-6 lg:px-8 lg:h-[85px] lg:my-auto clg:w-[100%] w-full sm1275:hidden">
           <div className="relative flex h-20 items-center justify-between w-[98%]">
             <div className="lg:flex flex-shrink-0 items-center flex justify-between clg:w-[55%] lclg:w-[46%] lclg:mx-auto clg:mx-auto space-x-6 clg:space-x-6 lclg:space-x-6 md:hidden sm:hidden">
               <Link href="/" className="cursor-pointer">
@@ -195,9 +199,9 @@ const Header = () => {
         </div>
 
         {/* 🔹 HEADER FOR MOBILE */}
-        <div className="flex justify-between items-center px-4 py-2 lg:hidden">
+        <div className="flex justify-between items-center px-4 py-2 lg:hidden sm1275:flex">
           {/* Hamburger menu */}
-          <DisclosureButton className="text-gray-500 focus:outline-none">
+          <DisclosureButton className="text-gray-500 focus:outline-none ">
             <Bars3Icon className="h-6 w-6" />
           </DisclosureButton>
 
@@ -226,7 +230,7 @@ const Header = () => {
         </div>
 
         {/* 🔹 MOBILE MENU DROP-DOWN PANEL */}
-        <DisclosurePanel className="lg:hidden bg-white shadow-md">
+        <DisclosurePanel className="lg:hidden bg-white shadow-md sm1275:block">
           <div className="flex flex-col h-full">
             {/* 📌 Barra superior con logo y botón de cerrar */}
             <div className="flex items-center justify-between px-4 py-3 border-b">
@@ -309,7 +313,7 @@ const Header = () => {
                 {isCoursesOpen && (
                   <div className="pl-4 mt-2 space-y-2">
                     <Link
-                      href="/explore-courses"
+                      href="/Course"
                       className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                     >
                       <Image
@@ -323,7 +327,7 @@ const Header = () => {
                     </Link>
 
                     <Link
-                      href="/my-courses"
+                      href={`/mycoursepage/${"sample-profile"}`}
                       className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                     >
                       <Image
@@ -337,7 +341,7 @@ const Header = () => {
                     </Link>
 
                     <Link
-                      href="/my-certifications"
+                      href={`/Certifications/${"sample-profile"}`}
                       className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                     >
                       <Image
@@ -351,7 +355,7 @@ const Header = () => {
                     </Link>
 
                     <Link
-                      href="/create-course"
+                      href={`/Course/CreateACourse/${courseQuestions[0]}`}
                       className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                     >
                       <Image
@@ -368,7 +372,7 @@ const Header = () => {
               </div>
               {/* 📌 Events - Enlace directo */}
               <Link
-                href="/events"
+                href="/Events/events"
                 className="block px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
               >
                 Events
@@ -393,7 +397,7 @@ const Header = () => {
               {isBootcampsOpen && (
                 <div className="pl-4 mt-2 space-y-2">
                   <Link
-                    href="/explore-bootcamps"
+                    href="/Bootcamps"
                     className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                   >
                     <Image
@@ -407,7 +411,7 @@ const Header = () => {
                   </Link>
 
                   <Link
-                    href="/explore-bootcamps"
+                    href="/Createorganization"
                     className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                   >
                     <Image
@@ -421,7 +425,7 @@ const Header = () => {
                   </Link>
 
                   <Link
-                    href="/my-bootcamps"
+                    href="/Mybootcamps"
                     className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                   >
                     <Image

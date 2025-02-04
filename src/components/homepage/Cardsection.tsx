@@ -27,7 +27,7 @@ const Cardsection = () => {
   ];
 
   return (
-    <div className="mt-4 sm:mt-10 md:mt-12 w-[90%] md:w-[80%] lg:w-[90%] mx-auto flex flex-col sm:flex-row md:flex-col md:items-center lg:flex-row sm:justify-center sm:space-x-6 space-y-6 sm:space-y-0 md:space-y-8 md:px-6">
+    <div className="mt-4 sm:mt-10 md:mt-12 w-[90%] md:w-[80%] sm:w-[80%] sm:pb-10 lg:w-[90%] mx-auto flex flex-col sm:flex-col md:flex-col sm:items-center md:items-center lg:flex-row sm:justify-center sm:space-x-6 space-y-6 sm:space-y-8 sm:px-6 md:space-y-8 md:px-6">
       {data.map((item, index) => (
         <div
           key={index}
