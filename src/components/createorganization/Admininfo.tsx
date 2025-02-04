@@ -54,15 +54,12 @@ const Admininfo = () => {
   }
 
   const handleEmailAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setOrganizationData((prevData) => ({
-      ...prevData, // Spread existing data to retain untouched fields
-      organizationAminEmail: e.target.value, // Dynamically update the specific field
-    }))
+    const value = e.target.value // Add this line to get the input value
 
-    // setOrganizationData((prevData) => ({
-    //   ...prevData,
-    //   organizationAdminfullname: value,
-    // }))
+    setOrganizationData((prevData) => ({
+      ...prevData,
+      organizationAminEmail: value, // Use value instead of e.target.value
+    }))
 
     // Clear error when input changes
     setErrors((prev) => ({

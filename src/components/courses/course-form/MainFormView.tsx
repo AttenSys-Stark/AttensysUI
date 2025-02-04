@@ -40,7 +40,9 @@ const MainFormView = () => {
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target
     setFormData((prev) => ({
       ...prev,
@@ -68,6 +70,7 @@ const MainFormView = () => {
     }
   }
 
+  // Update the handleSubmit function to properly handle the form data
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
   ) => {
@@ -79,14 +82,18 @@ const MainFormView = () => {
 
     setIsSubmitting(true)
     try {
-      handleCreateCourse("courseSetup2", router, formData)
+      // Pass just the required parameters as expected by the imported handleCreateCourse
+      handleCreateCourse(
+        e as React.MouseEvent<HTMLButtonElement>,
+        router,
+        formData,
+      )
     } catch (error) {
       console.error("Error submitting form:", error)
     } finally {
       setIsSubmitting(false)
     }
   }
-
   return (
     <div className="block sm:flex">
       <div className="hidden lg:block">
@@ -266,5 +273,4 @@ const MainFormView = () => {
     </div>
   )
 }
-
 export default MainFormView

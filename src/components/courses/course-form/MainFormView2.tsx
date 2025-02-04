@@ -5,6 +5,12 @@ import CourseSideBar from "./SideBar"
 import { handleCreateCourse } from "@/utils/helpers"
 import { useRouter } from "next/navigation"
 
+interface FormErrors {
+  studentRequirements: string
+  learningObjectives: string
+  targetAudience: string
+}
+
 const MainFormView2 = () => {
   const router = useRouter()
 
@@ -12,21 +18,26 @@ const MainFormView2 = () => {
   const [studentRequirements, setStudentRequirements] = useState("")
   const [learningObjectives, setLearningObjectives] = useState("")
   const [targetAudience, setTargetAudience] = useState("")
-  const [errors, setErrors] = useState({
+  const [studentRequirementsList, setStudentRequirementsList] = useState<
+    string[]
+  >([])
+  const [errors, setErrors] = useState<FormErrors>({
     studentRequirements: "",
     learningObjectives: "",
     targetAudience: "",
   })
 
   // Handle form submission
+  // In MainFormView2.tsx, update the handleSubmit function:
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     // Validate fields
     const newErrors = {
-      studentRequirements: !studentRequirements.trim()
-        ? "Student requirements are required"
-        : "",
+      studentRequirements:
+        !studentRequirements.trim() && studentRequirementsList.length === 0
+          ? "Student requirements are required"
+          : "",
       learningObjectives: !learningObjectives.trim()
         ? "Learning objectives are required"
         : "",
@@ -42,7 +53,52 @@ const MainFormView2 = () => {
 
     // Proceed only if no errors
     if (!hasErrors) {
-      handleCreateCourse(undefined, "courseSetup3", router)
+      // Store form data in localStorage before navigation
+      localStorage.setItem(
+        "courseFormData",
+        JSON.stringify({
+          studentRequirements: studentRequirementsList,
+          learningObjectives,
+          targetAudience,
+        }),
+      )
+
+      handleCreateCourse(
+        e as unknown as React.MouseEvent<HTMLFormElement>,
+        "courseSetup3".trim(), // Make sure to call trim() on the section
+        router,
+      )
+    }
+  }
+  const handleGoBack = () => {
+    window.history.back()
+  }
+
+  const handleStudentRequirementsChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setStudentRequirements(e.target.value)
+    setErrors((prev) => ({ ...prev, studentRequirements: "" }))
+  }
+
+  const handleLearningObjectivesChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setLearningObjectives(e.target.value)
+    setErrors((prev) => ({ ...prev, learningObjectives: "" }))
+  }
+
+  const handleTargetAudienceChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    setTargetAudience(e.target.value)
+    setErrors((prev) => ({ ...prev, targetAudience: "" }))
+  }
+
+  const handleAddItem = () => {
+    if (studentRequirements.trim()) {
+      setStudentRequirementsList((prev) => [...prev, studentRequirements])
+      setStudentRequirements("") // Reset input field after adding item
     }
   }
 
@@ -65,7 +121,7 @@ const MainFormView2 = () => {
             <div className="flex items-center">
               <div className="px-4 sm:px-8 border-r border-blue-100">
                 <IoMdArrowBack
-                  onClick={() => history.back()}
+                  onClick={handleGoBack}
                   className="cursor-pointer"
                 />
               </div>
@@ -74,7 +130,10 @@ const MainFormView2 = () => {
               </p>
             </div>
 
-            <button className="hidden sm:block bg-[#c5d322] px-7 py-3 rounded text-black">
+            <button
+              type="button"
+              className="hidden sm:block bg-[#c5d322] px-7 py-3 rounded text-black"
+            >
               Save progress
             </button>
           </div>
@@ -83,30 +142,34 @@ const MainFormView2 = () => {
             <form onSubmit={handleSubmit}>
               <div className="my-12">
                 <label
-                  htmlFor=""
+                  htmlFor="studentRequirements"
                   className="font-semibold text-[18px] leading-[31px] text-[#333333]"
                 >
                   Student requirements
                 </label>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
-                  {` What will users taking this course need to get the best out of it.`}
+                  What will users taking this course need to get the best out of
+                  it.
                 </p>
                 <div className="flex items-start my-4">
                   <input
-                    type="input"
+                    id="studentRequirements"
+                    type="text"
                     value={studentRequirements}
-                    onChange={(e) => {
-                      setStudentRequirements(e.target.value)
-                      setErrors((prev) => ({
-                        ...prev,
-                        studentRequirements: "",
-                      }))
-                    }}
-                    className={`w-[50%] sm:w-[70%] h-[55px] py-2 px-6 border ${errors.studentRequirements ? "border-red-500" : "border-gray-300"} rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400`}
+                    onChange={handleStudentRequirementsChange}
+                    className={`w-[50%] sm:w-[70%] h-[55px] py-2 px-6 border ${
+                      errors.studentRequirements
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    } rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400`}
                     placeholder="e.g A laptop."
                   />
-                  <button className="rounded-xl py-2 px-4 h-[55px] font-normal text-[18px] w-[155px] text-[#2D3A4B] leading-[21px] border-2 p-1 ml-5 text-xs sm:text-base bg-white">
-                    <span className="">+</span> Add Item
+                  <button
+                    type="button"
+                    onClick={handleAddItem}
+                    className="rounded-xl py-2 px-4 h-[55px] font-normal text-[18px] w-[155px] text-[#2D3A4B] leading-[21px] border-2 p-1 ml-5 text-xs sm:text-base bg-white"
+                  >
+                    <span>+</span> Add Item
                   </button>
                 </div>
                 {errors.studentRequirements && (
@@ -114,29 +177,41 @@ const MainFormView2 = () => {
                     {errors.studentRequirements}
                   </p>
                 )}
+                <ul className="mt-2">
+                  {studentRequirementsList.map((item, index) => (
+                    <li key={index} className="text-sm text-[#333333]">
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
 
               <div className="my-12">
-                <label className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor="learningObjectives"
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Learning Objectives
                 </label>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
-                  please outline the key skills and knowledge that students will
+                  Please outline the key skills and knowledge that students will
                   gain by completing your course.
                 </p>
                 <div className="flex items-start my-4">
                   <textarea
+                    id="learningObjectives"
                     value={learningObjectives}
-                    onChange={(e) => {
-                      setLearningObjectives(e.target.value)
-                      setErrors((prev) => ({ ...prev, learningObjectives: "" }))
-                    }}
-                    className={`block px-6 pb-64 py-3 w-[80%] text-sm text-gray-900 ${errors.learningObjectives ? "border-red-500" : "border-gray-300"} bg-gray-50 rounded-lg border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
-                    placeholder={`E.g When this course is done, students will :
+                    onChange={handleLearningObjectivesChange}
+                    className={`block px-6 pb-64 py-3 w-[80%] text-sm text-gray-900 ${
+                      errors.learningObjectives
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    } bg-gray-50 rounded-lg border focus:ring-blue-500 focus:border-blue-500`}
+                    placeholder={`E.g When this course is done, students will:
 
 Understand fundamental concepts in [Subject/Field]
 Create and implement strategies for [Specific Outcome]`}
-                  ></textarea>
+                  />
                 </div>
                 {errors.learningObjectives && (
                   <p className="text-red-500 text-sm mt-1">
@@ -146,7 +221,10 @@ Create and implement strategies for [Specific Outcome]`}
               </div>
 
               <div className="my-12">
-                <label className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor="targetAudience"
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Target Audience
                 </label>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
@@ -154,17 +232,19 @@ Create and implement strategies for [Specific Outcome]`}
                 </p>
                 <div className="flex items-start my-4">
                   <textarea
+                    id="targetAudience"
                     value={targetAudience}
-                    onChange={(e) => {
-                      setTargetAudience(e.target.value)
-                      setErrors((prev) => ({ ...prev, targetAudience: "" }))
-                    }}
-                    className={`block px-6 pb-64 py-3 w-[80%] text-sm text-gray-900 ${errors.targetAudience ? "border-red-500" : "border-gray-300"} bg-gray-50 rounded-lg border focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500`}
+                    onChange={handleTargetAudienceChange}
+                    className={`block px-6 pb-64 py-3 w-[80%] text-sm text-gray-900 ${
+                      errors.targetAudience
+                        ? "border-red-500"
+                        : "border-gray-300"
+                    } bg-gray-50 rounded-lg border focus:ring-blue-500 focus:border-blue-500`}
                     placeholder={`Example:
-                    This course is ideal for:
-                    Beginners with no prior experience in [Subject/Field].
-                    Professionals looking to enhance their skills in [Specific Area].`}
-                  ></textarea>
+This course is ideal for:
+Beginners with no prior experience in [Subject/Field].
+Professionals looking to enhance their skills in [Specific Area].`}
+                  />
                 </div>
                 {errors.targetAudience && (
                   <p className="text-red-500 text-sm mt-1">
@@ -173,18 +253,21 @@ Create and implement strategies for [Specific Outcome]`}
                 )}
               </div>
 
-              <div className="my-12 ">
-                <div className="mt-12 m">
+              <div className="my-12">
+                <div className="mt-12">
                   <button
-                    className="bg-[#4A90E2] px-28 sm:px-48 py-3 rounded-xl text-white"
                     type="submit"
+                    className="bg-[#4A90E2] px-28 sm:px-48 py-3 rounded-xl text-white"
                   >
                     Next
                   </button>
                 </div>
 
                 <div className="mt-6 mb-24">
-                  <button className="block sm:hidden bg-[#c5d322]  text-xs px-12 py-3 rounded text-black">
+                  <button
+                    type="button"
+                    className="block sm:hidden bg-[#c5d322] text-xs px-12 py-3 rounded text-black"
+                  >
                     Save progress
                   </button>
                 </div>
