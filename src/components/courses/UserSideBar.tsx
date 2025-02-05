@@ -54,10 +54,17 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
   }
 
   return (
-    <div className="pt-12">
+    <>
+      <div className="bg-gradient-to-r block lg:hidden from-[#4A90E2] to-[#9B51E0] py-4 px-8 xl:w-[400px]">
+        <p className="text-white text-center text-sm">
+        Your course creation progress saves automatically, 
+        but feel free to also save your progress manually
+        </p>
+      </div>
+    <div className="pt-12 px-4">
       {/* User info */}
 
-      <div className="bg-white py-4 px-8 rounded-xl border-[1px] border-[#BCBCBC] w-[400px]">
+      <div className="bg-white py-4 px-8 rounded-xl border-[1px] border-[#BCBCBC] lg:w-[293px] xl:w-[400px]">
         <div>
           <div className="flex justify-between items-center mt-4">
             <div className="flex space-x-4">
@@ -65,7 +72,7 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
               <Image src={profilePic} alt="profilePic" className="h-full w-full object-cover" />
 
               </div>
-              <div className="w-[200px]"> 
+              <div className="xl:w-[200px]"> 
                 <p className="text-[13px] text-[#2D3A4B] font-bold leading-[22px]">Akinbola Kehinde</p>
                 <p className="text-[#A01B9B] text-[12px] font-normal leading-[24px]">0xb3...1ce</p>
               </div>
@@ -148,7 +155,8 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
       {page == "myCourse" ? null : (
         <div className="flex sm:hidden justify-between mt-10 border-b-2 p-3">
           <div>
-            <p>All</p>
+            <p>All NFts</p>
+
           </div>
 
           <div className="flex">
@@ -196,7 +204,7 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
 
           {certSideProperties.map((item, i) => (
             <div
-              className={`border-[1px] border-[#BCBCBC] bg-[#FFFFFF] rounded-xl my-3 h-[62px] w-[400px] px-6 flex items-center cursor-pointer hover:bg-violet-600 active:bg-violet-700 ${selected == item.title ? "focus:outline-none focus:ring focus:ring-violet-300" : ""} `}
+              className={`border-[1px] border-[#BCBCBC] bg-[#FFFFFF] rounded-xl my-3 h-[62px] xl:w-[400px] px-6 flex items-center cursor-pointer hover:bg-violet-600 active:bg-violet-700 ${selected == item.title ? "focus:outline-none focus:ring focus:ring-violet-300" : ""} `}
               key={i}
             >
               <div
@@ -223,6 +231,7 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
         </div>
       )}
     </div>
+    </>
   )
 }
 

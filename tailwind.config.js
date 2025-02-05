@@ -14,9 +14,9 @@ module.exports = withMT({
     extend: {
       screens: {
         'xlg': '1680px',
-        clg: { min: '1440px', max: '1679px' },
-        lclg: { min: '1280px', max: '1439px' },
-        
+        'clg': { min: '1440px', max: '1679px' },
+        'lclg': { min: '1280px', max: '1439px' },
+        'sm1275': { min: '937px', max: '1279px' }, 
       },
 
       backgroundImage: (theme) => ({

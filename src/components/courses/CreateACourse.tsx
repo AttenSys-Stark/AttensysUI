@@ -15,7 +15,7 @@ const CreateACourse = () => {
   return (
     <div className="py-12">
       {/* header */}
-      <div className="">
+      <div className="px-4 xl:px-0">
         <h1 className="font-bold py-5 text-[#A01B9B] text-[20px] leading-[22px]">Create a course</h1>
         <div className="bg-transparent sm:bg-white sm:p-10 rounded-xl  border-[#bcbcbc] sm:border">
           <div className="block sm:flex items-center justify-between text-sm">
