@@ -5,7 +5,6 @@ import { useAtom } from "jotai"
 import { Button, Field, Input, Label } from "@headlessui/react"
 import clsx from "clsx"
 import TargetCategory from "./TargetCategory"
-import { styled } from '@mui/material/styles'
 import Calendar from "react-calendar"
 import "react-calendar/dist/Calendar.css"
 import { FaRegCalendarAlt } from "react-icons/fa"
@@ -30,18 +29,6 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import dayjs, { Dayjs } from "dayjs"
 import { FcCancel } from "react-icons/fc"
 import { pinata } from "../../../utils/config"
-import { TextField } from "@mui/material"
-
-const StyledDatePicker = styled(DatePicker)(({ theme }) => ({
-  "& .MuiInputBase-root": {
-    minWidth: "100px",
-    width: "150px",
-    [theme.breakpoints.up("lg")]: {
-      minWidth: "200px",
-      width: "200px",
-    },
-  },
-}));
 
 const format = "h:mm a"
 const now = moment().hour(0).minute(0)
@@ -286,21 +273,17 @@ const Create = ({ height }: { height: number | null }) => {
     }))
   }
 
-  const vw = window.innerWidth
-
   return (
     <div
-      className="absolute z-[9999] h-auto w-[100%]"
+      className="absolute z-[999] h-auto w-full"
       style={{
         height: height ? `${height}px` : "100vh", // Use dynamic height or fallback to 100vh
       }}
     >
       <div className="h-full flex">
-        <div className="w-[35%] h-full bg-[#07070733] hidden md:block"></div>
+        <div className="w-[35%] hidden lg:block h-full bg-[#07070733]"></div>
 
-        <div
-          className={`w-[100%] md:w-[65%] h-full bg-[#FFFFFF] overflow-y-scroll`}
-        >
+        <div className="lg:w-[65%] w-[100%] h-full bg-[#FFFFFF] overflow-y-scroll">
           <div className="w-[100%] h-[10px] bg-bootcreate-gradient"></div>
           <div className="w-[90%] mx-auto flex justify-between mt-5">
             <h1 className="text-[22px] leading-[22px] text-[#333333] font-semibold">
@@ -314,7 +297,7 @@ const Create = ({ height }: { height: number | null }) => {
 
           <div className="w-[90%] mx-auto mt-6">
             <div className="space-y-3 w-full">
-              <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 Bootcamp Name
               </h1>
               <Field>
@@ -322,16 +305,16 @@ const Create = ({ height }: { height: number | null }) => {
                   onChange={handleBootcampNameChange}
                   placeholder="e.g starknet basecamp"
                   className={clsx(
-                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                     "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                   )}
                 />
               </Field>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-y-3 justify-between w-full space-x-2 mt-4">
+            <div className="flex-col flex lg:flex-row justify-between w-full space-y-5 space-x-2 mt-4">
               <div className="space-y-3 w-full">
-                <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+                <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                   Bootcamp Organization
                 </h1>
                 <Field>
@@ -340,14 +323,14 @@ const Create = ({ height }: { height: number | null }) => {
                     readOnly
                     placeholder="e.g starknet basecamp"
                     className={clsx(
-                      "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg  py-1.5 px-3 text-sm/6 text-[#4A90E2]",
+                      "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#4A90E2]",
                       "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                     )}
                   />
                 </Field>
               </div>
               <div className="space-y-3 w-full">
-                <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+                <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                   Target Audience
                 </h1>
                 <TargetCategory />
@@ -355,7 +338,7 @@ const Create = ({ height }: { height: number | null }) => {
             </div>
 
             <div className="space-y-3 mt-4">
-              <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 Description
               </h1>
               <Field>
@@ -363,7 +346,7 @@ const Create = ({ height }: { height: number | null }) => {
                   placeholder="Short overview detailing what the bootcamp covers"
                   onChange={handleBootcampDescriptionChange}
                   className={clsx(
-                    "h-[110px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                    "h-[110px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                     "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                   )}
                 />
@@ -371,70 +354,75 @@ const Create = ({ height }: { height: number | null }) => {
             </div>
 
             {/* NFT data collection */}
-            {/* <div className='space-y-3 w-[60%] mt-4'>
-                    <h1 className='text-[14px] text-[#2D3A4B] font-light leading-[20px]'>NFT Certificate Name</h1>
-                    <Field>
-                        <Input
-                        onChange={handleNFTNameChange}
-                        placeholder='nft name'
-                        className={clsx(
-                            'h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]',
-                            'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25'
-                        )}
-                        />
-                    </Field>
-                </div>
-
-                <div className='space-y-3 w-[60%] mt-4'>
-                    <h1 className='text-[14px] text-[#2D3A4B] font-light leading-[20px]'>NFT Certificate symbol</h1>
-                    <Field>
-                        <Input
-                        onChange={handleNFTSymbolChange}
-                        placeholder='Enter nft symbol'
-                        className={clsx(
-                            'h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]',
-                            'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25'
-                        )}
-                        />
-                    </Field>
-                </div>
-
-
-                <div className='space-y-3 w-[60%] mt-4'>
-            <h1 className='text-[14px] text-[#2D3A4B] font-light leading-[20px]'>Upload NFT Certificate Image</h1>
-            <div className="w-[200px] h-[200px] bg-[#3F3E58] rounded-xl flex justify-center items-center cursor-pointer" onClick={handleImageClick}>
-                                    <Image src={add} alt="add"   className="cursor-pointer h-[100px] w-[100px] object-cover rounded-xl" />
-                                    <input
-                                        ref={fileInputRef}
-                                        type="file"
-                                        accept="image/jpeg, image/jpg, image/png"
-                                        onChange={handleFileChange}
-                                        style={{ display: 'none' }} // Hide the input
-                                    />
+            <div className="space-y-3 w-[60%] mt-4">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+                NFT Certificate Name
+              </h1>
+              <Field>
+                <Input
+                  onChange={handleNFTNameChange}
+                  placeholder="nft name"
+                  className={clsx(
+                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
+                    "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
+                  )}
+                />
+              </Field>
             </div>
-        </div> */}
+
+            <div className="space-y-3 w-[60%] mt-4">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+                NFT Certificate symbol
+              </h1>
+              <Field>
+                <Input
+                  onChange={handleNFTSymbolChange}
+                  placeholder="Enter nft symbol"
+                  className={clsx(
+                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
+                    "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
+                  )}
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-3 w-[60%] mt-4">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+                Upload NFT Certificate Image
+              </h1>
+              <div
+                className="w-[200px] h-[200px] bg-[#3F3E58] rounded-xl flex justify-center items-center cursor-pointer"
+                onClick={handleImageClick}
+              >
+                <Image
+                  src={add}
+                  alt="add"
+                  className="cursor-pointer h-[100px] w-[100px] object-cover rounded-xl"
+                />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg, image/jpg, image/png"
+                  onChange={handleFileChange}
+                  style={{ display: "none" }} // Hide the input
+                />
+              </div>
+            </div>
             <div className="mt-8">
               <h1 className="text-[16px] leading-[23px] font-semibold text-[#2D3A4B]">
                 Structure & schedules
               </h1>
               <div className="mt-3 space-y-2">
-                <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+                <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                   Bootcamp Date
                 </h1>
-                <div className="flex flex-wrap space-x-2 gap-x-2 md:space-x-4 max-w-full">
+                <div className="flex gap-x-4">
                   <>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DemoContainer components={["DatePicker"]}>
-                        {/* <DatePicker
+                        <DatePicker
                           label="Start date"
                           onChange={handleStartdateChange}
-                          className="w-[150px] min-w-[100px] lg:min-w-[200px] text-[12px] overflow-x-none"
-                        /> */}
-                        <StyledDatePicker
-                          label="Start Date"
-                          onChange={handleStartdateChange}
-                          // @ts-ignore
-                          renderInput={(params) => <TextField {...params} />}
                         />
                       </DemoContainer>
                     </LocalizationProvider>
@@ -443,11 +431,9 @@ const Create = ({ height }: { height: number | null }) => {
                   <>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DemoContainer components={["DatePicker"]}>
-                        <StyledDatePicker
-                          label="End Date"
+                        <DatePicker
+                          label="End date"
                           onChange={handleEnddateChange}
-                          // @ts-ignore
-                          renderInput={(params) => <TextField {...params} />}
                         />
                       </DemoContainer>
                     </LocalizationProvider>
@@ -457,55 +443,58 @@ const Create = ({ height }: { height: number | null }) => {
             </div>
 
             <div className="mt-8 space-y-2">
-              <h1 className="text-[12px] sm:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 Bootcamp Time
               </h1>
-              <div className="flex flex-wrap sm:flex-row space-x-3 items-center">
-                <div className="flex flex-col space-y-2">
+              <div className="flex flex-col lg:flex-row gap-x-3 items-start gap-y-4">
+                <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-3">
                   {bootcampTimes.map((component, index) => (
                     <BootcampTime key={index} day={index + 1} />
                   ))}
                 </div>
-                <div
-                  id="add-day"
-                  onClick={handleAddDay}
-                  className="flex text-nowrap mt-2 cursor-pointer relative items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[130px] rounded-lg"
-                >
-                  <FaPlus className="text-[#2D3A4B]" />
-                  <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
-                    Add Day
-                  </h1>
+
+                <div className="flex">
+                  <div
+                    id="add-day"
+                    onClick={handleAddDay}
+                    className="mt-2 cursor-pointer relative flex items-center px-4 gap-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[130px] rounded-lg"
+                  >
+                    <FaPlus className="text-[#2D3A4B]" />
+                    <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
+                      Add Day
+                    </h1>
+                  </div>
+                  <div
+                    id="add-day"
+                    onClick={handleRemoveDay}
+                    className="mt-2 cursor-pointer relative flex items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[150px] rounded-lg"
+                  >
+                    <FcCancel className="text-[#2D3A4B]" />
+                    <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
+                      Remove Day
+                    </h1>
+                  </div>
                 </div>
 
-                <div
-                  id="add-day"
-                  onClick={handleRemoveDay}
-                  className="mt-2 text-nowrap cursor-pointer relative flex items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[150px] rounded-lg"
-                >
-                  <FcCancel className="text-[#2D3A4B]" />
-                  <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
-                    Remove Day
-                  </h1>
-                </div>
               </div>
             </div>
 
-            <div className="mt-8 max-w-[200px]">
+            <div className="mt-8">
               <h1 className="text-[16px] leading-[23px] font-semibold text-[#2D3A4B]">
                 Curriculum
               </h1>
               <div className="flex w-[380px] items-center space-x-1 mt-1">
                 <IoIosInformationCircleOutline />
-                <h1 className="text-[13px] text-[#2D3A4B] leading-[20px] font-light w-[250px]">
+                <h1 className="text-[13px] text-[#2D3A4B] leading-[20px] font-light">
                   You can edit and add more details later in your dashboard{" "}
                 </h1>
               </div>
               <div></div>
 
-              <div className="space-y-12 w-[300px]">
+              <div className="space-y-12">
                 {bootcampTimes.map((component, index) => (
                   <div key={index}>
-                    <div className="mt-4 flex flex-wrap space-x-2 gap-y-2">
+                    <div className="mt-4 flex-col flex lg:flex-row gap-x-2 space-y-5 lg:space-y-0">
                       <Field>
                         <Input
                           placeholder="Add lecture title"
@@ -513,13 +502,13 @@ const Create = ({ height }: { height: number | null }) => {
                             handleTitleChange(index, e.target.value)
                           }
                           className={clsx(
-                            "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[320px] sm:w-[395px] lg:w-[450px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                            "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[395px] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                             "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                           )}
                         />
                       </Field>
 
-                      <div className="relative flex bg-[#A666E3] items-center px-4  justify-between border-[1px] border-[#D0D5DD] h-[55px] w-fit md:w-[120px] rounded-lg">
+                      <div className="relative flex bg-[#A666E3] items-center px-4  justify-between border-[1px] border-[#D0D5DD] h-[55px] w-[120px] rounded-lg">
                         <div className="space-x-3 flex">
                           <FaRegCalendarAlt className="h-[20px] w-[14px] text-[#FFFFFF]" />
                           <h1 className="text-[12px] leading-[18px] font-light text-[#FFFFFF]">
@@ -529,7 +518,7 @@ const Create = ({ height }: { height: number | null }) => {
                       </div>
                     </div>
 
-                    <div className=" mt-4 flex space-x-2 relative gap-y-2">
+                    <div className=" mt-4 flex space-x-2 relative">
                       <div>
                         <Field>
                           <textarea
@@ -538,11 +527,10 @@ const Create = ({ height }: { height: number | null }) => {
                             }
                             placeholder="Add lecture description"
                             className={clsx(
-                              "h-[127px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block  w-[320px] sm:w-[395px] lg:w-[450px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                              "h-[127px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[390px] lg:w-[557px] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                               "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                             )}
                           />
-                          
                         </Field>
                       </div>
                     </div>
@@ -578,7 +566,7 @@ const Create = ({ height }: { height: number | null }) => {
                         readOnly
                         placeholder="e.g starknet basecamp"
                         className={clsx(
-                          "h-[55px] border-[2px] text-center bg-[#FFFFFF] border-[#D0D5DD] block w-[179px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#4A90E2]",
+                          "h-[55px] border-[2px] text-center bg-[#FFFFFF] border-[#D0D5DD] block w-[179px] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#4A90E2]",
                           "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                         )}
                       />
@@ -590,7 +578,7 @@ const Create = ({ height }: { height: number | null }) => {
                       <Input
                         onChange={handleBootcampPriceChange}
                         className={clsx(
-                          "h-[55px] border-[2px] text-center bg-[#FFFFFF] border-[#D0D5DD] block w-[100px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#4A90E2]",
+                          "h-[55px] border-[2px] text-center bg-[#FFFFFF] border-[#D0D5DD] block w-[100px] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#4A90E2]",
                           "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                         )}
                       />
@@ -604,11 +592,11 @@ const Create = ({ height }: { height: number | null }) => {
                   Upload Bootcamp creative
                 </h1>
 
-                <div className="flex flex-col md:flex-row md:space-x-16 items-center justify-center">
-                  <div className="h-[316px] w-[90%] mx-auto md:w-[459px] mt-3 rounded-lg bg-[#DCDCDC] flex justify-center items-center">
-                    <div className="h-[246px] w-[400px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-3 flex flex-col items-center justify-center">
+                <div className="flex flex-col lg:flex-row gap-x-16 lg:space-x-16 space-y-10">
+                  <div className="h-[316px] lg:w-[459px] w-[390px] mt-3 rounded-lg bg-[#DCDCDC] flex justify-center items-center">
+                    <div className="h-[256px] lg:w-[400px] w-[350px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-3 flex flex-col items-center justify-center">
                       <Image src={cloud} alt="upload" />
-                      <h1 className="text-[14px] text-[#475367] font-light leading-[20px]">
+                      <h1 className="text-[12px] lg:text-[14px] text-[#475367] font-light leading-[20px]">
                         <span className="text-[#4A90E2]">Click to upload</span>{" "}
                         or drag and drop
                       </h1>
@@ -616,7 +604,6 @@ const Create = ({ height }: { height: number | null }) => {
                         SVG, PNG, JPG or GIF (max. 800x400px)
                       </p>
                       <Image src={dividers} alt="divider" className="mt-7" />
-
                       <input
                         ref={logoInputRef}
                         type="file"
@@ -626,15 +613,14 @@ const Create = ({ height }: { height: number | null }) => {
                       />
                       <Button
                         onClick={handleBrowse}
-                        className="h-[36px] w-[118px] flex justify-center items-center bg-[#9B51E0] rounded-xl text-[14px] text-[#FFFFFF] font-light leading-[20px]"
+                        className="h-[36px] w-[118px] flex justify-center items-center bg-[#9B51E0] rounded-xl text-[12px] lg:text-[14px] text-[#FFFFFF] font-light leading-[20px]"
                       >
                         Browse Files
                       </Button>
                     </div>
                   </div>
-
-                  <div className="mt-3 space-y-2 mx-auto w-[90%]">
-                    <div className="h-[166px] w-full md:w-[251px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-0 flex flex-col items-center justify-center">
+                  <div className="mt-3 flex flex-col-reverse lg:flex-col space-y-5 lg:space-y-2">
+                    <div className="h-[166px] w-[251px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-0 flex flex-col items-center justify-center">
                       <Image src={cloud} alt="upload" />
                       <h1 className="text-[8px] text-[#475367] font-light leading-[20px]">
                         <span className="text-[#4A90E2]">Click to upload</span>{" "}
@@ -651,19 +637,19 @@ const Create = ({ height }: { height: number | null }) => {
                     <h1 className="text-[18px] text-[#333333] font-semibold leading-[31px] ">
                       Upload thumbnail
                     </h1>
-                    <p className="w-[254px] text-[14px] font-light text-[#2D3A4B] leading-[21px]">
+                    <p className="w-[254px] text-[12px] lg:text-[14px] font-light text-[#2D3A4B] leading-[21px]">
                       Upload your bootcamp image here. 750x422 pixels; .jpg,
                       .jpeg,. gif, or .png.{" "}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex justify-end my-5">
+                <div className="flex justify-end my-10 lg:my-5">
                   <div
-                    className="h-[47px] w-full md:w-[342px] rounded-xl bg-[#4A90E2] flex items-center justify-center cursor-pointer"
+                    className="h-[47px] w-full px-6 sm:w-auto lg:w-[342px] rounded-xl bg-[#4A90E2] flex items-center justify-center cursor-pointer"
                     onClick={handlePublishButton}
                   >
-                    <h1 className="text-[#FFFFFF] text-[14px] font-semibold leading-[16px]">
+                    <h1 className="text-[#FFFFFF] text-[12px] lg:text-[14px] font-semibold leading-[16px]">
                       {uploading
                         ? "Uploading data"
                         : "Save and Publish bootcamp"}

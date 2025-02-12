@@ -85,8 +85,8 @@ const Organizationtabs = () => {
                 </div>
                 <div className='text-[14px] py-3 text-[#5801A9] border-t border-b border-[#5801A9] md:hidden text-center' 
                     onClick={() => {
-                        handlePermission; 
-                        handleregistered;
+                        handlePermission(); 
+                        handleregistered();
                     }}
                 >
                     <p>

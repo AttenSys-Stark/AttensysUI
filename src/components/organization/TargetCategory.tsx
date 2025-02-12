@@ -30,7 +30,7 @@ export default function TargetCategory() {
       <Listbox value={selected} onChange={handleCategoryChange}>
         <ListboxButton
           className={clsx(
-            'relative block w-full border-[2px] border-[#D0D5DD] rounded-lg bg-[#FFFFFF] h-[56px] py-1.5 pr-8 pl-3 text-left text-sm/6 text-[#98999B]',
+            'relative block w-full border-[2px] border-[#D0D5DD] rounded-lg bg-[#FFFFFF] h-[56px] py-1.5 pr-8 pl-3 text-left text-[12px] md:text-sm/6 text-[#98999B]',
             'focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25'
           )}
         >
@@ -55,7 +55,7 @@ export default function TargetCategory() {
               className="group flex cursor-pointer items-center gap-2 rounded-lg py-1.5 px-3 select-none data-[focus]:bg-white/10"
             >
               <CheckIcon className="invisible size-4 fill-white group-data-[selected]:visible" />
-              <div className="text-sm/6 text-[#2D3A4B] cursor-pointer">{targ.name}</div>
+              <div className="text-[11px] md:text-sm/6 text-[#2D3A4B] cursor-pointer">{targ.name}</div>
             </ListboxOption>
           ))}
         </ListboxOptions>
