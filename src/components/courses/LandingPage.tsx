@@ -162,8 +162,8 @@ const LandingPage = () => {
         </div>
 
         {/* comments */}
-        <div className="block sm:flex py-12 mx-12 sm:mx-48 items-center content-center justify-around text-sm">
-          <div className="w-[100%] sm:w-[30%]">
+        <div className="block lg:flex py-12 mx-12 sm:mx-48 items-center content-center justify-around text-sm">
+          <div className="w-[100%] lg:w-[30%]">
             <div className="flex items-center">
               <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">OM</p>
               <div className="ml-6 space-y-2">
@@ -179,9 +179,9 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div className="border-[1px] border-[#B8B9BA] h-28 hidden sm:block"></div>
+          <div className="border-[1px] border-[#B8B9BA] h-28 hidden lg:block"></div>
 
-          <div className="w-[100%] sm:w-[30%]">
+          <div className="w-[100%] lg:w-[30%]">
             <div className="flex items-center">
               <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">OM</p>
               <div className="ml-6 space-y-2">
