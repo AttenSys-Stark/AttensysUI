@@ -43,21 +43,6 @@ const MainFormView5 = () => {
 
   return (
     <div className="lg:flex">
-      {/* Mobile Header (visible on lg and smaller screens) */}
-      <header className="lg:hidden sticky top-0 bg-white border-b z-50">
-        <div className="flex items-center justify-between px-4 h-14">
-          <IoMenuOutline className="w-6 h-6 text-[#383838]" />
-          <Image
-            src={video}
-            alt="Attensys"
-            width={100}
-            height={24}
-            className="h-6 object-contain"
-          />
-          <IoSearchOutline className="w-6 h-6 text-[#383838]" />
-        </div>
-      </header>
-
       <div className="hidden xl:block">
         <CourseSideBar />
       </div>
@@ -70,7 +55,7 @@ const MainFormView5 = () => {
           </p>
         </div>
 
-        <div className="lg:px-4 xl:px-0">
+        <div className="p-4 lg:p-0 lg:px-4 xl:px-0">
           <div className="block lg:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] lg:px-5 items-center">
             <div className="flex items-center">
               <div className="px-8 border-r border-blue-100">
@@ -85,27 +70,33 @@ const MainFormView5 = () => {
             </div>
 
             <form action="course-landing-page" method="post">
-              <button className="lg:hidden xl:block bg-[#C5D322] px-7 py-3 rounded text-white">
+              <button className="hidden xl:block bg-[#C5D322] px-7 py-3 rounded text-white">
                 Publish
               </button>
             </form>
           </div>
 
           <div className="lg:mx-4 xl:mx-24 mt-12">
+            {/* field */}
+            <div className="mb-3 order-first block lg:hidden">
+              <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">
+                Technology | Web Development
+              </p>
+            </div>
             <div className="block lg:grid lg:grid-cols-2 gap-4">
               {/* Course Image */}
-              <div className="w-full lg:w-[368px] h-[238px] rounded-xl mb-4 lg:mb-0">
+              <div className="w-full lg:w-[368px] h-[238px] rounded-xl mb-4 lg:mb-0 p-3">
                 <Image
                   src={video || "/placeholder.svg"}
                   alt="hero"
-                  className="h-full w-full object-cover rounded-xl"
+                  className="h-full w-full object-cover rounded-xl border-4 border-[#4A90E2]"
                 />
               </div>
 
               {/* Course information */}
               <div>
                 {/* field */}
-                <div className="mb-3 order-first">
+                <div className="mb-3 order-first hidden lg:block">
                   <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">
                     Technology | Web Development
                   </p>
@@ -123,7 +114,7 @@ const MainFormView5 = () => {
                   </p>
                 </div>
 
-                <div className="bg-[#5801A9] py-2 text-white w-full lg:w-[200px] text-center mt-6 mb-3 lg:w-[50%] rounded-lg">
+                <div className="bg-[#5801A9] py-2 text-white w-fit p-2 text-center mt-6 mb-3 lg:w-[50%] rounded-lg">
                   <p className="text-[14px] font-extrabold leading-[22px]">
                     Tech Innovators Academy
                   </p>
@@ -200,7 +191,7 @@ const MainFormView5 = () => {
                     After completion students will be issued certification
                   </p>
                 </div>
-                <div className="mt-12 mb-24">
+                <div className="mt-12 mb-24 p-10">
                   <form action="course-landing-page" method="post">
                     <button
                       className="w-full lg:w-auto rounded-xl bg-[#4A90E2] px-8 lg:px-24 py-3 text-white"
