@@ -59,15 +59,13 @@ const Mybootcamp = (props: any) => {
           >
            {caroselldata.map((data, index) => (
               <Mybootcampcarousel
-              key={index}
-                  name={data.name} 
-                  time={data.time}
-                  flier={data.flier}
-                  logo={data.logo}
+                  key={index}
+                  name={data.bootcamp_name} 
                   action="Ongoing"
                   height="200px"
                   width='200px'
-                  onClick={() => handlebootcamproute(data.name)}
+                  uri={data.bootcamp_ipfs_uri}
+                  onClick={() => handlebootcamproute(data.bootcamp_name, Number(data.bootcamp_id))}
               />
             ))}
           </Carousel>
