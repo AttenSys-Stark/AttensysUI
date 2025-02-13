@@ -1,5 +1,5 @@
-import React from "react"
-import Previous from "./previous"
+import React from "react";
+import Previous from "./previous";
 
 const CourseForm3 = () => {
   return (
@@ -84,7 +84,7 @@ const CourseForm3 = () => {
         <Previous />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CourseForm3
+export default CourseForm3;

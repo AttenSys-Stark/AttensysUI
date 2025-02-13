@@ -1,7 +1,7 @@
-import React from "react"
-import Carousel from "react-multi-carousel"
-import "react-multi-carousel/lib/styles.css"
-import { CardWithLink } from "./Cards"
+import React from "react";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+import { CardWithLink } from "./Cards";
 
 const CarouselComp = () => {
   const responsive = {
@@ -22,14 +22,14 @@ const CarouselComp = () => {
       breakpoint: { max: 820, min: 0 },
       items: 1,
     },
-  }
+  };
   return (
     <div className="hidden w-full mx-auto lg:flex flex-col justify-center items-center">
-      <Carousel 
-        className="course-carousel" 
-        responsive={responsive} 
-        centerMode={true} 
-        containerClass="container" 
+      <Carousel
+        className="course-carousel"
+        responsive={responsive}
+        centerMode={true}
+        containerClass="container"
         additionalTransfrom={0}
         arrows
         dotListClass=""
@@ -40,7 +40,8 @@ const CarouselComp = () => {
         keyBoardControl
         minimumTouchDrag={80}
         autoPlay={true}
-        autoPlaySpeed={3000}>
+        autoPlaySpeed={3000}
+      >
         <CardWithLink />
         <CardWithLink />
         <CardWithLink />
@@ -48,7 +49,7 @@ const CarouselComp = () => {
         <CardWithLink />
       </Carousel>
     </div>
-  )
-}
+  );
+};
 
-export default CarouselComp
+export default CarouselComp;

@@ -1,6 +1,6 @@
-import Image from "next/image"
-import React from "react"
-import book from "@/assets/book.svg"
+import Image from "next/image";
+import React from "react";
+import book from "@/assets/book.svg";
 
 const MobileStudentRegisteredCard = () => {
   return (
@@ -37,7 +37,7 @@ const MobileStudentRegisteredCard = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MobileStudentRegisteredCard
+export default MobileStudentRegisteredCard;

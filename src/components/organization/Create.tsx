@@ -1,37 +1,43 @@
-import React, { ChangeEvent, useRef, useState } from "react"
-import { IoIosInformationCircleOutline, IoMdClose } from "react-icons/io"
-import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext"
-import { useAtom } from "jotai"
-import { Button, Field, Input, Label } from "@headlessui/react"
-import clsx from "clsx"
-import TargetCategory from "./TargetCategory"
-import Calendar from "react-calendar"
-import "react-calendar/dist/Calendar.css"
-import { FaRegCalendarAlt } from "react-icons/fa"
-import "rc-time-picker/assets/index.css"
-import moment from "moment"
-import TimePicker from "rc-time-picker"
-import BootcampTime from "./BootcampTime"
-import { FaPlus } from "react-icons/fa6"
-import { RiArrowDropDownLine } from "react-icons/ri"
-import Toggle from "react-toggle"
-import cloud from "@/assets/cloud.svg"
-import Image from "next/image"
-import dividers from "@/assets/Dividers.svg"
-import { useRouter } from "next/navigation"
-import add from "@/assets/add.svg"
-import { createBootcampInitState } from "@/state/connectedWalletStarknetkitNext"
-import { FileObject } from "pinata"
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
-import { DatePicker } from "@mui/x-date-pickers/DatePicker"
-import dayjs, { Dayjs } from "dayjs"
-import { FcCancel } from "react-icons/fc"
-import { pinata } from "../../../utils/config"
+import React, { ChangeEvent, useRef, useState, useEffect } from "react";
+import { IoIosInformationCircleOutline, IoMdClose } from "react-icons/io";
+import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
+import { Button, Field, Input, Label } from "@headlessui/react";
+import clsx from "clsx";
+import TargetCategory from "./TargetCategory";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import { FaRegCalendarAlt } from "react-icons/fa";
+import "rc-time-picker/assets/index.css";
+import moment from "moment";
+import TimePicker from "rc-time-picker";
+import BootcampTime from "./BootcampTime";
+import { FaPlus } from "react-icons/fa6";
+import { RiArrowDropDownLine } from "react-icons/ri";
+import Toggle from "react-toggle";
+import cloud from "@/assets/cloud.svg";
+import Image from "next/image";
+import dividers from "@/assets/Dividers.svg";
+import { useRouter } from "next/navigation";
+import add from "@/assets/add.svg";
+import { createBootcampInitState } from "@/state/connectedWalletStarknetkitNext";
+import { FileObject } from "pinata";
+import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import dayjs, { Dayjs } from "dayjs";
+import { FcCancel } from "react-icons/fc";
+import { pinata } from "../../../utils/config";
+import { attensysOrgAbi } from "@/deployments/abi";
+import { attensysOrgAddress } from "@/deployments/contracts";
+import { connect } from "starknetkit";
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { Contract } from "starknet";
 
-const format = "h:mm a"
-const now = moment().hour(0).minute(0)
+const format = "h:mm a";
+const now = moment().hour(0).minute(0);
 
 type ValuePiece = Date | null
 
@@ -66,22 +72,57 @@ const ResetBootcampData = {
 
 //   {day:"", lecturetitle:"", lectureDescription: "", start:"", end:""}
 
-const Create = ({ height }: { height: number | null }) => {
+const Create = (props: any) => {
+  // { height }: { height: number | null }
+  const { height, organizationName } = props;
   const [createOverlayStat, setCreateOverlayStat] = useAtom(
     createbootcampoverlay,
-  )
-  const [value, onChange] = useState<Value>(new Date())
+  );
+  const [value, onChange] = useState<Value>(new Date());
   const [startdateStat, SetStartDateStatus] = React.useState<Dayjs | null>(
     dayjs(),
-  )
-  const [EnddateStat, SetEndDateStatus] = React.useState<Dayjs | null>(dayjs())
-  const [bootcampTimes, setBootcampTimes] = useState([{ day: 1 }])
-  const [isPaid, setIsPaid] = useState<boolean>(false)
-  const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const logoInputRef = useRef<HTMLInputElement | null>(null)
-  const [bootcampData, setBootcampData] = useAtom(createBootcampInitState)
-  const [uploading, setUploading] = useState(false)
+  );
+  const [EnddateStat, SetEndDateStatus] = React.useState<Dayjs | null>(dayjs());
+  const [bootcampTimes, setBootcampTimes] = useState([{ day: 1 }]);
+  const [isPaid, setIsPaid] = useState<boolean>(false);
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
+  const [bootcampData, setBootcampData] = useAtom(createBootcampInitState);
+  const [uploading, setUploading] = useState(false);
+  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [numOfClassesToCreate, setNumOfClassesToCreate] = useState<
+    number | any
+  >(1);
+
+  useEffect(() => {
+    const autoConnect = async () => {
+      try {
+        const { wallet: connectedWallet, connector } = await connect({
+          //@ts-ignore
+          provider,
+          modalMode: "neverAsk",
+          webWalletUrl: ARGENT_WEBWALLET_URL,
+          argentMobileOptions: {
+            dappName: "Attensys",
+            url: window.location.hostname,
+            chainId: CHAIN_ID,
+            icons: [],
+          },
+        });
+
+        // console.log(connector.wallet.account )
+        setWallet(connectedWallet);
+      } catch (e) {
+        console.error(e);
+        alert((e as any).message);
+      }
+    };
+
+    if (!wallet) {
+      autoConnect();
+    }
+  }, [wallet]);
 
   // console.dir(bootcampData, {depth: null})
   // console.dir(bootcampTimes, {depth: null})
@@ -170,34 +211,78 @@ const Create = ({ height }: { height: number | null }) => {
   }
 
   const handlePublishButton = async () => {
-    setUploading(true)
-    const bootcamplogo = await pinata.upload.file(bootcampData.BootcampLogo)
-    const Nftimage = await pinata.upload.file(bootcampData.bootcampNftImage)
+    setUploading(true);
+    const bootcamplogo = await pinata.upload.file(bootcampData.BootcampLogo);
+    const Nftimage = await pinata.upload.file(bootcampData.bootcampNftImage);
     const Dataupload = await pinata.upload.json({
       BootcampName: bootcampData.bootcampName,
-      BootcampLogo: bootcamplogo.cid,
+      BootcampLogo: bootcamplogo.IpfsHash,
       BootcampDescription: bootcampData.bootcampDescription,
       Bootcamplecturedata: bootcampData.bootcampLecture,
       BootcampStartDate: bootcampData.bootcampStartdate,
       BootEndDate: bootcampData.bootcampEndDate,
       BootcampNFTname: bootcampData.bootcampNftName,
       BootcampNFTsymbol: bootcampData.bootCampNftSymbol,
-      BootcampNftImage: Nftimage.cid,
+      BootcampNftImage: Nftimage.IpfsHash,
       Organizer: bootcampData.bootcampOrganization,
       PriceStaus: bootcampData.price,
       BootcampPrice: bootcampData.bootcampPrice,
       targetAudience: bootcampData.targetAudience,
-    })
+    });
 
     if (Dataupload) {
-      console.log("Data upload here", Dataupload)
-      console.log("Create bootcamp Cid to send to contract ", Dataupload.cid)
-      setUploading(false)
-      router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`)
-      setCreateOverlayStat(false)
-      setBootcampData(ResetBootcampData)
+      console.log("Data upload here", Dataupload);
+      console.log(
+        "Create bootcamp Cid to send to contract ",
+        Dataupload.IpfsHash,
+      );
+      // setUploading(false);
+      // router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`)
+      // setCreateOverlayStat(false);
+      // setBootcampData(ResetBootcampData)
+
+      const organizationContract = new Contract(
+        attensysOrgAbi,
+        attensysOrgAddress,
+        wallet?.account,
+      );
+
+      const create_bootcamp_calldata = organizationContract.populate(
+        "create_bootcamp",
+        [
+          organizationName,
+          bootcampData.bootcampName,
+          Dataupload.IpfsHash,
+          bootcampData.bootcampNftName,
+          bootcampData.bootCampNftSymbol,
+          numOfClassesToCreate,
+          Dataupload.IpfsHash,
+        ],
+      );
+
+      const callContract = await wallet?.account.execute([
+        {
+          contractAddress: attensysOrgAddress,
+          entrypoint: "create_bootcamp",
+          calldata: create_bootcamp_calldata.calldata,
+        },
+      ]);
+
+      //@ts-ignore
+      wallet?.account?.provider
+        .waitForTransaction(callContract.transaction_hash)
+        .then(() => {})
+        .catch((e: any) => {
+          console.log("Error: ", e);
+        })
+        .finally(() => {
+          setUploading(false);
+          router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`);
+          setCreateOverlayStat(false);
+          setBootcampData(ResetBootcampData);
+        });
     }
-  }
+  };
 
   const handleToggleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setIsPaid(event.target.checked)
@@ -209,6 +294,7 @@ const Create = ({ height }: { height: number | null }) => {
 
   const handleAddDay = () => {
     // Add a new BootcampTime component with an incremented day value
+    setNumOfClassesToCreate(numOfClassesToCreate + 1);
     setBootcampTimes((prevTimes) => [
       ...prevTimes,
       { day: prevTimes.length + 1 },
@@ -230,6 +316,7 @@ const Create = ({ height }: { height: number | null }) => {
   }
 
   const handleRemoveDay = () => {
+    setNumOfClassesToCreate(numOfClassesToCreate - 1);
     setBootcampTimes((prevTimes) => {
       if (prevTimes.length === 0) return prevTimes // Prevent removing if no days are present
       return prevTimes.slice(0, -1) // Remove the last day
@@ -662,7 +749,7 @@ const Create = ({ height }: { height: number | null }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Create

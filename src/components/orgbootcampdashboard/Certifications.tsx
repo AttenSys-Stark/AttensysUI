@@ -1,15 +1,15 @@
-import { Input } from "@headlessui/react"
-import React, { useState } from "react"
-import Image from "next/image"
-import batch from "@/assets/batch.svg"
-import single from "@/assets/single.svg"
+import { Input } from "@headlessui/react";
+import React, { useState } from "react";
+import Image from "next/image";
+import batch from "@/assets/batch.svg";
+import single from "@/assets/single.svg";
 
 const Certifications = () => {
-  const [inputValue, setinputValue] = useState("")
+  const [inputValue, setinputValue] = useState("");
 
   const handleChange = (event: { target: { value: any } }) => {
-    setinputValue(event.target.value)
-  }
+    setinputValue(event.target.value);
+  };
 
   return (
     <div className="w-full">
@@ -96,7 +96,7 @@ const Certifications = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Certifications
+export default Certifications;

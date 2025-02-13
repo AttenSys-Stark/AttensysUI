@@ -1,9 +1,9 @@
-import React from "react"
-import TopdiscoverSection from "./TopdiscoverSection"
-import Backgroundsection from "./Backgroundsection"
-import Timesection from "./Timesection"
-import Highlight from "./Highlight"
-import Allevents from "./Allevents"
+import React from "react";
+import TopdiscoverSection from "./TopdiscoverSection";
+import Backgroundsection from "./Backgroundsection";
+import Timesection from "./Timesection";
+import Highlight from "./Highlight";
+import Allevents from "./Allevents";
 
 const DiscoverLanding = () => {
   return (
@@ -14,7 +14,7 @@ const DiscoverLanding = () => {
       <Highlight />
       <Allevents />
     </div>
-  )
-}
+  );
+};
 
-export default DiscoverLanding
+export default DiscoverLanding;

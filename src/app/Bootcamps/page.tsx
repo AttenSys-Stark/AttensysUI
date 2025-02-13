@@ -1,42 +1,42 @@
-"use client"
-import React, { useEffect } from "react"
-import { useRouter } from "next/router"
-import { useParams } from "next/navigation"
+"use client";
+import React, { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
   connectorAtom,
   connectorDataAtom,
   walletStarknetkitNextAtom,
-} from "@/state/connectedWalletStarknetkitNext"
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
-import { RESET } from "jotai/utils"
-import { connect, disconnect } from "starknetkit"
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
+} from "@/state/connectedWalletStarknetkitNext";
+import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { RESET } from "jotai/utils";
+import { connect, disconnect } from "starknetkit";
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 
-import Coursedropdown from '@/components/courses/Coursedropdown'
-import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown"
-import { useAtom, useSetAtom } from "jotai"
-import BootcampLanding from "@/components/bootcamp/BootcampLanding"
+import Coursedropdown from "@/components/courses/Coursedropdown";
+import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
+import { useAtom, useSetAtom } from "jotai";
+import BootcampLanding from "@/components/bootcamp/BootcampLanding";
 
 const Index = () => {
-  const [courseDropdown, setCourseDropdown] = useAtom(coursestatusAtom)
+  const [courseDropdown, setCourseDropdown] = useAtom(coursestatusAtom);
   const [bootcampDropdown, setBootcampDropdown] = useAtom(
     bootcampdropdownstatus,
-  )
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
-  const setConnectorData = useSetAtom(connectorDataAtom)
-  const setConnector = useSetAtom(connectorAtom)
+  );
+  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
+  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
+  const setConnectorData = useSetAtom(connectorDataAtom);
+  const setConnector = useSetAtom(connectorAtom);
 
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
+  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
 
   useEffect(() => {
-    setWalletLatest(RESET)
-    setWalletNext(RESET)
-    setConnectorData(RESET)
-    setConnector(RESET)
-  }, [])
+    /* setWalletLatest(RESET) */
+    setWalletNext(RESET);
+    setConnectorData(RESET);
+    setConnector(RESET);
+  }, []);
 
   useEffect(() => {
     const autoConnect = async () => {
@@ -52,22 +52,22 @@ const Index = () => {
             chainId: CHAIN_ID,
             icons: [],
           },
-        })
-        setWallet(connectedWallet)
+        });
+        setWallet(connectedWallet);
       } catch (e) {
-        console.error(e)
-        alert((e as any).message)
+        console.error(e);
+        alert((e as any).message);
       }
-    }
+    };
 
     if (!wallet) {
-      autoConnect()
+      autoConnect();
     }
-  }, [wallet])
+  }, [wallet]);
   const handlePageClick = () => {
-    setBootcampDropdown(false)
-    setCourseDropdown(false)
-  }
+    setBootcampDropdown(false);
+    setCourseDropdown(false);
+  };
   return (
     <div onClick={handlePageClick}>
       {courseDropdown && (
@@ -84,7 +84,7 @@ const Index = () => {
       </div>
       <BootcampLanding />
     </div>
-  )
-}
+  );
+};
 
-export default Index
+export default Index;

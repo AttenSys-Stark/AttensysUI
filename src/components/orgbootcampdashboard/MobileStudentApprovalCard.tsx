@@ -1,11 +1,11 @@
-import Image from "next/image"
-import ex from "@/assets/ex.svg"
-import correct from "@/assets/correct.png"
+import Image from "next/image";
+import ex from "@/assets/ex.svg";
+import correct from "@/assets/correct.png";
 
 const MobileStudentApprovalCard = ({
   arg,
 }: {
-  arg: "both" | "check" | "cancel"
+  arg: "both" | "check" | "cancel";
 }) => {
   return (
     <div className="w-full bg-white border border-[#DADADA] rounded-[15px] py-7 px-5 space-y-3 relative">
@@ -36,7 +36,7 @@ const MobileStudentApprovalCard = ({
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MobileStudentApprovalCard
+export default MobileStudentApprovalCard;

@@ -1,18 +1,22 @@
-import React from 'react'
+import React from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import Mybootcampcarousel from './Mybootcampcarousel';
-import {caroselldata} from '@/constants/data'
-import { useRouter } from 'next/navigation';
+import Mybootcampcarousel from "./Mybootcampcarousel";
+import { caroselldata } from "@/constants/data";
+import { useRouter } from "next/navigation";
+import { currentID } from "@/state/connectedWalletStarknetkitNext";
+import { useSetAtom } from "jotai";
 import MobileBootcampCard from '../bootcamp/MobileBootcampCard';
 
-const Mybootcamp = () => {
+const Mybootcamp = (props: any) => {
   const router = useRouter();
+  const setCurrentID = useSetAtom(currentID);
 
-  const handlebootcamproute = (props : string) => {
-    router.push(`/Bootcamp/${props}/Outline`)
-
+  const handlebootcamproute = (props : string, id : any) => {
+    setCurrentID(id)
+    router.push(`/Bootcamp/${props}/Outline/?id=${id}`)
   }
+  console.log("dataa heerr", props.bootcampInfo)
     const responsive = {
         superLargeDesktop: {
           // the naming can be any, depends on you.
@@ -87,7 +91,7 @@ const Mybootcamp = () => {
         </div>
                            
     </div>
-  )
-}
+  );
+};
 
-export default Mybootcamp
+export default Mybootcamp;

@@ -24,13 +24,14 @@ const Herosection = () => {
         {/* 📌 Text and buttons */}
         <div className="w-[100%] space-y-8 sm:h-[55%] my-auto px-6 md:px-10 lg:px-12 relative">
           {/* 📌 Responsive Title */}
-          <h1 className="relative w-[90%] sm:w-[70%] md:w-[80%] lg:w-[70%] xl:w-[65%] 
+          <h1
+            className="relative w-[90%] sm:w-[70%] md:w-[80%] lg:w-[70%] xl:w-[65%] 
                   text-[26px] sm:text-[26px] md:text-[30px] lg:text-[36px] xl:text-[38px] 
                   leading-[35px] sm:leading-[45px] md:leading-[48px] lg:leading-[50px] 
-                  font-bold text-[#2D3A4B]">
-            One <span className="text-[#9B51E0]">Platform</span>, Infinite Possibilities—Track,
-            Stream, and Secure Your Certifications
-
+                  font-bold text-[#2D3A4B]"
+          >
+            One <span className="text-[#9B51E0]">Platform</span>, Infinite
+            Possibilities—Track, Stream, and Secure Your Certifications
             {/* 📌 Decorative line below the title */}
             <Image
               alt="line"
@@ -40,26 +41,32 @@ const Herosection = () => {
           </h1>
 
           {/* 📌 Descriptive Paragraph */}
-          <p className="break-words text-[#2D3A4B] font-light text-[16px] sm:text-[17px] md:text-[18px] 
+          <p
+            className="break-words text-[#2D3A4B] font-light text-[16px] sm:text-[17px] md:text-[18px] 
                   leading-[22px] sm:leading-[24px] md:leading-[26px] 
-                  w-[100%] sm:w-[70%] md:w-[80%] lg:w-[70%] xl:w-[65%]">
-            Simplifying certificate issuance, attendance tracking, and online course
-            management for schools, organizations, and event managers.
+                  w-[100%] sm:w-[70%] md:w-[80%] lg:w-[70%] xl:w-[65%]"
+          >
+            Simplifying certificate issuance, attendance tracking, and online
+            course management for schools, organizations, and event managers.
           </p>
 
           {/* 📌 Responsive Buttons */}
           <div className="flex space-x-3 sm:w-[60%] md:w-[70%] lg:w-[60%] xl:w-[50%]">
-            <Button className="flex rounded-lg bg-[#2D3A4B] py-2 px-4 h-[45px] sm:h-[50px] 
+            <Button
+              className="flex rounded-lg bg-[#2D3A4B] py-2 px-4 h-[45px] sm:h-[50px] 
                          md:h-[52px] lg:h-[47px] items-center w-[150px] md:w-[180px] 
                          lg:w-[154px] text-xs sm:text-sm md:text-md text-white 
-                         hover:bg-[#1B2936]">
+                         hover:bg-[#1B2936]"
+            >
               Verify Certificate
             </Button>
 
-            <Button className="border border-[#2D3A4B] flex rounded-lg py-2 px-4 
+            <Button
+              className="border border-[#2D3A4B] flex rounded-lg py-2 px-4 
                          h-[45px] sm:h-[50px] md:h-[52px] lg:h-[47px] items-center 
                          w-[180px] md:w-[220px] lg:w-[202px] text-xs sm:text-sm md:text-md 
-                         text-[#2D3A4B] hover:bg-[#F5F5F5]">
+                         text-[#2D3A4B] hover:bg-[#F5F5F5]"
+            >
               Get Started on Attensys
             </Button>
           </div>

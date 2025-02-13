@@ -1,11 +1,11 @@
-import React from 'react'
+import React from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import { regcaroselldata } from '@/constants/data'
-import Image from 'next/image';
-import drop from '@/assets/droporg.svg'
+import { regcaroselldata } from "@/constants/data";
+import Image from "next/image";
+import drop from "@/assets/droporg.svg";
 import { IoIosArrowDropdown } from "react-icons/io";
-import Carosellcard from './Carosellcard';
+import Carosellcard from "./Carosellcard";
 import { IoMdPerson } from "react-icons/io";
 import { useRouter } from 'next/navigation';
 import MobileBootcampCard from './MobileBootcampCard'
@@ -15,29 +15,29 @@ import { ImBooks } from "react-icons/im";
 
 const Registered = () => {
   const router = useRouter();
-    const responsive = {
-        superLargeDesktop: {
-          // the naming can be any, depends on you.
-          breakpoint: { max: 4000, min: 3000 },
-          items: 4
-        },
-        desktop: {
-          breakpoint: { max: 3000, min: 1440 },
-          items: 4
-        },
-        desktop_: {
-          breakpoint: { max: 1440, min: 1024 },
-          items: 3
-        },
-        tablet: {
-          breakpoint: { max: 1024, min: 464 },
-          items: 3
-        },
-        mobile: {
-          breakpoint: { max: 464, min: 0 },
-          items: 1
-        }
-      };
+  const responsive = {
+    superLargeDesktop: {
+      // the naming can be any, depends on you.
+      breakpoint: { max: 4000, min: 3000 },
+      items: 4,
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1440 },
+      items: 4,
+    },
+    desktop_: {
+      breakpoint: { max: 1440, min: 1024 },
+      items: 3,
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 3,
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1,
+    },
+  };
 
       const handlegotomybootcamp = () => {
           router.push('/Mybootcamps');
@@ -109,7 +109,7 @@ const Registered = () => {
         </div>
                            
     </div>
-  )
-}
+  );
+};
 
-export default Registered
+export default Registered;

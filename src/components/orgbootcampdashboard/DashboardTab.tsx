@@ -1,14 +1,14 @@
-"use client"
-import { Button } from "@headlessui/react"
-import React from "react"
+"use client";
+import { Button } from "@headlessui/react";
+import React from "react";
 import {
   outlineclick,
   allstudentclick,
   certificationsclick,
   addclassmodal,
-} from "@/state/connectedWalletStarknetkitNext"
-import { useAtom } from "jotai"
-import { useRouter } from "next/navigation"
+} from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
+import { useRouter } from "next/navigation";
 import {
   Menubar,
   MenubarContent,
@@ -17,44 +17,45 @@ import {
   MenubarSeparator,
   MenubarShortcut,
   MenubarTrigger,
-} from "@/components/ui/menubar"
-import { FaPlus } from "react-icons/fa6"
+} from "@/components/ui/menubar";
+import { FaPlus } from "react-icons/fa6";
 
 const DashboardTab = (props: any) => {
-  const [outlineClickstat, setOutlineClickstat] = useAtom(outlineclick)
-  const [allstudentclickstat, setallstudentclickstat] = useAtom(allstudentclick)
+  const [outlineClickstat, setOutlineClickstat] = useAtom(outlineclick);
+  const [allstudentclickstat, setallstudentclickstat] =
+    useAtom(allstudentclick);
   const [certificationclickstat, setcertificationclickstat] =
-    useAtom(certificationsclick)
-  const [addClass, setAddclass] = useAtom(addclassmodal)
-  const router = useRouter()
+    useAtom(certificationsclick);
+  const [addClass, setAddclass] = useAtom(addclassmodal);
+  const router = useRouter();
 
   const handleAddclass = () => {
-    setAddclass(true)
+    setAddclass((prev) => ({ ...prev, modalstatus: true }))
   }
 
   const handleinsightclick = () => {
-    setOutlineClickstat(true)
-    setallstudentclickstat(false)
-    setcertificationclickstat(false)
+    setOutlineClickstat(true);
+    setallstudentclickstat(false);
+    setcertificationclickstat(false);
 
     //@todo replace sample dashboard with org name
-    router.push(`/Bootcamp/${props.bootcampname}/Outline`)
-  }
+    router.push(`/Bootcamp/${props.bootcampname}/Outline`);
+  };
 
   const handlegueslistclick = () => {
-    setOutlineClickstat(false)
-    setallstudentclickstat(true)
-    setcertificationclickstat(false)
+    setOutlineClickstat(false);
+    setallstudentclickstat(true);
+    setcertificationclickstat(false);
     //@todo replace sample dashboard with org name
-    router.push(`/Bootcamp/${props.bootcampname}/Students`)
-  }
+    router.push(`/Bootcamp/${props.bootcampname}/Students`);
+  };
   const handleAttendanceclick = () => {
-    setOutlineClickstat(false)
-    setallstudentclickstat(false)
-    setcertificationclickstat(true)
+    setOutlineClickstat(false);
+    setallstudentclickstat(false);
+    setcertificationclickstat(true);
     //@todo replace sample dashboard with org name
-    router.push(`/Bootcamp/${props.bootcampname}/Certifications`)
-  }
+    router.push(`/Bootcamp/${props.bootcampname}/Certifications`);
+  };
 
   return (
     <>
@@ -64,7 +65,7 @@ const DashboardTab = (props: any) => {
             onClick={handleinsightclick}
             className={`${outlineClickstat && `border-[#9B51E0] border-b-[4px]`} w-[140px] text-[16px] font-medium text-[#333333]`}
           >
-            Course Ouline
+            Course Outline
           </Button>
           <Button
             onClick={handlegueslistclick}
@@ -117,7 +118,7 @@ const DashboardTab = (props: any) => {
         </Menubar>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default DashboardTab
+export default DashboardTab;

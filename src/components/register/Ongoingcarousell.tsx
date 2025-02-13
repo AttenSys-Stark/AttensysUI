@@ -1,11 +1,11 @@
-import React from "react"
-import Carousel from "react-multi-carousel"
-import "react-multi-carousel/lib/styles.css"
-import { caroselldata } from "@/constants/data"
-import Image from "next/image"
-import drop from "@/assets/droporg.svg"
-import { IoIosArrowDropdown } from "react-icons/io"
-import Carosellcard from "@/components/bootcamp/Carosellcard"
+import React from "react";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+import { caroselldata } from "@/constants/data";
+import Image from "next/image";
+import drop from "@/assets/droporg.svg";
+import { IoIosArrowDropdown } from "react-icons/io";
+import Carosellcard from "@/components/bootcamp/Carosellcard";
 
 const Ongoingcarousell = () => {
   const responsive = {
@@ -30,7 +30,7 @@ const Ongoingcarousell = () => {
       breakpoint: { max: 720, min: 0 },
       items: 1,
     },
-  }
+  };
 
   return (
     <div className="h-auto w-full px-10 flex flex-col items-center rounded-xl py-8 mt-10">
@@ -73,7 +73,7 @@ const Ongoingcarousell = () => {
         </Carousel>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Ongoingcarousell
+export default Ongoingcarousell;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { IoSettingsSharp } from "react-icons/io5";
 import { permisiondata } from '@/constants/data';
 import { IoIosRemoveCircleOutline } from 'react-icons/io';
@@ -82,7 +82,7 @@ const Permissions = () => {
           }
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Permissions
+export default Permissions;

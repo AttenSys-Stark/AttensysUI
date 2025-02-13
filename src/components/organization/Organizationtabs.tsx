@@ -1,49 +1,47 @@
-import React, { useState } from 'react'
-import threevert from '@/assets/threevert.svg'
-import Image from 'next/image'
-import gridline from '@/assets/gridicons_create.svg'
-import book from '@/assets/bookfall.svg'
-import drop from '@/assets/droporg.svg'
-import Mybootcamp from './Mybootcamp'
-import Permissions from './Permissions'
-import Registered from './Registered'
+import React, { useState } from "react";
+import threevert from "@/assets/threevert.svg";
+import Image from "next/image";
+import gridline from "@/assets/gridicons_create.svg";
+import book from "@/assets/bookfall.svg";
+import drop from "@/assets/droporg.svg";
+import Mybootcamp from "./Mybootcamp";
+import Permissions from "./Permissions";
+import Registered from "./Registered";
 import { FaPlus } from "react-icons/fa6";
-import {createbootcampoverlay} from '@/state/connectedWalletStarknetkitNext'
-import { useAtom } from 'jotai'
+import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
 import { ImBooks } from "react-icons/im";
 
+const Organizationtabs = (props: any) => {
+  const [mybootcampStat, setMyBootcampStat] = useState(true);
+  const [PermissionsStat, setPermissionscampStat] = useState(false);
+  const [RegisteredStat, setRegisteredStat] = useState(false);
+  const [createOverlayStat, setCreateOverlayStat] = useAtom(
+    createbootcampoverlay,
+  );
 
+  const handlemybootcamp = () => {
+    setMyBootcampStat(!mybootcampStat);
+    // setPermissionscampStat(false);
+    // setRegisteredStat(false)
+  };
 
-const Organizationtabs = () => {
-    const [mybootcampStat, setMyBootcampStat] = useState(true);
-    const [PermissionsStat, setPermissionscampStat] = useState(false);
-    const [RegisteredStat, setRegisteredStat] = useState(false);
-  const [createOverlayStat, setCreateOverlayStat] = useAtom(createbootcampoverlay);
+  const handlePermission = () => {
+    // setMyBootcampStat(false)
+    setPermissionscampStat(!PermissionsStat);
+    // setRegisteredStat(false)
+  };
 
-
-
-    const handlemybootcamp = () =>{
-        setMyBootcampStat(!mybootcampStat)
-        // setPermissionscampStat(false);
-        // setRegisteredStat(false)
-    }
-
-    const handlePermission = () =>{
-        // setMyBootcampStat(false)
-        setPermissionscampStat(!PermissionsStat);
-        // setRegisteredStat(false)
-    }
-
-    const handleregistered = () =>{
-        // setMyBootcampStat(false)
-        // setPermissionscampStat(false);
-        setRegisteredStat(!RegisteredStat)
-    }
-    const handleCreateOverlay = () => {
-        setCreateOverlayStat(true);
-        setRegisteredStat(false)
-        setPermissionscampStat(false);
-    }
+  const handleregistered = () => {
+    // setMyBootcampStat(false)
+    // setPermissionscampStat(false);
+    setRegisteredStat(!RegisteredStat);
+  };
+  const handleCreateOverlay = () => {
+    setCreateOverlayStat(true);
+    setRegisteredStat(false);
+    setPermissionscampStat(false);
+  };
 
   return (
     <div className='h-auto w-full md:w-[90%] mx-auto flex mt-8 space-x-10 pb-12'>
@@ -113,7 +111,7 @@ const Organizationtabs = () => {
             </div>
         </div>
     </div>
-  )
-}
+  );
+};
 
-export default Organizationtabs
+export default Organizationtabs;

@@ -1,15 +1,15 @@
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
-import { useSetAtom } from "jotai"
-import { useRouter } from "next/navigation"
-import { FC } from "react"
-import { connect } from "starknetkit"
-import { Button } from "@headlessui/react"
-import World from "@/assets/Vector.svg"
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { useSetAtom } from "jotai";
+import { useRouter } from "next/navigation";
+import { FC } from "react";
+import { connect } from "starknetkit";
+import { Button } from "@headlessui/react";
+import World from "@/assets/Vector.svg";
 
 const ConnectButton: FC = () => {
-  const setWallet = useSetAtom(walletStarknetkitLatestAtom)
-  const navigate = useRouter()
+  const setWallet = useSetAtom(walletStarknetkitLatestAtom);
+  const navigate = useRouter();
 
   const connectFn = async () => {
     try {
@@ -23,14 +23,14 @@ const ConnectButton: FC = () => {
           chainId: CHAIN_ID,
           icons: [],
         },
-      })
+      });
 
-      setWallet(wallet)
+      setWallet(wallet);
     } catch (e) {
-      console.error(e)
-      alert((e as any).message)
+      console.error(e);
+      alert((e as any).message);
     }
-  }
+  };
 
   return (
     <div>
@@ -60,7 +60,7 @@ const ConnectButton: FC = () => {
         </div>
       </Button>
     </div>
-  )
-}
+  );
+};
 
-export { ConnectButton }
+export { ConnectButton };

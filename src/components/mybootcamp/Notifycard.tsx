@@ -1,5 +1,5 @@
-import React from "react"
-import { GiBookshelf } from "react-icons/gi"
+import React from "react";
+import { GiBookshelf } from "react-icons/gi";
 
 const Notifycard = () => {
   return (
@@ -11,7 +11,7 @@ const Notifycard = () => {
         Deadline is 5th Nov, 2024 - 12am
       </h1>
     </div>
-  )
-}
+  );
+};
 
-export default Notifycard
+export default Notifycard;

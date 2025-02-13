@@ -1,30 +1,30 @@
-import React, { useState } from "react"
-import Organizationcard from "./Organizationcard"
-import { organizationData } from "@/constants/data"
+import React, { useState } from "react";
+import Organizationcard from "./Organizationcard";
+import { organizationData } from "@/constants/data";
 
-const Organizations = () => {
-  const [currentPage, setCurrentPage] = useState(1)
+const Organizations = (props: any) => {
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 6
+  const itemsPerPage = 6;
 
   // Calculate total pages
-  const totalPages = Math.ceil(organizationData.length / itemsPerPage)
+  const totalPages = Math.ceil(props.allorginfo.length / itemsPerPage);
 
   // Get current page items
-  const currentItems = organizationData.slice(
+  const currentItems = props.allorginfo.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
-  )
+  );
 
   const generatePageNumbers = () => {
-    const pageNumbers = []
-    const maxVisiblePages = 10
+    const pageNumbers = [];
+    const maxVisiblePages = 10;
 
     // Always show the first page
-    if (currentPage > 2) pageNumbers.push(1)
+    if (currentPage > 2) pageNumbers.push(1);
 
     // Show ellipsis if there are pages between the first page and current page range
-    if (currentPage > 3) pageNumbers.push("...")
+    if (currentPage > 3) pageNumbers.push("...");
 
     // Show the range of pages around the current page
     for (
@@ -32,29 +32,29 @@ const Organizations = () => {
       i <= Math.min(currentPage + 1, totalPages);
       i++
     ) {
-      pageNumbers.push(i)
+      pageNumbers.push(i);
     }
 
     // Show ellipsis if there are pages between the current range and the last page
-    if (currentPage < totalPages - 2) pageNumbers.push("...")
+    if (currentPage < totalPages - 2) pageNumbers.push("...");
 
     // Always show the last page
-    if (currentPage < totalPages - 1) pageNumbers.push(totalPages)
+    if (currentPage < totalPages - 1) pageNumbers.push(totalPages);
 
-    return pageNumbers
-  }
+    return pageNumbers;
+  };
 
   // Handle pagination controls
   const goToNextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
-  }
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+  };
 
   const goToPreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1))
-  }
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+  };
   const goToPage = (page: any) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   return (
     <div className="h-auto w-full flex flex-col justify-center items-center space-y-4">
@@ -63,23 +63,15 @@ const Organizations = () => {
       </h1>
       <div className="h-auto w-[90%] mx-auto bg-[#FFFFFF] border-[1px] border-[#C8C8C8] rounded-lg p-4 xl:p-8">
         <div className="gap-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 items-stretch xl:grid-cols-4">
-          {currentItems.map((data, index) => {
+          {currentItems.map((data: any, index: any) => {
             return (
               <div key={index} className="col-span-1 flex flex-none w-full">
                 <Organizationcard
                   key={index}
-                  name={data.name}
-                  about={data.about}
-                  numberofbootcamps={data.bootcampnumber}
-                  numberofinstructors={data.instructors}
-                  stars={data.stars}
-                  totalreviews={data.reviewnumber}
-                  tags={data.tags}
-                  logo={data.logo}
-                  flier={data.flier}
+                  orgaddress={data.address_of_org}
                 />
               </div>
-            )
+            );
           })}
         </div>
         {/* Pagination Controls */}
@@ -117,7 +109,7 @@ const Organizations = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Organizations
+export default Organizations;

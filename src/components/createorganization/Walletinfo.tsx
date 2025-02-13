@@ -1,17 +1,17 @@
-import React from "react"
-import walletimage from "@/assets/walletcrop.jpg"
-import Image from "next/image"
-import { ConnectButton } from "../connect/ConnectButton"
-import { Button } from "@headlessui/react"
-import { useRouter } from "next/navigation"
-import backArrow from "../../../public/backArrow.svg"
+import React from "react";
+import walletimage from "@/assets/walletcrop.jpg";
+import Image from "next/image";
+import { ConnectButton } from "../connect/ConnectButton";
+import { Button } from "@headlessui/react";
+import { useRouter } from "next/navigation";
+import backArrow from "../../../public/backArrow.svg";
 
 const Walletinfo = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   const handlerouting = (prop: string) => {
-    router.push(`/Createorganization/${prop}`)
-  }
+    router.push(`/Createorganization/${prop}`);
+  };
 
   return (
     <div className="lg:min-h-screen w-full">
@@ -46,10 +46,6 @@ const Walletinfo = () => {
           </div>
 
           <ConnectButton />
-
-          <h3 className="underline cursor-pointer text-[#5801A9] font-medium">
-            Create new wallet
-          </h3>
         </div>
 
         <Button
@@ -60,7 +56,7 @@ const Walletinfo = () => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Walletinfo
+export default Walletinfo;

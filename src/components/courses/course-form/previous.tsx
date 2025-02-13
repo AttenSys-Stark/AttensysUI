@@ -1,5 +1,5 @@
-import React from "react"
-import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
+import React from "react";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 
 const Previous = () => {
   return (
@@ -10,7 +10,7 @@ const Previous = () => {
       <IoMdArrowBack />
       <p>Previous</p>
     </div>
-  )
-}
+  );
+};
 
-export default Previous
+export default Previous;

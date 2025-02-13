@@ -1,16 +1,16 @@
-import React from 'react'
-import Discoversection from './Discoversection'
-import Createevents from './Createevents'
-import Myevents from './Myevents'
+import React from "react";
+import Discoversection from "./Discoversection";
+import Createevents from "./Createevents";
+import Myevents from "./Myevents";
 
 const Eventslanding = (props: any) => {
   return (
-    <div className='h-auto w-full bg-[#F5F7FA]'>
-        <Discoversection />
-        <Createevents />
-        <Myevents section={props.section} />
+    <div className="h-auto w-full bg-[#F5F7FA]">
+      <Discoversection />
+      <Createevents />
+      <Myevents section={props.section} />
     </div>
-  )
-}
+  );
+};
 
-export default Eventslanding
+export default Eventslanding;

@@ -3,15 +3,16 @@ import {
   ListboxButton,
   ListboxOption,
   ListboxOptions,
-} from "@headlessui/react"
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid"
-import clsx from "clsx"
-import { useState } from "react"
+} from "@headlessui/react";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import clsx from "clsx";
+import { useState } from "react";
 import {
   walletStarknetkitNextAtom,
   organzationInitState,
-} from "@/state/connectedWalletStarknetkitNext"
-import { useAtom } from "jotai"
+  isinputError,
+} from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
 
 const Organizationcategory = [
   { id: 1, name: "Select from predefined categories" },
@@ -19,19 +20,21 @@ const Organizationcategory = [
   { id: 3, name: "Web2" },
   { id: 4, name: "Web3" },
   { id: 5, name: "Health" },
-]
+];
 
 export default function Category() {
-  const [selected, setSelected] = useState(Organizationcategory[0])
-  const [organizationData, setOrganizationData] = useAtom(organzationInitState)
+  const [selected, setSelected] = useState(Organizationcategory[0]);
+  const [organizationData, setOrganizationData] = useAtom(organzationInitState);
+  const [inputError, setInputError] = useAtom(isinputError);
 
   const handleCategoryChange = (category: any) => {
-    setSelected(category) // Update selected category
+    setSelected(category); // Update selected category
     setOrganizationData((prev) => ({
       ...prev,
       organizationCategory: category.name, // Update organization category in state
-    }))
-  }
+    }));
+    setInputError(false);
+  };
 
   return (
     <div className="lg:w-[90%] w-full h-[55px] ">
@@ -71,5 +74,5 @@ export default function Category() {
         </ListboxOptions>
       </Listbox>
     </div>
-  )
+  );
 }

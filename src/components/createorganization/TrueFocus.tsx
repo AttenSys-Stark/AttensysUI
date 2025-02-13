@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
-
 const TrueFocus = ({
   sentence = "True Focus",
   manualMode = false,
@@ -16,13 +15,21 @@ const TrueFocus = ({
   const [lastActiveIndex, setLastActiveIndex] = useState(null);
   const containerRef = useRef(null);
   const wordRefs = useRef([]);
-  const [focusRect, setFocusRect] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [focusRect, setFocusRect] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
 
   useEffect(() => {
     if (!manualMode) {
-      const interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % words.length);
-      }, (animationDuration + pauseBetweenAnimations) * 1000);
+      const interval = setInterval(
+        () => {
+          setCurrentIndex((prev) => (prev + 1) % words.length);
+        },
+        (animationDuration + pauseBetweenAnimations) * 1000,
+      );
 
       return () => clearInterval(interval);
     }
@@ -34,7 +41,7 @@ const TrueFocus = ({
 
     //@ts-ignore
     const parentRect = containerRef.current.getBoundingClientRect();
-      //@ts-ignore
+    //@ts-ignore
     const activeRect = wordRefs.current[currentIndex].getBoundingClientRect();
 
     setFocusRect({
@@ -70,11 +77,10 @@ const TrueFocus = ({
         return (
           <span
             key={index}
-              //@ts-ignore
+            //@ts-ignore
             ref={(el) => (wordRefs.current[index] = el)}
             className="relative text-[3rem] font-black cursor-pointer text-[#9B51E0]"
             style={{
-                
               filter: manualMode
                 ? isActive
                   ? `blur(0px)`
@@ -82,7 +88,7 @@ const TrueFocus = ({
                 : isActive
                   ? `blur(0px)`
                   : `blur(${blurAmount}px)`,
-                    //@ts-ignore
+              //@ts-ignore
               "--border-color": borderColor,
               "--glow-color": glowColor,
               transition: `filter ${animationDuration}s ease`,
@@ -108,7 +114,7 @@ const TrueFocus = ({
           duration: animationDuration,
         }}
         style={{
-              //@ts-ignore
+          //@ts-ignore
           "--border-color": borderColor,
           "--glow-color": glowColor,
         }}

@@ -1,13 +1,13 @@
-import React from "react"
-import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
-import Dropdown from "../Dropdown"
-import CourseSideBar from "./SideBar"
-import { handleCreateCourse } from "@/utils/helpers"
-import { useRouter } from "next/navigation"
-import Stepper from "@/components/Stepper"
+import React from "react";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import Dropdown from "../Dropdown";
+import CourseSideBar from "./SideBar";
+import { handleCreateCourse } from "@/utils/helpers";
+import { useRouter } from "next/navigation";
+import Stepper from "@/components/Stepper";
 
 const MainFormView2 = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <div className="flex">
@@ -132,7 +132,7 @@ Professionals looking to enhance their skills in [Specific Area].`}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MainFormView2
+export default MainFormView2;

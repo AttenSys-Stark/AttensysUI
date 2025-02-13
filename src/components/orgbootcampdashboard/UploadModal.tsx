@@ -1,5 +1,11 @@
-"use client"
-import { ChangeEvent, SetStateAction, useEffect, useRef, useState } from "react"
+"use client";
+import {
+  ChangeEvent,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Button,
   Dialog,
@@ -19,19 +25,225 @@ import clsx from "clsx"
 import { FaPlus } from "react-icons/fa6"
 import cloud from "@/assets/cloud.svg"
 import dividers from "@/assets/Dividers.svg"
+import axios from "axios"
+import { Contract } from "starknet"
+import { attensysOrgAbi } from "@/deployments/abi"
+import { attensysOrgAddress } from "@/deployments/contracts"
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
+import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
+import { pinata } from "../../../utils/config"
+interface FormData {
+  topic: string
+  description: string
+  assignment: string
+  videoUrl: string
+  thumbnailUrl: string
+}
+
+interface UploadStatus {
+  success: boolean
+  error: string | null
+  showMessage: boolean
+  progress: number
+}
 
 export default function UploadModal(prop: any) {
-  const [open, setOpen] = useState(prop.status)
+  const [open, setOpen] = useState(prop.status.modalstatus)
   const [addClass, setAddclass] = useAtom(addclassmodal)
+  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
+  const [uploadStatus, setUploadStatus] = useState({
+    video: {
+      success: false,
+      error: null,
+      showMessage: false,
+      progress: 0,
+    } as UploadStatus,
+    thumbnail: {
+      success: false,
+      error: null,
+      showMessage: false,
+      progress: 0,
+    } as UploadStatus,
+  })
+  const [formData, setFormData] = useState<FormData>({
+    topic: "",
+    description: "",
+    assignment: "",
+    videoUrl: "",
+    thumbnailUrl: "",
+  })
+  const videoInputRef = useRef<HTMLInputElement>(null)
+  const thumbnailInputRef = useRef<HTMLInputElement>(null)
+  const [uploadhash, setUploadHash] = useState('')
+
+  const handleInputChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleFileUpload = async (file: File, type: "video" | "thumbnail") => {
+    if (!file) return
+
+    try {
+      setUploadStatus((prev) => ({
+        ...prev,
+        [type]: { ...prev[type], progress: 0 },
+      }))
+
+      const formData = new FormData()
+      formData.append("file", file)
+
+      const response = await axios.post(
+        "https://api.pinata.cloud/pinning/pinFileToIPFS",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
+          },
+          onUploadProgress: (progressEvent) => {
+            const progress = progressEvent.total
+              ? Math.round((progressEvent.loaded / progressEvent.total) * 100)
+              : 0
+            setUploadStatus((prev) => ({
+              ...prev,
+              [type]: { ...prev[type], progress },
+            }))
+          },
+        },
+      )
+
+      const ipfsHash = response.data.IpfsHash
+      const url = `${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${ipfsHash}`
+      
+      setUploadStatus((prev) => ({
+        ...prev,
+        [type]: {
+          success: true,
+          error: null,
+          showMessage: true,
+          progress: 100,
+        },
+      }))
+
+      setFormData((prev) => ({
+        ...prev,
+        [type === "video" ? "videoUrl" : "thumbnailUrl"]: url,
+      }))
+
+      setTimeout(() => {
+        setUploadStatus((prev) => ({
+          ...prev,
+          [type]: { ...prev[type], showMessage: false },
+        }))
+      }, 5000)
+      
+      if (ipfsHash) {
+        console.log(ipfsHash)
+        setUploadHash(ipfsHash)
+      }
+    
+    } catch (error: any) {
+      console.error("Upload error:", error)
+      setUploadStatus((prev) => ({
+        ...prev,
+        [type]: {
+          success: false,
+          error: error.message,
+          showMessage: true,
+          progress: 0,
+        },
+      }))
+
+      setTimeout(() => {
+        setUploadStatus((prev) => ({
+          ...prev,
+          [type]: { ...prev[type], showMessage: false },
+        }))
+      }, 5000)
+    }
+  }
+
+  const handleDrop = (e: React.DragEvent, type: "video" | "thumbnail") => {
+    e.preventDefault()
+    const file = e.dataTransfer.files[0]
+    if (type === "video" && !file.type.includes("video")) {
+      alert("Please upload a valid video file")
+      return
+    }
+    if (type === "thumbnail" && !file.type.includes("image")) {
+      alert("Please upload a valid image file")
+      return
+    }
+    handleFileUpload(file, type)
+  }
+
+  const handleFileSelect = (
+    e: ChangeEvent<HTMLInputElement>,
+    type: "video" | "thumbnail",
+  ) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      handleFileUpload(file, type)
+    }
+  }
+
+  const handleSave = async () => {
+    const Dataupload = await pinata.upload.json({
+        videocid : uploadhash,
+        courseData : formData  
+      })
+
+      if (Dataupload){
+        const organizationContract = new Contract(
+          attensysOrgAbi,
+          attensysOrgAddress,
+          wallet?.account,
+        )
+  
+        const videolink_calldata = organizationContract.populate("add_uploaded_video_link", [
+          Dataupload.IpfsHash,
+          true,
+          //@ts-ignore
+          wallet?.selectedAddress,
+          prop.status.idnumber,
+        ])
+  
+        const callContract = await wallet?.account.execute([
+                {
+                  contractAddress: attensysOrgAddress,
+                  entrypoint: "add_uploaded_video_link",
+                  calldata: videolink_calldata.calldata,
+                },
+        ])
+  
+            //@ts-ignore
+              wallet?.account?.provider
+                .waitForTransaction(callContract.transaction_hash)
+                .then(() => {})
+                .catch((e: any) => {
+                  console.log("Error: ", e)
+                }).finally(()=>{
+                  console.log("Saving form data:", formData)
+                  setOpen(false)
+                  setAddclass((prev) => ({ ...prev, modalstatus: false }))
+    })
+      }
+
+  }
 
   useEffect(() => {
     if (open) {
       window.scrollTo({
-        top: Math.max(0, 130), // Scroll up by 100 pixels
+        top: Math.max(0, 130),
         behavior: "smooth",
-      })
+      });
     }
-  }, [open])
+  }, [open]);
 
   return (
     <Dialog open={open} onClose={setOpen} className="relative z-10">
@@ -52,7 +264,7 @@ export default function UploadModal(prop: any) {
                 alt="cancel"
                 onClick={() => {
                   setOpen(false)
-                  setAddclass(false)
+                  setAddclass((prev) => ({ ...prev, modalstatus: false }))
                 }}
               />
             </div>
@@ -60,10 +272,13 @@ export default function UploadModal(prop: any) {
             <div className="w-[90%] mx-auto h-[75%] my-auto border-[1px] bg-[#EFEFEF52] border-[#C2C2C2] rounded-xl mt-7 px-8 py-6 space-y-4 overflow-y-scroll">
               <div className="space-y-2">
                 <h1 className="text-[16px] text-[#2D3A4B] font-light leading-[23px]">
-                  Topic:
+                  Topic:{" "}
                 </h1>
                 <Field>
                   <Input
+                   name="topic"
+                   value={formData.topic}
+                   onChange={handleInputChange}
                     placeholder="Class title "
                     className={clsx(
                       "h-[55px] border-[2px] border-[#D0D5DD] block md:w-[50%] rounded-lg bg-white/5 py-1.5 px-3 w-full text-sm/6 text-[#667185]",
@@ -79,6 +294,9 @@ export default function UploadModal(prop: any) {
                 </h1>
                 <Field>
                   <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
                     placeholder="A short overview of the class, its focus areas..."
                     className={clsx(
                       "h-[126px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full md:w-[90%] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
@@ -94,6 +312,9 @@ export default function UploadModal(prop: any) {
                 </h1>
                 <Field>
                   <textarea
+                   name="assignment"
+                   value={formData.assignment}
+                   onChange={handleInputChange}
                     placeholder="Assignment description"
                     className={clsx(
                       "h-[126px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full md:w-[90%] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
@@ -117,71 +338,122 @@ export default function UploadModal(prop: any) {
                 </div>
               </div>
 
+             
               <div className="mt-6">
                 <h1 className="text-[16px] leading-[23px] font-semibold text-[#2D3A4B]">
                   Upload Recording
                 </h1>
-
                 <div className="flex flex-col md:flex-row gap-4 md:gap-0 md:space-x-16">
-                  <div className="h-[316px] w-full md:w-[459px] mt-3 rounded-lg  flex flex-col md:flex-row justify-center items-center">
-                    <div className="h-[246px] w-full md:w-[400px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-3 flex flex-col items-center justify-center">
+                  <div
+                   className="h-[316px] w-full md:w-[459px] mt-3 rounded-lg  flex flex-col md:flex-row justify-center items-center"
+                    onDrop={(e) => handleDrop(e, "video")}
+                    onDragOver={(e) => e.preventDefault()}
+                    onClick={() => videoInputRef.current?.click()}
+                  >
+                    <div  className="h-[246px] w-full md:w-[400px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-3 flex flex-col items-center justify-center">
                       <Image src={cloud} alt="upload" />
                       <h1 className="text-[14px] text-[#475367] font-light leading-[20px]">
                         <span className="text-[#4A90E2]">Click to upload</span>{" "}
                         or drag and drop
                       </h1>
                       <p className="text-[12px] text-[#475367] font-light leading-[17px]">
+                        MP4, WebM, MKV (max size: 2GB)
+                      </p>
+                      <Image src={dividers} alt="divider" className="mt-7" />
+                      <input
+                        ref={videoInputRef}
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => handleFileSelect(e, "video")}
+                        style={{ display: "none" }}
+                      />
+                      <Button
+                        disabled={
+                          uploadStatus.video.progress > 0 &&
+                          uploadStatus.video.progress < 100
+                        }
+                        className="h-[36px] w-[118px] flex justify-center items-center bg-[#9B51E0] rounded-xl text-[14px] text-[#FFFFFF] font-light leading-[20px]"
+                      >
+                        {uploadStatus.video.progress > 0 &&
+                        uploadStatus.video.progress < 100
+                          ? `Uploading (${uploadStatus.video.progress}%)`
+                          : "Browse Files"}
+                      </Button>
+                      {uploadStatus.video.progress > 0 &&
+                        uploadStatus.video.progress < 100 && (
+                          <div className="w-[90%]  bg-gray-200 rounded-full h-2.5 mt-2">
+                            <div
+                              className="bg-green-600 h-2.5 rounded-full"
+                              style={{
+                                width: `${uploadStatus.video.progress}%`,
+                              }}
+                            ></div>
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                  {/* Section for Thumbnail Upload  */}
+                 <div className="mt-3 space-y-2">
+                    <h1 className="w-[254px] text-[14px] font-light text-[#2D3A4B] leading-[21px]">
+                      Upload thumbnail
+                    </h1>
+                    <div
+                      className="h-[180px] w-[251px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-0 flex flex-col gap-1 items-center justify-center relative"
+                      onDrop={(e) => handleDrop(e, "thumbnail")}
+                      onDragOver={(e) => e.preventDefault()}
+                      onClick={() => thumbnailInputRef.current?.click()}
+                    >
+                      <Image src={cloud} alt="upload" />
+                      <h1 className="text-[8px] text-[#475367] font-light leading-[20px]">
+                        <span className="text-[#4A90E2]">Click to upload</span>{" "}
+                        or drag and drop
+                      </h1>
+                      <p className="text-[7.5px] text-[#475367] font-light leading-[17px]">
                         SVG, PNG, JPG or GIF (max. 800x400px)
                       </p>
                       <Image src={dividers} alt="divider" className="mt-7" />
                       <input
-                        // ref={logoInputRef}
+                        ref={thumbnailInputRef}
                         type="file"
-                        accept="image/jpeg, image/jpg, image/png"
-                        // onChange={handleLogoChange}
-                        style={{ display: "none" }} // Hide the input
+                        accept="image/*"
+                        onChange={(e) => handleFileSelect(e, "thumbnail")}
+                        style={{ display: "none" }}
                       />
-                      <Button className="h-[36px] w-[118px] flex justify-center items-center bg-[#9B51E0] rounded-xl text-[14px] text-[#FFFFFF] font-light leading-[20px]">
-                        Browse Files
+                      <Button
+                        disabled={
+                          uploadStatus.thumbnail.progress > 0 &&
+                          uploadStatus.thumbnail.progress < 100
+                        }
+                        className="h-[23px] w-[74px] flex justify-center items-center  bg-[#9B51E0] rounded-xl text-[8px] text-[#FFFFFF] font-light leading-[20px]"
+                      >
+                        {uploadStatus.thumbnail.progress > 0 &&
+                        uploadStatus.thumbnail.progress < 100
+                          ? `Uploading (${uploadStatus.thumbnail.progress}%)`
+                          : "Browse Files"}
                       </Button>
+                      {uploadStatus.thumbnail.progress > 0 &&
+                        uploadStatus.thumbnail.progress < 100 && (
+                          <div className="w-[90%]  bg-gray-200 rounded-full h-2.5 ">
+                            <div
+                              className="bg-green-600 h-2.5  rounded-full"
+                              style={{
+                                width: `${uploadStatus.thumbnail.progress}%`,
+                              }}
+                            ></div>
+                          </div>
+                        )}
                     </div>
-                  </div>
-                  <div className="mt-3 space-y-2">
-                    <h1 className="w-[254px] text-[14px] font-light text-[#2D3A4B] leading-[21px]">
-                      Upload your Recorded class here for your students to watch
-                      later
-                    </h1>
-                    <div className="h-auto py-4 md:py-0 md:h-[166px] w-full md:w-[251px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-3 md:space-y-0 flex flex-col items-center justify-center">
-                      <Image src={cloud} alt="upload" />
-                      <h1 className="text-[14px] md:text-[8px] text-[#475367] font-light leading-[20px]">
-                        <span className="text-[#4A90E2]">Click to upload</span>{" "}
-                        or drag and drop
-                      </h1>
-                      <p className="text-[12px] md:text-[7.5px] text-[#475367] font-light leading-[17px]">
-                        SVG, PNG, JPG or GIF (max. 800x400px)
-                      </p>
-                      <Image src={dividers} alt="divider" className="mt-7" />
-                      <Button className="h-[36px] md:h-[23px] w-[118px] md:w-[74px] flex justify-center items-center bg-[#9B51E0] rounded-xl text-[14px] md:text-[8px] text-[#FFFFFF] font-light leading-[20px]">
-                        Browse Files
-                      </Button>
-                    </div>
-                    <h1 className="text-[18px] text-[#333333] font-semibold leading-[31px] ">
-                      Upload thumbnail
-                    </h1>
-                    <p className="w-[254px] text-[14px] font-light text-[#2D3A4B] leading-[21px]">
-                      Upload your bootcamp image here. 750x422 pixels; .jpg,
-                      .jpeg,. gif, or .png.{" "}
-                    </p>
-                  </div>
+                  </div> 
                 </div>
               </div>
+         
             </div>
+            
+            
+            
             <div className="flex justify-end my-5 px-16">
               <div
-                onClick={() => {
-                  setOpen(false)
-                  setAddclass(false)
-                }}
+               onClick={handleSave}
                 className="h-[47px] w-[342px] rounded-xl bg-[#9B51E0] flex items-center justify-center cursor-pointer"
               >
                 <h1 className="text-[#FFFFFF] text-[14px] font-semibold leading-[16px]">
@@ -193,5 +465,5 @@ export default function UploadModal(prop: any) {
         </div>
       </div>
     </Dialog>
-  )
+  );
 }

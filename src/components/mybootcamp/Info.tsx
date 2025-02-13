@@ -1,7 +1,7 @@
-import React from "react"
-import Image from "next/image"
-import avatar from "@/assets/profile_pic.png"
-import { RiShieldUserLine } from "react-icons/ri"
+import React from "react";
+import Image from "next/image";
+import avatar from "@/assets/profile_pic.png";
+import { RiShieldUserLine } from "react-icons/ri";
 
 const Info = () => {
   return (
@@ -34,7 +34,7 @@ const Info = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Info
+export default Info;

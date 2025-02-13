@@ -1,9 +1,9 @@
-import React from 'react';
-import plane from '@/assets/plane.svg';
-import thoughts from '@/assets/thoughts.png';
-import group10 from '@/assets/Group 10.png';
-import cloud from '@/assets/3d-techny-international-transportation-and-delivery-logistics 1.png';
-import Image from 'next/image';
+import React from "react";
+import plane from "@/assets/plane.svg";
+import thoughts from "@/assets/thoughts.png";
+import group10 from "@/assets/Group 10.png";
+import cloud from "@/assets/3d-techny-international-transportation-and-delivery-logistics 1.png";
+import Image from "next/image";
 
 const World = () => {
   return (
@@ -18,24 +18,22 @@ const World = () => {
 
           {/* 📌 Description */}
           <p className="text-[14px] sm:text-[16px] lg:text-[18px] font-light text-[#2D3A4B] leading-[20px] sm:leading-[24px] lg:leading-[28px] mb-8">
-            Simplifying certificate issuance, attendance tracking, and online course
-            management for schools, organizations, and event managers.
+            Simplifying certificate issuance, attendance tracking, and online
+            course management for schools, organizations, and event managers.
           </p>
 
           {/* 📌 List */}
           <ul className="space-y-4">
             <li className="text-[14px] sm:text-[16px] lg:text-[18px] font-light text-[#9B51E0] leading-[20px] sm:leading-[24px] lg:leading-[28px]">
-              <span className="text-[#2D3A4B]">
-                Take and get Certified in
-              </span>{' '}
+              <span className="text-[#2D3A4B]">Take and get Certified in</span>{" "}
               professional courses & Top-tier skillsets from all over the world.
             </li>
             <li className="text-[14px] sm:text-[16px] lg:text-[18px] font-light text-[#9B51E0] leading-[20px] sm:leading-[24px] lg:leading-[28px]">
-              AttenSys{' '}
+              AttenSys{" "}
               <span className="text-[#2D3A4B]">
-                is built with top-tier security protocols, including encryption and
-                blockchain technology, to ensure that your data and certificates are
-                safe.
+                is built with top-tier security protocols, including encryption
+                and blockchain technology, to ensure that your data and
+                certificates are safe.
               </span>
             </li>
           </ul>
@@ -51,7 +49,6 @@ const World = () => {
 
       {/* Responsive Images */}
       <div className="w-full sm:w-[40%] relative">
-
         {/* 📌 Images for small screens */}
         <div className="sm:hidden relative mb-[350px]">
           {/* Planet Image */}
@@ -99,9 +96,7 @@ const World = () => {
             className="absolute top-[-180px] left-[-90px] w-[290px] h-[190px]"
           />
         </div>
-
       </div>
-
     </div>
   );
 };

@@ -289,6 +289,63 @@ export const attensysCourseAbi = [
     state_mutability: "view",
   },
   {
+    type: "function",
+    name: "transfer_admin",
+    inputs: [
+      {
+        name: "new_admin",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "claim_admin_ownership",
+    inputs: [],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_admin",
+    inputs: [],
+    outputs: [
+      {
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_new_admin",
+    inputs: [],
+    outputs: [
+      {
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_total_course_completions",
+    inputs: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::integer::u256",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
     type: "constructor",
     name: "constructor",
     inputs: [
@@ -304,9 +361,123 @@ export const attensysCourseAbi = [
   },
   {
     type: "event",
+    name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseCreated",
+    kind: "struct",
+    members: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "owner_",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "accessment_",
+        type: "core::bool",
+        kind: "data",
+      },
+      {
+        name: "base_uri",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "name_",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "symbol",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseReplaced",
+    kind: "struct",
+    members: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "owner_",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "new_course_uri_a",
+        type: "core::felt252",
+        kind: "data",
+      },
+      {
+        name: "new_course_uri_b",
+        type: "core::felt252",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseCertClaimed",
+    kind: "struct",
+    members: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "candidate",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::AdminTransferred",
+    kind: "struct",
+    members: [
+      {
+        name: "new_admin",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
     name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::Event",
     kind: "enum",
-    variants: [],
+    variants: [
+      {
+        name: "CourseCreated",
+        type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseCreated",
+        kind: "nested",
+      },
+      {
+        name: "CourseReplaced",
+        type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseReplaced",
+        kind: "nested",
+      },
+      {
+        name: "CourseCertClaimed",
+        type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseCertClaimed",
+        kind: "nested",
+      },
+      {
+        name: "AdminTransferred",
+        type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::AdminTransferred",
+        kind: "nested",
+      },
+    ],
   },
 ];
 export const attensysEventAbi = [
@@ -627,6 +798,79 @@ export const attensysEventAbi = [
     state_mutability: "view",
   },
   {
+    type: "function",
+    name: "transfer_admin",
+    inputs: [
+      {
+        name: "new_admin",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "claim_admin_ownership",
+    inputs: [],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_admin",
+    inputs: [],
+    outputs: [
+      {
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_new_admin",
+    inputs: [],
+    outputs: [
+      {
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "sponsor_event",
+    inputs: [
+      {
+        name: "event",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "amt",
+        type: "core::integer::u256",
+      },
+      {
+        name: "uri",
+        type: "core::byte_array::ByteArray",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "withdraw_sponsorship_funds",
+    inputs: [
+      {
+        name: "amt",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
     type: "constructor",
     name: "constructor",
     inputs: [
@@ -638,13 +882,71 @@ export const attensysEventAbi = [
         name: "_hash",
         type: "core::starknet::class_hash::ClassHash",
       },
+      {
+        name: "_token_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "sponsorship_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Sponsor",
+    kind: "struct",
+    members: [
+      {
+        name: "amt",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "uri",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "event",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "key",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Withdrawn",
+    kind: "struct",
+    members: [
+      {
+        name: "amt",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "event",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "key",
+      },
     ],
   },
   {
     type: "event",
     name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Event",
     kind: "enum",
-    variants: [],
+    variants: [
+      {
+        name: "Sponsor",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Sponsor",
+        kind: "nested",
+      },
+      {
+        name: "Withdrawn",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Withdrawn",
+        kind: "nested",
+      },
+    ],
   },
 ];
 export const attensysOrgAbi = [
@@ -686,20 +988,6 @@ export const attensysOrgAbi = [
     ],
   },
   {
-    type: "struct",
-    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Instructor",
-    members: [
-      {
-        name: "address_of_org",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        name: "num_of_classes",
-        type: "core::integer::u256",
-      },
-    ],
-  },
-  {
     type: "enum",
     name: "core::bool",
     variants: [
@@ -710,6 +998,92 @@ export const attensysOrgAbi = [
       {
         name: "True",
         type: "()",
+      },
+    ],
+  },
+  {
+    type: "struct",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Student",
+    members: [
+      {
+        name: "address_of_student",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "num_of_bootcamps_registered_for",
+        type: "core::integer::u256",
+      },
+      {
+        name: "registered",
+        type: "core::bool",
+      },
+    ],
+  },
+  {
+    type: "struct",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Instructor",
+    members: [
+      {
+        name: "address_of_instructor",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "num_of_classes",
+        type: "core::integer::u256",
+      },
+      {
+        name: "name_of_org",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "organization_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+  },
+  {
+    type: "struct",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Bootcamp",
+    members: [
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u256",
+      },
+      {
+        name: "address_of_org",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "org_name",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "bootcamp_name",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "number_of_instructors",
+        type: "core::integer::u256",
+      },
+      {
+        name: "number_of_students",
+        type: "core::integer::u256",
+      },
+      {
+        name: "number_of_all_bootcamp_classes",
+        type: "core::integer::u256",
+      },
+      {
+        name: "nft_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_ipfs_uri",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "active_meet_link",
+        type: "core::byte_array::ByteArray",
       },
     ],
   },
@@ -735,7 +1109,7 @@ export const attensysOrgAbi = [
       },
       {
         name: "bootcamp_id",
-        type: "core::integer::u64",
+        type: "core::integer::u256",
       },
     ],
   },
@@ -771,18 +1145,8 @@ export const attensysOrgAbi = [
         name: "org_ipfs_uri",
         type: "core::byte_array::ByteArray",
       },
-    ],
-  },
-  {
-    type: "struct",
-    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Student",
-    members: [
       {
-        name: "address_of_student",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        name: "num_of_classes_registered_for",
+        name: "total_sponsorship_fund",
         type: "core::integer::u256",
       },
     ],
@@ -806,6 +1170,22 @@ export const attensysOrgAbi = [
   {
     type: "function",
     name: "add_instructor_to_org",
+    inputs: [
+      {
+        name: "instructor",
+        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+      },
+      {
+        name: "org_name",
+        type: "core::byte_array::ByteArray",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "remove_instructor_from_org",
     inputs: [
       {
         name: "instructor",
@@ -853,7 +1233,55 @@ export const attensysOrgAbi = [
   },
   {
     type: "function",
-    name: "register_for_class",
+    name: "add_active_meet_link",
+    inputs: [
+      {
+        name: "meet_link",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+      {
+        name: "is_instructor",
+        type: "core::bool",
+      },
+      {
+        name: "org_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "add_uploaded_video_link",
+    inputs: [
+      {
+        name: "video_link",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "is_instructor",
+        type: "core::bool",
+      },
+      {
+        name: "org_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "register_for_bootcamp",
     inputs: [
       {
         name: "org_",
@@ -864,7 +1292,23 @@ export const attensysOrgAbi = [
         type: "core::starknet::contract_address::ContractAddress",
       },
       {
-        name: "class_id",
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "approve_registration",
+    inputs: [
+      {
+        name: "student_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
         type: "core::integer::u64",
       },
     ],
@@ -913,6 +1357,106 @@ export const attensysOrgAbi = [
   },
   {
     type: "function",
+    name: "setSponsorShipAddress",
+    inputs: [
+      {
+        name: "sponsor_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "sponsor_organization",
+    inputs: [
+      {
+        name: "organization",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "uri",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "amt",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "withdraw_sponsorship_fund",
+    inputs: [
+      {
+        name: "amt",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_bootcamp_active_meet_link",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::byte_array::ByteArray",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_bootcamp_uploaded_video_link",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<core::byte_array::ByteArray>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_all_registration_request",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<attendsys::contracts::AttenSysOrg::AttenSysOrg::Student>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
     name: "get_org_instructors",
     inputs: [
       {
@@ -923,6 +1467,33 @@ export const attensysOrgAbi = [
     outputs: [
       {
         type: "core::array::Array::<attendsys::contracts::AttenSysOrg::AttenSysOrg::Instructor>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_all_org_bootcamps",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<attendsys::contracts::AttenSysOrg::AttenSysOrg::Bootcamp>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_all_bootcamps_on_platform",
+    inputs: [],
+    outputs: [
+      {
+        type: "core::array::Array::<attendsys::contracts::AttenSysOrg::AttenSysOrg::Bootcamp>",
       },
     ],
     state_mutability: "view",
@@ -1008,26 +1579,6 @@ export const attensysOrgAbi = [
   },
   {
     type: "function",
-    name: "retrieve_all_class_of_instructors",
-    inputs: [
-      {
-        name: "org_",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
-        name: "instructor",
-        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
-      },
-    ],
-    outputs: [
-      {
-        type: "core::array::Array::<attendsys::contracts::AttenSysOrg::AttenSysOrg::Class>",
-      },
-    ],
-    state_mutability: "view",
-  },
-  {
-    type: "function",
     name: "get_student_classes",
     inputs: [
       {
@@ -1059,16 +1610,375 @@ export const attensysOrgAbi = [
     state_mutability: "view",
   },
   {
+    type: "function",
+    name: "get_instructor_info",
+    inputs: [
+      {
+        name: "instructor",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<attendsys::contracts::AttenSysOrg::AttenSysOrg::Instructor>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_bootcamp_info",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [
+      {
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Bootcamp",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
     type: "constructor",
     name: "constructor",
     inputs: [
       {
-        name: "owner",
+        name: "admin",
         type: "core::starknet::contract_address::ContractAddress",
       },
       {
         name: "class_hash",
         type: "core::starknet::class_hash::ClassHash",
+      },
+      {
+        name: "_token_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "sponsorship_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Sponsor",
+    kind: "struct",
+    members: [
+      {
+        name: "amt",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "uri",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "organization",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "key",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Withdrawn",
+    kind: "struct",
+    members: [
+      {
+        name: "amt",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "organization",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "key",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::OrganizationProfile",
+    kind: "struct",
+    members: [
+      {
+        name: "org_name",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "org_ipfs_uri",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::InstructorAddedToOrg",
+    kind: "struct",
+    members: [
+      {
+        name: "org_name",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "instructor",
+        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+        kind: "key",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::InstructorRemovedFromOrg",
+    kind: "struct",
+    members: [
+      {
+        name: "instructor_addr",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "org_owner",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::BootCampCreated",
+    kind: "struct",
+    members: [
+      {
+        name: "org_name",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "bootcamp_name",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "nft_name",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "nft_symbol",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "nft_uri",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "num_of_classes",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "bootcamp_ipfs_uri",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::ActiveMeetLinkAdded",
+    kind: "struct",
+    members: [
+      {
+        name: "meet_link",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+        kind: "data",
+      },
+      {
+        name: "is_instructor",
+        type: "core::bool",
+        kind: "data",
+      },
+      {
+        name: "org_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::VideoLinkUploaded",
+    kind: "struct",
+    members: [
+      {
+        name: "video_link",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "is_instructor",
+        type: "core::bool",
+        kind: "data",
+      },
+      {
+        name: "org_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::BootcampRegistration",
+    kind: "struct",
+    members: [
+      {
+        name: "org_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "instructor_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::RegistrationApproved",
+    kind: "struct",
+    members: [
+      {
+        name: "student_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::AttendanceMarked",
+    kind: "struct",
+    members: [
+      {
+        name: "org_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "instructor_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "class_id",
+        type: "core::integer::u64",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::StudentsCertified",
+    kind: "struct",
+    members: [
+      {
+        name: "org_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "class_id",
+        type: "core::integer::u64",
+        kind: "data",
+      },
+      {
+        name: "student_addresses",
+        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::SponsorshipAddressSet",
+    kind: "struct",
+    members: [
+      {
+        name: "sponsor_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::OrganizationSponsored",
+    kind: "struct",
+    members: [
+      {
+        name: "organization_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "sponsor_uri",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "sponsorship_amount",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::SponsorshipFundWithdrawn",
+    kind: "struct",
+    members: [
+      {
+        name: "withdrawal_amount",
+        type: "core::integer::u256",
+        kind: "data",
       },
     ],
   },
@@ -1076,6 +1986,216 @@ export const attensysOrgAbi = [
     type: "event",
     name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Event",
     kind: "enum",
-    variants: [],
+    variants: [
+      {
+        name: "Sponsor",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Sponsor",
+        kind: "nested",
+      },
+      {
+        name: "Withdrawn",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Withdrawn",
+        kind: "nested",
+      },
+      {
+        name: "OrganizationProfile",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::OrganizationProfile",
+        kind: "nested",
+      },
+      {
+        name: "InstructorAddedToOrg",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::InstructorAddedToOrg",
+        kind: "nested",
+      },
+      {
+        name: "InstructorRemovedFromOrg",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::InstructorRemovedFromOrg",
+        kind: "nested",
+      },
+      {
+        name: "BootCampCreated",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::BootCampCreated",
+        kind: "nested",
+      },
+      {
+        name: "ActiveMeetLinkAdded",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::ActiveMeetLinkAdded",
+        kind: "nested",
+      },
+      {
+        name: "VideoLinkUploaded",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::VideoLinkUploaded",
+        kind: "nested",
+      },
+      {
+        name: "BootcampRegistration",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::BootcampRegistration",
+        kind: "nested",
+      },
+      {
+        name: "RegistrationApproved",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::RegistrationApproved",
+        kind: "nested",
+      },
+      {
+        name: "AttendanceMarked",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::AttendanceMarked",
+        kind: "nested",
+      },
+      {
+        name: "StudentsCertified",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::StudentsCertified",
+        kind: "nested",
+      },
+      {
+        name: "SponsorshipAddressSet",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::SponsorshipAddressSet",
+        kind: "nested",
+      },
+      {
+        name: "OrganizationSponsored",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::OrganizationSponsored",
+        kind: "nested",
+      },
+      {
+        name: "SponsorshipFundWithdrawn",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::SponsorshipFundWithdrawn",
+        kind: "nested",
+      },
+    ],
+  },
+];
+export const attensysSponsorAbi = [
+  {
+    type: "impl",
+    name: "AttenSysSponsorImpl",
+    interface_name: "attendsys::contracts::AttenSysSponsor::IAttenSysSponsor",
+  },
+  {
+    type: "struct",
+    name: "core::integer::u256",
+    members: [
+      {
+        name: "low",
+        type: "core::integer::u128",
+      },
+      {
+        name: "high",
+        type: "core::integer::u128",
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "deposit",
+    inputs: [
+      {
+        name: "token_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "amount",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "withdraw",
+    inputs: [
+      {
+        name: "token_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "amount",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_contract_balance",
+    inputs: [
+      {
+        name: "token_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::integer::u256",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "constructor",
+    name: "constructor",
+    inputs: [
+      {
+        name: "organization_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "event_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysSponsor::AttenSysSponsor::SponsorDeposited",
+    kind: "struct",
+    members: [
+      {
+        name: "token",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "amount",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysSponsor::AttenSysSponsor::TokenWithdraw",
+    kind: "struct",
+    members: [
+      {
+        name: "token",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "amount",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysSponsor::AttenSysSponsor::Event",
+    kind: "enum",
+    variants: [
+      {
+        name: "SponsorDeposited",
+        type: "attendsys::contracts::AttenSysSponsor::AttenSysSponsor::SponsorDeposited",
+        kind: "nested",
+      },
+      {
+        name: "TokenWithdraw",
+        type: "attendsys::contracts::AttenSysSponsor::AttenSysSponsor::TokenWithdraw",
+        kind: "nested",
+      },
+    ],
   },
 ];

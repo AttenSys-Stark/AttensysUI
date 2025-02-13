@@ -1,14 +1,14 @@
-import React from "react"
-import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
-import Dropdown from "../Dropdown"
-import { skills, levelOptions } from "@/constants/data"
-import CourseSideBar from "./SideBar"
-import { handleCreateCourse } from "@/utils/helpers"
-import { useRouter } from "next/navigation"
-import Stepper from "@/components/Stepper"
+import React from "react";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import Dropdown from "../Dropdown";
+import { skills, levelOptions } from "@/constants/data";
+import CourseSideBar from "./SideBar";
+import { handleCreateCourse } from "@/utils/helpers";
+import { useRouter } from "next/navigation";
+import Stepper from "@/components/Stepper";
 
 const MainFormView = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   return (
     <div className="block sm:flex">
@@ -142,7 +142,7 @@ const MainFormView = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MainFormView
+export default MainFormView;

@@ -1,17 +1,17 @@
-import React from "react"
-import location from "@/assets/darkloc.svg"
-import calendar from "@/assets/darkcalend.svg"
-import Image from "next/image"
+import React from "react";
+import location from "@/assets/darkloc.svg";
+import calendar from "@/assets/darkcalend.svg";
+import Image from "next/image";
 
 interface alleventCardprops {
-  name: string
-  hall: string
-  city: string
-  date: string
-  time: string
-  fee: string
-  image: any
-  onClick?: () => void
+  name: string;
+  hall: string;
+  city: string;
+  date: string;
+  time: string;
+  fee: string;
+  image: any;
+  onClick?: () => void;
 }
 const AlleventCard: React.FC<alleventCardprops> = (props) => {
   return (
@@ -59,7 +59,7 @@ const AlleventCard: React.FC<alleventCardprops> = (props) => {
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AlleventCard
+export default AlleventCard;

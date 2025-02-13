@@ -1,16 +1,16 @@
-import React from "react"
-import Image from "next/image"
-import moon from "@/assets/moon.svg"
-import purple from "@/assets/purple.svg"
-import top from "@/assets/top.svg"
-import { useRouter } from "next/navigation"
+import React from "react";
+import Image from "next/image";
+import moon from "@/assets/moon.svg";
+import purple from "@/assets/purple.svg";
+import top from "@/assets/top.svg";
+import { useRouter } from "next/navigation";
 
 const Eventdetailsdiscover = (props: any) => {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleDiscover = () => {
-    router.push("/Discoverevent")
-  }
+    router.push("/Discoverevent");
+  };
 
   return (
     <div className="h-[100px] clg:h-[80px] lg:[70px] lclg:[60px] flex justify-between w-[90%] mx-auto items-center">
@@ -30,7 +30,7 @@ const Eventdetailsdiscover = (props: any) => {
       </div>
       <Image src={top} alt="moon" />
     </div>
-  )
-}
+  );
+};
 
-export default Eventdetailsdiscover
+export default Eventdetailsdiscover;

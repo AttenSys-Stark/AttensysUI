@@ -1,10 +1,10 @@
-import React from "react"
-import Carousel from "react-multi-carousel"
-import "react-multi-carousel/lib/styles.css"
-import Carosellcard from "./Carosellcard"
-import { caroselldata } from "@/constants/data"
+import React from "react";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+import Carosellcard from "./Carosellcard";
+import { caroselldata } from "@/constants/data";
 
-const BootcampCarousell = () => {
+const BootcampCarousell = (props: any) => {
   const responsive = {
     superLargeDesktop: {
       // the naming can be any, depends on you.
@@ -27,7 +27,7 @@ const BootcampCarousell = () => {
       breakpoint: { max: 720, min: 0 },
       items: 1,
     },
-  }
+  };
   //@todo make register and finshed status dynamic in line 56
   return (
     <div className="h-[450px] w-full flex flex-col items-center justify-center">
@@ -53,13 +53,11 @@ const BootcampCarousell = () => {
           autoPlay={true} // Enables auto-scrolling
           autoPlaySpeed={3000}
         >
-          {caroselldata.map((data, index) => (
+          {props.allbootcampInfo.map((data: any, index: any) => (
             <Carosellcard
               key={index}
-              name={data.name}
-              time={data.time}
-              flier={data.flier}
-              logo={data.logo}
+              name={data.bootcamp_name}
+              uri={data.bootcamp_ipfs_uri}
               action="Register"
               height="300px"
               width="300px"
@@ -68,7 +66,7 @@ const BootcampCarousell = () => {
         </Carousel>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BootcampCarousell
+export default BootcampCarousell;

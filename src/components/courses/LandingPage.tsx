@@ -1,25 +1,24 @@
-import React from "react"
-import video from "@/assets/video.png"
-import Image from "next/image"
-import Lectures from "./Lectures"
-import youtube from "@/assets/youtube.svg"
-import podcast from "@/assets/Podcast.svg"
-import rich from "@/assets/Richin2024.svg"
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar"
-import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck"
-import { GiBackwardTime } from "@react-icons/all-files/gi/GiBackwardTime"
-import { FaPlay } from "@react-icons/all-files/fa/FaPlay"
-import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond"
-import CarouselComp from "./Carousel"
-import { handleCourse } from "@/utils/helpers"
-import { useRouter } from "next/navigation"
-import StarRating from "../bootcamp/StarRating"
+import React from "react";
+import video from "@/assets/video.png";
+import Image from "next/image";
+import Lectures from "./Lectures";
+import youtube from "@/assets/youtube.svg";
+import podcast from "@/assets/Podcast.svg";
+import rich from "@/assets/Richin2024.svg";
+import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
+import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck";
+import { GiBackwardTime } from "@react-icons/all-files/gi/GiBackwardTime";
+import { FaPlay } from "@react-icons/all-files/fa/FaPlay";
+import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond";
+import CarouselComp from "./Carousel";
+import { handleCourse } from "@/utils/helpers";
+import { useRouter } from "next/navigation";
+import StarRating from "../bootcamp/StarRating";
 import { HiOutlineCheckBadge } from "react-icons/hi2";
-import { LuBadgeCheck } from "react-icons/lu"
-
+import { LuBadgeCheck } from "react-icons/lu";
 
 const LandingPage = () => {
-  const router = useRouter()
+  const router = useRouter();
   const lectures = [
     {
       img: rich,
@@ -39,7 +38,7 @@ const LandingPage = () => {
       desc: "An introduction to the world of web development, covering the basics of how websites...",
       timing: 8,
     },
-  ]
+  ];
   return (
     <div className="pb-14 bg-[#F5F8FA]">
       <div
@@ -56,9 +55,12 @@ const LandingPage = () => {
           <div className="text-sm">
             {/* field */}
             <div className="">
-              <button   onClick={(e) =>
-                handleCourse(e, e.currentTarget.textContent, router)
-              } className="hidden sm:block bg-[#fff] px-7 py-2 rounded text-[#333333] font-bold">
+              <button
+                onClick={(e) =>
+                  handleCourse(e, e.currentTarget.textContent, router)
+                }
+                className="hidden sm:block bg-[#fff] px-7 py-2 rounded text-[#333333] font-bold"
+              >
                 Get course
               </button>
             </div>
@@ -73,9 +75,11 @@ const LandingPage = () => {
             </h4>
 
             <div className="flex">
-            <div className="bg-[#5801A9] py-2 text-white w-[200px] mb-4 text-center Sm:w-[50%] rounded-lg">
-                  <p className="text-[14px] font-extrabold leading-[22px]">Tech Innovators Academy</p>
-                </div>
+              <div className="bg-[#5801A9] py-2 text-white w-[200px] mb-4 text-center Sm:w-[50%] rounded-lg">
+                <p className="text-[14px] font-extrabold leading-[22px]">
+                  Tech Innovators Academy
+                </p>
+              </div>
 
               <div className="">
                 <button className="sm:hidden block bg-[#9b51e0] px-7 py-2 rounded text-[#333333] font-bold">
@@ -92,46 +96,54 @@ const LandingPage = () => {
               </div>
 
               <div className="flex space-x-2 items-center text-black sm:text-white">
-                <HiOutlineCheckBadge color="#fff" className="h-[22px] w-[20px]" />
+                <HiOutlineCheckBadge
+                  color="#fff"
+                  className="h-[22px] w-[20px]"
+                />
                 <p className="font-bold">291 certification</p>
               </div>
             </div>
 
-              {/* creator and last update */}
-              <div className="flex space-x-14 sm:flex sm:text-center mt-12 mb-4">
-                  <div className="">
-                    <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-                      Created by{" "}
-                      <span className="underline">Akinbola Kehinde</span>
-                    </p>
-                  </div>
+            {/* creator and last update */}
+            <div className="flex space-x-14 sm:flex sm:text-center mt-12 mb-4">
+              <div className="">
+                <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+                  Created by <span className="underline">Akinbola Kehinde</span>
+                </p>
+              </div>
 
-                  <div className="flex ml-0 sm:ml-5 items-center  space-x-1">
-                    <GiBackwardTime />
-                    <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">Last updated 10|10|24</p>
-                  </div>
-                </div>
+              <div className="flex ml-0 sm:ml-5 items-center  space-x-1">
+                <GiBackwardTime />
+                <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+                  Last updated 10|10|24
+                </p>
+              </div>
+            </div>
 
-                {/* video prop */}
-                <div className="block sm:flex space-x-10 mb-4">
-                  <div className="flex my-1 space-x-2 items-center">
-                    <FaPlay className="h-[14px] w-[14px] text-[#5801A9]"/>
-                    <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">Total play time: 2 hrs 35 mins</p>
-                  </div>
-                  <div className="flex sm:ml-5 space-x-2 items-center">
-                    <GrDiamond color="#2D3A4B" className="h-[14px] w-[14px]" />
-                    <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">Difficulty level: Elementary</p>
-                  </div>
-                </div>
+            {/* video prop */}
+            <div className="block sm:flex space-x-10 mb-4">
+              <div className="flex my-1 space-x-2 items-center">
+                <FaPlay className="h-[14px] w-[14px] text-[#5801A9]" />
+                <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+                  Total play time: 2 hrs 35 mins
+                </p>
+              </div>
+              <div className="flex sm:ml-5 space-x-2 items-center">
+                <GrDiamond color="#2D3A4B" className="h-[14px] w-[14px]" />
+                <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+                  Difficulty level: Elementary
+                </p>
+              </div>
+            </div>
 
-                <div className="flex space-x-2 items-center mb-4">
-                  <div>
-                    <LuBadgeCheck className="h-[14px] w-[14px] text-[#5801A9]" />
-                  </div>
-                  <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">Certificate of Completion</p>
-                </div>
-
-
+            <div className="flex space-x-2 items-center mb-4">
+              <div>
+                <LuBadgeCheck className="h-[14px] w-[14px] text-[#5801A9]" />
+              </div>
+              <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+                Certificate of Completion
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -144,7 +156,9 @@ const LandingPage = () => {
       <div>
         <div className="border-b-[1px] border-b-[#949494] mx-24 sm:mx-48 flex space-x-2 items-center h-[50px]">
           <IoIosStar color="#F6A61C" className="h-[20px] w-[20px]" />
-          <p className="text-[20px] text-[#333333] font-semibold leading-[22px]">4.9 Rating | (281 reviews)</p>
+          <p className="text-[20px] text-[#333333] font-semibold leading-[22px]">
+            4.9 Rating | (281 reviews)
+          </p>
         </div>
 
         {/* comments */}
@@ -154,7 +168,7 @@ const LandingPage = () => {
               <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">OM</p>
               <div className="ml-6 space-y-2">
                 <p>Olivia. M</p>
-                  <StarRating totalStars={5} starnumber={4} />
+                <StarRating totalStars={5} starnumber={4} />
               </div>
             </div>
 
@@ -172,7 +186,7 @@ const LandingPage = () => {
               <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">OM</p>
               <div className="ml-6 space-y-2">
                 <p>Olivia. M</p>
-                  <StarRating totalStars={5} starnumber={4} />
+                <StarRating totalStars={5} starnumber={4} />
               </div>
             </div>
 
@@ -195,7 +209,7 @@ const LandingPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LandingPage
+export default LandingPage;

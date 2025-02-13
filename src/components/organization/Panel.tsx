@@ -5,12 +5,12 @@ import { IoIosInformationCircleOutline } from "react-icons/io"
 import { GoOrganization } from "react-icons/go"
 import { CiCircleInfo } from "react-icons/ci"
 
-const Panel = () => {
+const Panel = (props: any) => {
   return (
     <div className="h-auto w-[90%] mx-auto mt-24">
       <div className="flex justify-between w-[320px] items-center">
         <h1 className="text-[22px] leading-[22px] text-[#333333] font-bold">
-          Orangutan Edu Academy
+          {props.orgname}
         </h1>
         <Image src={drop} alt="dropdown" />
       </div>
@@ -39,9 +39,9 @@ const Panel = () => {
                             <h1>Key : </h1>
                         </div>
                         <h1 className="">
-                            Addressss{" "}
+                            Address{" "}
                             <span className="text-[#9B51E0]">
-                             (0x5c956e61...de5232dc11)
+                             ({props.owner})
                             </span>
                         </h1>
                     </div>
@@ -49,10 +49,10 @@ const Panel = () => {
                     <div className="flex lg:justify-between justify-start gap-2">
                       <div className="space-x-2 flex items-center">
                           <CiCircleInfo className="text-[18px]" />
-                          <h1>Status : </h1>
+                          <h1>Bootcamps :</h1>
                       </div>
                       <div className="h-[30px] w-[64px] text-[#115E2C] bg-[#C4FFA2] flex items-center justify-center rounded-lg">
-                          Verified
+                          {props.bootcampNumber}
                       </div>
                     </div>
 
@@ -61,7 +61,7 @@ const Panel = () => {
                         <CiCircleInfo className="text-[18px]" />
                         <h1>Organization : </h1>
                     </div>
-                    <h1> Orangutan Edu Academy</h1>
+                    <h1> {props.orgname}</h1>
                     </div>
                 </div>
 
@@ -69,10 +69,10 @@ const Panel = () => {
                     <div className="flex lg:justify-between justify-start gap-2">
                     <div className="space-x-2 flex items-center">
                         <CiCircleInfo className="text-[18px]" />
-                        <h1>Courses : </h1>
+                        <h1>Classes : </h1>
                     </div>
                     <h1>
-                        <span className="text-[#9B51E0]">63</span> Courses
+                        <span className="text-[#9B51E0]">{props.classes}</span> Classes
                     </h1>
                     </div>
 
@@ -82,7 +82,7 @@ const Panel = () => {
                         <h1>Tutors : </h1>
                     </div>
                     <h1>
-                        <span className="text-[#9B51E0]">3</span> Tutors
+                        <span className="text-[#9B51E0]">{props.tutors}</span> Tutors
                     </h1>
                     </div>
 
@@ -101,9 +101,9 @@ const Panel = () => {
                     <div className="flex lg:justify-between justify-start gap-2">
                     <div className="space-x-2 flex items-center">
                         <CiCircleInfo className="text-[18px]" />
-                        <h1>Created :  </h1>
+                        <h1>Created by:  </h1>
                     </div>
-                    <h1>11 Oct, 2024 | 10:25 PM</h1>
+                    <h1>{props.creator}</h1>
                     </div>
 
                     <div className="flex lg:justify-between justify-start gap-2">
@@ -112,7 +112,7 @@ const Panel = () => {
                         <h1>Total registered student : </h1>
                     </div>
                     <h1>
-                        <span className="text-[#9B51E0]">3,789</span> Registered
+                        <span className="text-[#9B51E0]">{props.studentNumber}</span>{" "} Registered
                     </h1>
                     </div>
                 </div>
@@ -124,12 +124,7 @@ const Panel = () => {
             <h1>Organization info </h1>
           </div>
           <p className="lg:w-[95%] text-[14px] text-[#6B6D6E] font-medium w-[100%]">
-            Blockchain Academy Pro is a leading Web3-focused educational
-            organization dedicated to empowering individuals with cutting-edge
-            knowledge in blockchain technology, decentralized applications
-            (dApps), and cryptocurrency. Since its inception in 2018, the
-            organization has trained over 10,000 students and collaborated with
-            top-tier instructors from around the globe.
+            {props.description}
           </p>
         </div>
       </div>

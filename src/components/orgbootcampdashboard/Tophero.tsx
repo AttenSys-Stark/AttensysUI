@@ -1,19 +1,19 @@
-import React from "react"
-import Image from "next/image"
-import flier from "@/assets/flierd.svg"
-import { Button } from "@headlessui/react"
-import { LuCalendarDays } from "react-icons/lu"
-import { RiEditFill } from "react-icons/ri"
-import { FiLink } from "react-icons/fi"
-import { createMeeting } from "@/state/connectedWalletStarknetkitNext"
-import { useAtom } from "jotai"
+import React from "react";
+import Image from "next/image";
+import flier from "@/assets/flierd.svg";
+import { Button } from "@headlessui/react";
+import { LuCalendarDays } from "react-icons/lu";
+import { RiEditFill } from "react-icons/ri";
+import { FiLink } from "react-icons/fi";
+import { createMeeting } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
 
 const Tophero = () => {
-  const [meetingCreation, setMeetingCreation] = useAtom(createMeeting)
+  const [meetingCreation, setMeetingCreation] = useAtom(createMeeting);
 
   const handleCreateMeeting = () => {
-    setMeetingCreation(true)
-  }
+    setMeetingCreation(true);
+  };
   return (
     <div className="lg:h-[261px] w-full lg:w-[90%]  lg:mx-auto flex flex-col lg:flex-row justify-between lg:items-center rounded-xl">
       <div className="lg:hidden flex px-[22px] gap-1 mt-10">
@@ -81,7 +81,7 @@ const Tophero = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Tophero
+export default Tophero;

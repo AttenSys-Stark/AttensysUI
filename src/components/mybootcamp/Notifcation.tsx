@@ -1,7 +1,7 @@
-import React from "react"
-import { IoMdNotificationsOutline } from "react-icons/io"
-import { IoCloseCircleOutline } from "react-icons/io5"
-import Notifycard from "./Notifycard"
+import React from "react";
+import { IoMdNotificationsOutline } from "react-icons/io";
+import { IoCloseCircleOutline } from "react-icons/io5";
+import Notifycard from "./Notifycard";
 
 const Notifcation = () => {
   return (
@@ -31,7 +31,7 @@ const Notifcation = () => {
         <Notifycard />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Notifcation
+export default Notifcation;

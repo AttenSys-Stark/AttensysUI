@@ -1,52 +1,54 @@
-"use client"
-import React, { useState, useEffect } from "react"
-import Coursedropdown from "@/components/courses/Coursedropdown"
-import { useParams, useRouter } from "next/navigation"
+"use client";
+import React, { useState, useEffect } from "react";
+import Coursedropdown from "@/components/courses/Coursedropdown";
+import { useParams, useRouter } from "next/navigation";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
   connectorAtom,
   connectorDataAtom,
   walletStarknetkitNextAtom,
-} from "@/state/connectedWalletStarknetkitNext"
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
-import { RESET } from "jotai/utils"
-import { connect, disconnect } from "starknetkit"
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
-import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown"
-import { useAtom, useSetAtom } from "jotai"
-import Basicinfo from "@/components/createorganization/Basicinfo"
-import Walletinfo from "@/components/createorganization/Walletinfo"
-import Admininfo from "@/components/createorganization/Admininfo"
-import Addinstructor from "@/components/createorganization/Addinstructor"
-import Congratulations from "@/components/createorganization/Congratulations"
-import WalletisConnected from "@/components/createorganization/WalletisConnected"
-import Image from "next/image"
-import backArrow from "../../../../public/backArrow.svg"
+} from "@/state/connectedWalletStarknetkitNext";
+import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { RESET } from "jotai/utils";
+import { connect, disconnect } from "starknetkit";
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
+import { useAtom, useSetAtom } from "jotai";
+import Basicinfo from "@/components/createorganization/Basicinfo";
+import Walletinfo from "@/components/createorganization/Walletinfo";
+import Admininfo from "@/components/createorganization/Admininfo";
+import Addinstructor from "@/components/createorganization/Addinstructor";
+import Congratulations from "@/components/createorganization/Congratulations";
+import WalletisConnected from "@/components/createorganization/WalletisConnected";
+import Image from "next/image";
+import backArrow from "../../../../public/backArrow.svg";
 
 const Index = () => {
-  const [status, setstatus] = useAtom(coursestatusAtom)
+  const [status, setstatus] = useAtom(coursestatusAtom);
   const [bootcampdropstat, setbootcampdropstat] = useAtom(
     bootcampdropdownstatus,
-  )
-  const router = useRouter()
-  const params = useParams()
-  const section = params.info
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
-  const setConnectorData = useSetAtom(connectorDataAtom)
-  const setConnector = useSetAtom(connectorAtom)
+  );
+  const router = useRouter();
+  const params = useParams();
+  const section = params.info;
+  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
+  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
+  const setConnectorData = useSetAtom(connectorDataAtom);
+  const setConnector = useSetAtom(connectorAtom);
 
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
+  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
 
-  const [connectorDataAccount, setConnectorDataAccount] = useState<null | any>()
+  const [connectorDataAccount, setConnectorDataAccount] = useState<
+    null | any
+  >();
 
   useEffect(() => {
-    setWalletLatest(RESET)
-    setWalletNext(RESET)
-    setConnectorData(RESET)
-    setConnector(RESET)
-  }, [])
+    /* setWalletLatest(RESET) */
+    setWalletNext(RESET);
+    setConnectorData(RESET);
+    setConnector(RESET);
+  }, []);
 
   useEffect(() => {
     const autoConnect = async () => {
@@ -62,30 +64,30 @@ const Index = () => {
             chainId: CHAIN_ID,
             icons: [],
           },
-        })
+        });
 
         // console.log(connector.wallet.account )
-        setConnectorDataAccount(connector.wallet.account)
-        setWallet(connectedWallet)
+        setConnectorDataAccount(connector.wallet.account);
+        setWallet(connectedWallet);
       } catch (e) {
-        console.error(e)
-        alert((e as any).message)
+        console.error(e);
+        alert((e as any).message);
       }
-    }
+    };
 
     if (!wallet) {
-      autoConnect()
+      autoConnect();
     }
-  }, [wallet])
+  }, [wallet]);
 
   const handlePageClick = () => {
-    setbootcampdropstat(false)
-    setstatus(false)
-  }
+    setbootcampdropstat(false);
+    setstatus(false);
+  };
 
   const handlerouting = (prop: string) => {
-    router.push(`/Createorganization/${prop}`)
-  }
+    router.push(`/Createorganization/${prop}`);
+  };
 
   const renderContent = () => {
     switch (section) {
@@ -94,35 +96,35 @@ const Index = () => {
           <>
             <Basicinfo />
           </>
-        )
+        );
 
       case "wallet-info":
-        return <>{!wallet ? <Walletinfo /> : <WalletisConnected />} </>
+        return <>{!wallet ? <Walletinfo /> : <WalletisConnected />} </>;
       case "admin-info":
         return (
           <>
             <Admininfo />
           </>
-        )
+        );
 
       case "add-instructors":
         return (
           <>
             <Addinstructor connectorDataAccount={connectorDataAccount} />
           </>
-        )
+        );
 
       case "create-a-bootcamp":
         return (
           <>
             <Congratulations />
           </>
-        )
+        );
 
       default:
-        return <p>Error 404</p>
+        return <p>Error 404</p>;
     }
-  }
+  };
 
   const renderHeader = () => {
     switch (section) {
@@ -148,7 +150,7 @@ const Index = () => {
               ))}
             </div>
           </>
-        )
+        );
 
       case "wallet-info":
         return (
@@ -205,7 +207,7 @@ const Index = () => {
               </div>
             </div>
           </>
-        )
+        );
 
       case "admin-info":
         return (
@@ -280,7 +282,7 @@ const Index = () => {
               </p>
             </div>
           </>
-        )
+        );
 
       case "add-instructors":
         return (
@@ -319,7 +321,7 @@ const Index = () => {
               your admin email.
             </p>
           </>
-        )
+        );
 
       case "create-a-bootcamp":
         return (
@@ -328,12 +330,12 @@ const Index = () => {
               Congratulations your Organization is all setup!!
             </h1>
           </>
-        )
+        );
 
       default:
-        return <p>Error 404</p>
+        return <p>Error 404</p>;
     }
-  }
+  };
 
   return (
     <div onClick={handlePageClick} className="h-auto">
@@ -352,11 +354,11 @@ const Index = () => {
 
       <div className="flex justify-center lg:justify-start w-full ">
         <div className="w-[20%] bg-create-gradient lg:flex hidden justify-end">
-          <div className="mt-2 bg-[#F5F8FA]0 space-y-2 md:space-y-5">
+          <div className="mt-20 bg-[#F5F8FA]0 space-y-2 md:space-y-5">
             <div
               className={`cursor-pointer h-[67px] w-[278px] text-[16px]  rounded-tl-xl rounded-bl-xl py-5 pl-10 ${section == "basic-info" ? "bg-[#F5F8FA] text-[#5801A9]" : "bg-none text-[#FFFFFF]"} leading-[22px] font-bold`}
               onClick={() => {
-                handlerouting("basic-info")
+                handlerouting("basic-info");
               }}
             >
               Basic Info
@@ -365,7 +367,7 @@ const Index = () => {
             <div
               className={`cursor-pointer h-[67px] w-[278px] text-[16px]  rounded-tl-xl rounded-bl-xl py-5 pl-10 ${section == "wallet-info" ? "bg-[#F5F8FA] text-[#5801A9]" : "bg-none text-[#FFFFFF]"} leading-[22px] font-bold`}
               onClick={() => {
-                handlerouting("wallet-info")
+                handlerouting("wallet-info");
               }}
             >
               Wallet Information
@@ -373,7 +375,7 @@ const Index = () => {
             <div
               className={`cursor-pointer h-[67px] w-[278px] text-[16px]  rounded-tl-xl rounded-bl-xl py-5 pl-10 ${section == "admin-info" ? "bg-[#F5F8FA] text-[#5801A9]" : "bg-none text-[#FFFFFF]"} leading-[22px] font-bold`}
               onClick={() => {
-                handlerouting("admin-info")
+                handlerouting("admin-info");
               }}
             >
               Admin information
@@ -381,7 +383,7 @@ const Index = () => {
             <div
               className={`cursor-pointer h-[67px] w-[278px] text-[16px]  rounded-tl-xl rounded-bl-xl py-5 pl-10 ${section == "add-instructors" ? "bg-[#F5F8FA] text-[#5801A9]" : "bg-none text-[#FFFFFF]"} leading-[22px] font-bold`}
               onClick={() => {
-                handlerouting("add-instructors")
+                handlerouting("add-instructors");
               }}
             >
               Add Instructors
@@ -389,7 +391,7 @@ const Index = () => {
             <div
               className={`cursor-pointer h-[67px] w-[278px] text-[16px]  rounded-tl-xl rounded-bl-xl py-5 pl-10 ${section == "create-a-bootcamp" ? "bg-[#F5F8FA] text-[#5801A9]" : "bg-none text-[#FFFFFF]"} leading-[22px] font-bold`}
               onClick={() => {
-                handlerouting("create-a-bootcamp")
+                handlerouting("create-a-bootcamp");
               }}
             >
               Create bootcamp
@@ -405,7 +407,7 @@ const Index = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Index
+export default Index;

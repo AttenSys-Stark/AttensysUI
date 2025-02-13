@@ -1,18 +1,18 @@
-import React from "react"
-import Image from "next/image"
-import flier from "@/assets/flierd.svg"
-import { Button } from "@headlessui/react"
-import { LuCalendarDays } from "react-icons/lu"
-import { RiEditFill } from "react-icons/ri"
-import { FiLink } from "react-icons/fi"
-import { useRouter } from "next/navigation"
+import React from "react";
+import Image from "next/image";
+import flier from "@/assets/flierd.svg";
+import { Button } from "@headlessui/react";
+import { LuCalendarDays } from "react-icons/lu";
+import { RiEditFill } from "react-icons/ri";
+import { FiLink } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 const MybootcampTophero = (props: any) => {
-  const router = useRouter()
+  const router = useRouter();
 
   const handleroute = () => {
-    router.push(`/Register/${props.bootcampname}`)
-  }
+    router.push(`/Register/${props.bootcampname}`);
+  };
 
   return (
     <div className="h-auto w-[90%] mx-auto flex flex-col justify-center items-center space-y-4 space-x-0 md:flex-row md:justify-between md:items-stretch md:space-x-4 md:space-y-0 rounded-xl">
@@ -73,7 +73,7 @@ const MybootcampTophero = (props: any) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MybootcampTophero
+export default MybootcampTophero;

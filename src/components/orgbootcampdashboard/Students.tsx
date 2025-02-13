@@ -1,30 +1,30 @@
-import React, { useState } from "react"
-import Image from "next/image"
-import { Button, Input } from "@headlessui/react"
-import filter from "@/assets/filter.png"
-import exportimg from "@/assets/export.svg"
-import Studentlist from "./Studentlist"
-import Pendinglist from "./Pendinglist"
-import MobileStudentApprovalCard from "./MobileStudentApprovalCard"
-import MobileStudentRegisteredCard from "./MobileStudentRegisteredCard"
+import React, { useState } from "react";
+import Image from "next/image";
+import { Button, Input } from "@headlessui/react";
+import filter from "@/assets/filter.png";
+import exportimg from "@/assets/export.svg";
+import Studentlist from "./Studentlist";
+import Pendinglist from "./Pendinglist";
+import MobileStudentApprovalCard from "./MobileStudentApprovalCard";
+import MobileStudentRegisteredCard from "./MobileStudentRegisteredCard";
 
 const Students = () => {
-  const [pendingclickstat, setPendingclickstat] = useState(true)
-  const [registeredclick, setRegisteredClick] = useState(false)
-  const [searchValue, setSearchValue] = useState("")
+  const [pendingclickstat, setPendingclickstat] = useState(true);
+  const [registeredclick, setRegisteredClick] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
 
   const handlependingClick = () => {
-    setPendingclickstat(true)
-    setRegisteredClick(false)
-  }
+    setPendingclickstat(true);
+    setRegisteredClick(false);
+  };
   const handleRegclick = () => {
-    setPendingclickstat(false)
-    setRegisteredClick(true)
-  }
+    setPendingclickstat(false);
+    setRegisteredClick(true);
+  };
 
   const handleChange = (event: { target: { value: any } }) => {
-    setSearchValue(event.target.value)
-  }
+    setSearchValue(event.target.value);
+  };
 
   return (
     <div className="w-[88%] mx-auto">
@@ -261,7 +261,7 @@ const Students = () => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Students
+export default Students;

@@ -1,23 +1,22 @@
-import React from "react"
-import ProgressBar from "@ramonak/react-progress-bar"
-import Image from "next/image"
-import play from "@/assets/play.svg"
-
+import React from "react";
+import ProgressBar from "@ramonak/react-progress-bar";
+import Image from "next/image";
+import play from "@/assets/play.svg";
 
 interface ItemProps {
-  no: number
-  title: string
-  tag: string
-  playTime: string
-  level: string
-  stars: number
-  url: string
-  certificate: number
+  no: number;
+  title: string;
+  tag: string;
+  playTime: string;
+  level: string;
+  stars: number;
+  url: string;
+  certificate: number;
 }
 
 interface LearningJourneyProps {
-  item: ItemProps // or another type like `number` or a union type
-  selected: string // Replace with appropriate type
+  item: ItemProps; // or another type like `number` or a union type
+  selected: string; // Replace with appropriate type
 }
 
 const LearningJourney: React.FC<LearningJourneyProps> = ({
@@ -61,7 +60,7 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
 
           <div>
             <div className="px-5 xl:px-12 flex flex-col xl:flex-row space-x-12 items-center">
-              <div  className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
+              <div className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
                 <Image
                   src={item.url}
                   alt="video"
@@ -94,11 +93,17 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
                 </div>
 
                 <div className="my-3">
-                  <ProgressBar completed={"58"} height="13px" bgColor="#9B51E0" />
+                  <ProgressBar
+                    completed={"58"}
+                    height="13px"
+                    bgColor="#9B51E0"
+                  />
                 </div>
 
                 <div className="my-3 flex justify-between">
-                  <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">3/6 Lectures completed</p>
+                  <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                    3/6 Lectures completed
+                  </p>
                   <p className="underline text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
                     (8:03 mins)
                   </p>
@@ -109,7 +114,7 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default LearningJourney
+export default LearningJourney;

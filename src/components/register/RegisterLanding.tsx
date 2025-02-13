@@ -1,30 +1,30 @@
-import React, { useState } from "react"
-import Image from "next/image"
-import largeflier from "@/assets/largeflier.svg"
-import { FaTags } from "react-icons/fa"
-import { CiCalendarDate } from "react-icons/ci"
-import { IoTimeSharp } from "react-icons/io5"
-import { IoPeopleSharp } from "react-icons/io5"
-import { FaRegHourglass } from "react-icons/fa"
-import Sponsors from "./Sponsors"
-import Descriptionsupport from "./Descriptionsupport"
-import Ongoingcarousell from "./Ongoingcarousell"
-import { useRouter } from "next/navigation"
-import RegisterModal from "./RegisterModal"
-import { registerModal } from "@/state/connectedWalletStarknetkitNext"
-import { useAtom } from "jotai"
+import React, { useState } from "react";
+import Image from "next/image";
+import largeflier from "@/assets/largeflier.svg";
+import { FaTags } from "react-icons/fa";
+import { CiCalendarDate } from "react-icons/ci";
+import { IoTimeSharp } from "react-icons/io5";
+import { IoPeopleSharp } from "react-icons/io5";
+import { FaRegHourglass } from "react-icons/fa";
+import Sponsors from "./Sponsors";
+import Descriptionsupport from "./Descriptionsupport";
+import Ongoingcarousell from "./Ongoingcarousell";
+import { useRouter } from "next/navigation";
+import RegisterModal from "./RegisterModal";
+import { registerModal } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
 
 const RegisterLanding = (props: any) => {
-  const [regModal, setRegModal] = useAtom(registerModal)
-  const decodedName = decodeURIComponent(props.regname)
-  const router = useRouter()
+  const [regModal, setRegModal] = useAtom(registerModal);
+  const decodedName = decodeURIComponent(props.regname);
+  const router = useRouter();
 
   const handleExplore = () => {
-    router.push("/Bootcamps")
-  }
+    router.push("/Bootcamps");
+  };
   const handleRegister = () => {
-    setRegModal(true)
-  }
+    setRegModal(true);
+  };
   return (
     <>
       {regModal && <RegisterModal status={regModal} />}
@@ -141,7 +141,6 @@ const RegisterLanding = (props: any) => {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -151,7 +150,7 @@ const RegisterLanding = (props: any) => {
         <Ongoingcarousell />
       </div>
     </>
-  )
-}
+  );
+};
 
-export default RegisterLanding
+export default RegisterLanding;

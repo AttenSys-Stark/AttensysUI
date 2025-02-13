@@ -1,42 +1,43 @@
-"use client"
-import React, { ChangeEvent, useEffect, useRef, useState } from "react"
-import calenderimage from "@/assets/calendar.svg"
-import ticket from "@/assets/ticket.svg"
-import Image from "next/image"
-import { Button } from "@headlessui/react"
-import Eventcard from "./Eventcard"
+"use client";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import calenderimage from "@/assets/calendar.svg";
+import ticket from "@/assets/ticket.svg";
+import Image from "next/image";
+import { Button } from "@headlessui/react";
+import Eventcard from "./Eventcard";
 import {
   eventcreatedAtom,
   eventregistedAtom,
   existingeventCreationAtom,
   createEventClickAtom,
   createorexplore,
-} from "@/state/connectedWalletStarknetkitNext"
-import { useAtom, useSetAtom } from "jotai"
-import { useRouter } from "next/navigation"
-import { Description, Field, Input, Label } from "@headlessui/react"
-import clsx from "clsx"
-import add from "@/assets/add.svg"
+} from "@/state/connectedWalletStarknetkitNext";
+import { useAtom, useSetAtom } from "jotai";
+import { useRouter } from "next/navigation";
+import { Description, Field, Input, Label } from "@headlessui/react";
+import clsx from "clsx";
+import add from "@/assets/add.svg";
 
 const Myevents = (props: any) => {
-  const [createdstat, setCreatedStat] = useAtom(eventcreatedAtom)
-  const [Regstat, setRegStat] = useAtom(eventregistedAtom)
+  const [createdstat, setCreatedStat] = useAtom(eventcreatedAtom);
+  const [Regstat, setRegStat] = useAtom(eventregistedAtom);
   const [existingeventStat, setexistingeventStat] = useAtom(
     existingeventCreationAtom,
-  )
+  );
   const [CreateeventClickStat, setCreateeventClickStat] =
-    useAtom(createEventClickAtom)
-  const [CreateorExplorestat, setCreateorExplorestat] = useAtom(createorexplore)
-  const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+    useAtom(createEventClickAtom);
+  const [CreateorExplorestat, setCreateorExplorestat] =
+    useAtom(createorexplore);
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleImageClick = () => {
     // Trigger the file input on image click
-    fileInputRef.current?.click()
-  }
+    fileInputRef.current?.click();
+  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+    const file = event.target.files?.[0];
     if (
       file &&
       (file.type === "image/jpeg" ||
@@ -44,36 +45,36 @@ const Myevents = (props: any) => {
         file.type === "image/jpg")
     ) {
       // Process the file
-      console.log("Selected file:", file)
+      console.log("Selected file:", file);
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).")
+      console.log("Please select a valid image file (JPEG, JPG, or PNG).");
     }
-  }
+  };
 
-  const height = props.section === "createevent" ? "900px" : "630px"
+  const height = props.section === "createevent" ? "900px" : "630px";
   const handlecreatedEventStat = () => {
-    setCreatedStat(true)
-    setRegStat(false)
-    sessionStorage.setItem("scrollPosition", `${window.scrollY}`)
-    router.push("/Events/createdevent")
-  }
+    setCreatedStat(true);
+    setRegStat(false);
+    sessionStorage.setItem("scrollPosition", `${window.scrollY}`);
+    router.push("/Events/createdevent");
+  };
   const handleRegEventStat = () => {
-    setCreatedStat(false)
-    setRegStat(true)
-    sessionStorage.setItem("scrollPosition", `${window.scrollY}`)
-    router.push("/Events/registeredevent")
-  }
+    setCreatedStat(false);
+    setRegStat(true);
+    sessionStorage.setItem("scrollPosition", `${window.scrollY}`);
+    router.push("/Events/registeredevent");
+  };
 
   const handleCreateEventClick = () => {
-    setCreateeventClickStat(true)
-    sessionStorage.setItem("scrollPosition", `${window.scrollY}`)
-    router.push("/Events/createevent")
-  }
+    setCreateeventClickStat(true);
+    sessionStorage.setItem("scrollPosition", `${window.scrollY}`);
+    router.push("/Events/createevent");
+  };
 
   const handleCreateEventButton = () => {
     //@todo replace sample event with event name
-    router.push("/Overview/sample-event/insight")
-  }
+    router.push("/Overview/sample-event/insight");
+  };
 
   const data = [
     {
@@ -97,7 +98,7 @@ const Myevents = (props: any) => {
       host: "Selfless hearts Foundation",
       location: "Google Meet",
     },
-  ]
+  ];
 
   const mockeventcreatedData = [
     {
@@ -107,7 +108,7 @@ const Myevents = (props: any) => {
       host: "Selfless hearts Foundation",
       location: "Google Meet",
     },
-  ]
+  ];
 
   const boiler = () => {
     return (
@@ -134,14 +135,14 @@ const Myevents = (props: any) => {
         </div>
         <div className="w-[100%] h-[1px] bg-[#7B7B7B8A]"></div>
       </>
-    )
-  }
+    );
+  };
 
   const renderContent = () => {
     switch (props.section) {
       case "createevent":
         {
-          setCreateorExplorestat(true)
+          setCreateorExplorestat(true);
         }
         return (
           <>
@@ -285,12 +286,12 @@ const Myevents = (props: any) => {
               </Button>
             </div>
           </>
-        )
+        );
       case "createdevent":
         {
-          setCreatedStat(true)
-          setRegStat(false)
-          setCreateorExplorestat(false)
+          setCreatedStat(true);
+          setRegStat(false);
+          setCreateorExplorestat(false);
         }
         return (
           <>
@@ -330,12 +331,12 @@ const Myevents = (props: any) => {
               </div>
             )}
           </>
-        )
+        );
       case "registeredevent":
         {
-          setCreatedStat(false)
-          setRegStat(true)
-          setCreateorExplorestat(false)
+          setCreatedStat(false);
+          setRegStat(true);
+          setCreateorExplorestat(false);
         }
         return (
           <>
@@ -353,12 +354,12 @@ const Myevents = (props: any) => {
               ))}
             </div>
           </>
-        )
+        );
       case "events":
         {
-          setCreatedStat(true)
-          setRegStat(false)
-          setCreateorExplorestat(false)
+          setCreatedStat(true);
+          setRegStat(false);
+          setCreateorExplorestat(false);
         }
         return (
           <>
@@ -398,25 +399,25 @@ const Myevents = (props: any) => {
               </div>
             )}
           </>
-        )
+        );
       default:
-        return <p>Error 404</p>
+        return <p>Error 404</p>;
     }
-  }
+  };
 
   useEffect(() => {
-    setexistingeventStat(false)
-  })
+    setexistingeventStat(false);
+  });
 
   useEffect(() => {
-    const scrollY = sessionStorage.getItem("scrollPosition")
+    const scrollY = sessionStorage.getItem("scrollPosition");
     if (scrollY) {
-      window.scrollTo(0, parseFloat(scrollY))
+      window.scrollTo(0, parseFloat(scrollY));
     }
     if (props.section == "events") {
-      window.scrollTo(0, 0)
+      window.scrollTo(0, 0);
     }
-  }, [])
+  }, []);
 
   return (
     <div
@@ -425,7 +426,7 @@ const Myevents = (props: any) => {
     >
       {renderContent()}
     </div>
-  )
-}
+  );
+};
 
-export default Myevents
+export default Myevents;

@@ -1,10 +1,10 @@
-import React from "react"
-import Previous from "./previous"
+import React from "react";
+import Previous from "./previous";
 
 const CourseForm = (props: any) => {
   const handleNext = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-  }
+    event.preventDefault();
+  };
   return (
     <div className="relative mx-10 md:mx-auto w-auto md:w-3/4 lg:w-5/12 pt-16 ">
       <div className="hidden lg:block">
@@ -86,12 +86,12 @@ const CourseForm = (props: any) => {
           </button>
         </div>
       </form>
-    
+
       <div className="block absolute left-[35%] bottom-36 lg:hidden">
         <Previous />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CourseForm
+export default CourseForm;

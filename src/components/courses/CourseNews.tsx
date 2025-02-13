@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 const CourseNews = () => {
   return (
@@ -6,7 +6,7 @@ const CourseNews = () => {
       🚀 Exciting news! Our new course creation features are now live. Start
       building your course today!
     </div>
-  )
-}
+  );
+};
 
-export default CourseNews
+export default CourseNews;

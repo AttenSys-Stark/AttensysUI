@@ -1,5 +1,5 @@
-import React from "react"
-import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
+import React from "react";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 
 const Coursepricing = () => {
   return (
@@ -95,7 +95,7 @@ const Coursepricing = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Coursepricing
+export default Coursepricing;

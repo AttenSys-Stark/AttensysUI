@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import {
   Card,
   CardBody,
@@ -6,20 +6,20 @@ import {
   Typography,
   Button,
   CardProps,
-} from "@material-tailwind/react"
+} from "@material-tailwind/react";
 
-import robotImg from "../../assets/roboy.png"
-import Image from "next/image"
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar"
-import StarRating from "./StarRating"
+import robotImg from "../../assets/roboy.png";
+import Image from "next/image";
+import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
+import StarRating from "./StarRating";
 
 interface favoritecourseprop {
-  title: string
-  name: string
-  numberofstudent: number
-  instructor: string
-  flier: any
-  stars: number
+  title: string;
+  name: string;
+  numberofstudent: number;
+  instructor: string;
+  flier: any;
+  stars: number;
 }
 
 const FavoriteCourseCard: React.FC<favoritecourseprop> = (props) => {
@@ -107,7 +107,7 @@ const FavoriteCourseCard: React.FC<favoritecourseprop> = (props) => {
         </div>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
-export default FavoriteCourseCard
+export default FavoriteCourseCard;

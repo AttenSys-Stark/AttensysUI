@@ -1,7 +1,7 @@
-import FavoriteCourseCard from "./FavoriteCoursecard"
-import Carousel from "react-multi-carousel"
-import "react-multi-carousel/lib/styles.css"
-import { favoriteCourseData } from "@/constants/data"
+import FavoriteCourseCard from "./FavoriteCoursecard";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+import { favoriteCourseData } from "@/constants/data";
 
 export function FavoriteCourse() {
   const responsive = {
@@ -26,7 +26,7 @@ export function FavoriteCourse() {
       breakpoint: { max: 720, min: 0 },
       items: 1,
     },
-  }
+  };
 
   return (
     <div className="h-[488px] w-full bg-event-gradient flex flex-col items-center justify-center mt-8">
@@ -66,5 +66,5 @@ export function FavoriteCourse() {
         </Carousel>
       </div>
     </div>
-  )
+  );
 }

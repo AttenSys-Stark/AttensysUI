@@ -1,25 +1,25 @@
-import React from "react"
-import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
-import Dropdown from "../Dropdown"
-import Image from "next/image"
-import upload from "@/assets/upload.svg"
-import upload_other from "@/assets/upload_other.svg"
-import tick_circle from "@/assets/tick-circle.svg"
-import trash from "@/assets/trash.svg"
-import film from "@/assets/film.svg"
-import { IoMdCheckmark } from "@react-icons/all-files/io/IoMdCheckmark"
-import CourseSideBar from "./SideBar"
-import { handleCreateCourse } from "@/utils/helpers"
-import { useRouter } from "next/navigation"
-import { Button } from "@headlessui/react"
-import Stepper from "@/components/Stepper"
+import React from "react";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import Dropdown from "../Dropdown";
+import Image from "next/image";
+import upload from "@/assets/upload.svg";
+import upload_other from "@/assets/upload_other.svg";
+import tick_circle from "@/assets/tick-circle.svg";
+import trash from "@/assets/trash.svg";
+import film from "@/assets/film.svg";
+import { IoMdCheckmark } from "@react-icons/all-files/io/IoMdCheckmark";
+import CourseSideBar from "./SideBar";
+import { handleCreateCourse } from "@/utils/helpers";
+import { useRouter } from "next/navigation";
+import { Button } from "@headlessui/react";
+import Stepper from "@/components/Stepper";
 
 const MainFormView3 = () => {
-  const router = useRouter()
+  const router = useRouter();
   const handleBrowsefiles = () => {
     //@todo handle file upload logic
-    console.log("click")
-  }
+    console.log("click");
+  };
   return (
     <div className="flex items-stretch">
       <div className="hidden lg:block">
@@ -311,7 +311,7 @@ You want to make sure your creative is very catchy.`}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MainFormView3
+export default MainFormView3;

@@ -1,5 +1,5 @@
-import React from "react"
-import CourseOutlinecard from "./CourseOutlinecard"
+import React from "react";
+import CourseOutlinecard from "./CourseOutlinecard";
 
 const CourseOutline = () => {
   return (
@@ -14,7 +14,7 @@ const CourseOutline = () => {
         </h1>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CourseOutline
+export default CourseOutline;

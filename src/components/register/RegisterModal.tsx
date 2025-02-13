@@ -1,5 +1,5 @@
-"use client"
-import { ChangeEvent, SetStateAction, useRef, useState } from "react"
+"use client";
+import { ChangeEvent, SetStateAction, useRef, useState } from "react";
 import {
   Button,
   Dialog,
@@ -9,29 +9,29 @@ import {
   Field,
   Input,
   Label,
-} from "@headlessui/react"
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline"
-import { useAtom } from "jotai"
-import Image from "next/image"
-import cancel from "@/assets/cancel.svg"
+} from "@headlessui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { useAtom } from "jotai";
+import Image from "next/image";
+import cancel from "@/assets/cancel.svg";
 import {
   registerModal,
   detailsEntryStat,
   detailsEntryLoading,
   registrationsuccess,
-} from "@/state/connectedWalletStarknetkitNext"
-import RegistrationDetails from "./RegistrationDetails"
-import DetailsLoading from "./DetailsLoading"
-import RegistrationSuccess from "./RegistrationSuccess"
+} from "@/state/connectedWalletStarknetkitNext";
+import RegistrationDetails from "./RegistrationDetails";
+import DetailsLoading from "./DetailsLoading";
+import RegistrationSuccess from "./RegistrationSuccess";
 
 export default function RegisterModal(prop: any) {
-  const [open, setOpen] = useState(prop.status)
-  const [regModal, setRegModal] = useAtom(registerModal)
-  const [detailsEntrystatus, setDetailsEntryStatus] = useAtom(detailsEntryStat)
+  const [open, setOpen] = useState(prop.status);
+  const [regModal, setRegModal] = useAtom(registerModal);
+  const [detailsEntrystatus, setDetailsEntryStatus] = useAtom(detailsEntryStat);
   const [detailsEntryLoadingstatus, setDetailsEntryLoadingStatus] =
-    useAtom(detailsEntryLoading)
+    useAtom(detailsEntryLoading);
   const [registrationsuccessstatus, setregistrationsuccessstatus] =
-    useAtom(registrationsuccess)
+    useAtom(registrationsuccess);
 
   return (
     <Dialog open={open} onClose={setOpen} className="relative z-10">
@@ -51,11 +51,11 @@ export default function RegisterModal(prop: any) {
                 src={cancel}
                 alt="cancel"
                 onClick={() => {
-                  setOpen(false)
-                  setRegModal(false)
-                  setDetailsEntryStatus(true)
-                  setDetailsEntryLoadingStatus(false)
-                  setregistrationsuccessstatus(false)
+                  setOpen(false);
+                  setRegModal(false);
+                  setDetailsEntryStatus(true);
+                  setDetailsEntryLoadingStatus(false);
+                  setregistrationsuccessstatus(false);
                 }}
               />
             </div>
@@ -66,5 +66,5 @@ export default function RegisterModal(prop: any) {
         </div>
       </div>
     </Dialog>
-  )
+  );
 }

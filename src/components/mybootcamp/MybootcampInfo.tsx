@@ -1,10 +1,10 @@
-import React from "react"
-import { IoIosPeople } from "react-icons/io"
-import { IoIosArrowDropdown } from "react-icons/io"
-import Carousel from "react-multi-carousel"
-import "react-multi-carousel/lib/styles.css"
-import { caroselldata } from "@/constants/data"
-import Carosellcard from "../bootcamp/Carosellcard"
+import React from "react";
+import { IoIosPeople } from "react-icons/io";
+import { IoIosArrowDropdown } from "react-icons/io";
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
+import { caroselldata } from "@/constants/data";
+import Carosellcard from "../bootcamp/Carosellcard";
 
 const MybootcampInfo = () => {
   const responsive = {
@@ -29,7 +29,7 @@ const MybootcampInfo = () => {
       breakpoint: { max: 800, min: 0 },
       items: 1,
     },
-  }
+  };
   return (
     <div className="mt-4 w-[90%] sm:w-[80%] mx-auto h-auto max-h-[450px] rounded-xl bg-[#FFFFFF] border-[1px] border-[#D9D9D9] py-3">
       <div className="h-[80px] w-full border-b-[1px] border-b-[#D9D9D9] flex justify-between px-4 sm:px-8 items-center">
@@ -79,7 +79,7 @@ const MybootcampInfo = () => {
         </Carousel>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MybootcampInfo
+export default MybootcampInfo;

@@ -1,21 +1,20 @@
-import React, { useState } from "react"
-import Image from "next/image"
-import bootlog from "@/assets/bootlog.svg"
-import ramp from "@/assets/ramplog.svg"
-import { Button } from "@headlessui/react"
-import Modal from "../eventdetails/Modal"
+import React, { useState } from "react";
+import Image from "next/image";
+import bootlog from "@/assets/bootlog.svg";
+import ramp from "@/assets/ramplog.svg";
+import { Button } from "@headlessui/react";
+import Modal from "../eventdetails/Modal";
 
 const Sponsors = () => {
-  const [modal, setModal] = useState(false)
+  const [modal, setModal] = useState(false);
 
   const handlemodal = () => {
-    setModal(!modal)
-  }
+    setModal(!modal);
+  };
   return (
     <>
       {modal && <Modal status={modal} />}
       <div className="h-auto w-auto px-8 space-y-4 py-2" onClick={handlemodal}>
-        
         <h1 className="text-md text-[#2D3A4B] font-semibold">Sponsors</h1>
 
         <div className="flex space-x-4 lg:space-x-8">
@@ -46,7 +45,7 @@ const Sponsors = () => {
         </Button>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Sponsors
+export default Sponsors;

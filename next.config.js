@@ -1,4 +1,4 @@
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -6,13 +6,13 @@ const nextConfig = {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
-        url: require.resolve('url'),
+        url: require.resolve("url"),
       };
 
       config.plugins.push(
         new webpack.NormalModuleReplacementPlugin(/^node:/, (resource) => {
           resource.request = resource.request.replace(/^node:/, "");
-        })
+        }),
       );
 
       config.plugins.push(new NodePolyfillPlugin());

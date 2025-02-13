@@ -1,26 +1,24 @@
-import React, { useState } from 'react'
-import Image from 'next/image'
-import blucecirle from '@/assets/bluecircle.svg'
-import {Calendar} from "@nextui-org/react";
-import type {DateValue} from "@react-types/calendar";
-import {today, getLocalTimeZone} from "@internationalized/date";
-import eventlog from '@/assets/eventlogo.svg'
-import fire from '@/assets/fire.svg'
-import { CiLocationOn } from 'react-icons/ci';
-
+import React, { useState } from "react";
+import Image from "next/image";
+import blucecirle from "@/assets/bluecircle.svg";
+import { Calendar } from "@nextui-org/react";
+import type { DateValue } from "@react-types/calendar";
+import { today, getLocalTimeZone } from "@internationalized/date";
+import eventlog from "@/assets/eventlogo.svg";
+import fire from "@/assets/fire.svg";
+import { CiLocationOn } from "react-icons/ci";
 
 interface MyeventCardProp {
-    todaydate : string,
-    time : string,
-    eventname : string,
-    host : string,
-    location: string
+  todaydate: string;
+  time: string;
+  eventname: string;
+  host: string;
+  location: string;
 }
 
-
-const Eventcard : React.FC<MyeventCardProp> = (props)  => {
-    let defaultDate = today(getLocalTimeZone());
-    // let [focusedDate, setFocusedDate] = useState<DateValue>(defaultDate);
+const Eventcard: React.FC<MyeventCardProp> = (props) => {
+  let defaultDate = today(getLocalTimeZone());
+  // let [focusedDate, setFocusedDate] = useState<DateValue>(defaultDate);
   return (
     <div className="flex max-w-[747px] gap-4 relative px-4 mb-8">
       <div className="flex flex-col justify-center items-center gap-1">
@@ -46,17 +44,17 @@ const Eventcard : React.FC<MyeventCardProp> = (props)  => {
         <Image src={fire} alt="image avater" className="rounded-3xl w-32" />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Eventcard
+export default Eventcard;
 
-
-
-{/* <Calendar 
+{
+  /* <Calendar 
                                 aria-label="Date (Controlled Focused Value)"
                                 focusedValue={focusedDate}
                                 value={defaultDate}
                                 onFocusChange={setFocusedDate}
                                 className=" text-white rounded-lg shadow-2xl p-4 h-[285px]"
-                                /> */}
+                                /> */
+}

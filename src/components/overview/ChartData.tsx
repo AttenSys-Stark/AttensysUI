@@ -6,7 +6,15 @@ export default function ChartData() {
     const config: ChartConfiguration = {
       type: "line",
       data: {
-        labels: ["January", "February", "March", "April", "May", "June", "July"],
+        labels: [
+          "January",
+          "February",
+          "March",
+          "April",
+          "May",
+          "June",
+          "July",
+        ],
         datasets: [
           {
             label: new Date().getFullYear().toString(),
@@ -45,28 +53,28 @@ export default function ChartData() {
         scales: {
           xAxes: [
             {
-              display: true, 
+              display: true,
               ticks: {
-                fontColor: "#333333", 
+                fontColor: "#333333",
                 stepSize: 25,
-                beginAtZero: true, 
+                beginAtZero: true,
               },
               gridLines: {
                 display: true,
-                color: "rgba(0, 0, 0, 0.1)", 
+                color: "rgba(0, 0, 0, 0.1)",
               },
             },
           ],
           yAxes: [
             {
-              display: true, 
+              display: true,
               ticks: {
-                fontColor: "#333333", 
-                beginAtZero: true, 
+                fontColor: "#333333",
+                beginAtZero: true,
               },
               gridLines: {
                 display: true,
-                color: "rgba(0, 0, 0, 0.1)"
+                color: "rgba(0, 0, 0, 0.1)",
               },
             },
           ],
@@ -74,7 +82,9 @@ export default function ChartData() {
       },
     };
 
-    const canvas = document.getElementById("line-chart") as HTMLCanvasElement | null;
+    const canvas = document.getElementById(
+      "line-chart",
+    ) as HTMLCanvasElement | null;
     if (canvas) {
       const ctx = canvas.getContext("2d");
       if (ctx) {

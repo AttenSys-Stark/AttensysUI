@@ -1,5 +1,5 @@
-import React from "react"
-import { ChevronLeftIcon } from "@heroicons/react/24/solid"
+import React from "react";
+import { ChevronLeftIcon } from "@heroicons/react/24/solid";
 
 const BootcampHero = () => {
   return (
@@ -48,7 +48,7 @@ const BootcampHero = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BootcampHero
+export default BootcampHero;

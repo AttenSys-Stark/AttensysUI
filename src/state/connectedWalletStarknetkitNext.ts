@@ -2,13 +2,14 @@ import {
   AccountChangeEventHandler,
   ChainId,
   NetworkChangeEventHandler,
-} from "@starknet-io/types-js"
-import { useAtomValue, useSetAtom, atom} from "jotai"
-import { atomWithReset } from "jotai/utils"
-import { useEffect } from "react"
-import { ConnectorData, StarknetWindowObject } from "starknetkit-next"
-import { Connector } from "starknetkit"
+} from "@starknet-io/types-js";
+import { useAtomValue, useSetAtom, atom } from "jotai";
+import { atomWithReset } from "jotai/utils";
+import { useEffect } from "react";
+import { ConnectorData, StarknetWindowObject } from "starknetkit-next";
+import { Connector } from "starknetkit";
 import { FileObject } from "pinata";
+import { number } from "starknet"
 
 const emptyData: FileObject = {
   name: "",
@@ -21,48 +22,48 @@ const emptyData: FileObject = {
 };
 
 const InitOrganizationRegstrationData = {
-  organizationBanner : emptyData,
-  organizationName : "",
-  organizationDescription : "",
-  organizationLogo : emptyData,
-  organizationCategory : "",
+  organizationBanner: emptyData,
+  organizationName: "",
+  organizationDescription: "",
+  organizationLogo: emptyData,
+  organizationCategory: "",
   organizationAdminfullname: "",
-  organizationAminEmail : "",
-  organizationAdminWallet : "",
-  organizationInstructorEmails : [""],
-  organizationInstructorsWalletAddresses : [""],
-}
+  organizationAminEmail: "",
+  organizationAdminWallet: "",
+  organizationInstructorEmails: [""],
+  organizationInstructorsWalletAddresses: [""],
+};
 
 const InitBootcampData = {
-  bootcampName : "",
+  bootcampName: "",
   bootcampOrganization: "",
   targetAudience: "",
   bootcampDescription: "",
-  bootcampStartdate : "",
+  bootcampStartdate: "",
   bootcampEndDate: "",
-  bootcampLecture: [{day:"", lecturetitle:"", lectureDescription: "", start:"", end:""}],
+  bootcampLecture: [
+    { day: "", lecturetitle: "", lectureDescription: "", start: "", end: "" },
+  ],
   price: false,
-  bootcampPrice : "",
-  BootcampLogo : emptyData,
-  bootcampNftName : "",
-  bootCampNftSymbol : "",
-  bootcampNftImage : emptyData,
-}
+  bootcampPrice: "",
+  BootcampLogo: emptyData,
+  bootcampNftName: "",
+  bootCampNftSymbol: "",
+  bootcampNftImage: emptyData,
+};
 
 //organization data state
 export const organzationInitState = atom(InitOrganizationRegstrationData);
 //bootcamp data state
-export const createBootcampInitState = atom(InitBootcampData)
-
-
+export const createBootcampInitState = atom(InitBootcampData);
 
 export const walletStarknetkitNextAtom = atomWithReset<
   StarknetWindowObject | null | undefined
->(undefined)
+>(undefined);
 
-export const connectorDataAtom = atomWithReset<ConnectorData | null>(null)
+export const connectorDataAtom = atomWithReset<ConnectorData | null>(null);
 
-export const connectorAtom = atomWithReset<Connector | null>(null)
+export const connectorAtom = atomWithReset<Connector | null>(null);
 
 export const coursestatusAtom = atom(false);
 
@@ -80,7 +81,6 @@ export const modalstatus = atom(false);
 
 export const orguploadstatus = atom(true);
 export const confirmationstatus = atom(false);
-
 
 export const sendingstatus = atom(false);
 export const successstatus = atom(false);
@@ -100,12 +100,24 @@ export const detailsEntryStat = atom(true);
 export const detailsEntryLoading = atom(false);
 
 export const registrationsuccess = atom(false);
-export const addclassmodal = atom(false);
+
+const data = {
+  modalstatus : false,
+  idnumber : 0
+}
+
+export const addclassmodal = atom(data);
 
 export const createMeeting = atom(false);
+export const isinputError = atom(false);
+export const currentID = atom(null);
+
+export const isRegisteredatom = atom(false);
+export const orgnameatom = atom("none");
+
 export const useWalletAccountChange = () => {
-  const wallet = useAtomValue(walletStarknetkitNextAtom)
-  const setConnectorData = useSetAtom(connectorDataAtom)
+  const wallet = useAtomValue(walletStarknetkitNextAtom);
+  const setConnectorData = useSetAtom(connectorDataAtom);
 
   const accountChangeHandler: AccountChangeEventHandler = (
     accounts?: string[],
@@ -113,31 +125,31 @@ export const useWalletAccountChange = () => {
     setConnectorData((prev) => ({
       account: accounts?.[0],
       chainId: prev?.chainId,
-    }))
-  }
+    }));
+  };
   const networkChangeHandler: NetworkChangeEventHandler = async (
     chainId?: ChainId,
     accounts?: string[],
   ) => {
-    let walletAccount = undefined
+    let walletAccount = undefined;
     if (!accounts || accounts.length === 0) {
       walletAccount = await wallet?.request({
         type: "wallet_requestAccounts",
-      })
+      });
     }
 
     setConnectorData({
       account: accounts?.[0] || walletAccount?.[0],
       chainId: chainId ? BigInt(chainId) : undefined,
-    })
-  }
+    });
+  };
 
-  wallet?.on("accountsChanged", accountChangeHandler)
-  wallet?.on("networkChanged", networkChangeHandler)
+  wallet?.on("accountsChanged", accountChangeHandler);
+  wallet?.on("networkChanged", networkChangeHandler);
 
   useEffect(() => {
-    wallet?.off("accountsChanged", accountChangeHandler)
-    wallet?.off("networkChanged", networkChangeHandler)
-    return
-  }, [wallet, accountChangeHandler, networkChangeHandler])
-}
+    wallet?.off("accountsChanged", accountChangeHandler);
+    wallet?.off("networkChanged", networkChangeHandler);
+    return;
+  }, [wallet, accountChangeHandler, networkChangeHandler]);
+};

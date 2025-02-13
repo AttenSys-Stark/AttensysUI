@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 const Descriptionsupport = () => {
   return (
@@ -23,7 +23,7 @@ const Descriptionsupport = () => {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Descriptionsupport
+export default Descriptionsupport;

@@ -1,5 +1,11 @@
-"use client"
-import { ChangeEvent, SetStateAction, useEffect, useRef, useState } from "react"
+"use client";
+import {
+  ChangeEvent,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Button,
   Dialog,
@@ -9,30 +15,30 @@ import {
   Field,
   Input,
   Label,
-} from "@headlessui/react"
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline"
-import { useAtom } from "jotai"
-import Image from "next/image"
-import cancel from "@/assets/cancel.svg"
-import { createMeeting } from "@/state/connectedWalletStarknetkitNext"
-import clsx from "clsx"
-import { FaPlus } from "react-icons/fa6"
-import cloud from "@/assets/cloud.svg"
-import dividers from "@/assets/Dividers.svg"
-import { RiInformation2Line } from "react-icons/ri"
+} from "@headlessui/react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { useAtom } from "jotai";
+import Image from "next/image";
+import cancel from "@/assets/cancel.svg";
+import { createMeeting } from "@/state/connectedWalletStarknetkitNext";
+import clsx from "clsx";
+import { FaPlus } from "react-icons/fa6";
+import cloud from "@/assets/cloud.svg";
+import dividers from "@/assets/Dividers.svg";
+import { RiInformation2Line } from "react-icons/ri";
 
 export default function Createmeeting(prop: any) {
-  const [open, setOpen] = useState(prop.status)
-  const [meetingCreation, setMeetingCreation] = useAtom(createMeeting)
+  const [open, setOpen] = useState(prop.status);
+  const [meetingCreation, setMeetingCreation] = useAtom(createMeeting);
 
   useEffect(() => {
     if (open) {
       window.scrollTo({
         top: Math.max(0, 130), // Scroll up by 100 pixels
         behavior: "smooth",
-      })
+      });
     }
-  }, [open])
+  }, [open]);
 
   return (
     <Dialog open={open} onClose={setOpen} className="relative z-10">
@@ -52,8 +58,8 @@ export default function Createmeeting(prop: any) {
                 src={cancel}
                 alt="cancel"
                 onClick={() => {
-                  setOpen(false)
-                  setMeetingCreation(false)
+                  setOpen(false);
+                  setMeetingCreation(false);
                 }}
               />
             </div>
@@ -84,8 +90,8 @@ export default function Createmeeting(prop: any) {
 
               <div
                 onClick={() => {
-                  setOpen(false)
-                  setMeetingCreation(false)
+                  setOpen(false);
+                  setMeetingCreation(false);
                 }}
                 className="h-[47px] w-[103px] rounded-xl bg-[#9B51E0] flex items-center justify-center cursor-pointer"
               >
@@ -98,5 +104,5 @@ export default function Createmeeting(prop: any) {
         </div>
       </div>
     </Dialog>
-  )
+  );
 }

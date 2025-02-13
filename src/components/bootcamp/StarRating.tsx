@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
 interface starprop {
-  totalStars : number,
-  starnumber : number,
+  totalStars: number;
+  starnumber: number;
 }
 
-const StarRating : React.FC<starprop> = (prop) => {
+const StarRating: React.FC<starprop> = (prop) => {
   const [rating, setRating] = useState(0); // Current selected rating
 
-useEffect(() => {
-  setRating(prop.starnumber);
-}, [prop.starnumber])
-
+  useEffect(() => {
+    setRating(prop.starnumber);
+  }, [prop.starnumber]);
 
   return (
     <div className="flex space-x-1">
@@ -38,11 +37,9 @@ useEffect(() => {
 
 export default StarRating;
 
-
-
 // const StarRating = ({ totalStars = 5, onRatingChange }) => {
 //     const [rating, setRating] = useState(0); // Current selected rating
-  
+
 //     // Handle star click
 //     const handleStarClick = (index) => {
 //       setRating(index + 1);
@@ -50,4 +47,3 @@ export default StarRating;
 //         onRatingChange(index + 1);
 //       }
 //     };
-  

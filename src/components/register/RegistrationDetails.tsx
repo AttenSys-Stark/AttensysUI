@@ -1,12 +1,12 @@
-import React, { useState } from "react"
-import clsx from "clsx"
-import { useAtom } from "jotai"
+import React, { useState } from "react";
+import clsx from "clsx";
+import { useAtom } from "jotai";
 import {
   registerModal,
   detailsEntryStat,
   detailsEntryLoading,
   registrationsuccess,
-} from "@/state/connectedWalletStarknetkitNext"
+} from "@/state/connectedWalletStarknetkitNext";
 import {
   Button,
   Dialog,
@@ -16,34 +16,34 @@ import {
   Field,
   Input,
   Label,
-} from "@headlessui/react"
+} from "@headlessui/react";
 
 const RegistrationDetails = () => {
-  const [regModal, setRegModal] = useAtom(registerModal)
-  const [inputValue, setInputValue] = useState<number | string>("")
-  const [detailsEntrystatus, setDetailsEntryStatus] = useAtom(detailsEntryStat)
+  const [regModal, setRegModal] = useAtom(registerModal);
+  const [inputValue, setInputValue] = useState<number | string>("");
+  const [detailsEntrystatus, setDetailsEntryStatus] = useAtom(detailsEntryStat);
   const [detailsEntryLoadingstatus, setDetailsEntryLoadingStatus] =
-    useAtom(detailsEntryLoading)
+    useAtom(detailsEntryLoading);
   const [registrationsuccessstatus, setregistrationsuccessstatus] =
-    useAtom(registrationsuccess)
+    useAtom(registrationsuccess);
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
+    const value = event.target.value;
     // Validate numeric input or clear it
     if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
-      setInputValue(value)
+      setInputValue(value);
     }
-  }
+  };
 
   const handlePay = () => {
-    setDetailsEntryStatus(false)
-    setDetailsEntryLoadingStatus(true)
+    setDetailsEntryStatus(false);
+    setDetailsEntryLoadingStatus(true);
 
     setTimeout(() => {
-      setDetailsEntryLoadingStatus(false)
-      setregistrationsuccessstatus(true)
-    }, 2000)
-  }
+      setDetailsEntryLoadingStatus(false);
+      setregistrationsuccessstatus(true);
+    }, 2000);
+  };
 
   return (
     <div className="w-full px-4 md:px-8 space-y-4 mt-8">
@@ -112,7 +112,7 @@ const RegistrationDetails = () => {
         Register & pay
       </Button>
     </div>
-  )
-}
+  );
+};
 
-export default RegistrationDetails
+export default RegistrationDetails;

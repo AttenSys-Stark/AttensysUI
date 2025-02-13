@@ -1,12 +1,12 @@
-import React from "react"
-import { AiFillEdit } from "react-icons/ai"
-import Image from "next/image"
-import classvid from "@/assets/classtsest.svg"
-import { IoMdCalendar } from "react-icons/io"
-import { GoEye } from "react-icons/go"
-import { MdOutlineAssignment } from "react-icons/md"
-import { BsFillFileEarmarkSpreadsheetFill } from "react-icons/bs"
-import { IoIosPeople } from "react-icons/io"
+import React from "react";
+import { AiFillEdit } from "react-icons/ai";
+import Image from "next/image";
+import classvid from "@/assets/classtsest.svg";
+import { IoMdCalendar } from "react-icons/io";
+import { GoEye } from "react-icons/go";
+import { MdOutlineAssignment } from "react-icons/md";
+import { BsFillFileEarmarkSpreadsheetFill } from "react-icons/bs";
+import { IoIosPeople } from "react-icons/io";
 
 const OutlineCard = () => {
   return (
@@ -99,7 +99,7 @@ const OutlineCard = () => {
         </h1>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default OutlineCard
+export default OutlineCard;

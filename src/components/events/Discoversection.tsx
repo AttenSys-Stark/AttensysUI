@@ -1,19 +1,19 @@
-import React from "react"
-import Image from "next/image"
-import moon from "@/assets/moon.svg"
-import upcoming from "@/assets/upcoming.svg"
-import top from "@/assets/top.svg"
-import { useRouter } from "next/navigation"
+import React from "react";
+import Image from "next/image";
+import moon from "@/assets/moon.svg";
+import upcoming from "@/assets/upcoming.svg";
+import top from "@/assets/top.svg";
+import { useRouter } from "next/navigation";
 
 const Discoversection = () => {
-  const router = useRouter()
+  const router = useRouter();
 
   const handlerouting = () => {
-    router.push("/Events/events")
-  }
+    router.push("/Events/events");
+  };
   const handleDiscover = () => {
-    router.push("/Discoverevent")
-  }
+    router.push("/Discoverevent");
+  };
 
   return (
     <div className="h-[100px] clg:h-[80px] lg:[70px] lclg:[60px] flex justify-between w-[90%] mx-auto items-center">
@@ -39,7 +39,7 @@ const Discoversection = () => {
         <Image src={top} alt="moon" />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Discoversection
+export default Discoversection;

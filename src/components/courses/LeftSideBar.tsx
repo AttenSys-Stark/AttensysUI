@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 const LeftSideBar = () => {
   const properties = [
@@ -36,7 +36,7 @@ const LeftSideBar = () => {
       title: "Review & Publish",
       periphery: ["Publish Course"],
     },
-  ]
+  ];
   return (
     <div>
       {properties.map((item, id) => (
@@ -58,7 +58,7 @@ const LeftSideBar = () => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
-export default LeftSideBar
+export default LeftSideBar;

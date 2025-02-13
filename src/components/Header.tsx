@@ -1,5 +1,5 @@
-"use client"
-import React, { useEffect, useState } from "react"
+"use client";
+import React, { useEffect, useState } from "react";
 import {
   Disclosure,
   DisclosureButton,
@@ -9,114 +9,114 @@ import {
   MenuItem,
   MenuItems,
   Input,
-} from "@headlessui/react"
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline"
-import Logo from "@/assets/Logo.svg"
-import Image from "next/image"
-import { ConnectButton } from "./connect/ConnectButton"
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
+} from "@headlessui/react";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import Logo from "@/assets/Logo.svg";
+import Image from "next/image";
+import { ConnectButton } from "./connect/ConnectButton";
+import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
 import {
   connectorAtom,
   connectorDataAtom,
   walletStarknetkitNextAtom,
-} from "@/state/connectedWalletStarknetkitNext"
-import { RESET } from "jotai/utils"
-import { DisconnectButton } from "./DisconnectButton"
-import { connect, disconnect } from "starknetkit"
-import Coursedropdown from "./courses/Coursedropdown"
+} from "@/state/connectedWalletStarknetkitNext";
+import { RESET } from "jotai/utils";
+import { DisconnectButton } from "./DisconnectButton";
+import { connect, disconnect } from "starknetkit";
+import Coursedropdown from "./courses/Coursedropdown";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
-} from "@/state/connectedWalletStarknetkitNext"
-import { useAtom, useSetAtom } from "jotai"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { handleSubmit } from "@/utils/helpers"
-import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline"
+} from "@/state/connectedWalletStarknetkitNext";
+import { useAtom, useSetAtom } from "jotai";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { handleSubmit } from "@/utils/helpers";
+import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
-import ImagenCourses1 from "@/assets/ImagenCourses1.png"
-import ImagenCourses2 from "@/assets/ImagenCourses2.png"
-import ImagenCourses3 from "@/assets/ImagenCourses3.png"
+import ImagenCourses1 from "@/assets/ImagenCourses1.png";
+import ImagenCourses2 from "@/assets/ImagenCourses2.png";
+import ImagenCourses3 from "@/assets/ImagenCourses3.png";
 
-import Lupa from "@/assets/Lupa.png"
-import PeopleBoot from "@/assets/PeopleBoot.png"
-import ProfilePic from "@/assets/profile_pic.png"
-import LupaPurple from "@/assets/LupaPurple.png"
-import organizationHeader from "@/assets/organizationHeader.png"
-import { courseQuestions } from "@/constants/data"
+import Lupa from "@/assets/Lupa.png";
+import PeopleBoot from "@/assets/PeopleBoot.png";
+import ProfilePic from "@/assets/profile_pic.png";
+import LupaPurple from "@/assets/LupaPurple.png";
+import organizationHeader from "@/assets/organizationHeader.png";
+import { courseQuestions } from "@/constants/data";
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
   { name: "Events", href: "#", current: false },
   { name: "Bootcamps", href: "#", current: false },
-]
+];
 
 function classNames(...classes: any[]) {
-  return classes.filter(Boolean).join(" ")
+  return classes.filter(Boolean).join(" ");
 }
 
 const Header = () => {
-  const router = useRouter()
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
-  const setConnectorData = useSetAtom(connectorDataAtom)
-  const setConnector = useSetAtom(connectorAtom)
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-  const [searchValue, setSearchValue] = useState("")
-  const [coursestatus, setcourseStatus] = useAtom(coursestatusAtom)
-  const [status] = useAtom(coursestatusAtom)
+  const router = useRouter();
+  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
+  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
+  const setConnectorData = useSetAtom(connectorDataAtom);
+  const setConnector = useSetAtom(connectorAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [searchValue, setSearchValue] = useState("");
+  const [coursestatus, setcourseStatus] = useAtom(coursestatusAtom);
+  const [status] = useAtom(coursestatusAtom);
   const [bootcampdropstat, setbootcampdropstat] = useAtom(
     bootcampdropdownstatus,
-  )
+  );
 
-  const [isBootcampsOpen, setIsBootcampsOpen] = useState(false)
+  const [isBootcampsOpen, setIsBootcampsOpen] = useState(false);
 
   const handleChange = (event: { target: { value: any } }) => {
-    setSearchValue(event.target.value)
-  }
+    setSearchValue(event.target.value);
+  };
 
   const handleTabClick = (arg: string) => {
     if (arg == "Courses") {
-      setcourseStatus(!coursestatus)
+      setcourseStatus(!coursestatus);
     } else if (arg == "Events") {
-      setcourseStatus(false)
-      setbootcampdropstat(false)
-      router.push("/Events/events")
+      setcourseStatus(false);
+      setbootcampdropstat(false);
+      router.push("/Events/events");
     } else if (arg == "Bootcamps") {
       // e.stopPropagation();
-      setbootcampdropstat(!bootcampdropstat)
+      setbootcampdropstat(!bootcampdropstat);
     }
-  }
-  const [isCoursesOpen, setIsCoursesOpen] = useState(false)
+  };
+  const [isCoursesOpen, setIsCoursesOpen] = useState(false);
 
   useEffect(() => {
-    setWalletLatest(RESET)
-    setWalletNext(RESET)
-    setConnectorData(RESET)
-    setConnector(RESET)
-  }, [])
+    /* setWalletLatest(RESET) */
+    setWalletNext(RESET);
+    setConnectorData(RESET);
+    setConnector(RESET);
+  }, []);
 
   useEffect(() => {
-    setWalletLatest(RESET)
-    setWalletNext(RESET)
-    setConnectorData(RESET)
-    setConnector(RESET)
-  }, [])
+    /* setWalletLatest(RESET) */
+    setWalletNext(RESET);
+    setConnectorData(RESET);
+    setConnector(RESET);
+  }, []);
 
   return (
     <>
-<Disclosure
-  as="nav"
-  className={`${status ? "bg-white opacity-80 backdrop-blur-sm" : "bg-white"} 
+      <Disclosure
+        as="nav"
+        className={`${status ? "bg-white opacity-80 backdrop-blur-sm" : "bg-white"} 
     pt-1 relative z-20 overflow-hidden 
     w-[98%] mx-auto 
      lclg:w-[100%] clg:w-[98%] xlg:w-[100%]`}
->
+      >
         <div className="lg:flex hidden sm:hidden justify-center items-center sm:px-6 lg:px-8 lg:h-[85px] lg:my-auto clg:w-[100%] w-full sm1275:hidden">
           <div className="relative flex h-20 items-center justify-between w-[98%]">
             <div className="lg:flex flex-shrink-0 items-center flex justify-between clg:w-[55%] lclg:w-[46%] lclg:mx-auto clg:mx-auto space-x-6 clg:space-x-6 lclg:space-x-6 md:hidden sm:hidden">
               <Link href="/" className="cursor-pointer">
-                <Image alt="Your Company" src={Logo} className="h-8 w-full" />
+                <Image alt="Your Company" src={Logo} className="w-full h-8" />
               </Link>
               <a
                 href="/Explorer"
@@ -141,7 +141,7 @@ const Header = () => {
                       viewBox="0 0 24 24"
                       strokeWidth="1.5"
                       stroke="currentColor"
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+                      className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2"
                     >
                       <path
                         strokeLinecap="round"
@@ -156,7 +156,7 @@ const Header = () => {
 
             <div className="flex items-center justify-center sm:items-stretch sm:justify-end">
               <div className="hidden lg:flex">
-                <div className="flex xlg:space-x-24 text-sm">
+                <div className="flex text-sm xlg:space-x-24">
                   {navigation.map((item, index) => (
                     <a
                       key={item.name}
@@ -181,13 +181,13 @@ const Header = () => {
                 </div>
               </div>
             </div>
-            <div className="hidden md:hidden lg:flex absolute inset-y-0 right-0 items-center sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <div className="absolute inset-y-0 right-0 items-center hidden md:hidden lg:flex sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               {wallet ? (
                 <>
                   <DisconnectButton
                     disconnectFn={disconnect}
                     resetFn={() => {
-                      setWallet(RESET)
+                      setWallet(RESET);
                     }}
                   />
                 </>
@@ -199,15 +199,15 @@ const Header = () => {
         </div>
 
         {/* 🔹 HEADER FOR MOBILE */}
-        <div className="flex justify-between items-center px-4 py-2 lg:hidden sm1275:flex">
+        <div className="flex items-center justify-between px-4 py-2 lg:hidden sm1275:flex">
           {/* Hamburger menu */}
           <DisclosureButton className="text-gray-500 focus:outline-none ">
-            <Bars3Icon className="h-6 w-6" />
+            <Bars3Icon className="w-6 h-6" />
           </DisclosureButton>
 
           {/* Logo */}
           <Link href="/" className="flex justify-center flex-1">
-            <Image alt="Attensys Logo" src={Logo} className="h-8 w-auto" />
+            <Image alt="Attensys Logo" src={Logo} className="w-auto h-8" />
           </Link>
 
           {/* Search icon on the right */}
@@ -218,7 +218,7 @@ const Header = () => {
               viewBox="0 0 24 24"
               strokeWidth="1.5"
               stroke="currentColor"
-              className="h-6 w-6"
+              className="w-6 h-6"
             >
               <path
                 strokeLinecap="round"
@@ -230,24 +230,24 @@ const Header = () => {
         </div>
 
         {/* 🔹 MOBILE MENU DROP-DOWN PANEL */}
-        <DisclosurePanel className="lg:hidden bg-white shadow-md sm1275:block">
+        <DisclosurePanel className="bg-white shadow-md lg:hidden sm1275:block">
           <div className="flex flex-col h-full">
             {/* 📌 Barra superior con logo y botón de cerrar */}
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <Link href="/" className="flex items-center">
-                <Image alt="Attensys Logo" src={Logo} className="h-8 w-auto" />
+                <Image alt="Attensys Logo" src={Logo} className="w-auto h-8" />
               </Link>
               {/* Close button */}
 
               <DisclosureButton className="text-gray-500 focus:outline-none">
-                <XMarkIcon className="h-6 w-6" />
+                <XMarkIcon className="w-6 h-6" />
               </DisclosureButton>
             </div>
           </div>
-          <div className="space-y-2 px-4 py-3">
+          <div className="px-4 py-3 space-y-2">
             {/* 🟢 Wallet data */}
 
-            <div className="flex items-center space-x-3 px-4 py-3 border-b">
+            <div className="flex items-center px-4 py-3 space-x-3 border-b">
               {wallet && wallet.account ? (
                 <>
                   {/* Profile picture */}
@@ -274,8 +274,8 @@ const Header = () => {
                   </div>
                 </>
               ) : (
-                <div className="w-full text-center py-2">
-                  <p className="text-gray-500 text-sm">Not connected</p>
+                <div className="w-full py-2 text-center">
+                  <p className="text-sm text-gray-500">Not connected</p>
                 </div>
               )}
             </div>
@@ -299,7 +299,7 @@ const Header = () => {
               {/* 📌 Courses - DESPLEGABLE */}
               <div>
                 <button
-                  className="flex justify-between items-center w-full px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                  className="flex items-center justify-between w-full px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                   onClick={() => setIsCoursesOpen(!isCoursesOpen)}
                 >
                   <span>Courses</span>
@@ -383,7 +383,7 @@ const Header = () => {
 
             <div>
               <button
-                className="flex justify-between items-center w-full px-7 py-2 text-gray-700 rounded-md hover:bg-gray-200"
+                className="flex items-center justify-between w-full py-2 text-gray-700 rounded-md px-7 hover:bg-gray-200"
                 onClick={() => setIsBootcampsOpen(!isBootcampsOpen)}
               >
                 <span>Bootcamps</span>
@@ -447,8 +447,8 @@ const Header = () => {
               {wallet ? (
                 <button
                   onClick={() => {
-                    disconnect()
-                    setWallet(RESET)
+                    disconnect();
+                    setWallet(RESET);
                   }}
                   className="w-full bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] text-white py-2 rounded-md flex items-center justify-center space-x-2"
                 >
@@ -458,7 +458,7 @@ const Header = () => {
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="h-5 w-5"
+                    className="w-5 h-5"
                   >
                     <path
                       strokeLinecap="round"
@@ -476,7 +476,7 @@ const Header = () => {
         </DisclosurePanel>
       </Disclosure>
     </>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;

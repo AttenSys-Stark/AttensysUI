@@ -1,40 +1,40 @@
-import { ConnectButton } from "@/components/connect/ConnectButton"
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
+import { ConnectButton } from "@/components/connect/ConnectButton";
+import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
 import {
   connectorAtom,
   connectorDataAtom,
   walletStarknetkitNextAtom,
-} from "@/state/connectedWalletStarknetkitNext"
-import { useSetAtom } from "jotai"
-import { RESET } from "jotai/utils"
-import { useEffect, useMemo, useRef, useState } from "react"
-import { DisconnectButton } from "@/components/DisconnectButton"
-import { useAtom } from "jotai"
-import { connect, disconnect } from "starknetkit"
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
-import { AccountSection } from "@/components/AccountSection"
+} from "@/state/connectedWalletStarknetkitNext";
+import { useSetAtom } from "jotai";
+import { RESET } from "jotai/utils";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { DisconnectButton } from "@/components/DisconnectButton";
+import { useAtom } from "jotai";
+import { connect, disconnect } from "starknetkit";
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { AccountSection } from "@/components/AccountSection";
 import {
   useAccount,
   useReadContract,
   useContract,
   useSendTransaction,
-} from "@starknet-react/core"
-import { attensysOrgAddress } from "./../deployments/contracts"
-import { attensysOrgAbi } from "./../deployments/abi"
-import { RpcProvider, Contract, Account, ec, json } from "starknet"
+} from "@starknet-react/core";
+import { attensysOrgAddress } from "./../deployments/contracts";
+import { attensysOrgAbi } from "./../deployments/abi";
+import { RpcProvider, Contract, Account, ec, json } from "starknet";
 
 const MockOrganization = () => {
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
-  const setConnectorData = useSetAtom(connectorDataAtom)
-  const setConnector = useSetAtom(connectorAtom)
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-  
-  const [inputValue, setInputValue] = useState("")
-  const [orgInputValue, setOrgInputValue] = useState("")
-  const [classOrgValue, setClassOrgValue] = useState("")
-  const [instructorValue, setInstructorValue] = useState("")
-  const [instructorInputValue, setInstructorInputValue] = useState("")
+  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
+  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
+  const setConnectorData = useSetAtom(connectorDataAtom);
+  const setConnector = useSetAtom(connectorAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+
+  const [inputValue, setInputValue] = useState("");
+  const [orgInputValue, setOrgInputValue] = useState("");
+  const [classOrgValue, setClassOrgValue] = useState("");
+  const [instructorValue, setInstructorValue] = useState("");
+  const [instructorInputValue, setInstructorInputValue] = useState("");
   const [orgData, setOrgData] = useState({
     address_of_org: "",
     nft_address: "",
@@ -42,142 +42,148 @@ const MockOrganization = () => {
     number_of_instructors: 0,
     number_of_students: 0,
     org_name: "",
-  })
-  const [isSuccess, setIsSuccess] = useState(false)
+  });
+  const [isSuccess, setIsSuccess] = useState(false);
 
   //initialize provider with a Sepolia Testnet node
   const organizationContract = new Contract(
     attensysOrgAbi,
     attensysOrgAddress,
     provider,
-  )
+  );
 
   // core write and read functions
 
   const registerOrg = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
-      event.preventDefault()
-      organizationContract.connect(wallet?.account)
+      event.preventDefault();
+      organizationContract.connect(wallet?.account);
       const myCall = organizationContract.populate("create_org_profile", [
         "web3",
         "http://w3bnft.com",
         "cairo",
         "CAO",
-      ])
-      const res = await organizationContract.create_org_profile(myCall.calldata)
-      await provider.waitForTransaction(res.transaction_hash)
+      ]);
+      const res = await organizationContract.create_org_profile(
+        myCall.calldata,
+      );
+      await provider.waitForTransaction(res.transaction_hash);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const handleOnSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    organizationContract.connect(wallet?.account)
+    event.preventDefault();
+    organizationContract.connect(wallet?.account);
     const myCall = organizationContract.populate("get_org_info", [
       wallet?.account.address,
-    ])
-    const res = await organizationContract.get_org_info(myCall.calldata)
+    ]);
+    const res = await organizationContract.get_org_info(myCall.calldata);
     if (res != undefined) {
-      setIsSuccess(true)
-      setOrgData(res)
+      setIsSuccess(true);
+      setOrgData(res);
     }
-  }
+  };
 
   const handleAddInstructor = async (
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     try {
-      event.preventDefault()
-      organizationContract.connect(wallet?.account)
-      console.log(instructorValue)
+      event.preventDefault();
+      organizationContract.connect(wallet?.account);
+      console.log(instructorValue);
       const myCall = organizationContract.populate("add_instructor_to_org", [
         instructorValue,
-      ])
+      ]);
       const res = await organizationContract.add_instructor_to_org(
         myCall.calldata,
-      )
-      await provider.waitForTransaction(res.transaction_hash)
+      );
+      await provider.waitForTransaction(res.transaction_hash);
     } catch (error) {}
-  }
+  };
 
   const handleGetAllOrg = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    organizationContract.connect(wallet?.account)
-    const myCall = organizationContract.populate("get_all_org_info", [])
-    const res = await organizationContract.get_all_org_info(myCall.calldata)
+    event.preventDefault();
+    organizationContract.connect(wallet?.account);
+    const myCall = organizationContract.populate("get_all_org_info", []);
+    const res = await organizationContract.get_all_org_info(myCall.calldata);
     if (res != undefined) {
-    //   console.log(res)
-    //   setIsSuccess(true)
+      //   console.log(res)
+      //   setIsSuccess(true)
     }
-  }
+  };
   const handleGetInstructor = async (
     event: React.FormEvent<HTMLFormElement>,
   ) => {
-    event.preventDefault()
-    organizationContract.connect(wallet?.account)
+    event.preventDefault();
+    organizationContract.connect(wallet?.account);
     const myCall = organizationContract.populate("get_org_instructors", [
       orgInputValue,
-    ])
-    const res = await organizationContract.get_org_instructors(myCall.calldata)
+    ]);
+    const res = await organizationContract.get_org_instructors(myCall.calldata);
     if (res != undefined) {
-      console.log(res)
+      console.log(res);
     }
-  }
+  };
 
   const handleCreateAClass = async (
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     try {
-      event.preventDefault()
-      organizationContract.connect(wallet?.account)
+      event.preventDefault();
+      organizationContract.connect(wallet?.account);
       const myCall = organizationContract.populate("create_a_class", [
         classOrgValue,
-      ])
-      const res = await organizationContract.create_a_class(
-        myCall.calldata,
-      )
-      await provider.waitForTransaction(res.transaction_hash)
+      ]);
+      const res = await organizationContract.create_a_class(myCall.calldata);
+      await provider.waitForTransaction(res.transaction_hash);
     } catch (error) {}
-  }
+  };
 
-  const handleGetInstructorPartOfOrg = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    organizationContract.connect(wallet?.account)
-    const myCall = organizationContract.populate("get_instructor_part_of_org", [instructorInputValue])
-    const res = await organizationContract.get_instructor_part_of_org(myCall.calldata)
+  const handleGetInstructorPartOfOrg = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault();
+    organizationContract.connect(wallet?.account);
+    const myCall = organizationContract.populate("get_instructor_part_of_org", [
+      instructorInputValue,
+    ]);
+    const res = await organizationContract.get_instructor_part_of_org(
+      myCall.calldata,
+    );
     if (res != undefined) {
-      console.log(res)
-    //   setIsSuccess(true)
+      console.log(res);
+      //   setIsSuccess(true)
     }
-  }
+  };
 
   // handle input values
 
   const handleOnChange = (event: any) => {
-    setInputValue(event.target.value)
-  }
+    setInputValue(event.target.value);
+  };
   const handleOnChange2 = (event: any) => {
-    setInstructorValue(event.target.value)
-  }
+    setInstructorValue(event.target.value);
+  };
   const handleOnChange3 = (event: any) => {
-    setOrgInputValue(event.target.value)
-  }
+    setOrgInputValue(event.target.value);
+  };
   const handleOnChange4 = (event: any) => {
-    setClassOrgValue(event.target.value)
-  }
+    setClassOrgValue(event.target.value);
+  };
   const handleOnChange5 = (event: any) => {
-    setInstructorInputValue(event.target.value)
-  }
+    setInstructorInputValue(event.target.value);
+  };
 
-  console.log(orgData)
+  console.log(orgData);
 
   useEffect(() => {
-    setWalletLatest(RESET)
-    setWalletNext(RESET)
-    setConnectorData(RESET)
-    setConnector(RESET)
-  }, [inputValue])
+    setWalletLatest(RESET);
+    setWalletNext(RESET);
+    setConnectorData(RESET);
+    setConnector(RESET);
+  }, [inputValue]);
 
   return (
     <div>
@@ -186,7 +192,7 @@ const MockOrganization = () => {
           <DisconnectButton
             disconnectFn={disconnect}
             resetFn={() => {
-              setWallet(RESET)
+              setWallet(RESET);
             }}
           />
         </>
@@ -393,7 +399,7 @@ const MockOrganization = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MockOrganization
+export default MockOrganization;

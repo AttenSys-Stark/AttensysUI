@@ -1,16 +1,16 @@
-import React from "react"
-import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack"
-import Dropdown from "../Dropdown"
-import Image from "next/image"
-import free from "@/assets/free.svg"
-import paid from "@/assets/paid.svg"
-import CourseSideBar from "./SideBar"
-import { handleCreateCourse } from "@/utils/helpers"
-import { useRouter } from "next/navigation"
-import Stepper from "@/components/Stepper"
+import React from "react";
+import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
+import Dropdown from "../Dropdown";
+import Image from "next/image";
+import free from "@/assets/free.svg";
+import paid from "@/assets/paid.svg";
+import CourseSideBar from "./SideBar";
+import { handleCreateCourse } from "@/utils/helpers";
+import { useRouter } from "next/navigation";
+import Stepper from "@/components/Stepper";
 
 const MainFormView4 = () => {
-  const router = useRouter()
+  const router = useRouter();
   const pricing = [
     {
       sym: free,
@@ -22,7 +22,7 @@ const MainFormView4 = () => {
       cost: "Paid",
       desc: "Set a price that reflects the value of your content",
     },
-  ]
+  ];
 
   return (
     <div className="flex">
@@ -63,7 +63,10 @@ const MainFormView4 = () => {
           <div className="mx-4 sm:ml-24 lg:mr-96 mt-12">
             <form action="CourseSetup5">
               <div className="my-12">
-                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor=""
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Course Pricing
                 </label>
                 <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px] my-2">
@@ -82,8 +85,12 @@ appropriately can help attract the right audience while providing a fair return 
                             <Image src={item.sym} alt={item.cost} width={30} />
                           </div>
                           <div className="mx-4">
-                            <p className="font-semibold text-base leading-[31px] text-[#333333]">{item.cost}</p>
-                            <p className="font-normal text-[13px]/[145%] text-[#2D3A4B]">{item.desc} </p>
+                            <p className="font-semibold text-base leading-[31px] text-[#333333]">
+                              {item.cost}
+                            </p>
+                            <p className="font-normal text-[13px]/[145%] text-[#2D3A4B]">
+                              {item.desc}{" "}
+                            </p>
                           </div>
                         </div>
 
@@ -97,7 +104,10 @@ appropriately can help attract the right audience while providing a fair return 
               </div>
 
               <div className="mt-[71px]">
-                <label htmlFor="" className="font-semibold text-[18px] leading-[31px] text-[#333333]">
+                <label
+                  htmlFor=""
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
                   Promo and Discount
                 </label>
                 <p className="font-normal text-[13px]/[145%] md:text-[14px] mt-5 text-[#2D3A4B] leading-[21px]">
@@ -135,7 +145,7 @@ appropriately can help attract the right audience while providing a fair return 
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MainFormView4
+export default MainFormView4;

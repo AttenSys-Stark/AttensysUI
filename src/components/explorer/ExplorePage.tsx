@@ -19,17 +19,17 @@ const ExplorePage = () => {
     const handleResize = () => {
       setMaxVisiblePages(window.innerWidth < 640 ? 3 : 10);
     };
-    
-    window.addEventListener('resize', handleResize);
+
+    window.addEventListener("resize", handleResize);
     handleResize();
-    
-    return () => window.removeEventListener('resize', handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const totalPages = Math.ceil(explorerData.length / itemsPerPage);
   const currentItems = explorerData.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const generatePageNumbers = () => {
@@ -53,15 +53,15 @@ const ExplorePage = () => {
   };
 
   const handleChange = (event: { target: { value: any } }) => {
-    setSearchValue(event.target.value)
-  }
+    setSearchValue(event.target.value);
+  };
 
   return (
     <div className="mx-4 md:mx-8 lg:mx-24 pb-10">
       {/* Hero Section */}
       <div className="bg-[url('/explorer_bg.svg')] relative text-white overflow-hidden px-4 md:px-16 lg:px-32 py-10 md:py-20 from-orange-400 via-red-500 to-pink-500 h-auto md:h-64 shadow-[inset_15px_25px_100px_rgba(0,0,0,1)]">
         <h1 className="text-xl md:text-2xl font-bold">The Attensys Explorer</h1>
-        
+
         {/* Search Form */}
         <div className="relative w-full md:w-[80%] my-5">
           <form onSubmit={(e) => handleSubmit(e, searchValue, router)}>
@@ -94,7 +94,9 @@ const ExplorePage = () => {
               </div>
 
               <div className="h-[42px] w-[25%] hidden md:flex rounded-lg items-center justify-center border border-[#6B6D6E] bg-[#e8e9ea] space-x-2">
-                <h1 className="text-[#2D3A4B] text-[14px] leading-[21px] font-medium">All Filters</h1>
+                <h1 className="text-[#2D3A4B] text-[14px] leading-[21px] font-medium">
+                  All Filters
+                </h1>
                 <RiArrowDropDownLine className="h-[20px] w-[20px] text-[#2D3A4B]" />
               </div>
             </div>
@@ -115,8 +117,7 @@ const ExplorePage = () => {
 
       {/* Table Section */}
       <div className="min-h-[930px] mx-auto bg-white mt-4 rounded-lg mb-24 p-4 md:p-6">
-      <div className="flex bg-[#9B51E052] bg-opacity-[35%] md:bg-[#9B51E052] xl:bg-transparent h-[80px] rounded-xl xl:max-h-20 justify-between align-middle items-center px-5 md:px-5 xl:px-12 mt-10 max-w-[92%] mx-auto">
-
+        <div className="flex bg-[#9B51E052] bg-opacity-[35%] md:bg-[#9B51E052] xl:bg-transparent h-[80px] rounded-xl xl:max-h-20 justify-between align-middle items-center px-5 md:px-5 xl:px-12 mt-10 max-w-[92%] mx-auto">
           <h1 className="text-[18px] font-medium leading-[22px] text-[#333333]">
             Recent activity
           </h1>
@@ -177,33 +178,37 @@ const ExplorePage = () => {
         {/* Pagination */}
         <div className="flex justify-center space-x-2 mt-8 overflow-x-auto py-4">
           <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
             className="px-3 md:px-4 py-2 border border-[#D0D5DD] rounded disabled:opacity-50"
           >
             {"<"}
           </button>
-          
-          {generatePageNumbers().map((page, index) => (
+
+          {generatePageNumbers().map((page, index) =>
             page === "..." ? (
-              <span key={index} className="px-2 text-base mt-2">...</span>
+              <span key={index} className="px-2 text-base mt-2">
+                ...
+              </span>
             ) : (
               <button
                 key={index}
                 onClick={() => setCurrentPage(Number(page))}
                 className={`px-3 md:px-4 py-2 rounded text-[14px] ${
-                  currentPage === page 
-                    ? "border border-[#F56630] text-black" 
+                  currentPage === page
+                    ? "border border-[#F56630] text-black"
                     : "text-black"
                 }`}
               >
                 {page}
               </button>
-            )
-          ))}
-          
+            ),
+          )}
+
           <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+            }
             disabled={currentPage === totalPages}
             className="px-3 md:px-4 py-2 border border-[#D0D5DD] rounded disabled:opacity-50"
           >

@@ -1,7 +1,7 @@
-import React from "react"
-import Image from "next/image"
-import { HighlightData } from "@/constants/data"
-import Highlightcard from "./Highlightcard"
+import React from "react";
+import Image from "next/image";
+import { HighlightData } from "@/constants/data";
+import Highlightcard from "./Highlightcard";
 
 const Highlight = () => {
   return (
@@ -14,10 +14,10 @@ const Highlight = () => {
             image={data.image}
             time={data.time}
           />
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default Highlight
+export default Highlight;

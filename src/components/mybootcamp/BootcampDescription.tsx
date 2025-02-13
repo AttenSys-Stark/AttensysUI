@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 const BootcampDescription = () => {
   return (
@@ -23,7 +23,7 @@ const BootcampDescription = () => {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BootcampDescription
+export default BootcampDescription;

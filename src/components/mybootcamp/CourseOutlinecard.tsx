@@ -1,15 +1,15 @@
-import React from "react"
-import { HiMiniCheckBadge } from "react-icons/hi2"
-import Image from "next/image"
-import classvid from "@/assets/classtsest.svg"
-import { IoMdCalendar } from "react-icons/io"
-import { GoEye } from "react-icons/go"
-import { MdOutlineAssignment } from "react-icons/md"
-import { BsFillFileEarmarkSpreadsheetFill } from "react-icons/bs"
-import { IoIosPeople } from "react-icons/io"
-import { MdOutlinePending } from "react-icons/md"
-import { AiFillSignature } from "react-icons/ai"
-import { PiVideo } from "react-icons/pi"
+import React from "react";
+import { HiMiniCheckBadge } from "react-icons/hi2";
+import Image from "next/image";
+import classvid from "@/assets/classtsest.svg";
+import { IoMdCalendar } from "react-icons/io";
+import { GoEye } from "react-icons/go";
+import { MdOutlineAssignment } from "react-icons/md";
+import { BsFillFileEarmarkSpreadsheetFill } from "react-icons/bs";
+import { IoIosPeople } from "react-icons/io";
+import { MdOutlinePending } from "react-icons/md";
+import { AiFillSignature } from "react-icons/ai";
+import { PiVideo } from "react-icons/pi";
 
 const CourseOutlinecard = (props: any) => {
   return (
@@ -34,15 +34,11 @@ const CourseOutlinecard = (props: any) => {
           <div className="w-full flex flex-none space-x-1">
             <div className="py-2 px-2.5 rounded-lg space-x-1 flex items-center justify-center bg-[#2D3A4B]">
               <IoMdCalendar className="h-[14px] w-[14px] md:h-xs md:text-sm md:w-[14px] text-[#FFFFFF]" />
-              <h1 className="text-[#FFFFFF] text-sm font-medium">
-                Day 1
-              </h1>
+              <h1 className="text-[#FFFFFF] text-sm font-medium">Day 1</h1>
             </div>
             <div className="flex space-x-2 items-center justify-center h-[33px] w-[85px]">
               <GoEye className="w-[16px] h-[16px] md:w-[20px] md:h-[20px] text-[#2D3A4B]" />
-              <h1 className="text-xs text-[#2D3A4B] font-medium">
-                301
-              </h1>
+              <h1 className="text-xs text-[#2D3A4B] font-medium">301</h1>
             </div>
           </div>
           <h1 className="w-full flex flex-none text-[#2D3A4B] text-md font-medium">
@@ -103,7 +99,7 @@ const CourseOutlinecard = (props: any) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CourseOutlinecard
+export default CourseOutlinecard;

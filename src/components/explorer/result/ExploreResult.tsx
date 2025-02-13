@@ -1,50 +1,54 @@
 // ExploreResult.tsx
-import React, { useState } from "react"
-import { Button, Input } from "@headlessui/react"
-import Image from "next/image"
-import filter from "@/assets/filter.png"
+import React, { useState } from "react";
+import { Button, Input } from "@headlessui/react";
+import Image from "next/image";
+import filter from "@/assets/filter.png";
 import { RiArrowDropDownLine } from "react-icons/ri";
-import { eventsData, gridsData } from "@/constants/data"
-import ResultGrid from "./ResultGrid"
-import { handleSubmit } from "@/utils/helpers"
-import { useRouter } from "next/navigation"
+import { eventsData, gridsData } from "@/constants/data";
+import ResultGrid from "./ResultGrid";
+import { handleSubmit } from "@/utils/helpers";
+import { useRouter } from "next/navigation";
 
 type Params = {
   address?: string;
 };
 
 const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
-  const [searchValue, setSearchValue] = useState("")
-  const [currentPage, setCurrentPage] = useState(1)
-  const router = useRouter()
-  const { address } = params
-  const itemsPerPage = 10
+  const [searchValue, setSearchValue] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const { address } = params;
+  const itemsPerPage = 10;
 
-  const totalPages = Math.ceil(eventsData.length / itemsPerPage)
+  const totalPages = Math.ceil(eventsData.length / itemsPerPage);
 
   const goToPage = (page: any) => {
-    setCurrentPage(page)
-  }
+    setCurrentPage(page);
+  };
 
   const generatePageNumbers = () => {
-    const pageNumbers = []
-    if (currentPage > 2) pageNumbers.push(1)
-    if (currentPage > 3) pageNumbers.push("...")
-    for (let i = Math.max(1, currentPage - 1); i <= Math.min(currentPage + 1, totalPages); i++) {
-      pageNumbers.push(i)
+    const pageNumbers = [];
+    if (currentPage > 2) pageNumbers.push(1);
+    if (currentPage > 3) pageNumbers.push("...");
+    for (
+      let i = Math.max(1, currentPage - 1);
+      i <= Math.min(currentPage + 1, totalPages);
+      i++
+    ) {
+      pageNumbers.push(i);
     }
-    if (currentPage < totalPages - 2) pageNumbers.push("...")
-    if (currentPage < totalPages - 1) pageNumbers.push(totalPages)
-    return pageNumbers
-  }
+    if (currentPage < totalPages - 2) pageNumbers.push("...");
+    if (currentPage < totalPages - 1) pageNumbers.push(totalPages);
+    return pageNumbers;
+  };
 
   const handleChange = (event: { target: { value: any } }) => {
-    setSearchValue(event.target.value)
-  }
+    setSearchValue(event.target.value);
+  };
 
   const shortenAddress = (address: any) => {
-    return address.slice(0, 10) + '...' + address.slice(-10);
-  }
+    return address.slice(0, 10) + "..." + address.slice(-10);
+  };
 
   return (
     <div className="bg-[#F5F7FA] w-full">
@@ -52,9 +56,14 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
         {/* Top Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center border-b-2 border-[#e0e0e0] pb-4">
           <div className="space-y-2 mb-4 lg:mb-0">
-            <h1 className="text-[18px] font-medium leading-[22px] text-[#333333]">Explorer Result</h1>
+            <h1 className="text-[18px] font-medium leading-[22px] text-[#333333]">
+              Explorer Result
+            </h1>
             <p className="text-[15px] font-medium leading-[18px] text-[#817676]">
-              Key : Address <span className="text-[#9b51e0]">({shortenAddress(address)})</span>
+              Key : Address{" "}
+              <span className="text-[#9b51e0]">
+                ({shortenAddress(address)})
+              </span>
             </p>
           </div>
 
@@ -89,7 +98,9 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
                 </div>
 
                 <div className="hidden lg:flex h-[42px] w-[20%] rounded-xl items-center justify-center bg-[#4A90E21F] border-[1px] border-[#6B6D6E] space-x-1">
-                  <h1 className="text-[#2D3A4B] text-[14px] leading-[21px] font-medium">All Filters</h1>
+                  <h1 className="text-[#2D3A4B] text-[14px] leading-[21px] font-medium">
+                    All Filters
+                  </h1>
                   <RiArrowDropDownLine className="h-[20px] w-[20px] text-[#2D3A4B]" />
                 </div>
               </div>
@@ -99,15 +110,19 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
 
         {/* Categories */}
         <div className="flex flex-wrap lg:flex-nowrap gap-3 my-5">
-          {["Filter", "Events", "Organization", "Certification", "Courses"].map((category, index) => (
-            <Button
-              key={index}
-              className="hidden lg:flex rounded-lg bg-[#4A90E21F] py-2 px-4 h-[42px] items-center w-[90px] text-sm text-[#2d3a4b]"
-            >
-              {category === "Filter" && <Image src={filter} alt="filter" className="mr-2" />}
-              <div className="text-[11px]">{category}</div>
-            </Button>
-          ))}
+          {["Filter", "Events", "Organization", "Certification", "Courses"].map(
+            (category, index) => (
+              <Button
+                key={index}
+                className="hidden lg:flex rounded-lg bg-[#4A90E21F] py-2 px-4 h-[42px] items-center w-[90px] text-sm text-[#2d3a4b]"
+              >
+                {category === "Filter" && (
+                  <Image src={filter} alt="filter" className="mr-2" />
+                )}
+                <div className="text-[11px]">{category}</div>
+              </Button>
+            ),
+          )}
         </div>
       </div>
 
@@ -125,7 +140,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ExploreResult
+export default ExploreResult;

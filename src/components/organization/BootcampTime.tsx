@@ -90,7 +90,7 @@ const BootcampTime: React.FC<timeProp> = (props) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default BootcampTime

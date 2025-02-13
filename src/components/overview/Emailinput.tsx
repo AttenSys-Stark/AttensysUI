@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 interface EmailInputProps {
   onEmailsChange: (emails: string[]) => void;
 }
 
 const Emailinput: React.FC<EmailInputProps> = ({ onEmailsChange }) => {
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>("");
   const [emails, setEmails] = useState<string[]>([]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' || e.key === ',') {
+    if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
       if (inputValue.trim() && validateEmail(inputValue.trim())) {
         const newEmails = [...emails, inputValue.trim()];
         setEmails(newEmails);
         onEmailsChange(newEmails);
-        setInputValue('');
+        setInputValue("");
       }
     }
   };

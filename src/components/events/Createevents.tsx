@@ -1,26 +1,26 @@
-import { Button } from "@headlessui/react"
-import React from "react"
-import ticket from "@/assets/ticket.svg"
-import Image from "next/image"
-import { createorexplore } from "@/state/connectedWalletStarknetkitNext"
-import { useAtom } from "jotai"
-import discover from "@/assets/discover.svg"
-import { useRouter } from "next/navigation"
+import { Button } from "@headlessui/react";
+import React from "react";
+import ticket from "@/assets/ticket.svg";
+import Image from "next/image";
+import { createorexplore } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
+import discover from "@/assets/discover.svg";
+import { useRouter } from "next/navigation";
 
 const Createevents = () => {
-  const [CreateorExplorestat] = useAtom(createorexplore)
-  const router = useRouter()
+  const [CreateorExplorestat] = useAtom(createorexplore);
+  const router = useRouter();
 
   const handlerouting = (
     event: React.MouseEvent<HTMLButtonElement | HTMLDivElement>,
   ) => {
-    event.preventDefault()
+    event.preventDefault();
     if (!CreateorExplorestat) {
-      router.push("/Events/createevent")
+      router.push("/Events/createevent");
     } else {
-      router.push("/Discoverevent")
+      router.push("/Discoverevent");
     }
-  }
+  };
 
   return (
     <div
@@ -53,7 +53,7 @@ const Createevents = () => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Createevents
+export default Createevents;

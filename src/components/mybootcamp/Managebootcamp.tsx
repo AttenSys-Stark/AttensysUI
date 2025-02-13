@@ -1,7 +1,7 @@
-import React from "react"
-import MybootcampTophero from "./MybootcampTophero"
-import BootcampDescription from "./BootcampDescription"
-import CourseOutline from "./CourseOutline"
+import React from "react";
+import MybootcampTophero from "./MybootcampTophero";
+import BootcampDescription from "./BootcampDescription";
+import CourseOutline from "./CourseOutline";
 
 const Managebootcamp = (props: any) => {
   return (
@@ -15,7 +15,7 @@ const Managebootcamp = (props: any) => {
       </div>
       <CourseOutline />
     </div>
-  )
-}
+  );
+};
 
-export default Managebootcamp
+export default Managebootcamp;

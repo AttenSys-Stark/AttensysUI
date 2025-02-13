@@ -1,7 +1,7 @@
-import React from "react"
-import { Button } from "@headlessui/react"
-import Image from "next/image"
-import Logo from "@/assets/Logo.svg"
+import React from "react";
+import { Button } from "@headlessui/react";
+import Image from "next/image";
+import Logo from "@/assets/Logo.svg";
 
 const Footer = () => {
   return (
@@ -86,7 +86,7 @@ const Footer = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

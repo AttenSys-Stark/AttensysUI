@@ -1,10 +1,10 @@
-"use client"
+"use client";
 // import { CheckIcon } from "@heroicons/react/20/solid"
 type Step = {
-  name: string
-  href: string
-  status: "complete" | "current" | "upcoming"
-}
+  name: string;
+  href: string;
+  status: "complete" | "current" | "upcoming";
+};
 
 const initialSteps: Step[] = [
   { name: "Step 1", href: "#", status: "current" },
@@ -12,30 +12,30 @@ const initialSteps: Step[] = [
   { name: "Step 3", href: "#", status: "upcoming" },
   { name: "Step 4", href: "#", status: "upcoming" },
   { name: "Step 5", href: "#", status: "upcoming" },
-]
+];
 
 function classNames(...classes: any) {
-  return classes.filter(Boolean).join(" ")
+  return classes.filter(Boolean).join(" ");
 }
 
 function updateStepsStatus(steps: Step[], step: number): Step[] {
   return steps.map((s, index) => {
     if (index <= step - 1) {
-      return { ...s, status: "complete" }
+      return { ...s, status: "complete" };
     } else if (index === step) {
-      return { ...s, status: "current" }
+      return { ...s, status: "current" };
     } else {
-      return { ...s, status: "upcoming" }
+      return { ...s, status: "upcoming" };
     }
-  })
+  });
 }
 
 type StepperProps = {
   currentStep: number;
-}
+};
 
 export default function Stepper({ currentStep }: StepperProps) {
-  const steps = updateStepsStatus(initialSteps, currentStep)
+  const steps = updateStepsStatus(initialSteps, currentStep);
   return (
     <nav aria-label="Progress">
       <ol role="list" className="flex items-center">
@@ -101,5 +101,5 @@ export default function Stepper({ currentStep }: StepperProps) {
         ))}
       </ol>
     </nav>
-  )
+  );
 }
