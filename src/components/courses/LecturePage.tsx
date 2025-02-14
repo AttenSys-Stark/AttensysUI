@@ -229,7 +229,7 @@ const LecturePage = (props: any) => {
           </div>
 
           {/* Comments */}
-          <div className="space-y-4 hidden xl:flex">
+          <div className="space-y-4 hidden xl:flex flex-col">
             <h1 className="text-[16px] font-bold text-[#2D3A4B] leading-[22px]">
               Leave a review
             </h1>
@@ -341,7 +341,7 @@ const LecturePage = (props: any) => {
             </div>
           </div>
 
-          <div>
+          <div className="block xl:hidden">
             <div className="border-b-[1px] border-b-[#949494] justify-center xl:mx-48 flex space-x-2 items-center h-[50px]">
               <IoIosStar color="#F6A61C" className="h-[20px] w-[20px]" />
               <p className="text-[20px] text-[#333333] font-semibold leading-[22px]">
@@ -350,7 +350,7 @@ const LecturePage = (props: any) => {
             </div>
 
             {/* comments */}
-            <div className="block xl:flex py-12 mx-12 sm:mx-48 items-center content-center justify-around text-sm">
+            <div className="block xl:hidden py-12 mx-12 sm:mx-48 items-center content-center justify-around text-sm">
               <div className="w-[100%] xl:w-[30%]">
                 <div className="flex items-center">
                   <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">
@@ -387,6 +387,53 @@ const LecturePage = (props: any) => {
                   every chapter. Concise and easy to understand, very useful to
                   apply to any Web design journey!
                 </p>
+              </div>
+            </div>
+
+            <div className="flex xl:hidden flex-col">
+              <p className="mt-8 font-semibold">Leave a review</p>
+              <div className=" w-[100%] gap-6 bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide p-4 flex flex-col ">
+                <div className="flex items-center w-full space-x-3">
+                  <Image src={profile_pic} alt="pic" width={48} />
+                  <div className="space-y-1">
+                    <h4 className="text-[16px] text-[#333333] leading-[22px] font-semibold">
+                      0xRavenclaw
+                    </h4>
+                    <p className="text-[#9b51e0] text-[12px] font-medium leading-[14px]">
+                      0x5c956e61...de5232dc11
+                    </p>
+                  </div>
+                </div>
+                <div className="h-full w-full space-x-3 flex items-center">
+                  <h1 className="text-[14px] text-[#333333] leading-[16px] font-medium">
+                    Tap to rate:
+                  </h1>
+                  <StarRating totalStars={5} starnumber={0} />
+                </div>
+                <div className="h-full w-full flex items-center space-x-3">
+                  <StarRating totalStars={5} starnumber={4} />
+                  <h1 className="text-[14px] text-[#333333] leading-[16px] font-medium">
+                    <span className="text-[#A01B9B]">1,245</span> students
+                  </h1>
+                </div>
+                <div className="flex flex-col gap-5">
+                  {/* input and button */}
+                  <input
+                    type="text"
+                    placeholder="What do you think about this course?"
+                    className="w-full h-[45px] border shadow-dm p-6 rounded-xl text-[14px] font-medium leading-[16px]"
+                  />
+                  <Button
+                    size="md"
+                    variant="text"
+                    className="bg-[#9b51e0] text-white w-fit"
+                    placeholder={undefined}
+                    onPointerEnterCapture={undefined}
+                    onPointerLeaveCapture={undefined}
+                  >
+                    Send review
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
