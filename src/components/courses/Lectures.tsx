@@ -37,7 +37,7 @@ const Lectures = ({ lectures }: LectureData) => {
         ))}
       </div>
 
-      <div className="mt-12 hidden lg:block">
+      <div className="mt-12 hidden xl:block">
         <div className="  text-[#333333] text-[14px] font-light leading-[22px]">
           <p>
             {`  This course provides a foundational understanding of web
