@@ -273,7 +273,7 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <div className="mx-12 lg:mx-48 sm:mt-4 xl:mt-32 mt-96 mb-10">
+      <div className="px-6 lg:mx-48 sm:mt-4 xl:mt-32 mb-10">
         <Lectures lectures={lectures} />
       </div>
 
