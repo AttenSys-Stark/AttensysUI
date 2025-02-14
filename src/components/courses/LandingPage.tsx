@@ -89,13 +89,13 @@ const LandingPage = () => {
             </div>
 
             {/* rating and num of students */}
-            <div className="flex  items-center mb-3 space-x-16">
+            <div className="flex items-center justify-center mb-3 space-x-16">
               <div className="flex items-center space-x-3">
                 <StarRating totalStars={5} starnumber={4} />
-                <p className="font-bold text-black sm:text-white">(281)</p>
+                <p className="font-bold text-black xl:text-white">(281)</p>
               </div>
 
-              <div className="flex space-x-2 items-center text-black sm:text-white">
+              <div className="flex space-x-2 items-center text-black xl:text-white">
                 <HiOutlineCheckBadge
                   color="#fff"
                   className="h-[22px] w-[20px]"
@@ -103,7 +103,6 @@ const LandingPage = () => {
                 <p className="font-bold">291 certification</p>
               </div>
             </div>
-
             {/* creator and last update */}
             <div className="flex space-x-14 sm:flex sm:text-center mt-12 mb-4">
               <div className="">
