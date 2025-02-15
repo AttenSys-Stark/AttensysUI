@@ -42,17 +42,17 @@ const LandingPage = () => {
   return (
     <div className="pb-14 bg-[#F5F8FA]">
       <div
-        className={`bg-[url('/hero_asset.png')] text-white lg:h-[322px] px-12 sm:px-28 py-16 from-orange-400 via-red-500 to-pink-500 sm:h-64  `}
+        className={`bg-[url('/hero_asset.png')] text-white xl:h-[322px] px-12 xl:px-28 py-16 from-orange-400 via-red-500 to-pink-500 sm:h-96  `}
       >
-        <div className="block sm:grid grid-cols-2 gap-4 sm:mx-20">
+        <div className="flex justify-center xl:grid xl:grid-cols-2 gap-4 sm:mx-20">
           {/* Course Image */}
-          <div className="col-2 text-sm">
+          <div className="text-sm">
             <p className="font-bold mb-2">Technology | Web development</p>
             <Image src={video} alt="hero" />
           </div>
 
           {/* Course information */}
-          <div className="text-sm">
+          <div className="text-sm hidden xl:block">
             {/* field */}
             <div className="">
               <button
@@ -66,7 +66,7 @@ const LandingPage = () => {
             </div>
 
             <h4
-              className="text-[39px] leading-[39px] w-[393px] h-[78px] my-5 font-bold text-black sm:text-white cursor-pointer"
+              className="text-[39px] leading-[39px] w-[393px] h-[78px] my-5 font-bold text-black xl:text-white cursor-pointer"
               onClick={(e) =>
                 handleCourse(e, e.currentTarget.textContent, router)
               }
@@ -75,7 +75,7 @@ const LandingPage = () => {
             </h4>
 
             <div className="flex">
-              <div className="bg-[#5801A9] py-2 text-white w-[200px] mb-4 text-center Sm:w-[50%] rounded-lg">
+              <div className="bg-[#5801A9] py-2 text-white w-[200px] mb-4 text-center Sm:w-[50%] rounded-xl">
                 <p className="text-[14px] font-extrabold leading-[22px]">
                   Tech Innovators Academy
                 </p>
@@ -89,13 +89,13 @@ const LandingPage = () => {
             </div>
 
             {/* rating and num of students */}
-            <div className="flex  items-center mb-3 space-x-16">
+            <div className="flex items-center justify-center mb-3 space-x-16">
               <div className="flex items-center space-x-3">
                 <StarRating totalStars={5} starnumber={4} />
-                <p className="font-bold text-black sm:text-white">(281)</p>
+                <p className="font-bold text-black xl:text-white">(281)</p>
               </div>
 
-              <div className="flex space-x-2 items-center text-black sm:text-white">
+              <div className="flex space-x-2 items-center text-black xl:text-white">
                 <HiOutlineCheckBadge
                   color="#fff"
                   className="h-[22px] w-[20px]"
@@ -103,7 +103,6 @@ const LandingPage = () => {
                 <p className="font-bold">291 certification</p>
               </div>
             </div>
-
             {/* creator and last update */}
             <div className="flex space-x-14 sm:flex sm:text-center mt-12 mb-4">
               <div className="">
@@ -148,7 +147,133 @@ const LandingPage = () => {
         </div>
       </div>
 
-      <div className="mx-12 sm:mx-48 sm:mt-32 mt-96 mb-10">
+      {/* Course information */}
+      <div className="text-sm block xl:hidden p-4">
+        {/* field */}
+        <div className="">
+          <button
+            onClick={(e) =>
+              handleCourse(e, e.currentTarget.textContent, router)
+            }
+            className="hidden xl:block bg-[#fff] px-7 py-2 rounded text-[#333333] font-bold"
+          >
+            Get course
+          </button>
+        </div>
+
+        <h4
+          className="text-[39px] leading-[39px] w-[393px] h-[78px] my-5 font-bold text-black xl:text-white cursor-pointer"
+          onClick={(e) => handleCourse(e, e.currentTarget.textContent, router)}
+        >
+          Introduction to Web Development
+        </h4>
+
+        <div className="flex">
+          <div className="bg-[#5801A9] py-2 text-white w-[200px] mb-4 text-center Sm:w-[50%] rounded-xl ">
+            <p className="text-[14px] font-extrabold leading-[22px]">
+              Tech Innovators Academy
+            </p>
+          </div>
+
+          <div className="ml-4 xl:ml-0 ">
+            <button className="sm:hidden block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold">
+              Get course
+            </button>
+          </div>
+        </div>
+
+        {/* rating and num of students */}
+        <div className="flex flex-col xl:flex-row  xl:items-center mb-3 space-x-16">
+          <div className="flex items-center space-x-3">
+            <StarRating totalStars={5} starnumber={4} />
+            <p className="font-bold text-black xl:text-white">(281)</p>
+          </div>
+
+          <div className="flex items-center space-x-3 text-black xl:text-white">
+            <HiOutlineCheckBadge color="#333" className="h-[22px] w-[20px]" />
+            <p className="font-bold">291 certification</p>
+          </div>
+        </div>
+
+        {/* creator and last update */}
+        <div className="flex flex-col xl:flex-row items-start space-x-0 xl:space-x-14 sm:flex sm:text-center mt-12">
+          <div>
+            <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+              Created by <span className="underline">Akinbola Kehinde</span>
+            </p>
+          </div>
+
+          <div className="flex ml-0 xl:ml-5 items-center space-x-1">
+            <GiBackwardTime />
+            <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+              Last updated 10|10|24
+            </p>
+          </div>
+        </div>
+
+        {/* video prop */}
+        <div className="flex flex-col xl:flex-row items-start xl:space-x-10 mb-4">
+          <div className="flex my-1 space-x-2 items-center">
+            <FaPlay className="h-[14px] w-[14px] text-[#5801A9]" />
+            <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+              Total play time: 2 hrs 35 mins
+            </p>
+          </div>
+          <div className="flex mt-2 xl:mt-0 xl:ml-5 space-x-2 items-center">
+            <GrDiamond color="#2D3A4B" className="h-[14px] w-[14px]" />
+            <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+              Difficulty level: Elementary
+            </p>
+          </div>
+        </div>
+
+        <div className="flex space-x-2 items-center mb-4">
+          <div>
+            <LuBadgeCheck className="h-[14px] w-[14px] text-[#5801A9]" />
+          </div>
+          <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+            Certificate of Completion
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-12 block px-4 xl:hidden">
+        <div className="  text-[#333333] text-[14px] font-light leading-[22px]">
+          <p>
+            {`  This course provides a foundational understanding of web
+            development. You'll learn essential skills in HTML and CSS, enabling
+            you to create and style your own web pages. No prior experience is
+            necessary!`}
+          </p>
+        </div>
+
+        <div className="py-5">
+          <h4 className="font-semibold text-[14px] text-[#333333] leading-[22px]">
+            Student Requirements
+          </h4>
+
+          <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
+            <li>A computer with internet access</li>
+            <li>Basic computer skills</li>
+            <li>Willingness to learn and experiment</li>
+          </ul>
+        </div>
+
+        <div className="py-5">
+          <h4 className="font-semibold text-[14px] text-[#333333] leading-[22px]">
+            {" "}
+            Target Audience
+          </h4>
+
+          <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
+            <li>Beginners interested in web development</li>
+            <li>Aspiring web developers looking to start their journey</li>
+            <li>Anyone wanting to create their own websites</li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="px-6 lg:mx-48 sm:mt-4 xl:mt-32 mb-10">
         <Lectures lectures={lectures} />
       </div>
 
@@ -162,8 +287,8 @@ const LandingPage = () => {
         </div>
 
         {/* comments */}
-        <div className="block sm:flex py-12 mx-12 sm:mx-48 items-center content-center justify-around text-sm">
-          <div className="w-[100%] sm:w-[30%]">
+        <div className="block xl:flex py-12 mx-12 sm:mx-48 items-center content-center justify-around text-sm">
+          <div className="w-[100%] xl:w-[30%]">
             <div className="flex items-center">
               <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">OM</p>
               <div className="ml-6 space-y-2">
@@ -179,9 +304,9 @@ const LandingPage = () => {
             </p>
           </div>
 
-          <div className="border-[1px] border-[#B8B9BA] h-28 hidden sm:block"></div>
+          <div className="border-[1px] border-[#B8B9BA] h-28 hidden xl:block"></div>
 
-          <div className="w-[100%] sm:w-[30%]">
+          <div className="w-[100%] xl:w-[30%] mt-8 xl:mt-0">
             <div className="flex items-center">
               <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">OM</p>
               <div className="ml-6 space-y-2">

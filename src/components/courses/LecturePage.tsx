@@ -71,16 +71,16 @@ const LecturePage = (props: any) => {
 
       {/* ReactPlayer & lecture*/}
       <div className="w-[100%] mx-auto flex justify-between items-center px-12 mt-5">
-        <div className="w-[67%] h-[543px] rounded-xl overflow-hidden">
+        <div className="w-full xl:w-[67%] xl:h-[543px] h-auto aspect-video sm:aspect-[16/9] md:aspect-[16/8] lg:aspect-[16/7] rounded-xl overflow-hidden">
           <ReactPlayer
             url="https://www.youtube.com/watch?v=lEF4ccMlQB8"
-            width="100%" // Ensures the player takes up full width
-            height="543px"
+            width="100%"
+            height="100%"
             className="rounded-xl"
           />
         </div>
 
-        <div className="w-[30%] h-[543px] space-y-4">
+        <div className="hidden xl:block w-[30%] h-[543px] space-y-4">
           <div className="flex space-x-2  justify-center bg-gradient-to-r from-[#5801a9] to-[#4a90e2] text-white items-center text-sm py-3 px-7 rounded-xl">
             <HiBadgeCheck color="#fff" />
             <p>Attensys Certified Course</p>
@@ -121,18 +121,21 @@ const LecturePage = (props: any) => {
       </div>
 
       <div className="w-[100%] mx-auto flex justify-between items-center px-12 mt-5">
-        <div className="w-[67%] space-y-3">
+        <div
+          className="w-full 
+        xl:w-[67%] space-y-3"
+        >
           <div className="flex space-x-14">
             <h1 className="font-bold text-[24px] text-[#2D3A4B] leading-[31px]">
               Introduction to Web Development
             </h1>
-            <div className="flex sm:ml-5 space-x-2 items-center">
+            <div className="hidden xl:flex sm:ml-5 space-x-2 items-center">
               <GrDiamond color="#2D3A4B" className="h-[20px] w-[20px]" />
               <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
                 Difficulty level: Elementary
               </p>
             </div>
-            <div className="flex space-x-2 items-center">
+            <div className="hidden xl:flex space-x-2 items-center">
               <div>
                 <LuBadgeCheck className="h-[20px] w-[20px] text-[#5801A9]" />
               </div>
@@ -149,14 +152,14 @@ const LecturePage = (props: any) => {
           </div>
         </div>
 
-        <div className="bg-[url('/hero_asset.png')] text-white p-10 rounded-xl w-[30%] flex items-center justify-center h-[85px]">
+        <div className="bg-[url('/hero_asset.png')] text-white p-10 rounded-xl w-[30%] hidden xl:flex items-center justify-center h-[85px]">
           <Image src={attensys_logo} alt="logo" />
         </div>
       </div>
 
-      <div className="w-[100%] mx-auto flex justify-between px-12 mt-5">
-        <div className="w-[67%] h-auto space-y-12">
-          <div className="h-auto w-full rounded-xl bg-[#FFFFFF] border-[1px] border-[#D9D9D9] p-10">
+      <div className="w-[100%] mx-auto flex justify-between px-6 xl:px-12 mt-5">
+        <div className="w-full xl:w-[67%] h-auto space-y-12">
+          <div className="h-auto w-full rounded-xl xl:bg-[#FFFFFF] xl:border-[1px] xl:border-[#D9D9D9] xl:p-10">
             <div className="pb-4">
               <p className="font-bold py-2 text-[14px] text-[#333333] leading-[22px]">
                 About this course
@@ -192,7 +195,41 @@ const LecturePage = (props: any) => {
             </div>
           </div>
 
-          <div className="space-y-4">
+          {/* Lectures */}
+          <div className="flex xl:hidden flex-col">
+            <p className="mt-8 font-semibold">Lectures(4)</p>
+            <div className=" w-[100%] bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide">
+              {lectures.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex w-full space-y-1 items-center p-3 space-x-6 justify-center"
+                >
+                  <p className="font-bold text-[#5801a9]">{i + 1}</p>
+                  <div className="w-[131px] h-[84px] rounded-xl">
+                    <Image
+                      src={item.img}
+                      alt={item.title}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
+                      {item.title}
+                    </p>
+                    <h1 className="text-[8px] text-[#333333] leading-[14px] font-medium">
+                      Creator address
+                    </h1>
+                    <div className="rounded-lg bg-[#9B51E052] w-[40%] flex items-center justify-center">
+                      <p className="text-xs px-4 py-1">{item.timing}: 01</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Comments */}
+          <div className="space-y-4 hidden xl:flex flex-col">
             <h1 className="text-[16px] font-bold text-[#2D3A4B] leading-[22px]">
               Leave a review
             </h1>
@@ -263,7 +300,7 @@ const LecturePage = (props: any) => {
                   </p>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-6 w-full">
                   <div className="flex space-x-3 items-center">
                     <div className="h-[64px] w-[64px] bg-[#9B51E01A] text-[20px] text-[#101928] leading-[24px] rounded-full flex items-center justify-center">
                       OM
@@ -303,8 +340,105 @@ const LecturePage = (props: any) => {
               </div>
             </div>
           </div>
+
+          <div className="block xl:hidden">
+            <div className="border-b-[1px] border-b-[#949494] justify-center xl:mx-48 flex space-x-2 items-center h-[50px]">
+              <IoIosStar color="#F6A61C" className="h-[20px] w-[20px]" />
+              <p className="text-[20px] text-[#333333] font-semibold leading-[22px]">
+                4.9 Rating | (281 reviews)
+              </p>
+            </div>
+
+            {/* comments */}
+            <div className="block xl:hidden py-12 mx-12 sm:mx-48 items-center content-center justify-around text-sm">
+              <div className="w-[100%] xl:w-[30%]">
+                <div className="flex items-center">
+                  <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">
+                    OM
+                  </p>
+                  <div className="ml-6 space-y-2">
+                    <p>Olivia. M</p>
+                    <StarRating totalStars={5} starnumber={4} />
+                  </div>
+                </div>
+
+                <p className="mt-6 text-[14px] font-medium text-[#333333] leading-[22px]">
+                  Halfway through the course and lots of information given in
+                  every chapter. Concise and easy to understand, very useful to
+                  apply to any Web design journey!
+                </p>
+              </div>
+
+              <div className="border-[1px] border-[#B8B9BA] h-28 hidden xl:block"></div>
+
+              <div className="w-[100%] xl:w-[30%] mt-8 xl:mt-0">
+                <div className="flex items-center">
+                  <p className="p-5 bg-[#9b51e01a] font-bold rounded-full">
+                    OM
+                  </p>
+                  <div className="ml-6 space-y-2">
+                    <p>Olivia. M</p>
+                    <StarRating totalStars={5} starnumber={4} />
+                  </div>
+                </div>
+
+                <p className="mt-6 text-[14px] font-medium text-[#333333] leading-[22px]">
+                  Halfway through the course and lots of information given in
+                  every chapter. Concise and easy to understand, very useful to
+                  apply to any Web design journey!
+                </p>
+              </div>
+            </div>
+
+            <div className="flex xl:hidden flex-col">
+              <p className="mt-8 font-semibold">Leave a review</p>
+              <div className=" w-[100%] gap-6 bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide p-4 flex flex-col ">
+                <div className="flex items-center w-full space-x-3">
+                  <Image src={profile_pic} alt="pic" width={48} />
+                  <div className="space-y-1">
+                    <h4 className="text-[16px] text-[#333333] leading-[22px] font-semibold">
+                      0xRavenclaw
+                    </h4>
+                    <p className="text-[#9b51e0] text-[12px] font-medium leading-[14px]">
+                      0x5c956e61...de5232dc11
+                    </p>
+                  </div>
+                </div>
+                <div className="h-full w-full space-x-3 flex items-center">
+                  <h1 className="text-[14px] text-[#333333] leading-[16px] font-medium">
+                    Tap to rate:
+                  </h1>
+                  <StarRating totalStars={5} starnumber={0} />
+                </div>
+                <div className="h-full w-full flex items-center space-x-3">
+                  <StarRating totalStars={5} starnumber={4} />
+                  <h1 className="text-[14px] text-[#333333] leading-[16px] font-medium">
+                    <span className="text-[#A01B9B]">1,245</span> students
+                  </h1>
+                </div>
+                <div className="flex flex-col gap-5">
+                  {/* input and button */}
+                  <input
+                    type="text"
+                    placeholder="What do you think about this course?"
+                    className="w-full h-[45px] border shadow-dm p-6 rounded-xl text-[14px] font-medium leading-[16px]"
+                  />
+                  <Button
+                    size="md"
+                    variant="text"
+                    className="bg-[#9b51e0] text-white w-fit"
+                    placeholder={undefined}
+                    onPointerEnterCapture={undefined}
+                    onPointerLeaveCapture={undefined}
+                  >
+                    Send review
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="w-[30%] h-[1020px]">
+        <div className="hidden xl:block w-[30%] h-[1020px]">
           <h1>Courses you might like</h1>
           <div className="space-y-10">
             <CardWithLink />
