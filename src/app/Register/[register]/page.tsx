@@ -1,21 +1,14 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
 import { useRouter } from "next/router";
 import { useParams } from "next/navigation";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
-  connectorAtom,
-  connectorDataAtom,
-  walletStarknetkitNextAtom,
 } from "@/state/connectedWalletStarknetkitNext";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
-import { RESET } from "jotai/utils";
-import { connect, disconnect } from "starknetkit";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import RegisterLanding from "@/components/register/RegisterLanding";
 
 const Index = () => {
@@ -25,47 +18,6 @@ const Index = () => {
   );
   const params = useParams();
   const regbootcampname = params.register;
-
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
-  const setConnectorData = useSetAtom(connectorDataAtom);
-  const setConnector = useSetAtom(connectorAtom);
-
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
-
-  useEffect(() => {
-    /* setWalletLatest(RESET) */
-    setWalletNext(RESET);
-    setConnectorData(RESET);
-    setConnector(RESET);
-  }, []);
-
-  useEffect(() => {
-    const autoConnect = async () => {
-      try {
-        const { wallet: connectedWallet } = await connect({
-          //@ts-ignore
-          provider,
-          modalMode: "neverAsk",
-          webWalletUrl: ARGENT_WEBWALLET_URL,
-          argentMobileOptions: {
-            dappName: "Attensys",
-            url: window.location.hostname,
-            chainId: CHAIN_ID,
-            icons: [],
-          },
-        });
-        setWallet(connectedWallet);
-      } catch (e) {
-        console.error(e);
-        alert((e as any).message);
-      }
-    };
-
-    if (!wallet) {
-      autoConnect();
-    }
-  }, [wallet]);
 
   const handlePageClick = () => {
     setbootcampdropstat(false);

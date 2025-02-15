@@ -15,13 +15,13 @@ import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 
 const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
 
 const Bootcampdropdown = () => {
   const [bootcampdropstat] = useAtom(bootcampdropdownstatus);
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [isreg, setisRegistered] = useAtom(isRegisteredatom);
   const [orgname, setOrgname] = useAtom(orgnameatom);
   const router = useRouter();
@@ -31,15 +31,15 @@ const Bootcampdropdown = () => {
   // }
 
   const getOrgInfo = async () => {
-    let org_info = await orgContract?.get_org_info(
+    const org_info = await orgContract?.get_org_info(
       wallet?.selectedAddress ?? "0x0",
     );
-    console.log(org_info);
+    console.info(org_info);
 
     if (org_info?.org_name != "") {
       setisRegistered(true);
       setOrgname(org_info.org_name);
-      console.log(org_info.org_name);
+      console.info(org_info.org_name);
     } else {
       setisRegistered(false);
     }
@@ -59,8 +59,8 @@ const Bootcampdropdown = () => {
         <div className=" bg-[#FFFFFF] h-[157px] w-[100%] absolute z-50 shadow-2xl">
           <div className="flex justify-between mx-auto w-[80%] h-[90%] items-center">
             <div className="space-y-4 w-[337px] text-[16px]">
-              <a href="/Bootcamps" className=" cursor-pointer">
-                <div className="flex space-x-3  my-3">
+              <a href="/Bootcamps" className="cursor-pointer ">
+                <div className="flex my-3 space-x-3">
                   <Image src={bootsearch} alt="search" />
 
                   <h1 className="text-[16px] font-bold cursor-pointer">

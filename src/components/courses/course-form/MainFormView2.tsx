@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
-import Dropdown from "../Dropdown";
 import CourseSideBar from "./SideBar";
 import { handleCreateCourse } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
@@ -8,6 +7,56 @@ import Stepper from "@/components/Stepper";
 
 const MainFormView2 = () => {
   const router = useRouter();
+  const [requirements, setRequirements] = useState<string[]>([]);
+  const [requirementInput, setRequirementInput] = useState("");
+  const [learningObjectives, setLearningObjectives] = useState("");
+  const [targetAudience, setTargetAudience] = useState("");
+  const [requirementsError, setRequirementsError] = useState("");
+  const [learningObjectivesError, setLearningObjectivesError] = useState("");
+  const [targetAudienceError, setTargetAudienceError] = useState("");
+
+  const handleAddRequirement = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (requirementInput.trim()) {
+      setRequirements([...requirements, requirementInput.trim()]);
+      setRequirementInput("");
+      setRequirementsError("");
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Reset errors
+    setRequirementsError("");
+    setLearningObjectivesError("");
+    setTargetAudienceError("");
+
+    let hasError = false;
+
+    // Validate requirements
+    if (requirements.length === 0) {
+      setRequirementsError("At least one student requirement is required");
+      hasError = true;
+    }
+
+    // Validate learning objectives
+    if (!learningObjectives.trim()) {
+      setLearningObjectivesError("Learning objectives are required");
+      hasError = true;
+    }
+
+    // Validate target audience
+    if (!targetAudience.trim()) {
+      setTargetAudienceError("Target audience description is required");
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    // Proceed to next step
+    handleCreateCourse(e, "courseSetup3", router);
+  };
 
   return (
     <div className="flex">
@@ -46,7 +95,7 @@ const MainFormView2 = () => {
           </div>
 
           <div className="mx-6 sm:ml-24 mt-12">
-            <form action="CourseSetup3">
+            <form onSubmit={handleSubmit}>
               <div className="my-12">
                 <label
                   htmlFor=""
@@ -62,10 +111,30 @@ const MainFormView2 = () => {
                     type="input"
                     className="w-auto sm:w-[70%] h-[55px] py-2 px-6 border border-gray-300 rounded md:rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
                     placeholder="e.g A laptop."
+                    value={requirementInput}
+                    onChange={(e) => {
+                      setRequirementInput(e.target.value);
+                      setRequirementsError("");
+                    }}
                   />
-                  <button className="rounded md:rounded-[6px] py-2 px-4 h-[41px] md:h-[55px] min-w-max font-normal min-w-[119px] md:min-w-fit text-[#2D3A4B] leading-[21px] border-2 p-1 ml-2 md:ml-5 text-[13px] sm:text-base bg-white">
+                  <button
+                    onClick={handleAddRequirement}
+                    className="rounded md:rounded-[6px] py-2 px-4 h-[41px] md:h-[55px] min-w-max font-normal min-w-[119px] md:min-w-fit text-[#2D3A4B] leading-[21px] border-2 p-1 ml-2 md:ml-5 text-[13px] sm:text-base bg-white"
+                  >
                     <span className="text-xl leading-none">+</span> Add Item
                   </button>
+                </div>
+                {requirementsError && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {requirementsError}
+                  </p>
+                )}
+                <div className="mt-2">
+                  {requirements.map((req, index) => (
+                    <div key={index} className="bg-gray-100 p-2 rounded mb-2">
+                      {req}
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -81,12 +150,19 @@ const MainFormView2 = () => {
                   <textarea
                     id="message"
                     className="block px-6 pb-64 py-3 w-full md:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder={`E.g When this course is done, students will :
-
-Understand fundamental concepts in [Subject/Field]
-Create and implement strategies for [Specific Outcome]`}
+                    placeholder={`E.g When this course is done, students will :`}
+                    value={learningObjectives}
+                    onChange={(e) => {
+                      setLearningObjectives(e.target.value);
+                      setLearningObjectivesError("");
+                    }}
                   ></textarea>
                 </div>
+                {learningObjectivesError && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {learningObjectivesError}
+                  </p>
+                )}
               </div>
 
               <div className="my-12">
@@ -100,12 +176,19 @@ Create and implement strategies for [Specific Outcome]`}
                   <textarea
                     id="message"
                     className="block px-6 pb-64 py-3 w-full md:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder={`Example:
-This course is ideal for:
-Beginners with no prior experience in [Subject/Field].
-Professionals looking to enhance their skills in [Specific Area].`}
+                    placeholder={`Example:`}
+                    value={targetAudience}
+                    onChange={(e) => {
+                      setTargetAudience(e.target.value);
+                      setTargetAudienceError("");
+                    }}
                   ></textarea>
                 </div>
+                {targetAudienceError && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {targetAudienceError}
+                  </p>
+                )}
               </div>
 
               <div className="my-12 w-full">
@@ -113,9 +196,6 @@ Professionals looking to enhance their skills in [Specific Area].`}
                   <button
                     className="bg-[#4A90E2] px-28 sm:px-48 py-3 rounded-xl text-white w-full md:max-w-[350px]"
                     type="submit"
-                    onClick={(e) =>
-                      handleCreateCourse(e, "courseSetup3", router)
-                    }
                   >
                     Next
                   </button>

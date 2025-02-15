@@ -30,8 +30,8 @@ const DashboardTab = (props: any) => {
   const router = useRouter();
 
   const handleAddclass = () => {
-    setAddclass((prev) => ({ ...prev, modalstatus: true }))
-  }
+    setAddclass((prev) => ({ ...prev, modalstatus: true }));
+  };
 
   const handleinsightclick = () => {
     setOutlineClickstat(true);

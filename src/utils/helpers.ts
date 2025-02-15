@@ -58,7 +58,7 @@ export const handleMyCourseSubComp = (
 };
 
 export const handleCreateCourse = (
-  event: React.MouseEvent<HTMLButtonElement | HTMLDivElement | HTMLFormElement>,
+  event: React.FormEvent<HTMLButtonElement | HTMLDivElement | HTMLFormElement>,
   section: any,
   router: any,
 ) => {

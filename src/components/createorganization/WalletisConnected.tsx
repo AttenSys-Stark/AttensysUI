@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import add from "@/assets/add.svg";
 import TrueFocus from "./TrueFocus";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import {
   walletStarknetkitNextAtom,
   organzationInitState,
@@ -18,7 +18,7 @@ import { useAtom } from "jotai";
 const WalletisConnected = () => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [organizationData, setOrganizationData] = useAtom(organzationInitState);
 
   // console.dir(organizationData, {depth : null})

@@ -5,7 +5,7 @@ import Organizationtabs from "./Organizationtabs";
 import Create from "./Create";
 import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
@@ -18,7 +18,7 @@ const Organizationlanding = (prop: any) => {
   const [createOverlayStat] = useAtom(createbootcampoverlay);
   const [orgHeight, setOrgHeight] = useState<number | null>(null); // State to store the height
   const landingRef = useRef<HTMLDivElement>(null); // Ref for OrganizationLanding
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [logoImagesource, setLogoImage] = useState<string | null>(null);
   const [bannerImagesource, setBannerImage] = useState<string | null>(null);
   const [organizationName, setOrgName] = useState<string | null>(null);
@@ -41,7 +41,7 @@ const Organizationlanding = (prop: any) => {
     try {
       const data = await pinata.gateways.get(CID);
       //@ts-ignore
-      console.log(data?.data);
+      console.info(data?.data);
       //@ts-ignore
       const logoData: GetCIDResponse = await pinata.gateways.get(
         //@ts-ignore
@@ -77,18 +77,18 @@ const Organizationlanding = (prop: any) => {
   };
 
   const getOrgInfo = async () => {
-    let org_info = await orgContract?.get_org_info(wallet?.selectedAddress);
+    const org_info = await orgContract?.get_org_info(wallet?.selectedAddress);
     setNumberofClasses(Number(org_info.number_of_all_classes));
     setNumberofTutors(Number(org_info.number_of_instructors));
     setStudentNumber(Number(org_info.number_of_students));
     setBootcampNumber(Number(org_info.number_of_all_bootcamps));
-    console.log(org_info);
+    console.info(org_info);
     const ipfsdata = getPubIpfs(org_info.org_ipfs_uri);
-    console.log(ipfsdata);
+    console.info(ipfsdata);
   };
 
   const getAllOrgBootcamp = async () => {
-    let org_boot_camp_info = await orgContract?.get_all_org_bootcamps(
+    const org_boot_camp_info = await orgContract?.get_all_org_bootcamps(
       wallet?.selectedAddress,
     );
     setBootcampdataInfo(org_boot_camp_info);

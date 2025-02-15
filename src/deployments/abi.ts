@@ -89,6 +89,10 @@ export const attensysCourseAbi = [
         name: "uri",
         type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::Uri",
       },
+      {
+        name: "course_ipfs_uri",
+        type: "core::byte_array::ByteArray",
+      },
     ],
   },
   {
@@ -131,6 +135,10 @@ export const attensysCourseAbi = [
       },
       {
         name: "symbol",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "course_ipfs_uri",
         type: "core::byte_array::ByteArray",
       },
     ],
@@ -391,6 +399,11 @@ export const attensysCourseAbi = [
       },
       {
         name: "symbol",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "course_ipfs_uri",
         type: "core::byte_array::ByteArray",
         kind: "data",
       },
@@ -1288,10 +1301,6 @@ export const attensysOrgAbi = [
         type: "core::starknet::contract_address::ContractAddress",
       },
       {
-        name: "instructor_",
-        type: "core::starknet::contract_address::ContractAddress",
-      },
-      {
         name: "bootcamp_id",
         type: "core::integer::u64",
       },
@@ -1860,11 +1869,6 @@ export const attensysOrgAbi = [
     members: [
       {
         name: "org_address",
-        type: "core::starknet::contract_address::ContractAddress",
-        kind: "data",
-      },
-      {
-        name: "instructor_address",
         type: "core::starknet::contract_address::ContractAddress",
         kind: "data",
       },

@@ -6,15 +6,10 @@ import {
   coursestatusAtom,
   bootcampdropdownstatus,
   connectorAtom,
-  connectorDataAtom,
-  walletStarknetkitNextAtom,
 } from "@/state/connectedWalletStarknetkitNext";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
-import { RESET } from "jotai/utils";
-import { connect, disconnect } from "starknetkit";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import Basicinfo from "@/components/createorganization/Basicinfo";
 import Walletinfo from "@/components/createorganization/Walletinfo";
 import Admininfo from "@/components/createorganization/Admininfo";
@@ -32,53 +27,13 @@ const Index = () => {
   const router = useRouter();
   const params = useParams();
   const section = params.info;
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
-  const setConnectorData = useSetAtom(connectorDataAtom);
-  const setConnector = useSetAtom(connectorAtom);
 
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet] = useAtom(walletStarknetkit);
+  const [connector] = useAtom(connectorAtom);
 
-  const [connectorDataAccount, setConnectorDataAccount] = useState<
-    null | any
-  >();
-
-  useEffect(() => {
-    /* setWalletLatest(RESET) */
-    setWalletNext(RESET);
-    setConnectorData(RESET);
-    setConnector(RESET);
-  }, []);
-
-  useEffect(() => {
-    const autoConnect = async () => {
-      try {
-        const { wallet: connectedWallet, connector } = await connect({
-          //@ts-ignore
-          provider,
-          modalMode: "neverAsk",
-          webWalletUrl: ARGENT_WEBWALLET_URL,
-          argentMobileOptions: {
-            dappName: "Attensys",
-            url: window.location.hostname,
-            chainId: CHAIN_ID,
-            icons: [],
-          },
-        });
-
-        // console.log(connector.wallet.account )
-        setConnectorDataAccount(connector.wallet.account);
-        setWallet(connectedWallet);
-      } catch (e) {
-        console.error(e);
-        alert((e as any).message);
-      }
-    };
-
-    if (!wallet) {
-      autoConnect();
-    }
-  }, [wallet]);
+  const [connectorDataAccount] = useState<null | any>(
+    connector?.wallet.account,
+  );
 
   const handlePageClick = () => {
     setbootcampdropstat(false);
@@ -155,13 +110,13 @@ const Index = () => {
       case "wallet-info":
         return (
           <>
-            <div className="w-full px-4 sm:px-6 flex flex-col items-center space-y-4 sm:space-y-6">
+            <div className="flex flex-col items-center w-full px-4 space-y-4 sm:px-6 sm:space-y-6">
               <h1 className="text-[16px] sm:text-[18px] font-bold text-[#5801A9] leading-[20px] sm:leading-[22px] text-center">
                 Great Job!!, you&apos;re almost there
               </h1>
 
               {/* Desktop Progress Stepper - Hidden on mobile */}
-              <div className="hidden sm:flex space-x-4 justify-center items-center">
+              <div className="items-center justify-center hidden space-x-4 sm:flex">
                 <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[38px] w-[38px] flex items-center justify-center">
                   1
                 </div>
@@ -212,7 +167,7 @@ const Index = () => {
       case "admin-info":
         return (
           <>
-            <div className="w-full px-4 sm:px-6 flex flex-col items-center space-y-6 sm:space-y-8">
+            <div className="flex flex-col items-center w-full px-4 space-y-6 sm:px-6 sm:space-y-8">
               <h1 className="text-[16px] sm:text-[18px] font-bold text-[#5801A9] leading-[20px] sm:leading-[22px] text-center">
                 Now, let&apos;s know the{" "}
                 <span className="text-[#4A90E2]">brains</span> behind your
@@ -220,7 +175,7 @@ const Index = () => {
               </h1>
 
               {/* Desktop Progress Stepper - Hidden on mobile */}
-              <div className="hidden sm:flex space-x-4 justify-center items-center">
+              <div className="items-center justify-center hidden space-x-4 sm:flex">
                 <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[38px] w-[38px] flex items-center justify-center">
                   1
                 </div>
@@ -265,7 +220,7 @@ const Index = () => {
                 </div>
               </div>
 
-              <div className=" float-left ml-4 w-full lg:hidden text-purple-500 flex space-x-3">
+              <div className="flex float-left w-full ml-4 space-x-3 text-purple-500 lg:hidden">
                 <Image src={backArrow} alt="back arrow" />
                 <p className="text-lg font-extrabold">Basic Info</p>
               </div>
@@ -293,7 +248,7 @@ const Index = () => {
             </h1>
 
             {/* Progress Steps - Adjusts size on mobile */}
-            <div className="flex space-x-2 sm:space-x-4 justify-center items-center px-4 sm:px-0">
+            <div className="flex items-center justify-center px-4 space-x-2 sm:space-x-4 sm:px-0">
               <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
                 1
               </div>
@@ -352,7 +307,7 @@ const Index = () => {
         <Bootcampdropdown />
       </div>
 
-      <div className="flex justify-center lg:justify-start w-full ">
+      <div className="flex justify-center w-full lg:justify-start ">
         <div className="w-[20%] bg-create-gradient lg:flex hidden justify-end">
           <div className="mt-20 bg-[#F5F8FA]0 space-y-2 md:space-y-5">
             <div
@@ -400,7 +355,7 @@ const Index = () => {
         </div>
 
         <div className="lg:w-[80%] w-full bg-[#f5f8fa] px-6 pb-12 lg:px-16 lg:pb-32">
-          <div className="h-auto pt-24 pb-8 w-full flex flex-col justify-center items-center space-y-5">
+          <div className="flex flex-col items-center justify-center w-full h-auto pt-24 pb-8 space-y-5">
             {renderHeader()}
           </div>
           {renderContent()}

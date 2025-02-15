@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "prepare": "husky",
+    "pre-commit": "lint-staged",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -30,6 +31,7 @@
     "@starknet-io/types-js": "^0.7.7",
     "@starknet-react/chains": "3.0.0-beta.2",
     "@starknet-react/core": "3.0.0-beta.2",
+    "@typescript-eslint/eslint-plugin": "^8.24.0",
     "@yudiel/react-qr-scanner": "^2.2.1",
     "axios": "^1.7.9",
     "buffer": "^6.0.3",
@@ -40,6 +42,7 @@
     "copy-to-clipboard": "^3.3.3",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.5",
+    "eslint-plugin-react-refresh": "^0.4.19",
     "framer-motion": "^11.17.0",
     "get-starknet-core": "^4.0.0",
     "graceful-fs": "^4.2.11",
@@ -50,6 +53,7 @@
     "nanoid": "3.3.8",
     "next": "^15.0.0",
     "node-fetch": "^2.7.0",
+    "ox": "^0.6.9",
     "pinata": "^1.10.1",
     "pinata-web3": "^0.5.4",
     "popmotion": "^11.0.5",

@@ -33,7 +33,7 @@ import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import { connect } from "starknetkit";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { Contract } from "starknet";
 
 const format = "h:mm a";
@@ -90,7 +90,7 @@ const Create = (props: any) => {
   const logoInputRef = useRef<HTMLInputElement | null>(null);
   const [bootcampData, setBootcampData] = useAtom(createBootcampInitState);
   const [uploading, setUploading] = useState(false);
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [numOfClassesToCreate, setNumOfClassesToCreate] = useState<
     number | any
   >(1);
@@ -175,7 +175,7 @@ const Create = (props: any) => {
         bootcampNftImage: file, // Dynamically update the specific field
       }));
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).");
+      console.error("Please select a valid image file (JPEG, JPG, or PNG).");
     }
   };
 
@@ -206,7 +206,7 @@ const Create = (props: any) => {
         BootcampLogo: file, // Dynamically update the specific field
       }));
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).");
+      console.error("Please select a valid image file (JPEG, JPG, or PNG).");
     }
   };
 
@@ -231,8 +231,8 @@ const Create = (props: any) => {
     });
 
     if (Dataupload) {
-      console.log("Data upload here", Dataupload);
-      console.log(
+      console.info("Data upload here", Dataupload);
+      console.info(
         "Create bootcamp Cid to send to contract ",
         Dataupload.IpfsHash,
       );
@@ -273,7 +273,7 @@ const Create = (props: any) => {
         .waitForTransaction(callContract.transaction_hash)
         .then(() => {})
         .catch((e: any) => {
-          console.log("Error: ", e);
+          console.error("Error: ", e);
         })
         .finally(() => {
           setUploading(false);
@@ -362,15 +362,15 @@ const Create = (props: any) => {
 
   return (
     <div
-      className="absolute z-[1] h-auto w-full"
+      className="absolute z-[999] h-auto w-full"
       style={{
         height: height ? `${height}px` : "100vh", // Use dynamic height or fallback to 100vh
       }}
     >
-      <div className="h-full flex">
-        <div className="w-[35%] h-full bg-[#07070733]"></div>
+      <div className="flex h-full">
+        <div className="w-[35%] hidden lg:block h-full bg-[#07070733]"></div>
 
-        <div className="w-[65%] h-full bg-[#FFFFFF] overflow-y-scroll">
+        <div className="lg:w-[65%] w-[100%] h-full bg-[#FFFFFF] overflow-y-scroll">
           <div className="w-[100%] h-[10px] bg-bootcreate-gradient"></div>
           <div className="w-[90%] mx-auto flex justify-between mt-5">
             <h1 className="text-[22px] leading-[22px] text-[#333333] font-semibold">
@@ -383,8 +383,8 @@ const Create = (props: any) => {
           </div>
 
           <div className="w-[90%] mx-auto mt-6">
-            <div className="space-y-3 w-full">
-              <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+            <div className="w-full space-y-3">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 Bootcamp Name
               </h1>
               <Field>
@@ -392,40 +392,40 @@ const Create = (props: any) => {
                   onChange={handleBootcampNameChange}
                   placeholder="e.g starknet basecamp"
                   className={clsx(
-                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                     "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                   )}
                 />
               </Field>
             </div>
 
-            <div className="flex justify-between w-full space-x-2 mt-4">
-              <div className="space-y-3 w-full">
-                <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+            <div className="flex flex-col justify-between w-full mt-4 space-x-2 space-y-5 lg:flex-row">
+              <div className="w-full space-y-3">
+                <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                   Bootcamp Organization
                 </h1>
                 <Field>
                   <Input
-                    value={organizationName}
+                    value="Orangutan Edu Academy"
                     readOnly
                     placeholder="e.g starknet basecamp"
                     className={clsx(
-                      "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg  py-1.5 px-3 text-sm/6 text-[#4A90E2]",
+                      "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-full rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#4A90E2]",
                       "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                     )}
                   />
                 </Field>
               </div>
-              <div className="space-y-3 w-full">
-                <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+              <div className="w-full space-y-3">
+                <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                   Target Audience
                 </h1>
                 <TargetCategory />
               </div>
             </div>
 
-            <div className="space-y-3 mt-4">
-              <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+            <div className="mt-4 space-y-3">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 Description
               </h1>
               <Field>
@@ -433,7 +433,7 @@ const Create = (props: any) => {
                   placeholder="Short overview detailing what the bootcamp covers"
                   onChange={handleBootcampDescriptionChange}
                   className={clsx(
-                    "h-[110px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                    "h-[110px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                     "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                   )}
                 />
@@ -442,7 +442,7 @@ const Create = (props: any) => {
 
             {/* NFT data collection */}
             <div className="space-y-3 w-[60%] mt-4">
-              <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 NFT Certificate Name
               </h1>
               <Field>
@@ -450,7 +450,7 @@ const Create = (props: any) => {
                   onChange={handleNFTNameChange}
                   placeholder="nft name"
                   className={clsx(
-                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                     "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                   )}
                 />
@@ -458,7 +458,7 @@ const Create = (props: any) => {
             </div>
 
             <div className="space-y-3 w-[60%] mt-4">
-              <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 NFT Certificate symbol
               </h1>
               <Field>
@@ -466,7 +466,7 @@ const Create = (props: any) => {
                   onChange={handleNFTSymbolChange}
                   placeholder="Enter nft symbol"
                   className={clsx(
-                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                    "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[100%] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                     "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                   )}
                 />
@@ -474,7 +474,7 @@ const Create = (props: any) => {
             </div>
 
             <div className="space-y-3 w-[60%] mt-4">
-              <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 Upload NFT Certificate Image
               </h1>
               <div
@@ -500,10 +500,10 @@ const Create = (props: any) => {
                 Structure & schedules
               </h1>
               <div className="mt-3 space-y-2">
-                <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+                <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                   Bootcamp Date
                 </h1>
-                <div className="flex space-x-4">
+                <div className="flex gap-x-4">
                   <>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DemoContainer components={["DatePicker"]}>
@@ -530,35 +530,37 @@ const Create = (props: any) => {
             </div>
 
             <div className="mt-8 space-y-2">
-              <h1 className="text-[14px] text-[#2D3A4B] font-light leading-[20px]">
+              <h1 className="text-[12px] lg:text-[14px] text-[#2D3A4B] font-light leading-[20px]">
                 Bootcamp Time
               </h1>
-              <div className="flex space-x-3 items-center">
-                <div className="flex flex-col space-y-2">
+              <div className="flex flex-col items-start lg:flex-row gap-x-3 gap-y-4">
+                <div className="flex flex-col items-center lg:flex-row gap-y-2 gap-x-3">
                   {bootcampTimes.map((component, index) => (
                     <BootcampTime key={index} day={index + 1} />
                   ))}
                 </div>
-                <div
-                  id="add-day"
-                  onClick={handleAddDay}
-                  className="mt-2 cursor-pointer relative flex items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[130px] rounded-lg"
-                >
-                  <FaPlus className="text-[#2D3A4B]" />
-                  <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
-                    Add Day
-                  </h1>
-                </div>
 
-                <div
-                  id="add-day"
-                  onClick={handleRemoveDay}
-                  className="mt-2 cursor-pointer relative flex items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[150px] rounded-lg"
-                >
-                  <FcCancel className="text-[#2D3A4B]" />
-                  <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
-                    Remove Day
-                  </h1>
+                <div className="flex">
+                  <div
+                    id="add-day"
+                    onClick={handleAddDay}
+                    className="mt-2 cursor-pointer relative flex items-center px-4 gap-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[130px] rounded-lg"
+                  >
+                    <FaPlus className="text-[#2D3A4B]" />
+                    <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
+                      Add Day
+                    </h1>
+                  </div>
+                  <div
+                    id="add-day"
+                    onClick={handleRemoveDay}
+                    className="mt-2 cursor-pointer relative flex items-center px-4 space-x-3 border-[1px] border-[#D0D5DD] h-[55px] w-[150px] rounded-lg"
+                  >
+                    <FcCancel className="text-[#2D3A4B]" />
+                    <h1 className="text-[15px] leading-[18px] font-light text-[#2D3A4B]">
+                      Remove Day
+                    </h1>
+                  </div>
                 </div>
               </div>
             </div>
@@ -578,7 +580,7 @@ const Create = (props: any) => {
               <div className="space-y-12">
                 {bootcampTimes.map((component, index) => (
                   <div key={index}>
-                    <div className="mt-4 flex space-x-2">
+                    <div className="flex flex-col mt-4 space-y-5 lg:flex-row gap-x-2 lg:space-y-0">
                       <Field>
                         <Input
                           placeholder="Add lecture title"
@@ -586,14 +588,14 @@ const Create = (props: any) => {
                             handleTitleChange(index, e.target.value)
                           }
                           className={clsx(
-                            "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[395px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                            "h-[55px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[395px] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                             "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                           )}
                         />
                       </Field>
 
                       <div className="relative flex bg-[#A666E3] items-center px-4  justify-between border-[1px] border-[#D0D5DD] h-[55px] w-[120px] rounded-lg">
-                        <div className="space-x-3 flex">
+                        <div className="flex space-x-3">
                           <FaRegCalendarAlt className="h-[20px] w-[14px] text-[#FFFFFF]" />
                           <h1 className="text-[12px] leading-[18px] font-light text-[#FFFFFF]">
                             Day {index + 1}
@@ -602,7 +604,7 @@ const Create = (props: any) => {
                       </div>
                     </div>
 
-                    <div className=" mt-4 flex space-x-2 relative">
+                    <div className="relative flex mt-4 space-x-2 ">
                       <div>
                         <Field>
                           <textarea
@@ -611,7 +613,7 @@ const Create = (props: any) => {
                             }
                             placeholder="Add lecture description"
                             className={clsx(
-                              "h-[127px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[557px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#667185]",
+                              "h-[127px] border-[2px] bg-[#FFFFFF] border-[#D0D5DD] block w-[390px] lg:w-[557px] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#667185]",
                               "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                             )}
                           />
@@ -624,7 +626,7 @@ const Create = (props: any) => {
             </div>
 
             <div className="mt-6">
-              <div className="flex space-x-8 items-center">
+              <div className="flex items-center space-x-8">
                 <div>
                   <h1 className="text-[16px] leading-[23px] font-semibold text-[#2D3A4B]">
                     Pricing
@@ -642,7 +644,7 @@ const Create = (props: any) => {
               </div>
 
               {isPaid && (
-                <div className="mt-3 flex space-x-3">
+                <div className="flex mt-3 space-x-3">
                   <div>
                     <Field>
                       <Input
@@ -650,19 +652,19 @@ const Create = (props: any) => {
                         readOnly
                         placeholder="e.g starknet basecamp"
                         className={clsx(
-                          "h-[55px] border-[2px] text-center bg-[#FFFFFF] border-[#D0D5DD] block w-[179px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#4A90E2]",
+                          "h-[55px] border-[2px] text-center bg-[#FFFFFF] border-[#D0D5DD] block w-[179px] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#4A90E2]",
                           "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                         )}
                       />
                     </Field>
                   </div>
-                  <div className="flex space-x-1 items-center">
+                  <div className="flex items-center space-x-1">
                     <h1 className="text-[24px] text-[#2D3A4B] font-light">$</h1>
                     <Field>
                       <Input
                         onChange={handleBootcampPriceChange}
                         className={clsx(
-                          "h-[55px] border-[2px] text-center bg-[#FFFFFF] border-[#D0D5DD] block w-[100px] rounded-lg  py-1.5 px-3 text-sm/6 text-[#4A90E2]",
+                          "h-[55px] border-[2px] text-center bg-[#FFFFFF] border-[#D0D5DD] block w-[100px] rounded-lg  py-1.5 px-3 text-[12px] lg:text-sm/6 text-[#4A90E2]",
                           "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
                         )}
                       />
@@ -676,11 +678,11 @@ const Create = (props: any) => {
                   Upload Bootcamp creative
                 </h1>
 
-                <div className="flex space-x-16">
-                  <div className="h-[316px] w-[459px] mt-3 rounded-lg bg-[#DCDCDC] flex justify-center items-center">
-                    <div className="h-[246px] w-[400px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-3 flex flex-col items-center justify-center">
+                <div className="flex flex-col space-y-10 lg:flex-row gap-x-16 lg:space-x-16">
+                  <div className="h-[316px] lg:w-[459px] w-[390px] mt-3 rounded-lg bg-[#DCDCDC] flex justify-center items-center">
+                    <div className="h-[256px] lg:w-[400px] w-[350px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-3 flex flex-col items-center justify-center">
                       <Image src={cloud} alt="upload" />
-                      <h1 className="text-[14px] text-[#475367] font-light leading-[20px]">
+                      <h1 className="text-[12px] lg:text-[14px] text-[#475367] font-light leading-[20px]">
                         <span className="text-[#4A90E2]">Click to upload</span>{" "}
                         or drag and drop
                       </h1>
@@ -697,13 +699,13 @@ const Create = (props: any) => {
                       />
                       <Button
                         onClick={handleBrowse}
-                        className="h-[36px] w-[118px] flex justify-center items-center bg-[#9B51E0] rounded-xl text-[14px] text-[#FFFFFF] font-light leading-[20px]"
+                        className="h-[36px] w-[118px] flex justify-center items-center bg-[#9B51E0] rounded-xl text-[12px] lg:text-[14px] text-[#FFFFFF] font-light leading-[20px]"
                       >
                         Browse Files
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-3 space-y-2">
+                  <div className="flex flex-col-reverse mt-3 space-y-5 lg:flex-col lg:space-y-2">
                     <div className="h-[166px] w-[251px] border-[3px] border-dotted border-[#D0D5DD] bg-[#FFFFFF] rounded-xl space-y-0 flex flex-col items-center justify-center">
                       <Image src={cloud} alt="upload" />
                       <h1 className="text-[8px] text-[#475367] font-light leading-[20px]">
@@ -721,19 +723,19 @@ const Create = (props: any) => {
                     <h1 className="text-[18px] text-[#333333] font-semibold leading-[31px] ">
                       Upload thumbnail
                     </h1>
-                    <p className="w-[254px] text-[14px] font-light text-[#2D3A4B] leading-[21px]">
+                    <p className="w-[254px] text-[12px] lg:text-[14px] font-light text-[#2D3A4B] leading-[21px]">
                       Upload your bootcamp image here. 750x422 pixels; .jpg,
                       .jpeg,. gif, or .png.{" "}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex justify-end my-5">
+                <div className="flex justify-end my-10 lg:my-5">
                   <div
-                    className="h-[47px] w-[342px] rounded-xl bg-[#4A90E2] flex items-center justify-center cursor-pointer"
+                    className="h-[47px] w-full px-6 sm:w-auto lg:w-[342px] rounded-xl bg-[#4A90E2] flex items-center justify-center cursor-pointer"
                     onClick={handlePublishButton}
                   >
-                    <h1 className="text-[#FFFFFF] text-[14px] font-semibold leading-[16px]">
+                    <h1 className="text-[#FFFFFF] text-[12px] lg:text-[14px] font-semibold leading-[16px]">
                       {uploading
                         ? "Uploading data"
                         : "Save and Publish bootcamp"}

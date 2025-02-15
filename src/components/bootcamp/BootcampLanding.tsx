@@ -3,7 +3,7 @@ import BootcampHero from "./BootcampHero";
 import BootcampCarousell from "./BootcampCarousell";
 import Organizations from "./Organizations";
 import { FavoriteCourse } from "./FavoriteCourse";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useAtom } from "jotai";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
@@ -12,7 +12,7 @@ import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
 import { pinata } from "../../../utils/config";
 
 const BootcampLanding = () => {
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [bootcampDataInfo, setBootcampdataInfo] = useState([]);
   const [allorgInfo, setAllorgInfo] = useState([]);
 
@@ -23,13 +23,13 @@ const BootcampLanding = () => {
   );
 
   const getAllBootcamps = async () => {
-    let bootcamps_info = await orgContract?.get_all_bootcamps_on_platform();
+    const bootcamps_info = await orgContract?.get_all_bootcamps_on_platform();
     setBootcampdataInfo(bootcamps_info);
   };
 
   const getAllOrgInfo = async () => {
-    let AllOrg_info = await orgContract?.get_all_org_info();
-    console.log("intiial fetch", AllOrg_info);
+    const AllOrg_info = await orgContract?.get_all_org_info();
+    console.info("intiial fetch", AllOrg_info);
     setAllorgInfo(AllOrg_info);
   };
 

@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
-import { connect, disconnect, StarknetWindowObject } from "starknetkit";
-import { useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { useState } from "react";
+import { connect, disconnect } from "starknetkit";
+import { useAtom, useSetAtom } from "jotai";
+import {
+  connectorAtom,
+  connectorDataAtom,
+} from "@/state/connectedWalletStarknetkitNext";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 
 export interface WalletConnectionInfo {
   connected: boolean;
@@ -11,27 +14,19 @@ export interface WalletConnectionInfo {
   chainId?: string;
 }
 
-// Store only connection info, not the full wallet object
-const persistentWalletAtom = atomWithStorage<WalletConnectionInfo>(
-  "wallet-connection-info",
-  {
-    connected: false,
-  },
-);
-
 export const useWallet = () => {
   const [isConnecting, setIsConnecting] = useState(false);
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
-  const [persistentWallet, setPersistentWallet] = useAtom(persistentWalletAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const setConnector = useSetAtom(connectorAtom);
 
-  const connectWallet = async (reconnect = false) => {
+  const connectWallet = async () => {
     if (isConnecting) return;
 
     try {
       setIsConnecting(true);
 
-      const { wallet: connectedWallet } = await connect({
-        modalMode: reconnect ? "neverAsk" : "alwaysAsk",
+      const res = await connect({
+        modalMode: "alwaysAsk",
         provider,
         webWalletUrl: ARGENT_WEBWALLET_URL,
         argentMobileOptions: {
@@ -42,17 +37,11 @@ export const useWallet = () => {
         },
       });
 
-      if (connectedWallet) {
-        setWallet(connectedWallet);
-        setPersistentWallet({
-          connected: true,
-          address: connectedWallet.selectedAddress,
-          chainId: connectedWallet.chainId,
-        });
-        return connectedWallet;
-      }
-
-      return null;
+      const { wallet: connectedWallet, connector } = res;
+      //@ts-ignore
+      setWallet(connectedWallet);
+      setConnector(connector);
+      return connectedWallet;
     } catch (error) {
       console.error("Wallet connection error:", error);
       return null;
@@ -64,28 +53,54 @@ export const useWallet = () => {
   const disconnectWallet = async () => {
     try {
       disconnect();
-      setWallet(null);
-      setPersistentWallet({ connected: false });
+      await clearWalletInfo();
     } catch (error) {
       console.error("Wallet disconnection error:", error);
     }
   };
 
-  // Restore wallet connection on page load
-  useEffect(() => {
-    const restoreConnection = async () => {
-      if (!wallet && persistentWallet) {
-        await connectWallet();
-      }
-    };
+  const clearWalletInfo = async () => {
+    try {
+      setWallet(null);
+      setConnector(null);
+    } catch (error) {
+      console.error("Wallet clear error:", error);
+    }
+  };
 
-    restoreConnection();
-  }, []);
+  const autoConnectWallet = async () => {
+    if (isConnecting || wallet) return;
+    try {
+      const { wallet: connectedWallet, connector } = await connect({
+        provider,
+        modalMode: "neverAsk",
+        webWalletUrl: ARGENT_WEBWALLET_URL,
+        argentMobileOptions: {
+          dappName: "Attensys",
+          url: window.location.hostname,
+          chainId: CHAIN_ID,
+          icons: [],
+        },
+      });
+      // console.log("res ato", connectedWallet, connector, connectorData);
+      //@ts-ignore
+      setWallet(connectedWallet);
+      setConnector(connector);
+
+      if (!connectedWallet) {
+        console.warn("Wallet autoconnection failed");
+      }
+    } catch (e) {
+      console.error(e);
+      alert((e as any).message);
+    }
+  };
 
   return {
-    wallet,
     isConnecting,
     connectWallet,
+    autoConnectWallet,
     disconnectWallet,
+    clearWalletInfo,
   };
 };

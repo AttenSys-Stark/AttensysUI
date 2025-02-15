@@ -20,7 +20,7 @@ import { GetCIDResponse } from "pinata";
 //   onClick?: () => void;
 // }
 
-const Mybootcampcarousel = (props: any) => {
+const MobileBootcampCard = (props: any) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
   const [NFTImagesource, setNFTLogoImage] = useState<string | StaticImport>("");
@@ -62,42 +62,43 @@ const Mybootcampcarousel = (props: any) => {
   return (
     <>
       <div
-        className={`relative ${`h-[${props.height}] w-[${props.width}]`} rounded-2xl mx-auto cursor-pointer`}
+        className={`relative h-[${props.height}] w-[${props.width}] rounded-2xl mx-0 md:mx-auto overflow-hidden cursor-pointer`}
         onClick={props.onClick}
       >
         <div className="h-[200px] w-full rounded-2xl">
           <Image
             src={logoImagesource}
             alt="eventimage"
-            className="object-cover w-full h-full rounded-2xl"
+            className="object-cover w-full h-full"
             layout="fill"
           />
         </div>
-        <Button className="hidden absolute top-3 right-6 justify-center lg:flex rounded-lg bg-[#9B51E0] text-[#FFFCFC] py-2 px-4 lg:h-[23px] items-center lg:w-[50px] text-sm data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
-          <div className="text-[7px]">{props.action}</div>
+
+        <Button className="absolute top-3 right-4 justify-center lg:flex rounded-lg bg-[#9B51E0] text-[#FFFCFC] py-2 px-4 lg:h-[50px] items-center lg:w-[90px] text-[12px] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
+          {props.action}
         </Button>
+
         <div className="absolute bottom-0 z-20 flex items-center justify-center w-full pb-4 text-center bg-carousell-gradient">
           <div className="flex mt-20 space-x-3">
-            <div className="rounded-full h-[24px] w-[24px]">
+            <div className="rounded-full h-[41px] w-[41px] overflow-hidden">
               <Image
                 src={NFTImagesource}
                 alt="logo"
-                className="object-cover w-full h-full rounded-full"
-                height={24}
-                width={24}
+                className="object-cover"
+                height={41}
+                width={41}
               />
             </div>
             <div>
-              <h1 className="text-[#FFFFFF] text-[10px] font-bold leading-[22px]">
+              <h1 className="text-[#FFFFFF] text-[8px] font-bold">
                 {props.name}
               </h1>
-              <h1 className="text-[#FFFFFF] text-[10px] font-medium leading-[8px]">
-                {date}
-              </h1>
+              <h1 className="text-[#FFFFFF] text-[6px] font-medium">{date}</h1>
             </div>
           </div>
         </div>
       </div>
+
       <div className="w-[80%] mx-auto mt-3 flex items-center space-x-2">
         <IoSettingsSharp className="text-[#2D3A4B]" />
         <h1 className="text-[14px] leading-[22px] font-medium text-[#333333]">
@@ -108,4 +109,4 @@ const Mybootcampcarousel = (props: any) => {
   );
 };
 
-export default Mybootcampcarousel;
+export default MobileBootcampCard;

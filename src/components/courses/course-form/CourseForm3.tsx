@@ -1,7 +1,85 @@
-import React from "react";
+import React, { useState } from "react";
 import Previous from "./previous";
+import { useRouter } from "next/navigation";
+
+interface FormData {
+  completePlan: boolean;
+  roughPlan: boolean;
+  clearPlan: boolean;
+  helpOrganizing: boolean;
+  general: boolean;
+}
+
+interface FormErrors {
+  completePlan: string;
+  roughPlan: string;
+  clearPlan: string;
+  helpOrganizing: string;
+  general: string;
+}
 
 const CourseForm3 = () => {
+  const router = useRouter();
+  const [formData, setFormData] = useState<FormData>({
+    completePlan: false,
+    roughPlan: false,
+    clearPlan: false,
+    helpOrganizing: false,
+    general: false,
+  });
+  const [errors, setErrors] = useState<FormErrors>({
+    completePlan: "",
+    roughPlan: "",
+    clearPlan: "",
+    helpOrganizing: "",
+    general: "",
+  });
+
+  const handleCheckboxChange = (field: keyof FormData): void => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+
+    if (errors[field]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field]: "",
+      }));
+    }
+    if (errors.general) {
+      setErrors((prev) => ({
+        ...prev,
+        general: "",
+      }));
+    }
+  };
+
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
+    event.preventDefault();
+
+    setErrors({
+      completePlan: "",
+      roughPlan: "",
+      clearPlan: "",
+      helpOrganizing: "",
+      general: "",
+    });
+
+    const isAnyChecked = Object.values(formData).some((value) => value);
+
+    if (!isAnyChecked) {
+      setErrors((prev) => ({
+        ...prev,
+        general: "Please select at least one goal for your course",
+      }));
+      return;
+    }
+
+    router.push("/Course/CreateACourse/CourseSetup");
+  };
   return (
     <div className="relative mx-10 md:mx-auto w-auto md:w-3/4 lg:w-5/12 pt-16">
       <div className="hidden lg:block">
@@ -12,7 +90,7 @@ const CourseForm3 = () => {
           Do you already have a plan for what your course will cover?
         </h1>
       </div>
-      <form action="CourseSetup">
+      <form onSubmit={handleSubmit} noValidate>
         <div className=" bg-white px-5 md:px-12 py-9 md:py-16 rounded-2xl flex flex-col gap-5 md:gap-6 justify-center w-full max-w-[524px] mx-auto">
           <div className="flex">
             <input
@@ -20,11 +98,16 @@ const CourseForm3 = () => {
               min="2"
               max="5"
               className="required:border-red-500 indeterminate:bg-gray-300"
-              id="vehicle1"
-              name="vehicle1"
+              id="completePlan"
+              name="completePlan"
               value="Bike"
+              checked={formData.completePlan}
+              onChange={() => handleCheckboxChange("completePlan")}
             />
-            <label className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]">
+            <label
+              htmlFor="completePlan"
+              className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]"
+            >
               Yes, I have a complete course plan
             </label>
           </div>
@@ -34,11 +117,16 @@ const CourseForm3 = () => {
               min="2"
               max="5"
               className="required:border-red-500 indeterminate:bg-gray-300"
-              id="vehicle1"
-              name="vehicle1"
+              id="roughPlan"
+              name="roughPlan"
               value="Bike"
+              checked={formData.roughPlan}
+              onChange={() => handleCheckboxChange("roughPlan")}
             />
-            <label className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]">
+            <label
+              htmlFor="roughPlan"
+              className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]"
+            >
               I have a rough plan, but it needs work
             </label>
           </div>
@@ -48,11 +136,16 @@ const CourseForm3 = () => {
               min="2"
               max="5"
               className="required:border-red-500 indeterminate:bg-gray-300"
-              id="vehicle1"
-              name="vehicle1"
+              id="clearPlan"
+              name="clearPlan"
               value="Bike"
+              checked={formData.clearPlan}
+              onChange={() => handleCheckboxChange("clearPlan")}
             />
-            <label className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]">
+            <label
+              htmlFor="clearPlan"
+              className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]"
+            >
               I have some ideas but no clear plan yet
             </label>
           </div>
@@ -63,14 +156,23 @@ const CourseForm3 = () => {
               min="2"
               max="5"
               className="required:border-red-500 indeterminate:bg-gray-300"
-              id="vehicle1"
-              name="vehicle1"
+              id="helpOrganizing"
+              name="helpOrganizing"
               value="Bike"
+              checked={formData.helpOrganizing}
+              onChange={() => handleCheckboxChange("helpOrganizing")}
             />
-            <label className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]">
+            <label
+              htmlFor="helpOrganizing"
+              className="block my-2 md:my-3 ml-3  text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]"
+            >
               I need help organizing the course
             </label>
           </div>
+
+          {errors.general && (
+            <p className="text-red-500 text-sm mt-2">{errors.general}</p>
+          )}
         </div>
 
         <div className="text-center">

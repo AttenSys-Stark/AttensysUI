@@ -19,6 +19,20 @@ import clsx from "clsx";
 import add from "@/assets/add.svg";
 
 const Myevents = (props: any) => {
+  const [eventName, setEventName] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [errors, setErrors] = useState({
+    eventName: "",
+    startTime: "",
+    endTime: "",
+    location: "",
+    description: "",
+    file: "",
+  });
   const [createdstat, setCreatedStat] = useAtom(eventcreatedAtom);
   const [Regstat, setRegStat] = useAtom(eventregistedAtom);
   const [existingeventStat, setexistingeventStat] = useAtom(
@@ -44,10 +58,14 @@ const Myevents = (props: any) => {
         file.type === "image/png" ||
         file.type === "image/jpg")
     ) {
-      // Process the file
-      console.log("Selected file:", file);
+      setSelectedFile(file);
+      setErrors((prev) => ({ ...prev, file: "" }));
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).");
+      setSelectedFile(null);
+      setErrors((prev) => ({
+        ...prev,
+        file: "Please select a valid image file (JPEG, JPG, or PNG).",
+      }));
     }
   };
 
@@ -72,6 +90,24 @@ const Myevents = (props: any) => {
   };
 
   const handleCreateEventButton = () => {
+    const newErrors = {
+      eventName: !eventName.trim() ? "Event name is required" : "",
+      startTime: !startTime ? "Start time is required" : "",
+      endTime: !endTime ? "End time is required" : "",
+      location: !location.trim() ? "Location is required" : "",
+      description: !description.trim() ? "Description is required" : "",
+      file: !selectedFile ? "Event image is required" : "",
+    };
+
+    // Time validation
+    if (startTime && endTime && startTime >= endTime) {
+      newErrors.endTime = "End time must be after start time";
+    }
+
+    setErrors(newErrors);
+
+    if (Object.values(newErrors).some((error) => error)) return;
+
     //@todo replace sample event with event name
     router.push("/Overview/sample-event/insight");
   };
@@ -184,9 +220,20 @@ const Myevents = (props: any) => {
                     className={clsx(
                       "mt-3 block w-full border-b-[1px] border-white/50 bg-transparent text-[40px] font-bold leading-[83.53px] text-[#FFFFFF]",
                       "placeholder-white/50 focus:border-b-4 focus:border-[#ABADBA] focus:outline-none",
+                      errors.eventName && "border-red-500",
                     )}
                     placeholder="Event Name"
+                    value={eventName}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setEventName(e.target.value);
+                      setErrors((prev) => ({ ...prev, eventName: "" }));
+                    }}
                   />
+                  {errors.eventName && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.eventName}
+                    </p>
+                  )}
                 </div>
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
@@ -198,8 +245,19 @@ const Myevents = (props: any) => {
                       className={clsx(
                         "mt-1 block w-full rounded-lg border-none bg-white/5 py-1.5 px-3 text-sm/6 text-white",
                         "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
+                        errors.startTime && "border border-red-500",
                       )}
+                      value={startTime}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        setStartTime(e.target.value);
+                        setErrors((prev) => ({ ...prev, startTime: "" }));
+                      }}
                     />
+                    {errors.startTime && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.startTime}
+                      </p>
+                    )}
                   </Field>
                 </div>
 
@@ -213,8 +271,19 @@ const Myevents = (props: any) => {
                       className={clsx(
                         "mt-1 block w-full rounded-lg border-none bg-white/5 py-1.5 px-3 text-sm/6 text-white",
                         "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25",
+                        errors.endTime && "border border-red-500",
                       )}
+                      value={endTime}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        setEndTime(e.target.value);
+                        setErrors((prev) => ({ ...prev, endTime: "" }));
+                      }}
                     />
+                    {errors.endTime && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.endTime}
+                      </p>
+                    )}
                   </Field>
                 </div>
 
@@ -230,8 +299,19 @@ const Myevents = (props: any) => {
                       className={clsx(
                         "mt-3 block w-full rounded-lg border-none bg-white/5 py-1.5 px-3 text-sm/6 text-white h-20",
                         "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 resize-none",
+                        errors.location && "border border-red-500",
                       )}
+                      value={location}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                        setLocation(e.target.value);
+                        setErrors((prev) => ({ ...prev, location: "" }));
+                      }}
                     />
+                    {errors.location && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.location}
+                      </p>
+                    )}
                   </Field>
                 </div>
                 <div className="w-full max-w-lg px-4 mt-4">
@@ -246,8 +326,19 @@ const Myevents = (props: any) => {
                       className={clsx(
                         "mt-3 block w-full rounded-lg border-none bg-white/5 py-1.5 px-3 text-sm/6 text-white h-36",
                         "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25 resize-none",
+                        errors.description && "border border-red-500",
                       )}
+                      value={description}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                        setDescription(e.target.value);
+                        setErrors((prev) => ({ ...prev, description: "" }));
+                      }}
                     />
+                    {errors.description && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.description}
+                      </p>
+                    )}
                   </Field>
                 </div>
               </div>
@@ -270,6 +361,9 @@ const Myevents = (props: any) => {
                     onChange={handleFileChange}
                     style={{ display: "none" }} // Hide the input
                   />
+                  {errors.file && (
+                    <p className="text-red-500 text-sm mt-1">{errors.file}</p>
+                  )}
                 </div>
                 <Button
                   onClick={handleCreateEventButton}

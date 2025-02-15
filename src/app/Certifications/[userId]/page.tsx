@@ -1,18 +1,12 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
-  connectorAtom,
-  connectorDataAtom,
-  walletStarknetkitNextAtom,
 } from "@/state/connectedWalletStarknetkitNext";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
-import { RESET } from "jotai/utils";
-import { connect, disconnect } from "starknetkit";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import MyCertifications from "@/components/certifications/MyCertifications";
@@ -28,57 +22,16 @@ const Index = () => {
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
 
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
-  const setConnectorData = useSetAtom(connectorDataAtom);
-  const setConnector = useSetAtom(connectorAtom);
-
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
-
-  useEffect(() => {
-    /* setWalletLatest(RESET) */
-    setWalletNext(RESET);
-    setConnectorData(RESET);
-    setConnector(RESET);
-  }, []);
-
-  useEffect(() => {
-    const autoConnect = async () => {
-      try {
-        const { wallet: connectedWallet } = await connect({
-          //@ts-ignore
-          provider,
-          modalMode: "neverAsk",
-          webWalletUrl: ARGENT_WEBWALLET_URL,
-          argentMobileOptions: {
-            dappName: "Attensys",
-            url: window.location.hostname,
-            chainId: CHAIN_ID,
-            icons: [],
-          },
-        });
-        setWallet(connectedWallet);
-      } catch (e) {
-        console.error(e);
-        alert((e as any).message);
-      }
-    };
-
-    if (!wallet) {
-      autoConnect();
-    }
-  }, [wallet]);
-
-  let userId = null;
+  const userId = null;
   // const userId = searchParams.get('userId');
   const search = searchParams.get("userId");
 
   // This will be logged on the server during the initial render
   // and on the client on subsequent navigations.
-  console.log(search);
+  console.info(search);
 
   // Now you can use the userId
-  console.log(searchParams);
+  console.info(searchParams);
   // console.log(router)
 
   const handlePageClick = () => {

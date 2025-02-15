@@ -12,7 +12,7 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { pinata } from "../../../utils/config";
 import axios from "axios";
 import { GetCIDResponse } from "pinata";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useAtom } from "jotai";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
@@ -32,7 +32,7 @@ const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
 
 const Organizationcard = (props: any) => {
   const router = useRouter();
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
   const [bannerImagesource, setBannerImage] = useState<string | StaticImport>(
     "",
@@ -54,7 +54,7 @@ const Organizationcard = (props: any) => {
     try {
       //@ts-ignore
       const data = await pinata.gateways.get(CID);
-      console.log(data?.data);
+      console.info(data?.data);
       //@ts-ignore
       const logoData: GetCIDResponse = await pinata.gateways.get(
         //@ts-ignore
@@ -83,13 +83,15 @@ const Organizationcard = (props: any) => {
       //@ts-ignore
       const truncated = truncateToWords(data?.data.OrganizationDescription);
       setDescription(truncated);
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching IPFS content:", error);
+    }
   };
 
   const getOrgInfo = async () => {
-    let org_info = await orgContract?.get_org_info(props.orgaddress);
+    const org_info = await orgContract?.get_org_info(props.orgaddress);
 
-    console.log("here is specific org", org_info);
+    console.info("here is specific org", org_info);
     setNumberofClasses(Number(org_info.number_of_all_classes));
     setNumberofTutors(Number(org_info.number_of_instructors));
     setStudentNumber(Number(org_info.number_of_students));

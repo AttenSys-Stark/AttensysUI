@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import Dropdown from "../Dropdown";
 import Image from "next/image";
@@ -14,11 +14,41 @@ import { useRouter } from "next/navigation";
 import { Button } from "@headlessui/react";
 import Stepper from "@/components/Stepper";
 
+interface Lecture {
+  id: string;
+  title: string;
+  description: string;
+  file: File | null;
+  titleError: string;
+  fileError: string;
+}
 const MainFormView3 = () => {
   const router = useRouter();
+  const [lectureTitle, setLectureTitle] = useState("");
+  const [lectureTitleError, setLectureTitleError] = useState("");
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    // Reset errors
+    setLectureTitleError("");
+
+    let hasError = false;
+
+    // Validate lecture title only
+    if (!lectureTitle.trim()) {
+      setLectureTitleError("Lecture title is required");
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    // Proceed to next step
+    handleCreateCourse(e, "courseSetup4", router);
+  };
   const handleBrowsefiles = () => {
     //@todo handle file upload logic
-    console.log("click");
+    console.info("click");
   };
   return (
     <div className="flex items-stretch">
@@ -28,7 +58,7 @@ const MainFormView3 = () => {
 
       <div className="flex-1 w-full">
         <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
-          <p className="text-sm text-white text-center py-2">
+          <p className="py-2 text-sm text-center text-white">
             Your course creation progress saves automatically, but feel free to
             also save your progress manually
           </p>
@@ -40,7 +70,7 @@ const MainFormView3 = () => {
         <div className="w-full">
           <div className="block sm:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] px-5 items-center">
             <div className="flex items-center">
-              <div className="px-4 sm:px-8 border-r border-blue-100">
+              <div className="px-4 border-r border-blue-100 sm:px-8">
                 <IoMdArrowBack
                   onClick={() => history.back()}
                   className="cursor-pointer text-[#4A90E2]"
@@ -56,9 +86,9 @@ const MainFormView3 = () => {
             </button>
           </div>
 
-          <div className="mx-5 md:mx-10  mt-12">
-            <form action="CourseSetup4">
-              <div className="my-12 w-full">
+          <div className="mx-5 mt-12 md:mx-10">
+            <form onSubmit={handleSubmit}>
+              <div className="w-full my-12">
                 <label
                   htmlFor=""
                   className="font-semibold text-[18px] leading-[31px] text-[#333333]"
@@ -69,7 +99,7 @@ const MainFormView3 = () => {
                   {`This is the creative section of your course creation. Your course landing page is crucial to your success on Attensys. 
 You want to make sure your creative is very catchy.`}
                 </p>
-                <div className="block sm:flex flex-col lg:flex-row items-start my-4">
+                <div className="flex-col items-start block my-4 sm:flex lg:flex-row">
                   <div className="bg-[#DCDCDC] flex-1 p-4 sm:p-16 rounded-xl">
                     <div className="bg-white p-2 sm:p-14 text-center border-dotted rounded border-2 border-[#D0D5DD]  content-center text-xs ">
                       <div className="mx-auto w-[15%]">
@@ -89,7 +119,7 @@ You want to make sure your creative is very catchy.`}
                       </div>
 
                       <div>
-                        <div className="flex items-center gap-2 w-full">
+                        <div className="flex items-center w-full gap-2">
                           <div className="h-px w-full bg-[#F0F2F5]" />
                           <p className="text-[10.65px] md:text-[8px]">OR</p>
                           <div className="h-px w-full bg-[#F0F2F5]" />
@@ -105,7 +135,7 @@ You want to make sure your creative is very catchy.`}
                     </div>
                   </div>
 
-                  <div className="text-sm sm:mx-6 flex-1 ">
+                  <div className="flex-1 text-sm sm:mx-6 ">
                     <p className="font-semibold lg:hidden text-[18px] leading-[31px] text-[#333333] mt-[38px] mb-[18px]">
                       Upload thumbnail
                     </p>
@@ -127,7 +157,7 @@ You want to make sure your creative is very catchy.`}
                       </div>
 
                       <div className="my-2">
-                        <div className="flex items-center gap-2 w-full">
+                        <div className="flex items-center w-full gap-2">
                           <div className="h-px w-full bg-[#F0F2F5]" />
                           <p className="text-[10.65px] md:text-[8px]">OR</p>
                           <div className="h-px w-full bg-[#F0F2F5]" />
@@ -203,8 +233,18 @@ You want to make sure your creative is very catchy.`}
                     <input
                       placeholder="Class Title e.g UI/UX Basics"
                       className="w-auto lg:w-[80%]"
+                      onChange={(e) => {
+                        setLectureTitle(e.target.value);
+                        setLectureTitleError("");
+                      }}
                     />
                   </div>
+                  {lectureTitleError && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {lectureTitleError}
+                    </p>
+                  )}
+
                   <div className="flex bg-white p-5 rounded-[5px] my-3">
                     <p className="font-medium mr-3 text-[16px]">Description:</p>
                     <textarea
@@ -240,7 +280,7 @@ You want to make sure your creative is very catchy.`}
                       </p>
                     </div>
 
-                    <div className="bg-green flex items-center">
+                    <div className="flex items-center bg-green">
                       <Image src={tick_circle} alt="tick" />
                     </div>
                   </div>
@@ -261,7 +301,7 @@ You want to make sure your creative is very catchy.`}
                   </div>
 
                   <div className=" bg-white p-5 rounded-[5px] my-3">
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-start space-x-4">
                         <div>
                           <Image src={film} alt="film" />
@@ -281,20 +321,17 @@ You want to make sure your creative is very catchy.`}
                         <Image src={trash} alt="trash" />
                       </div>
                     </div>
-                    <div className="flex justify-between flex-1 items-center">
+                    <div className="flex items-center justify-between flex-1">
                       <div className="p-1.5 my-2 bg-green-500 w-[100%] rounded-xl  mr-3"></div>
                       <p>100%</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-12 mb-4 w-full">
+                <div className="w-full mt-12 mb-4">
                   <button
                     className="rounded-lg bg-[#4A90E2] px-8 py-[15px] text-white w-full md:max-w-[350px]"
                     type="submit"
-                    onClick={(e) =>
-                      handleCreateCourse(e, "courseSetup4", router)
-                    }
                   >
                     Almost there!
                   </button>

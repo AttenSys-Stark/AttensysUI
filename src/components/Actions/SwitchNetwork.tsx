@@ -4,14 +4,14 @@
 //   switchNetworkLatest,
 //   switchNetworkNext,
 // } from "@/services/addNetwork.ts"
-// import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
+// import { walletStarknetkit } from "@/state/connectedWalletStarknetkitLatest"
 // import { walletStarknetkitNextAtom } from "@/state/connectedWalletStarknetkitNext"
 // import { Flex, Heading } from "@chakra-ui/react"
 // import { useAtomValue } from "jotai"
 // import { FC, useState } from "react"
 
 // const SwitchNetworkLatest = () => {
-//   const wallet = useAtomValue(walletStarknetkitLatestAtom)
+//   const wallet = useAtomValue(walletStarknetkit)
 //   return (
 //     <SwitchNetwork
 //       switchNetworkFn={async () => await switchNetworkLatest(wallet)}

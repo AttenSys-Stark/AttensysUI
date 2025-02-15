@@ -1,18 +1,12 @@
 "use client";
 import React, { useEffect } from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
-  connectorAtom,
-  connectorDataAtom,
-  walletStarknetkitNextAtom,
 } from "@/state/connectedWalletStarknetkitNext";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
-import { RESET } from "jotai/utils";
-import { connect, disconnect } from "starknetkit";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import Explore from "@/components/courses/Explore";
@@ -24,46 +18,7 @@ const Index = () => {
     bootcampdropdownstatus,
   );
 
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
-  const setConnectorData = useSetAtom(connectorDataAtom);
-  const setConnector = useSetAtom(connectorAtom);
-
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
-
-  useEffect(() => {
-    /*     setWalletLatest(RESET)*/
-    setWalletNext(RESET);
-    setConnectorData(RESET);
-    setConnector(RESET);
-  }, []);
-
-  useEffect(() => {
-    const autoConnect = async () => {
-      try {
-        const { wallet: connectedWallet } = await connect({
-          //@ts-ignore
-          provider,
-          modalMode: "neverAsk",
-          webWalletUrl: ARGENT_WEBWALLET_URL,
-          argentMobileOptions: {
-            dappName: "Attensys",
-            url: window.location.hostname,
-            chainId: CHAIN_ID,
-            icons: [],
-          },
-        });
-        setWallet(connectedWallet);
-      } catch (e) {
-        console.error(e);
-        alert((e as any).message);
-      }
-    };
-
-    if (!wallet) {
-      autoConnect();
-    }
-  }, [wallet]);
+  const [wallet] = useAtom(walletStarknetkit);
 
   const handlePageClick = () => {
     setbootcampdropstat(false);

@@ -1,48 +1,60 @@
-"use client"
-import React, { useEffect, useState } from "react"
-import OutlineCard from "./OutlineCard"
-import { FaPlus } from "react-icons/fa6"
-import { addclassmodal } from "@/state/connectedWalletStarknetkitNext"
-import { useAtom } from "jotai"
+"use client";
+import React, { useEffect, useState } from "react";
+import OutlineCard from "./OutlineCard";
+import { FaPlus } from "react-icons/fa6";
+import {
+  addclassmodal,
+  currentID,
+  orgowneraddress,
+} from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
 import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
-import {attensysOrgAbi} from '@/deployments/abi'
-import {attensysOrgAddress} from '@/deployments/contracts'
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
+import { attensysOrgAbi } from "@/deployments/abi";
+import { attensysOrgAddress } from "@/deployments/contracts";
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { pinata } from "../../../utils/config";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
-import { useSearchParams } from 'next/navigation';
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useSearchParams } from "next/navigation";
 
-
- const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
+const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
 
 const Outline = () => {
-  const [dataStat, setDataStat] = useState(false)
-  const [addClass, setAddclass] = useAtom(addclassmodal)
-    const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-    const [videoarray, setVideoArray] = useState([])
-    const searchParams = useSearchParams();
-    const id = searchParams.get('id');
-  
-  console.log("this is ID",id)
-    const handleAddclass = () => {
-    setAddclass({ modalstatus: true, idnumber: Number(id) })
-  }
+  const [dataStat, setDataStat] = useState(false);
+  const [addClass, setAddclass] = useAtom(addclassmodal);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const [bootcampid, setbootcampid] = useAtom(currentID);
+  const [ownerAddress, setowneraddress] = useAtom(orgowneraddress);
+  const [videoarray, setVideoArray] = useState([]);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const org = searchParams.get("org");
+
+  console.log("this is ID", id);
+  console.log("this is org", org);
+  // console.log("new new id",bootcampid )
+  // console.log("ownerAddress",ownerAddress )
+  const handleAddclass = () => {
+    setAddclass({ modalstatus: true, idnumber: Number(id) });
+  };
 
   const getUploadedVideo = async () => {
-      let video_data = await orgContract.get_bootcamp_uploaded_video_link("0x05Bf9E38B116B37A8249a4cd041D402903a5E8a67C1a99d2D336ac7bd8B4034e", 0)
-      console.log("video data here", video_data)
+    let video_data = await orgContract.get_bootcamp_uploaded_video_link(
+      org,
+      id,
+    );
+    console.log("video data here", video_data);
 
-      if (video_data?.length == 0) {
-        setDataStat(true);
-      }else {
-        setVideoArray(video_data)
-      }
-  }
+    if (video_data?.length == 0) {
+      setDataStat(true);
+    } else {
+      setVideoArray(video_data);
+    }
+  };
 
-   useEffect(() => {
-     getUploadedVideo()
-   },[wallet])
-  
+  useEffect(() => {
+    getUploadedVideo();
+  }, [wallet]);
+
   return (
     <div className="relative w-full md:w-[90%] h-[721px] bg-transparent md:bg-[#FFFFFF]  md:mx-auto md:rounded-xl md:border-[#D2D2D2] md:border-[1px] px-6 md:px-7 ">
       {dataStat && (
@@ -52,10 +64,9 @@ const Outline = () => {
       )}
       {!dataStat && (
         <div className="h-[600px] w-full overflow-y-scroll pt-10 px-10">
-          {videoarray?.map((data, index)=>{
-            return <OutlineCard key={index}/>
+          {videoarray?.map((data, index) => {
+            return <OutlineCard key={index} />;
           })}
-
         </div>
       )}
       <div

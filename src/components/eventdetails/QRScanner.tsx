@@ -1,22 +1,22 @@
-import { Scanner } from "@yudiel/react-qr-scanner"
-import { useRouter } from "next/navigation"
+import { Scanner } from "@yudiel/react-qr-scanner";
+import { useRouter } from "next/navigation";
 
 const QrScannerComponent = ({ eventId }: { eventId: string }) => {
-  const router = useRouter()
+  const router = useRouter();
   const handleScan = (data: string | null) => {
     if (data) {
-      console.log("Scanned QR Code:", data)
+      console.info("Scanned QR Code:", data);
 
-      router.push("/")
+      router.push("/");
     }
-  }
+  };
 
   const handleError = (error: unknown) => {
-    console.error("QR Scan Error:", error)
-  }
+    console.error("QR Scan Error:", error);
+  };
 
   return (
-    <div className="flex justify-center  h-screen">
+    <div className="flex justify-center h-screen">
       <Scanner
         // @ts-ignore
         onScan={handleScan}
@@ -27,7 +27,7 @@ const QrScannerComponent = ({ eventId }: { eventId: string }) => {
         videoStyle={{ width: "100%", height: "100%", objectFit: "cover" }}
       />
     </div>
-  )
-}
+  );
+};
 
-export default QrScannerComponent
+export default QrScannerComponent;

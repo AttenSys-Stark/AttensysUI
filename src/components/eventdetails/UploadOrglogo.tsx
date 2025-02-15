@@ -52,15 +52,15 @@ const UploadOrglogo = () => {
         file.type === "image/jpg")
     ) {
       // Process the file
-      console.log("Selected file:", file);
+      console.info("Selected file:", file);
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).");
+      console.error("Please select a valid image file (JPEG, JPG, or PNG).");
     }
   };
 
   return (
     <div className="flex md:px-16  mx-auto md:space-x-16 mt-4 md:flex-row flex-col md:w-[90%] w-[90%] ">
-      <div className=" space-y-8 ">
+      <div className="space-y-8 ">
         <h1 className="text-[#2D3A4B] text-[18px] font-semibold leading-[26px]">
           Organization Logo
         </h1>
@@ -130,7 +130,7 @@ const UploadOrglogo = () => {
         </h1>
         <div className="w-full h-[202px] rounded-xl bg-amount-gradient flex flex-col justify-center space-y-7">
           <div className="text-[#FFFFFF] flex flex-col items-center justify-center">
-            <div className="flex space-x-3 items-center">
+            <div className="flex items-center space-x-3">
               <Input
                 onChange={handleAmountChange}
                 placeholder="0"

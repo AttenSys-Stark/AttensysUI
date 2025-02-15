@@ -1,5 +1,5 @@
 import { ConnectButton } from "@/components/connect/ConnectButton";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import {
   connectorAtom,
   connectorDataAtom,
@@ -22,14 +22,12 @@ import {
 import { attensysOrgAddress } from "./../deployments/contracts";
 import { attensysOrgAbi } from "./../deployments/abi";
 import { RpcProvider, Contract, Account, ec, json } from "starknet";
+import { useWallet } from "@/hooks/useWallet";
 
 const MockOrganization = () => {
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom);
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom);
-  const setConnectorData = useSetAtom(connectorDataAtom);
-  const setConnector = useSetAtom(connectorAtom);
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet] = useAtom(walletStarknetkit);
 
+  const { disconnectWallet } = useWallet();
   const [inputValue, setInputValue] = useState("");
   const [orgInputValue, setOrgInputValue] = useState("");
   const [classOrgValue, setClassOrgValue] = useState("");
@@ -69,7 +67,7 @@ const MockOrganization = () => {
       );
       await provider.waitForTransaction(res.transaction_hash);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -92,7 +90,7 @@ const MockOrganization = () => {
     try {
       event.preventDefault();
       organizationContract.connect(wallet?.account);
-      console.log(instructorValue);
+      console.info(instructorValue);
       const myCall = organizationContract.populate("add_instructor_to_org", [
         instructorValue,
       ]);
@@ -100,7 +98,9 @@ const MockOrganization = () => {
         myCall.calldata,
       );
       await provider.waitForTransaction(res.transaction_hash);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleGetAllOrg = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -123,7 +123,7 @@ const MockOrganization = () => {
     ]);
     const res = await organizationContract.get_org_instructors(myCall.calldata);
     if (res != undefined) {
-      console.log(res);
+      console.info(res);
     }
   };
 
@@ -138,7 +138,9 @@ const MockOrganization = () => {
       ]);
       const res = await organizationContract.create_a_class(myCall.calldata);
       await provider.waitForTransaction(res.transaction_hash);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleGetInstructorPartOfOrg = async (
@@ -153,7 +155,7 @@ const MockOrganization = () => {
       myCall.calldata,
     );
     if (res != undefined) {
-      console.log(res);
+      console.info(res);
       //   setIsSuccess(true)
     }
   };
@@ -176,15 +178,7 @@ const MockOrganization = () => {
     setInstructorInputValue(event.target.value);
   };
 
-  console.log(orgData);
-
-  useEffect(() => {
-    setWalletLatest(RESET);
-    setWalletNext(RESET);
-    setConnectorData(RESET);
-    setConnector(RESET);
-  }, [inputValue]);
-
+  console.info(orgData);
   return (
     <div>
       {wallet ? (
@@ -192,7 +186,7 @@ const MockOrganization = () => {
           <DisconnectButton
             disconnectFn={disconnect}
             resetFn={() => {
-              setWallet(RESET);
+              disconnectWallet();
             }}
           />
         </>
@@ -203,21 +197,21 @@ const MockOrganization = () => {
         address={wallet?.account?.address}
         chainId={wallet?.chainId}
       />
-      <h1 className="text-3xl font-bold underline text-red-700">
+      <h1 className="text-3xl font-bold text-red-700 underline">
         Organization test
       </h1>
       <br />
 
-      <div className="px-4 py-3x border-4 m-7">
+      <div className="px-4 border-4 py-3x m-7">
         <h1 className="my-5 font-bold">Register organization</h1>
         <div className="flex flex-row mb-4">
           <form>
-            <div className=" mb-4">
+            <div className="mb-4 ">
               <div className="flow flow-row">
                 <label>
                   Organization Name:
                   <input
-                    className="px-4 py-3x border-4 my-5"
+                    className="px-4 my-5 border-4 py-3x"
                     type="input"
                     // value={inputValue}
                     onChange={handleOnChange}
@@ -226,7 +220,7 @@ const MockOrganization = () => {
                 <label>
                   NFT Name:
                   <input
-                    className="px-4 py-3x border-4 my-5"
+                    className="px-4 my-5 border-4 py-3x"
                     type="input"
                     // value={inputValue}
                     onChange={handleOnChange}
@@ -235,7 +229,7 @@ const MockOrganization = () => {
                 <label>
                   NFT Symbol:
                   <input
-                    className="px-4 py-3x border-4 my-5"
+                    className="px-4 my-5 border-4 py-3x"
                     type="input"
                     // value={inputValue}
                     onChange={handleOnChange}
@@ -244,7 +238,7 @@ const MockOrganization = () => {
                 <label>
                   NFT URL:
                   <input
-                    className="px-4 py-3x border-4 my-5"
+                    className="px-4 my-5 border-4 py-3x"
                     type="input"
                     // value={inputValue}
                     onChange={handleOnChange}
@@ -267,19 +261,19 @@ const MockOrganization = () => {
           </form>
         </div>
       </div>
-      <div className="px-4 py-3x border-4 m-7 flex">
+      <div className="flex px-4 border-4 py-3x m-7">
         <div className="flex-1">
           <h1 className="my-5 font-bold">Read organization information</h1>
           <form onSubmit={handleOnSubmit}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={inputValue}
                 onChange={handleOnChange}
               />
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-5"
+                className="px-4 py-2 my-5 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
                 type="submit"
               >
                 Get
@@ -307,7 +301,7 @@ const MockOrganization = () => {
           <form onSubmit={handleAddInstructor}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={instructorValue}
                 onChange={handleOnChange2}
@@ -327,13 +321,13 @@ const MockOrganization = () => {
           <form onSubmit={handleGetInstructorPartOfOrg}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={instructorInputValue}
                 onChange={handleOnChange5}
               />
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-5"
+                className="px-4 py-2 my-5 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
                 type="submit"
               >
                 Get
@@ -343,13 +337,13 @@ const MockOrganization = () => {
         </div>
       </div>
 
-      <div className="px-4 py-3x border-4 m-7 flex">
+      <div className="flex px-4 border-4 py-3x m-7">
         <div className="flex-1">
           <h1 className="my-5 font-bold">Get all organization</h1>
           <form onSubmit={handleGetAllOrg}>
             <div className="flex flex-row mb-4">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-5"
+                className="px-4 py-2 my-5 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
                 type="submit"
               >
                 Get
@@ -363,13 +357,13 @@ const MockOrganization = () => {
           <form onSubmit={handleGetInstructor}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={orgInputValue}
                 onChange={handleOnChange3}
               />
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-5"
+                className="px-4 py-2 my-5 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
                 type="submit"
               >
                 Get info
@@ -383,7 +377,7 @@ const MockOrganization = () => {
           <form onSubmit={handleCreateAClass}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={classOrgValue}
                 onChange={handleOnChange4}

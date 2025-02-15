@@ -20,7 +20,7 @@ import clsx from "clsx";
 import Category from "./Category";
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { pinata } from "../../../utils/config";
 import backArrow from "../../../public/backArrow.svg";
 
@@ -28,7 +28,7 @@ const Basicinfo = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const logofileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [organizationData, setOrganizationData] = useAtom(organzationInitState);
   const [inputError, setInputError] = useState(false);
   const [logoinputError, setlogoiInputError] = useState(false);
@@ -62,7 +62,7 @@ const Basicinfo = () => {
       }));
       setInputError(false);
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).");
+      console.error("Please select a valid image file (JPEG, JPG, or PNG).");
     }
   };
 
@@ -81,7 +81,7 @@ const Basicinfo = () => {
       }));
       setlogoiInputError(false);
     } else {
-      console.log("Please select a valid image file (JPEG, JPG, or PNG).");
+      console.error("Please select a valid image file (JPEG, JPG, or PNG).");
     }
   };
 
@@ -115,7 +115,6 @@ const Basicinfo = () => {
     if (!organizationData.organizationCategory.trim()) {
       setCategoryInputError(true);
       isValid = false;
-    } else {
     }
     // Proceed with navigation if all validations pass
     if (isValid) {
@@ -144,9 +143,9 @@ const Basicinfo = () => {
   // console.dir(organizationData, {depth:null})
 
   return (
-    <div className="lg:space-y-20 space-y-10  ">
+    <div className="space-y-10 lg:space-y-20 ">
       <div className="space-y-5">
-        <div className=" lg:hidden text-purple-500 flex space-x-3">
+        <div className="flex space-x-3 text-purple-500 lg:hidden">
           <Image src={backArrow} alt="back arrow" />
           <p className="text-lg font-extrabold">Basic Info</p>
         </div>
@@ -171,9 +170,9 @@ const Basicinfo = () => {
         )}
       </div>
 
-      <div className="lg:flex block space-x-4">
+      <div className="block space-x-4 lg:flex">
         <div className="lg:w-[60%] w-full lg:space-y-16 space-y-8">
-          <div className="space-y-3 w-full">
+          <div className="w-full space-y-3">
             <h1 className="text-[16px] text-[#2D3A4B] font-semibold leading-[23px]">
               Organization Name
             </h1>
@@ -196,7 +195,7 @@ const Basicinfo = () => {
             </p>
           </div>
 
-          <div className="space-y-3 w-full">
+          <div className="w-full space-y-3">
             <h1 className="text-[16px] font-semibold text-[#2D3A4B] leading-[23px]">
               Organization Description
             </h1>
@@ -227,7 +226,7 @@ const Basicinfo = () => {
         </div>
 
         <div className="lg:w-[40%] w-full mt-8 lg:mt-0 flex flex-col  lg:justify-center lg:items-center space-y-8">
-          <div className="space-y-5 m-0 w-full lg:w-auto">
+          <div className="w-full m-0 space-y-5 lg:w-auto">
             <h1 className="text-[16px] text-[#2D3A4B] font-semibold leading-[23px]">
               Organization Logo
             </h1>
