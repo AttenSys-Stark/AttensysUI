@@ -18,6 +18,7 @@ import plus from "../../../public/plus.svg";
 import { specificOrgRoute } from "@/state/connectedWalletStarknetkitNext";
 
 import { FileObject } from "pinata";
+import { useAvnu } from "@/hooks/useAvnu";
 const emptyData: FileObject = {
   name: "",
   type: "",
@@ -47,6 +48,11 @@ const Addinstructor = (props: any) => {
   const [organizationData, setOrganizationData] = useAtom(organzationInitState);
   const [specificOrg, setSpecificOrg] = useAtom(specificOrgRoute);
   const [uploading, setUploading] = useState(false);
+  const {
+    executeGaslessCalls,
+    loading: gaslessLoading,
+    error: gaslessError,
+  } = useAvnu(connectorDataAccount);
   // const [cidToContract, setCidToContract] = useState<string>("")
 
   // console.dir(organizationData, {depth : null})
@@ -92,11 +98,11 @@ const Addinstructor = (props: any) => {
       OrganizationInstructorWalletAddresses:
         organizationData.organizationInstructorsWalletAddresses,
     });
-    //@todo reset all data field after pinata data upload is successful
+
     if (Dataupload) {
       console.log("Data upload here", Dataupload);
       console.log("Cid to send to contract", Dataupload.IpfsHash);
-      //initialize provider with a Sepolia Testnet node
+
       const organizationContract = new Contract(
         attensysOrgAbi,
         attensysOrgAddress,
@@ -120,38 +126,52 @@ const Addinstructor = (props: any) => {
         ],
       );
 
-      //@ts-ignore
-      const multiCall = await connectorDataAccount.execute([
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "create_org_profile",
-          calldata: create_org_calldata.calldata,
-        },
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "add_instructor_to_org",
-          calldata: add_instructor_calldata.calldata,
-        },
-      ]);
+      try {
+        const multiCall = await executeGaslessCalls([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "create_org_profile",
+            calldata: create_org_calldata.calldata,
+          },
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "add_instructor_to_org",
+            calldata: add_instructor_calldata.calldata,
+          },
+        ]);
 
-      //@ts-ignore
-      connectorDataAccount?.provider
-        .waitForTransaction(multiCall.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.log("Error: ", e);
-        })
-        .finally(() => {
-          setSpecificOrg(organizationData.organizationName);
-          //Resets all org data input
-          setOrganizationData(ResetOrgRegData);
-          router.push(`/Createorganization/create-a-bootcamp`);
-        });
-      setUploading(false);
+        // Get transaction hash safely considering both response types
+        const transactionHash =
+          "transaction_hash" in multiCall
+            ? multiCall.transaction_hash
+            : multiCall.transactionHash;
+
+        if (!transactionHash) {
+          throw new Error("No transaction hash returned");
+        }
+
+        await connectorDataAccount?.provider
+          .waitForTransaction(transactionHash)
+          .then(() => {
+            setSpecificOrg(organizationData.organizationName);
+            setOrganizationData(ResetOrgRegData);
+            router.push(`/Createorganization/create-a-bootcamp`);
+          })
+          .catch((e: any) => {
+            console.log("Error: ", e);
+          });
+      } catch (error) {
+        console.error("Gasless transaction failed:", error);
+      } finally {
+        setUploading(false);
+      }
     }
     setUploading(false);
   };
 
+  if (gaslessError) {
+    console.error("Gasless transaction error:", gaslessError);
+  }
   return (
     <div className="lg:h-[500px] w-full flex flex-col items-center space-y-8 py-3">
       <div className="mx-auto w-full lg:w-auto pt-12">
@@ -181,10 +201,18 @@ const Addinstructor = (props: any) => {
         onClick={() => {
           handle_multicall_routing();
         }}
+        disabled={uploading || gaslessLoading}
         className="w-[342px] h-[47px] mt-8 flex justify-center items-center text-[#FFFFFF] text-[14px] font-bold leading-[16px] bg-[#4A90E2] rounded-xl"
       >
-        {uploading ? "Uploading..." : "Create your first bootcamp"}
+        {uploading || gaslessLoading
+          ? "Uploading..."
+          : "Create your first bootcamp"}
       </Button>
+      {gaslessError && (
+        <div className="text-red-500 text-sm mt-2">
+          Failed to process transaction. Please try again.
+        </div>
+      )}
     </div>
   );
 };
