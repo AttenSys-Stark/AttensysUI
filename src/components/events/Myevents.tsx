@@ -22,6 +22,7 @@ import { Contract } from "starknet";
 import { pinata } from "../../../utils/config";
 import Eventcard from "./Eventcard";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAvnu } from "@/hooks/useAvnu";
 
 const Myevents = (props: any) => {
   const { connectorDataAccount } = props;
@@ -62,6 +63,11 @@ const Myevents = (props: any) => {
     useAtom(createorexplore);
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const {
+    executeGaslessCalls,
+    loading: gaslessLoading,
+    error: gaslessError,
+  } = useAvnu(connectorDataAccount);
 
   const handleImageClick = () => {
     // Trigger the file input on image click
@@ -117,7 +123,6 @@ const Myevents = (props: any) => {
 
     return unixTimestamp;
   };
-
   const handleCreateEventButton = async () => {
     const newErrors = {
       eventName: !eventName.trim() ? "Event name is required" : "",
@@ -132,7 +137,6 @@ const Myevents = (props: any) => {
       file: !selectedFile ? "Event image is required" : "",
     };
 
-    // Time validation
     if (startTime && endTime && startTime >= endTime) {
       newErrors.endTime = "End time must be after start time";
     }
@@ -143,66 +147,89 @@ const Myevents = (props: any) => {
 
     setisSubmitting(true);
 
-    const eventDesignUpload = await pinata.upload.file(selectedFile!);
+    try {
+      const eventDesignUpload = await pinata.upload.file(selectedFile!);
 
-    const Dataupload = await pinata.upload.json({
-      name: eventName,
-      startday: startDate,
-      endday: endDate,
-      starttime: startTime,
-      endtime: endTime,
-      location: location,
-      nftname: nftName,
-      nftsymbol: nftSymbol,
-      description: description,
-      eventDesign: eventDesignUpload.IpfsHash,
-    });
-    if (Dataupload) {
-      const eventContract = new Contract(
-        attensysEventAbi,
-        attensysEventAddress,
-        connectorDataAccount,
-      );
+      const Dataupload = await pinata.upload.json({
+        name: eventName,
+        startday: startDate,
+        endday: endDate,
+        starttime: startTime,
+        endtime: endTime,
+        location: location,
+        nftname: nftName,
+        nftsymbol: nftSymbol,
+        description: description,
+        eventDesign: eventDesignUpload.IpfsHash,
+      });
 
-      const startdateandtime = convertToUnixTimeStamp(startDate, startTime);
+      if (Dataupload) {
+        const eventContract = new Contract(
+          attensysEventAbi,
+          attensysEventAddress,
+          connectorDataAccount,
+        );
 
-      const enddateandtime = convertToUnixTimeStamp(endDate, endTime);
+        const startdateandtime = convertToUnixTimeStamp(startDate, startTime);
+        const enddateandtime = convertToUnixTimeStamp(endDate, endTime);
 
-      const createEventCall = eventContract.populate("create_event", [
-        wallet?.account?.address,
-        eventName,
-        Dataupload.IpfsHash,
-        nftName,
-        nftSymbol,
-        startdateandtime,
-        enddateandtime,
-        true,
-      ]);
+        // Prepare the call data
+        const createEventCalldata = eventContract.populate("create_event", [
+          wallet?.account?.address,
+          eventName,
+          Dataupload.IpfsHash,
+          nftName,
+          nftSymbol,
+          startdateandtime,
+          enddateandtime,
+          true,
+        ]);
 
-      const result = await eventContract.create_event(createEventCall.calldata);
-      //@ts-ignore
-      connectorDataAccount?.provider
-        .waitForTransaction(result.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.log("Error: ", e);
-        })
-        .finally(() => {
-          //Resets all event data input
-          setEventName("");
-          setStartDate("");
-          setStartTime("");
-          setEndDate("");
-          setEndTime("");
-          setLocation("");
-          setNftName("");
-          setNftSymbol("");
-          setDescription("");
-          setSelectedFile(null);
+        // Execute the gasless transaction
+        const result = await executeGaslessCalls([
+          {
+            contractAddress: attensysEventAddress,
+            entrypoint: "create_event",
+            calldata: createEventCalldata.calldata,
+          },
+        ]);
 
-          setisSubmitting(false);
-          router.push(`/Overview/${eventName}/insight`);
-        });
+        // Get transaction hash safely considering both response types
+        const transactionHash =
+          "transaction_hash" in result
+            ? result.transaction_hash
+            : result.transactionHash;
+
+        if (!transactionHash) {
+          throw new Error("No transaction hash returned");
+        }
+
+        // Wait for transaction confirmation
+        await connectorDataAccount?.provider
+          .waitForTransaction(transactionHash)
+          .then(() => {
+            // Reset all event data input
+            setEventName("");
+            setStartDate("");
+            setStartTime("");
+            setEndDate("");
+            setEndTime("");
+            setLocation("");
+            setNftName("");
+            setNftSymbol("");
+            setDescription("");
+            setSelectedFile(null);
+
+            router.push(`/Overview/${eventName}/insight`);
+          })
+          .catch((e: any) => {
+            console.log("Error: ", e);
+          });
+      }
+    } catch (error) {
+      console.error("Failed to create event:", error);
+    } finally {
+      setisSubmitting(false);
     }
   };
 
@@ -569,12 +596,19 @@ const Myevents = (props: any) => {
               </div>
               <Button
                 onClick={handleCreateEventButton}
-                disabled={isSubmitting}
+                disabled={isSubmitting || gaslessLoading}
                 className="flex rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[422px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700 justify-center md:hidden w-[90%] mt-10 mx-auto"
               >
-                {isSubmitting ? "Creating Event..." : "Create an Event"}
+                {isSubmitting || gaslessLoading
+                  ? "Creating Event..."
+                  : "Create an Event"}
                 Create an Event
               </Button>
+              {gaslessError && (
+                <div className="text-red-500 text-sm mt-2">
+                  Failed to process transaction. Please try again.
+                </div>
+              )}
             </div>
           </>
         );
