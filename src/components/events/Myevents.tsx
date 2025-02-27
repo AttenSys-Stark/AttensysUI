@@ -23,6 +23,7 @@ import { pinata } from "../../../utils/config";
 import Eventcard from "./Eventcard";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useAvnu } from "@/hooks/useAvnu";
+import GasTokenModal from "../GasTokenModal";
 
 const Myevents = (props: any) => {
   const { connectorDataAccount } = props;
@@ -67,7 +68,14 @@ const Myevents = (props: any) => {
     executeGaslessCalls,
     loading: gaslessLoading,
     error: gaslessError,
+    hasRewards,
+    selectedGasToken,
+    selectGasToken,
+    gasTokenPrices,
+    formattedMaxGasAmount,
+    refetchGasTokenPrices,
   } = useAvnu(connectorDataAccount);
+  const [showGasTokenModal, setShowGasTokenModal] = useState(false);
 
   const handleImageClick = () => {
     // Trigger the file input on image click
@@ -124,6 +132,10 @@ const Myevents = (props: any) => {
     return unixTimestamp;
   };
   const handleCreateEventButton = async () => {
+    if (!hasRewards && !selectedGasToken) {
+      setShowGasTokenModal(true);
+      return;
+    }
     const newErrors = {
       eventName: !eventName.trim() ? "Event name is required" : "",
       startDate: !startDate ? "Start date is required" : "",
@@ -590,10 +602,26 @@ const Myevents = (props: any) => {
                 <Button
                   onClick={handleCreateEventButton}
                   className="rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[422px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700 justify-center hidden md:flex"
+                  disabled={isSubmitting || gaslessLoading}
                 >
-                  Create an Event
+                  {isSubmitting || gaslessLoading
+                    ? "Creating Event..."
+                    : "Create an Event"}
                 </Button>
               </div>
+              <GasTokenModal
+                isOpen={showGasTokenModal}
+                onClose={() => setShowGasTokenModal(false)}
+                onConfirm={() => {
+                  setShowGasTokenModal(false);
+                  handleCreateEventButton();
+                }}
+                gasTokenPrices={gasTokenPrices}
+                selectedGasToken={selectedGasToken}
+                selectGasToken={selectGasToken}
+                formattedMaxGasAmount={formattedMaxGasAmount}
+                refetchGasTokenPrices={refetchGasTokenPrices}
+              />
               <Button
                 onClick={handleCreateEventButton}
                 disabled={isSubmitting || gaslessLoading}
@@ -602,7 +630,6 @@ const Myevents = (props: any) => {
                 {isSubmitting || gaslessLoading
                   ? "Creating Event..."
                   : "Create an Event"}
-                Create an Event
               </Button>
               {gaslessError && (
                 <div className="text-red-500 text-sm mt-2">

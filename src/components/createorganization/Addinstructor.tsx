@@ -19,6 +19,7 @@ import { specificOrgRoute } from "@/state/connectedWalletStarknetkitNext";
 
 import { FileObject } from "pinata";
 import { useAvnu } from "@/hooks/useAvnu";
+import GasTokenModal from "../GasTokenModal";
 const emptyData: FileObject = {
   name: "",
   type: "",
@@ -52,7 +53,15 @@ const Addinstructor = (props: any) => {
     executeGaslessCalls,
     loading: gaslessLoading,
     error: gaslessError,
+    hasRewards,
+    selectedGasToken,
+    selectGasToken,
+    gasTokenPrices,
+    formattedMaxGasAmount,
+    refetchGasTokenPrices,
   } = useAvnu(connectorDataAccount);
+  const [showGasTokenModal, setShowGasTokenModal] = useState(false);
+
   // const [cidToContract, setCidToContract] = useState<string>("")
 
   // console.dir(organizationData, {depth : null})
@@ -73,9 +82,22 @@ const Addinstructor = (props: any) => {
   };
   const router = useRouter();
 
+  const handleOpenModal = async () => {
+    // Fetch gas tokens before opening modal
+    if (refetchGasTokenPrices) {
+      await refetchGasTokenPrices();
+    }
+    setShowGasTokenModal(true);
+  };
+
   //handles routing and pinata interaction
   // function to handle multicall of create_org and add_instructor functions from contract
   const handle_multicall_routing = async () => {
+    // If user has no rewards and no gas token is selected yet, show the modal
+    if (!hasRewards && !selectedGasToken) {
+      handleOpenModal();
+      return;
+    }
     setUploading(true);
     const OrgBannerupload = await pinata.upload.file(
       organizationData.organizationBanner,
@@ -127,7 +149,7 @@ const Addinstructor = (props: any) => {
       );
 
       try {
-        const multiCall = await executeGaslessCalls([
+        const calls = [
           {
             contractAddress: attensysOrgAddress,
             entrypoint: "create_org_profile",
@@ -138,7 +160,8 @@ const Addinstructor = (props: any) => {
             entrypoint: "add_instructor_to_org",
             calldata: add_instructor_calldata.calldata,
           },
-        ]);
+        ];
+        const multiCall = await executeGaslessCalls(calls);
 
         // Get transaction hash safely considering both response types
         const transactionHash =
@@ -197,6 +220,19 @@ const Addinstructor = (props: any) => {
                             Send invite</Button>    */}
         </div>
       </div>
+      <GasTokenModal
+        isOpen={showGasTokenModal}
+        onClose={() => setShowGasTokenModal(false)}
+        onConfirm={() => {
+          setShowGasTokenModal(false);
+          handle_multicall_routing();
+        }}
+        gasTokenPrices={gasTokenPrices}
+        selectedGasToken={selectedGasToken}
+        selectGasToken={selectGasToken}
+        formattedMaxGasAmount={formattedMaxGasAmount}
+        refetchGasTokenPrices={refetchGasTokenPrices}
+      />
       <Button
         onClick={() => {
           handle_multicall_routing();
