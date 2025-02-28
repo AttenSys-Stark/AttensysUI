@@ -1,7 +1,7 @@
 // app/providers.tsx
 "use client"
 import { Provider as JotaiProvider } from "jotai"
-import { ReactNode, useEffect, useState } from "react"
+import { type ReactNode, useEffect, useState } from "react"
 import {
   StarknetConfig,
   argent,

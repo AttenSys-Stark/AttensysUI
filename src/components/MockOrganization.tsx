@@ -5,23 +5,19 @@ import {
   connectorDataAtom,
   walletStarknetkitNextAtom,
 } from "@/state/connectedWalletStarknetkitNext"
-import { useSetAtom } from "jotai"
+import { useAtomValue, useSetAtom } from "jotai"
 import { RESET } from "jotai/utils"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { DisconnectButton } from "@/components/DisconnectButton"
 import { useAtom } from "jotai"
-import { connect, disconnect } from "starknetkit"
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
+import { disconnect } from "starknetkit"
+import { provider } from "@/constants"
 import { AccountSection } from "@/components/AccountSection"
-import {
-  useAccount,
-  useReadContract,
-  useContract,
-  useSendTransaction,
-} from "@starknet-react/core"
 import { attensysOrgAddress } from "./../deployments/contracts"
 import { attensysOrgAbi } from "./../deployments/abi"
-import { RpcProvider, Contract, Account, ec, json } from "starknet"
+import { Contract, } from "starknet"
+import { sessionAccountAtom, sessionAtom, sessionKeyModeAtom } from "@/state/argentSessionState"
+import { SessionKeys } from "./connect/SessionKeys"
 
 const MockOrganization = () => {
   const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
@@ -29,6 +25,9 @@ const MockOrganization = () => {
   const setConnectorData = useSetAtom(connectorDataAtom)
   const setConnector = useSetAtom(connectorAtom)
   const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
+  const sessionKeyMode = useAtomValue(sessionKeyModeAtom)
+  const sessionAccount = useAtomValue(sessionAccountAtom)
+  const session = useAtomValue(sessionAtom)
   const [inputValue, setInputValue] = useState("")
   const [orgInputValue, setOrgInputValue] = useState("")
   const [classOrgValue, setClassOrgValue] = useState("")
@@ -52,21 +51,47 @@ const MockOrganization = () => {
   )
 
   // core write and read functions
-
   const registerOrg = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault()
-      organizationContract.connect(wallet?.account)
       const myCall = organizationContract.populate("create_org_profile", [
         "web3",
         "http://w3bnft.com",
         "cairo",
         "CAO",
       ])
-      const res = await organizationContract.create_org_profile(myCall.calldata)
-      await provider.waitForTransaction(res.transaction_hash)
+
+      if (sessionKeyMode) {
+        if (!session || !sessionAccount) {
+          throw new Error("No open session")
+        }
+
+        organizationContract.connect(sessionAccount)
+
+        const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
+          contractAddress: attensysOrgAddress,
+          entrypoint: "create_org_profile",
+          calldata: myCall.calldata,
+        })
+
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
+
+        const result = await organizationContract.create_org_profile(
+          myCall.calldata,
+          {
+            maxFee,
+          },
+        )
+
+        await provider.waitForTransaction(result.transaction_hash)
+      } else {
+        organizationContract.connect(wallet?.account)
+
+        const result = await organizationContract.create_org_profile(myCall.calldata)
+        await provider.waitForTransaction(result.transaction_hash)
+      }
     } catch (error) {
-      console.log(error)
+      console.error("Error creating organization profile:", error);
     }
   }
 
@@ -88,16 +113,49 @@ const MockOrganization = () => {
   ) => {
     try {
       event.preventDefault()
-      organizationContract.connect(wallet?.account)
       console.log(instructorValue)
+
       const myCall = organizationContract.populate("add_instructor_to_org", [
         instructorValue,
       ])
-      const res = await organizationContract.add_instructor_to_org(
-        myCall.calldata,
-      )
-      await provider.waitForTransaction(res.transaction_hash)
-    } catch (error) {}
+
+      if (sessionKeyMode) {
+        if (!session || !sessionAccount) {
+          throw new Error("No open session")
+        }
+
+        organizationContract.connect(sessionAccount)
+
+        const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
+          contractAddress: attensysOrgAddress,
+          entrypoint: "add_instructor_to_org",
+          calldata: myCall.calldata,
+        })
+
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
+
+        const result = await organizationContract.add_instructor_to_org(
+          myCall.calldata,
+          {
+            maxFee,
+          },
+        )
+
+        await provider.waitForTransaction(result.transaction_hash)
+      } else {
+
+        organizationContract.connect(wallet?.account)
+
+        const res = await organizationContract.add_instructor_to_org(
+          myCall.calldata,
+        )
+
+        await provider.waitForTransaction(res.transaction_hash)
+      }
+
+    } catch (error) {
+      console.error("Error adding an instructor to organization:", error);
+    }
   }
 
   const handleGetAllOrg = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -106,8 +164,8 @@ const MockOrganization = () => {
     const myCall = organizationContract.populate("get_all_org_info", [])
     const res = await organizationContract.get_all_org_info(myCall.calldata)
     if (res != undefined) {
-    //   console.log(res)
-    //   setIsSuccess(true)
+      //   console.log(res)
+      //   setIsSuccess(true)
     }
   }
   const handleGetInstructor = async (
@@ -129,15 +187,46 @@ const MockOrganization = () => {
   ) => {
     try {
       event.preventDefault()
-      organizationContract.connect(wallet?.account)
+
       const myCall = organizationContract.populate("create_a_class", [
         classOrgValue,
       ])
-      const res = await organizationContract.create_a_class(
-        myCall.calldata,
-      )
-      await provider.waitForTransaction(res.transaction_hash)
-    } catch (error) {}
+
+      if (sessionKeyMode) {
+        if (!session || !sessionAccount) {
+          throw new Error("No open session")
+        }
+
+        organizationContract.connect(sessionAccount)
+
+        const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
+          contractAddress: attensysOrgAddress,
+          entrypoint: "create_a_class",
+          calldata: myCall.calldata,
+        })
+
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
+
+        const result = await organizationContract.create_a_class(
+          myCall.calldata,
+          {
+            maxFee,
+          },
+        )
+
+        await provider.waitForTransaction(result.transaction_hash)
+      } else {
+
+        organizationContract.connect(wallet?.account)
+
+        const res = await organizationContract.create_a_class(
+          myCall.calldata,
+        )
+        await provider.waitForTransaction(res.transaction_hash)
+      }
+    } catch (error) {
+      console.error("Error creating a class:", error);
+    }
   }
 
   const handleGetInstructorPartOfOrg = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -147,7 +236,7 @@ const MockOrganization = () => {
     const res = await organizationContract.get_instructor_part_of_org(myCall.calldata)
     if (res != undefined) {
       console.log(res)
-    //   setIsSuccess(true)
+      //   setIsSuccess(true)
     }
   }
 
@@ -188,6 +277,7 @@ const MockOrganization = () => {
               setWallet(RESET)
             }}
           />
+          <SessionKeys />
         </>
       ) : (
         <ConnectButton />
@@ -196,21 +286,21 @@ const MockOrganization = () => {
         address={wallet?.account?.address}
         chainId={wallet?.chainId}
       />
-      <h1 className="text-3xl font-bold underline text-red-700">
+      <h1 className="text-3xl font-bold text-red-700 underline">
         Organization test
       </h1>
       <br />
 
-      <div className="px-4 py-3x border-4 m-7">
+      <div className="px-4 border-4 py-3x m-7">
         <h1 className="my-5 font-bold">Register organization</h1>
         <div className="flex flex-row mb-4">
           <form>
-            <div className=" mb-4">
+            <div className="mb-4 ">
               <div className="flow flow-row">
                 <label>
                   Organization Name:
                   <input
-                    className="px-4 py-3x border-4 my-5"
+                    className="px-4 my-5 border-4 py-3x"
                     type="input"
                     // value={inputValue}
                     onChange={handleOnChange}
@@ -219,7 +309,7 @@ const MockOrganization = () => {
                 <label>
                   NFT Name:
                   <input
-                    className="px-4 py-3x border-4 my-5"
+                    className="px-4 my-5 border-4 py-3x"
                     type="input"
                     // value={inputValue}
                     onChange={handleOnChange}
@@ -228,7 +318,7 @@ const MockOrganization = () => {
                 <label>
                   NFT Symbol:
                   <input
-                    className="px-4 py-3x border-4 my-5"
+                    className="px-4 my-5 border-4 py-3x"
                     type="input"
                     // value={inputValue}
                     onChange={handleOnChange}
@@ -237,7 +327,7 @@ const MockOrganization = () => {
                 <label>
                   NFT URL:
                   <input
-                    className="px-4 py-3x border-4 my-5"
+                    className="px-4 my-5 border-4 py-3x"
                     type="input"
                     // value={inputValue}
                     onChange={handleOnChange}
@@ -260,19 +350,19 @@ const MockOrganization = () => {
           </form>
         </div>
       </div>
-      <div className="px-4 py-3x border-4 m-7 flex">
+      <div className="flex px-4 border-4 py-3x m-7">
         <div className="flex-1">
           <h1 className="my-5 font-bold">Read organization information</h1>
           <form onSubmit={handleOnSubmit}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={inputValue}
                 onChange={handleOnChange}
               />
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-5"
+                className="px-4 py-2 my-5 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
                 type="submit"
               >
                 Get
@@ -300,7 +390,7 @@ const MockOrganization = () => {
           <form onSubmit={handleAddInstructor}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={instructorValue}
                 onChange={handleOnChange2}
@@ -320,13 +410,13 @@ const MockOrganization = () => {
           <form onSubmit={handleGetInstructorPartOfOrg}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={instructorInputValue}
                 onChange={handleOnChange5}
               />
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-5"
+                className="px-4 py-2 my-5 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
                 type="submit"
               >
                 Get
@@ -336,13 +426,13 @@ const MockOrganization = () => {
         </div>
       </div>
 
-      <div className="px-4 py-3x border-4 m-7 flex">
+      <div className="flex px-4 border-4 py-3x m-7">
         <div className="flex-1">
           <h1 className="my-5 font-bold">Get all organization</h1>
           <form onSubmit={handleGetAllOrg}>
             <div className="flex flex-row mb-4">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-5"
+                className="px-4 py-2 my-5 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
                 type="submit"
               >
                 Get
@@ -356,13 +446,13 @@ const MockOrganization = () => {
           <form onSubmit={handleGetInstructor}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={orgInputValue}
                 onChange={handleOnChange3}
               />
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-5"
+                className="px-4 py-2 my-5 font-bold text-white bg-blue-500 rounded hover:bg-blue-700"
                 type="submit"
               >
                 Get info
@@ -376,7 +466,7 @@ const MockOrganization = () => {
           <form onSubmit={handleCreateAClass}>
             <div className="flex flex-row mb-4">
               <input
-                className="px-4 py-3x border-4 my-5"
+                className="px-4 my-5 border-4 py-3x"
                 type="input"
                 value={classOrgValue}
                 onChange={handleOnChange4}

@@ -2,7 +2,7 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
 import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
 import { useSetAtom } from "jotai"
 import { useRouter } from "next/navigation"
-import { FC } from "react"
+import type { FC } from "react"
 import { connect } from "starknetkit"
 
 const ConnectButton: FC = () => {
@@ -31,13 +31,14 @@ const ConnectButton: FC = () => {
   }
 
   return (
-   <div>
-    <button
-      onClick={connectFn}
-      className="border-8 border-black mt-4 bg-black text-white"
-    >
-      Connect
-    </button>
+    <div>
+      <button
+        type="button"
+        onClick={connectFn}
+        className="mt-4 text-white bg-black border-8 border-black"
+      >
+        Connect
+      </button>
 
     </div>
   )
