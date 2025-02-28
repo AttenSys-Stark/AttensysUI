@@ -8,7 +8,7 @@ export const tokenAddressToInfo: Record<
     logoUrl: "https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png",
   },
   "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d": {
-    name: "Starknet Token",
+    name: "Starknet",
     symbol: "STRK",
     logoUrl: "https://s2.coinmarketcap.com/static/img/coins/64x64/22691.png",
   },

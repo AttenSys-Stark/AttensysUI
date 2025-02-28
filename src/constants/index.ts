@@ -1,5 +1,31 @@
 import { RpcProvider, constants } from "starknet";
 
+export const ERC20_ABI = [
+  {
+    members: [
+      { name: "low", offset: 0, type: "felt" },
+      { name: "high", offset: 1, type: "felt" },
+    ],
+    name: "Uint256",
+    size: 2,
+    type: "struct",
+  },
+  {
+    inputs: [{ name: "account", type: "felt" }],
+    name: "balanceOf",
+    outputs: [{ name: "balance", type: "Uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "decimals",
+    outputs: [{ name: "decimals", type: "felt" }],
+    stateMutability: "view",
+    type: "function",
+  },
+];
+
 export const CHAIN_ID =
   process.env.NEXT_PUBLIC_CHAIN_ID === constants.NetworkName.SN_MAIN
     ? constants.NetworkName.SN_MAIN

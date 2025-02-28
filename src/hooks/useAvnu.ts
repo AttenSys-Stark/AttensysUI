@@ -12,7 +12,7 @@ import {
   type GasTokenPrice,
 } from "@avnu/gasless-sdk";
 import type { AccountInterface, Call, EstimateFeeResponse } from "starknet";
-import { Provider, stark, transaction } from "starknet";
+import { provider, Provider, stark, transaction } from "starknet";
 import { formatUnits } from "ethers";
 
 const AVNU_BASE_URL =
@@ -251,6 +251,7 @@ export function useAvnu(account: AccountInterface | null) {
     maxGasTokenAmount,
     formattedMaxGasAmount: formattedMaxGasAmount(),
     compatibility,
+    activeCalls,
     refetchGasTokenPrices,
   };
 }
