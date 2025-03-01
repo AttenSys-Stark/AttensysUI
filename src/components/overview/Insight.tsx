@@ -8,12 +8,64 @@ import cross from "@/assets/cross.svg";
 import share from "@/assets/share.svg";
 import del from "@/assets/delete.svg";
 import ChartData from "./ChartData";
+import { Contract } from "starknet";
+import { attensysEventAbi } from "@/deployments/abi";
+import { attensysEventAddress } from "@/deployments/contracts";
+import { useAtom } from "jotai";
+import { connectorAtom } from "@/state/connectedWalletStarknetkitNext";
 
-const Insight = () => {
+const Insight = (props: any) => {
   const [emailList, setEmailList] = useState<string[]>([]);
+  const [connector] = useAtom(connectorAtom);
+  // const [loading, setLoading] = useState(false);
+
+  const [connectorDataAccount] = useState<null | any>(
+    connector?.wallet.account,
+  );
 
   const handleEmailsChange = (emails: string[]) => {
     setEmailList(emails);
+  };
+
+  const handleStartAndEndRegistration = async ({
+    start,
+    eventId = 2, //hardcoded event_identifier value of 2
+  }: {
+    start: boolean;
+    eventId?: number;
+  }) => {
+    if (!connectorDataAccount) {
+      alert("Please make sure you are connected to a wallet");
+      return;
+    }
+
+    // setLoading(true);
+    const eventContract = new Contract(
+      attensysEventAbi,
+      attensysEventAddress,
+      connectorDataAccount,
+    );
+    //This is calling the start_end_reg function from the contract using an hardcoded event_identifier value of 2 as set in the function parameters above
+    const startEndRegistrationCall = eventContract.populate("start_end_reg", [
+      start,
+      eventId,
+    ]);
+
+    const result = await eventContract.start_end_reg(
+      startEndRegistrationCall.calldata,
+    );
+    //@ts-ignore
+    connectorDataAccount?.provider
+      .waitForTransaction(result.transaction_hash)
+      .then(() => {
+        console.log("Success");
+      })
+      .catch((e: any) => {
+        console.log("Error: ", e);
+      })
+      .finally(() => {
+        // setLoading(false);
+      });
   };
 
   return (
@@ -23,7 +75,7 @@ const Insight = () => {
           <Image src={story} alt="story" objectFit="cover" layout="fill" />
         </div>
         <h1 className="mt-4 text-[#ABADBA] text-[29.7px] font-bold leading-[68px]">
-          Event Name
+          {props.eventname}
         </h1>
         <div className="mt-8">
           <div className="flex flex-col md:flex-row gap-2">
@@ -139,7 +191,21 @@ const Insight = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-center md:justify-end w-full">
+          <div className="flex justify-center md:justify-end w-full gap-4">
+            <Button
+              onClick={() => handleStartAndEndRegistration({ start: true })}
+              className="bg-green-500 text-[#FFFFFF] font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5"
+            >
+              {/* <Image src={del} alt="drop" className="mr-2" /> */}
+              Start Registeration
+            </Button>
+            <Button
+              onClick={() => handleStartAndEndRegistration({ start: false })}
+              className="bg-red-700 text-white font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5"
+            >
+              {/* <Image src={del} alt="drop" className="mr-2" /> */}
+              End Registeration
+            </Button>
             <Button className="bg-[#E0515152] text-[#730404] font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5">
               <Image src={del} alt="drop" className="mr-2" />
               Cancel Event

@@ -19,6 +19,11 @@ import {
   certSideProperties,
 } from "@/constants/data";
 import { IoMdInformationCircleOutline } from "react-icons/io";
+import { coursesDetails, learningDetails } from "@/constants/data";
+import CoursesCreated from "./CoursesCreated";
+import LearningJourney from "./LearningJourney";
+import Notification from "./Notification";
+import CreateACourse from "./CreateACourse";
 
 interface UserSideBarProps {
   page: string; // or another type like `number` or a union type
@@ -142,33 +147,65 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
 
         {page == "myCourse" &&
           sideProperties.map((item, i) => (
-            <div
-              className={`bg-white py-4 px-8 rounded-xl border-[1px] border-[#BCBCBC] my-2 cursor-pointer hover:bg-violet-600 active:bg-violet-700 ${selected == item.title ? "focus:outline-none focus:ring focus:ring-violet-300" : ""} `}
-              key={i}
-            >
+            <div key={i}>
               <div
-                className="flex justify-between text-sm items-start "
-                onClick={() => {
-                  setSelected(item.title);
-                }}
+                className={`bg-white py-4 px-8 rounded-xl border-[1px] border-[#BCBCBC] my-2 cursor-pointer hover:bg-violet-600 active:bg-violet-700 ${
+                  selected == item.title
+                    ? "focus:outline-none focus:ring focus:ring-violet-300"
+                    : ""
+                } `}
+                onClick={() => setSelected(item.title)}
               >
-                <div className="flex items-center">
-                  <div className="h-[15px] w-[18px]">
-                    <Image
-                      src={item.url}
-                      alt={item.title}
-                      className="h-full w-full object-cover"
-                    />
+                <div className="flex justify-between text-sm items-start">
+                  <div className="flex items-center">
+                    <div className="h-[15px] w-[18px]">
+                      <Image
+                        src={item.url}
+                        alt={item.title}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <p className="ml-3 text-[14px] text-[#2D3A4B] font-bold leading-[19px]">
+                      {item.title}{" "}
+                      {item.no == 0 ? null : <span>({item.no})</span>}
+                    </p>
                   </div>
-                  <p className="ml-3 text-[14px] text-[#2D3A4B] font-bold leading-[19px]">
-                    {item.title}{" "}
-                    {item.no == 0 ? null : <span>({item.no})</span>}
-                  </p>
-                </div>
-
-                <div>
                   <IoMdArrowDropdown />
                 </div>
+              </div>
+
+              <div className="sm:hidden">
+                {selected === item.title && (
+                  <>
+                    {coursesDetails.some((course) => course.tag === selected) &&
+                      coursesDetails
+                        .filter((course) => course.tag === selected)
+                        .map((course, index) => (
+                          <CoursesCreated
+                            key={index}
+                            item={course}
+                            selected={selected}
+                          />
+                        ))}
+
+                    {learningDetails.some(
+                      (journey) => journey.tag === selected,
+                    ) &&
+                      learningDetails.map((item, i) =>
+                        item && item.tag == selected ? (
+                          <LearningJourney
+                            item={item}
+                            selected={selected}
+                            key={i}
+                          />
+                        ) : null,
+                      )}
+
+                    {selected === "Create a course" && <CreateACourse />}
+
+                    {selected === "Notification" && <Notification />}
+                  </>
+                )}
               </div>
             </div>
           ))}

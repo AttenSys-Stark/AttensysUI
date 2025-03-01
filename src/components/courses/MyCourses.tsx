@@ -38,7 +38,7 @@ const MyCourses = (props: any) => {
     <div className="block lg:flex lg:mx-10 mb-8 pb-24 max-w-screen-2xl xl:mx-auto">
       <UserSideBar page={page} selected={selected} setSelected={setSelected} />
 
-      <div className="flex-auto ml-0 lg:ml-5 px-4 my-12 lg:my-0 lg:px-0">
+      <div className="flex-auto ml-0 lg:ml-5 px-4 my-12 lg:my-0 lg:px-0 hidden sm:block">
         {coursesDetails.map((item, i) =>
           item && item.tag == selected ? (
             <CoursesCreated item={item} selected={selected} key={i} />

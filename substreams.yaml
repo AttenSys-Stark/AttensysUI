@@ -1,0 +1,39 @@
+specVersion: v0.1.0
+package:
+  name: course_subgraph
+  version: v0.1.0
+
+imports:
+  starknet: https://spkg.io/streamingfast/starknet-foundational-v0.1.4.spkg
+
+protobuf:
+  files:
+    - events.proto
+  importPaths:
+    - ./proto
+
+  excludePaths:
+    - sf/substreams/index
+    - sf/substreams/rpc
+    - sf/substreams/sink
+    - sf/substreams/v1
+    - google
+
+binaries:
+  default:
+    type: wasm/rust-v1+wasm-bindgen-shims
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: map_coursecontract_events
+    kind: map
+    initialBlock: 557528
+    inputs:
+      - map: starknet:filtered_transactions
+    output:
+      type: proto:starknet.v1.Events
+
+network: starknet-testnet
+
+params:
+  starknet:filtered_transactions: ev:from_address:0x03f90884eca9e36599467b8178fa9ee5950df6fd22c06102a8effc58bb8945db

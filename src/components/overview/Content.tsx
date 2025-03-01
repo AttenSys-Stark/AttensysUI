@@ -30,7 +30,7 @@ const Content = (props: any) => {
         setsponsorshipclickstat(false);
         return (
           <>
-            <Insight />
+            <Insight eventname={props.eventname} />
           </>
         );
       case "guestlist":

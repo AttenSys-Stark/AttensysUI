@@ -12,6 +12,30 @@ import {
   voyager,
 } from "@starknet-react/core";
 import { devnet, sepolia, mainnet } from "@starknet-react/chains";
+import {
+  isServer,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 60 * 1000,
+      },
+    },
+  });
+}
+let browserQueryClient: QueryClient | undefined = undefined;
+function getQueryClient() {
+  if (isServer) {
+    return makeQueryClient();
+  } else {
+    if (!browserQueryClient) browserQueryClient = makeQueryClient();
+    return browserQueryClient;
+  }
+}
+
 export function Providers({ children }: { children: ReactNode }) {
   // solving white loading flash on dark mode when serving the page
   // https://brianlovin.com/writing/adding-dark-mode-with-next-js
@@ -29,6 +53,7 @@ export function Providers({ children }: { children: ReactNode }) {
   if (!mounted) {
     return <div style={{ visibility: "hidden" }}>{null}</div>;
   }
+  const queryClient = getQueryClient();
 
   const body = (
     <>
@@ -38,7 +63,11 @@ export function Providers({ children }: { children: ReactNode }) {
         connectors={connectors}
         explorer={voyager}
       >
-        <JotaiProvider>{children}</JotaiProvider>
+        <JotaiProvider>
+          <QueryClientProvider client={queryClient}>
+            {children}
+          </QueryClientProvider>
+        </JotaiProvider>
       </StarknetConfig>
     </>
   );

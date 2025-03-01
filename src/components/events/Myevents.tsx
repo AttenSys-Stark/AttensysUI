@@ -22,10 +22,13 @@ import { Contract } from "starknet";
 import { pinata } from "../../../utils/config";
 import Eventcard from "./Eventcard";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import Link from "next/link";
+import { useEvents } from "@/hooks/useEvents";
+import { decimalToHexAddress, FormatDateFromUnix } from "@/utils/formatAddress";
 
 const Myevents = (props: any) => {
   const { connectorDataAccount } = props;
-
+  const { events, getEvents } = useEvents();
   const [isSubmitting, setisSubmitting] = useState(false);
 
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -177,6 +180,7 @@ const Myevents = (props: any) => {
         startdateandtime,
         enddateandtime,
         true,
+        Dataupload.IpfsHash,
       ]);
 
       const result = await eventContract.create_event(createEventCall.calldata);
@@ -677,15 +681,24 @@ const Myevents = (props: any) => {
             )}
             {existingeventStat && (
               <div className="h-[508px] overflow-y-auto ">
-                {mockeventcreatedData.map((dataitem, index) => (
-                  <Eventcard
+                {events.map((dataitem, index) => (
+                  <Link
                     key={index}
-                    todaydate={dataitem.today}
-                    time={dataitem.time}
-                    eventname={dataitem.name}
-                    host={dataitem.host}
-                    location={dataitem.location}
-                  />
+                    href={`/Overview/${dataitem.event_name ?? "sample_event"}/insight`}
+                  >
+                    <Eventcard
+                      key={index}
+                      todaydate={
+                        FormatDateFromUnix(dataitem.time.start_time ?? 0n).date
+                      }
+                      time={
+                        FormatDateFromUnix(dataitem.time.start_time ?? 0n).time
+                      }
+                      eventname={dataitem.event_name}
+                      host={decimalToHexAddress(dataitem.event_organizer ?? 0)}
+                      location={"Google Meet"}
+                    />
+                  </Link>
                 ))}
               </div>
             )}
@@ -698,7 +711,8 @@ const Myevents = (props: any) => {
 
   useEffect(() => {
     setexistingeventStat(false);
-  });
+    // getEvents();
+  }, []);
 
   useEffect(() => {
     const scrollY = sessionStorage.getItem("scrollPosition");

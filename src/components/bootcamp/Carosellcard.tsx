@@ -35,7 +35,9 @@ const Carosellcard = (props: any) => {
         `/Register/${props.name}/?id=${Number(props.alldata.bootcamp_id)}&org=${props.alldata.address_of_org}`,
       );
     } else if (arg == "Manage") {
-      router.push(`/Mybootcamps/${props.name}`);
+      router.push(
+        `/Mybootcamps/${props.name}/?id=${Number(props.alldata.bootcamp_id)}&org=${props.alldata.address_of_org}`,
+      );
     }
   };
 

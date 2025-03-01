@@ -17,7 +17,11 @@ import StarRating from "../bootcamp/StarRating";
 import { HiOutlineCheckBadge } from "react-icons/hi2";
 import { LuBadgeCheck } from "react-icons/lu";
 
-const LandingPage = () => {
+interface ChildComponentProps {
+  courseData: any;
+}
+
+const LandingPage: React.FC<ChildComponentProps> = ({ courseData }) => {
   const router = useRouter();
   const lectures = [
     {
@@ -39,6 +43,9 @@ const LandingPage = () => {
       timing: 8,
     },
   ];
+
+  console.log(courseData);
+
   return (
     <div className="pb-14 bg-[#F5F8FA]">
       <div
@@ -274,7 +281,10 @@ const LandingPage = () => {
       </div>
 
       <div className="px-6 lg:mx-48 sm:mt-4 xl:mt-32 mb-10">
-        <Lectures lectures={lectures} />
+        <Lectures
+          lectures={lectures}
+          learningObj={courseData.learningObjectives}
+        />
       </div>
 
       {/* rating */}

@@ -212,21 +212,34 @@ const Create = (props: any) => {
 
   const handlePublishButton = async () => {
     setUploading(true);
+    //@ts-ignore
     const bootcamplogo = await pinata.upload.file(bootcampData.BootcampLogo);
+    //@ts-ignore
     const Nftimage = await pinata.upload.file(bootcampData.bootcampNftImage);
     const Dataupload = await pinata.upload.json({
+      //@ts-ignore
       BootcampName: bootcampData.bootcampName,
       BootcampLogo: bootcamplogo.IpfsHash,
+      //@ts-ignore
       BootcampDescription: bootcampData.bootcampDescription,
+      //@ts-ignore
       Bootcamplecturedata: bootcampData.bootcampLecture,
+      //@ts-ignore
       BootcampStartDate: bootcampData.bootcampStartdate,
+      //@ts-ignore
       BootEndDate: bootcampData.bootcampEndDate,
+      //@ts-ignore
       BootcampNFTname: bootcampData.bootcampNftName,
+      //@ts-ignore
       BootcampNFTsymbol: bootcampData.bootCampNftSymbol,
       BootcampNftImage: Nftimage.IpfsHash,
+      //@ts-ignore
       Organizer: bootcampData.bootcampOrganization,
+      //@ts-ignore
       PriceStaus: bootcampData.price,
+      //@ts-ignore
       BootcampPrice: bootcampData.bootcampPrice,
+      //@ts-ignore
       targetAudience: bootcampData.targetAudience,
     });
 
@@ -251,9 +264,12 @@ const Create = (props: any) => {
         "create_bootcamp",
         [
           organizationName,
+          //@ts-ignore
           bootcampData.bootcampName,
           Dataupload.IpfsHash,
+          //@ts-ignore
           bootcampData.bootcampNftName,
+          //@ts-ignore
           bootcampData.bootCampNftSymbol,
           numOfClassesToCreate,
           Dataupload.IpfsHash,
@@ -277,8 +293,10 @@ const Create = (props: any) => {
         })
         .finally(() => {
           setUploading(false);
+          //@ts-ignore
           router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`);
           setCreateOverlayStat(false);
+          //@ts-ignore
           setBootcampData(ResetBootcampData);
         });
     }
@@ -303,8 +321,10 @@ const Create = (props: any) => {
     setBootcampData((prevData) => ({
       ...prevData,
       bootcampLecture: [
+        //@ts-ignore
         ...prevData.bootcampLecture,
         {
+          //@ts-ignore
           day: (prevData.bootcampLecture.length + 1).toString(),
           lecturetitle: "",
           lectureDescription: "",
@@ -326,6 +346,7 @@ const Create = (props: any) => {
   const handleTitleChange = (index: number, value: string) => {
     setBootcampData((prevData) => ({
       ...prevData,
+      //@ts-ignore
       bootcampLecture: prevData.bootcampLecture.map((lecture, idx) =>
         idx === index ? { ...lecture, lecturetitle: value } : lecture,
       ),
@@ -335,6 +356,7 @@ const Create = (props: any) => {
   const handleDescriptionChange = (index: number, value: string) => {
     setBootcampData((prevData) => ({
       ...prevData,
+      //@ts-ignore
       bootcampLecture: prevData.bootcampLecture.map((lecture, idx) =>
         idx === index ? { ...lecture, lectureDescription: value } : lecture,
       ),
@@ -343,6 +365,7 @@ const Create = (props: any) => {
 
   const handleCreateOverlay = () => {
     setCreateOverlayStat(false);
+    //@ts-ignore
     setBootcampData(ResetBootcampData);
   };
 

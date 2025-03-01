@@ -1,0 +1,590 @@
+{
+  "generator": "starknet-events-beta",
+  "state": {
+    "name": "course_subgraph",
+    "chainName": "starknet-testnet",
+    "contracts": [
+      {
+        "name": "coursecontract",
+        "address": "0x03f90884eca9e36599467b8178fa9ee5950df6fd22c06102a8effc58bb8945db",
+        "initialBlock": 557528,
+        "aliases": [],
+        "rawAbi": [
+          {
+            "type": "impl",
+            "name": "IAttenSysCourseImpl",
+            "interface_name": "attendsys::contracts::AttenSysCourse::IAttenSysCourse"
+          },
+          {
+            "type": "enum",
+            "name": "core::bool",
+            "variants": [
+              {
+                "name": "False",
+                "type": "()"
+              },
+              {
+                "name": "True",
+                "type": "()"
+              }
+            ]
+          },
+          {
+            "type": "struct",
+            "name": "core::byte_array::ByteArray",
+            "members": [
+              {
+                "name": "data",
+                "type": "core::array::Array::\u003ccore::bytes_31::bytes31\u003e"
+              },
+              {
+                "name": "pending_word",
+                "type": "core::felt252"
+              },
+              {
+                "name": "pending_word_len",
+                "type": "core::integer::u32"
+              }
+            ]
+          },
+          {
+            "type": "struct",
+            "name": "core::integer::u256",
+            "members": [
+              {
+                "name": "low",
+                "type": "core::integer::u128"
+              },
+              {
+                "name": "high",
+                "type": "core::integer::u128"
+              }
+            ]
+          },
+          {
+            "type": "struct",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::Uri",
+            "members": [
+              {
+                "name": "first",
+                "type": "core::felt252"
+              },
+              {
+                "name": "second",
+                "type": "core::felt252"
+              }
+            ]
+          },
+          {
+            "type": "struct",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::Course",
+            "members": [
+              {
+                "name": "owner",
+                "type": "core::starknet::contract_address::ContractAddress"
+              },
+              {
+                "name": "course_identifier",
+                "type": "core::integer::u256"
+              },
+              {
+                "name": "accessment",
+                "type": "core::bool"
+              },
+              {
+                "name": "uri",
+                "type": "attendsys::contracts::AttenSysCourse::AttenSysCourse::Uri"
+              },
+              {
+                "name": "course_ipfs_uri",
+                "type": "core::byte_array::ByteArray"
+              },
+              {
+                "name": "is_suspended",
+                "type": "core::bool"
+              }
+            ]
+          },
+          {
+            "type": "struct",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::Creator",
+            "members": [
+              {
+                "name": "address",
+                "type": "core::starknet::contract_address::ContractAddress"
+              },
+              {
+                "name": "number_of_courses",
+                "type": "core::integer::u256"
+              },
+              {
+                "name": "creator_status",
+                "type": "core::bool"
+              }
+            ]
+          },
+          {
+            "type": "interface",
+            "name": "attendsys::contracts::AttenSysCourse::IAttenSysCourse",
+            "items": [
+              {
+                "type": "function",
+                "name": "create_course",
+                "inputs": [
+                  {
+                    "name": "owner_",
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  },
+                  {
+                    "name": "accessment_",
+                    "type": "core::bool"
+                  },
+                  {
+                    "name": "base_uri",
+                    "type": "core::byte_array::ByteArray"
+                  },
+                  {
+                    "name": "name_",
+                    "type": "core::byte_array::ByteArray"
+                  },
+                  {
+                    "name": "symbol",
+                    "type": "core::byte_array::ByteArray"
+                  },
+                  {
+                    "name": "course_ipfs_uri",
+                    "type": "core::byte_array::ByteArray"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "state_mutability": "external"
+              },
+              {
+                "type": "function",
+                "name": "add_replace_course_content",
+                "inputs": [
+                  {
+                    "name": "course_identifier",
+                    "type": "core::integer::u256"
+                  },
+                  {
+                    "name": "owner_",
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  },
+                  {
+                    "name": "new_course_uri_a",
+                    "type": "core::felt252"
+                  },
+                  {
+                    "name": "new_course_uri_b",
+                    "type": "core::felt252"
+                  }
+                ],
+                "outputs": [],
+                "state_mutability": "external"
+              },
+              {
+                "type": "function",
+                "name": "finish_course_claim_certification",
+                "inputs": [
+                  {
+                    "name": "course_identifier",
+                    "type": "core::integer::u256"
+                  }
+                ],
+                "outputs": [],
+                "state_mutability": "external"
+              },
+              {
+                "type": "function",
+                "name": "check_course_completion_status_n_certification",
+                "inputs": [
+                  {
+                    "name": "course_identifier",
+                    "type": "core::integer::u256"
+                  },
+                  {
+                    "name": "candidate",
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "core::bool"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_course_infos",
+                "inputs": [
+                  {
+                    "name": "course_identifiers",
+                    "type": "core::array::Array::\u003ccore::integer::u256\u003e"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "core::array::Array::\u003cattendsys::contracts::AttenSysCourse::AttenSysCourse::Course\u003e"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_user_completed_courses",
+                "inputs": [
+                  {
+                    "name": "user",
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "core::array::Array::\u003ccore::integer::u256\u003e"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_all_courses_info",
+                "inputs": [],
+                "outputs": [
+                  {
+                    "type": "core::array::Array::\u003cattendsys::contracts::AttenSysCourse::AttenSysCourse::Course\u003e"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_all_creator_courses",
+                "inputs": [
+                  {
+                    "name": "owner_",
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "core::array::Array::\u003cattendsys::contracts::AttenSysCourse::AttenSysCourse::Course\u003e"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_creator_info",
+                "inputs": [
+                  {
+                    "name": "creator",
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "attendsys::contracts::AttenSysCourse::AttenSysCourse::Creator"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_course_nft_contract",
+                "inputs": [
+                  {
+                    "name": "course_identifier",
+                    "type": "core::integer::u256"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "transfer_admin",
+                "inputs": [
+                  {
+                    "name": "new_admin",
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "outputs": [],
+                "state_mutability": "external"
+              },
+              {
+                "type": "function",
+                "name": "claim_admin_ownership",
+                "inputs": [],
+                "outputs": [],
+                "state_mutability": "external"
+              },
+              {
+                "type": "function",
+                "name": "get_admin",
+                "inputs": [],
+                "outputs": [
+                  {
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_new_admin",
+                "inputs": [],
+                "outputs": [
+                  {
+                    "type": "core::starknet::contract_address::ContractAddress"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_total_course_completions",
+                "inputs": [
+                  {
+                    "name": "course_identifier",
+                    "type": "core::integer::u256"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "core::integer::u256"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "ensure_admin",
+                "inputs": [],
+                "outputs": [],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "get_suspension_status",
+                "inputs": [
+                  {
+                    "name": "course_identifier",
+                    "type": "core::integer::u256"
+                  }
+                ],
+                "outputs": [
+                  {
+                    "type": "core::bool"
+                  }
+                ],
+                "state_mutability": "view"
+              },
+              {
+                "type": "function",
+                "name": "toggle_suspension",
+                "inputs": [
+                  {
+                    "name": "course_identifier",
+                    "type": "core::integer::u256"
+                  },
+                  {
+                    "name": "suspend",
+                    "type": "core::bool"
+                  }
+                ],
+                "outputs": [],
+                "state_mutability": "external"
+              }
+            ]
+          },
+          {
+            "type": "constructor",
+            "name": "constructor",
+            "inputs": [
+              {
+                "name": "owner",
+                "type": "core::starknet::contract_address::ContractAddress"
+              },
+              {
+                "name": "_hash",
+                "type": "core::starknet::class_hash::ClassHash"
+              }
+            ]
+          },
+          {
+            "type": "event",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseCreated",
+            "kind": "struct",
+            "members": [
+              {
+                "name": "course_identifier",
+                "type": "core::integer::u256",
+                "kind": "data"
+              },
+              {
+                "name": "owner_",
+                "type": "core::starknet::contract_address::ContractAddress",
+                "kind": "data"
+              },
+              {
+                "name": "accessment_",
+                "type": "core::bool",
+                "kind": "data"
+              },
+              {
+                "name": "base_uri",
+                "type": "core::byte_array::ByteArray",
+                "kind": "data"
+              },
+              {
+                "name": "name_",
+                "type": "core::byte_array::ByteArray",
+                "kind": "data"
+              },
+              {
+                "name": "symbol",
+                "type": "core::byte_array::ByteArray",
+                "kind": "data"
+              },
+              {
+                "name": "course_ipfs_uri",
+                "type": "core::byte_array::ByteArray",
+                "kind": "data"
+              }
+            ]
+          },
+          {
+            "type": "event",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseReplaced",
+            "kind": "struct",
+            "members": [
+              {
+                "name": "course_identifier",
+                "type": "core::integer::u256",
+                "kind": "data"
+              },
+              {
+                "name": "owner_",
+                "type": "core::starknet::contract_address::ContractAddress",
+                "kind": "data"
+              },
+              {
+                "name": "new_course_uri_a",
+                "type": "core::felt252",
+                "kind": "data"
+              },
+              {
+                "name": "new_course_uri_b",
+                "type": "core::felt252",
+                "kind": "data"
+              }
+            ]
+          },
+          {
+            "type": "event",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseCertClaimed",
+            "kind": "struct",
+            "members": [
+              {
+                "name": "course_identifier",
+                "type": "core::integer::u256",
+                "kind": "data"
+              },
+              {
+                "name": "candidate",
+                "type": "core::starknet::contract_address::ContractAddress",
+                "kind": "data"
+              }
+            ]
+          },
+          {
+            "type": "event",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::AdminTransferred",
+            "kind": "struct",
+            "members": [
+              {
+                "name": "new_admin",
+                "type": "core::starknet::contract_address::ContractAddress",
+                "kind": "data"
+              }
+            ]
+          },
+          {
+            "type": "event",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseSuspended",
+            "kind": "struct",
+            "members": [
+              {
+                "name": "course_identifier",
+                "type": "core::integer::u256",
+                "kind": "data"
+              }
+            ]
+          },
+          {
+            "type": "event",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseUnsuspended",
+            "kind": "struct",
+            "members": [
+              {
+                "name": "course_identifier",
+                "type": "core::integer::u256",
+                "kind": "data"
+              }
+            ]
+          },
+          {
+            "type": "event",
+            "name": "attendsys::contracts::AttenSysCourse::AttenSysCourse::Event",
+            "kind": "enum",
+            "variants": [
+              {
+                "name": "CourseCreated",
+                "type": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseCreated",
+                "kind": "nested"
+              },
+              {
+                "name": "CourseReplaced",
+                "type": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseReplaced",
+                "kind": "nested"
+              },
+              {
+                "name": "CourseCertClaimed",
+                "type": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseCertClaimed",
+                "kind": "nested"
+              },
+              {
+                "name": "AdminTransferred",
+                "type": "attendsys::contracts::AttenSysCourse::AttenSysCourse::AdminTransferred",
+                "kind": "nested"
+              },
+              {
+                "name": "CourseSuspended",
+                "type": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseSuspended",
+                "kind": "nested"
+              },
+              {
+                "name": "CourseUnsuspended",
+                "type": "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseUnsuspended",
+                "kind": "nested"
+              }
+            ]
+          }
+        ],
+        "Abi": {}
+      }
+    ],
+    "confirmEnoughContracts": true
+  }
+}

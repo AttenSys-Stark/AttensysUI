@@ -63,7 +63,7 @@ const Certifications = () => {
             Choose your prefered Certification method.
           </p>
           <div className="w-full mt-8 flex-col md:flex-row md:space-x-5 space-y-9 md:space-y-0 flex">
-            <div className="h-[246px] w-[243px] bg-[#FFFFFF] rounded-lg border-[1px] border-[#CACACA] px-6 flex flex-col justify-center space-y-4">
+            {/* <div className="h-[246px] w-[243px] bg-[#FFFFFF] rounded-lg border-[1px] border-[#CACACA] px-6 flex flex-col justify-center space-y-4">
               <Image src={single} alt="single" />
               <div className="space-y-1">
                 <h1 className="text-[15px] leading-[19px] font-semibold text-[#5801A9]">
@@ -76,7 +76,7 @@ const Certifications = () => {
               <div className="w-[155px] h-[35px] rounded-lg bg-[#2D3A4B] text-[#FFFFFF] text-[12px] font-medium leading-[17px] flex justify-center items-center">
                 Award Certifications
               </div>
-            </div>
+            </div> */}
 
             <div className="h-[246px] w-[243px] bg-[#FFFFFF] rounded-lg border-[1px] border-[#CACACA]  px-6 flex flex-col justify-center space-y-4">
               <Image src={batch} alt="single" />

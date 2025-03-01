@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import video from "@/assets/video.png";
 import youtube from "@/assets/youtube.svg";
@@ -11,39 +11,169 @@ import Lectures from "../Lectures";
 import CourseSideBar from "./SideBar";
 import { MdOutlineDiamond } from "react-icons/md";
 import { IoSearchOutline, IoMenuOutline } from "react-icons/io5";
+import { pinata } from "../../../../utils/config";
+import { FileObject } from "pinata";
+import { courseInitState } from "@/state/connectedWalletStarknetkitNext";
+import { lectures } from "@/constants/data";
+import { attensysCourseAddress } from "@/deployments/contracts";
+import { attensysCourseAbi } from "@/deployments/abi";
+import { Contract } from "starknet";
+import { useRouter } from "next/navigation";
+import { handleCreateCourse } from "@/utils/helpers";
 
-const MainFormView5 = () => {
+interface ChildComponentProps {
+  courseData: any;
+  setCourseData: any;
+  wallet: any;
+  handleCoursePublishWithCert: (
+    event: MouseEvent | React.SyntheticEvent<MouseEvent | KeyboardEvent, Event>,
+  ) => void;
+}
+
+// file setup
+const emptyData: FileObject = {
+  name: "",
+  type: "",
+  size: 0,
+  lastModified: 0,
+  arrayBuffer: async () => {
+    return new ArrayBuffer(0);
+  },
+};
+interface Lecture {
+  name: string;
+  description: string;
+  video: File | null;
+}
+const ResetCourseRegistrationData = {
+  primaryGoal: "",
+  targetAudience: "",
+  courseArea: "",
+  courseName: "",
+  courseDescription: "",
+  courseCategory: "",
+  difficultyLevel: "",
+  studentRequirements: "",
+  learningObjectives: "",
+  targetAudienceDesc: "",
+  courseImage: emptyData,
+  courseCurriculum: [] as Lecture[],
+  coursePricing: "",
+  promoAndDiscount: "",
+  publishWithCertificate: false,
+};
+
+const MainFormView5: React.FC<ChildComponentProps> = ({
+  courseData,
+  setCourseData,
+  wallet,
+  handleCoursePublishWithCert,
+}) => {
   const [isActivated, setIsActivated] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [cidToContract, setCidToContract] = useState<string>("");
+  const [cidCourseImage, setcidCourseImage] = useState<string>("");
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
 
-  const handleSwitch = () => {
+  const router = useRouter();
+  const handleSwitch = (
+    event: MouseEvent | React.SyntheticEvent<MouseEvent | KeyboardEvent, Event>,
+  ) => {
     setIsActivated(!isActivated);
+    handleCoursePublishWithCert(event);
   };
 
-  const lectures = [
-    {
-      img: rich,
-      title: "What is Web Development?",
-      desc: "An introduction to the world of web development, covering the basics of how websites...",
-      timing: 8,
-    },
-    {
-      img: youtube,
-      title: "What is Web Development?",
-      desc: "An introduction to the world of web development, covering the basics of how websites...",
-      timing: 8,
-    },
-    {
-      img: podcast,
-      title: "What is Web Development?",
-      desc: "An introduction to the world of web development, covering the basics of how websites...",
-      timing: 8,
-    },
-  ];
+  const handleCourseUpload = async () => {
+    setUploading(true);
+    const courseImgupload = await pinata.upload.file(courseData.courseImage);
+    //  const selectedLectureVideoUpload = await
+
+    const dataUpload = await pinata.upload.json({
+      primaryGoal: courseData.primaryGoal,
+      targetAudience: courseData.targetAudience,
+      courseArea: courseData.courseArea,
+      courseName: courseData.courseName,
+      courseDescription: courseData.courseDescription,
+      courseCategory: courseData.courseCategory,
+      difficultyLevel: courseData.difficultyLevel,
+      studentRequirements: courseData.studentRequirements,
+      learningObjectives: courseData.learningObjectives,
+      targetAudienceDesc: courseData.targetAudienceDesc,
+      courseImage: courseImgupload.IpfsHash,
+      courseCurriculum: courseData.courseCurriculum,
+      coursePricing: courseData.coursePricing,
+      promoAndDiscount: courseData.promoAndDiscount,
+      publishWithCertificate: courseData.publishWithCertificate,
+    });
+
+    if (dataUpload) {
+      setCidToContract(dataUpload.IpfsHash);
+      setcidCourseImage(courseImgupload.IpfsHash);
+      setUploading(false);
+    }
+  };
+
+  const courseCreation = async (e: any) => {
+    handleCourseUpload();
+
+    const courseContract = new Contract(
+      attensysCourseAbi,
+      attensysCourseAddress,
+      wallet?.account,
+    );
+
+    const create_course_calldata = courseContract.populate("create_course", [
+      wallet?.account?.address,
+      false,
+      cidCourseImage,
+      courseData.courseName,
+      "XXX",
+      cidToContract,
+    ]);
+
+    const callCourseContract = await wallet?.account.execute([
+      {
+        contractAddress: attensysCourseAddress,
+        entrypoint: "create_course",
+        calldata: create_course_calldata.calldata,
+      },
+    ]);
+
+    await wallet?.account?.provider
+      .waitForTransaction(callCourseContract.transaction_hash)
+      .then(() => {})
+      .catch((e: any) => {
+        console.log("Error: ", e);
+      })
+      .finally(() => {
+        //Resets all org data input
+        // setCourseData(ResetCourseRegistrationData);
+
+        // Proceed to next step
+        handleCreateCourse(e, "course-landing-page", router);
+      });
+  };
+
+  console.log(courseData.courseImage);
+
+  useEffect(() => {
+    // Check if file is a valid File object
+    if (courseData.courseImage instanceof File) {
+      // Create a temporary URL for the fetched image
+      const imageUrl = URL.createObjectURL(courseData.courseImage);
+      setImageSrc(imageUrl);
+
+      // Clean up the URL object to free up memory
+      return () => {
+        URL.revokeObjectURL(imageUrl);
+      };
+    }
+  }, [courseData.courseImage]);
 
   return (
     <div className="lg:flex">
       <div className="hidden xl:block">
-        <CourseSideBar />
+        <CourseSideBar courseData={courseData} />
       </div>
 
       <div className="flex-1">
@@ -68,11 +198,9 @@ const MainFormView5 = () => {
               </p>
             </div>
 
-            <form action="course-landing-page" method="post">
-              <button className="hidden xl:block bg-[#C5D322] px-7 py-3 rounded text-white">
-                Publish
-              </button>
-            </form>
+            <button className="hidden xl:block bg-[#C5D322] px-7 py-3 rounded text-white">
+              Publish
+            </button>
           </div>
 
           <div className="lg:mx-4 xl:mx-24 mt-12">
@@ -84,12 +212,24 @@ const MainFormView5 = () => {
             </div>
             <div className="block lg:grid lg:grid-cols-2 gap-4">
               {/* Course Image */}
-              <div className="w-full lg:w-[368px] h-[238px] rounded-xl mb-4 lg:mb-0 p-3">
+              <div className="w-full lg:w-[368px] h-[238px] rounded-xl mb-4 lg:mb-0 p-3w-[368px] h-[238px] rounded-xl">
                 <Image
-                  src={video || "/placeholder.svg"}
+                  src={video}
                   alt="hero"
-                  className="h-full w-full object-cover rounded-xl border-4 border-[#4A90E2]"
+                  className="h-full w-full object-cover rounded-xl"
                 />
+
+                {imageSrc ? (
+                  <Image
+                    src={(imageSrc as string) || "/placeholder.svg"}
+                    alt="Fetched Image"
+                    layout="fill"
+                    objectFit="cover"
+                    className="h-full w-full object-cover rounded-xl border-4 border-[#4A90E2]"
+                  />
+                ) : (
+                  <p>Loading image...</p>
+                )}
               </div>
 
               {/* Course information */}
@@ -97,19 +237,16 @@ const MainFormView5 = () => {
                 {/* field */}
                 <div className="mb-3 order-first hidden lg:block">
                   <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">
-                    Technology | Web Development
+                    {courseData.courseCategory} | Web Development
                   </p>
                 </div>
 
                 <h4 className="text-[19px] text-[#333333] leading-[34px] font-bold my-2 ">
-                  Introduction to Web Development
+                  {courseData.courseName}
                 </h4>
                 <div className="my-3">
-                  <p className="text-[#333333] text-[14px] font-light leading-[22px]">
-                    {`This course provides a foundational understanding of web
-                development. You'll learn essential skills in HTML and CSS,
-                enabling you to create and style your own web pages. No prior
-                experience is necessary!`}
+                  <p className="  text-[#333333] text-[14px] font-light leading-[22px]">
+                    {courseData.courseDescription}
                   </p>
                 </div>
 
@@ -122,7 +259,7 @@ const MainFormView5 = () => {
                 <div className="flex space-x-3 items-center">
                   <MdOutlineDiamond color="#333333" />
                   <p className="text-[#333333] text-[14px] font-medium leading-[22px]">
-                    Difficulty level : Elementary
+                    Difficulty level : {courseData.difficultyLevel}
                   </p>
                 </div>
               </div>
@@ -164,7 +301,10 @@ const MainFormView5 = () => {
               </div>
 
               {/* lectures in course */}
-              <Lectures lectures={lectures} />
+              <Lectures
+                lectures={lectures}
+                learningObj={courseData.learningObjectives}
+              />
               {/* course desc & student req */}
 
               <div className="">
@@ -175,6 +315,7 @@ const MainFormView5 = () => {
                     </h4>
 
                     <Switch
+                      //@ts-ignore
                       onChange={handleSwitch}
                       checked={isActivated}
                       onColor="#9B51E0"
@@ -191,14 +332,13 @@ const MainFormView5 = () => {
                   </p>
                 </div>
                 <div className="mt-12 mb-24 p-10">
-                  <form action="course-landing-page" method="post">
-                    <button
-                      className="w-full lg:w-auto rounded-xl bg-[#4A90E2] px-8 lg:px-24 py-3 text-white"
-                      type="submit"
-                    >
-                      Save and Publish Course
-                    </button>
-                  </form>
+                  <button
+                    className="w-full lg:w-auto rounded-xl bg-[#4A90E2] px-8 lg:px-24 py-3 text-white"
+                    type="submit"
+                    onClick={courseCreation}
+                  >
+                    Save and Publish Course
+                  </button>
                 </div>
               </div>
             </div>

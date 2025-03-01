@@ -10,9 +10,10 @@ interface Lecture {
 
 interface LectureData {
   lectures: Lecture[];
+  learningObj: string;
 }
 
-const Lectures = ({ lectures }: LectureData) => {
+const Lectures = ({ lectures, learningObj }: LectureData) => {
   return (
     <div className="block sm:grid grid-cols-2 gap-4">
       <div className="lg:py-6 sm:py-12  order-last sm:order-first">
@@ -39,12 +40,7 @@ const Lectures = ({ lectures }: LectureData) => {
 
       <div className="mt-12 hidden xl:block">
         <div className="  text-[#333333] text-[14px] font-light leading-[22px]">
-          <p>
-            {`  This course provides a foundational understanding of web
-            development. You'll learn essential skills in HTML and CSS, enabling
-            you to create and style your own web pages. No prior experience is
-            necessary!`}
-          </p>
+          <p>{learningObj}</p>
         </div>
 
         <div className="py-5">
