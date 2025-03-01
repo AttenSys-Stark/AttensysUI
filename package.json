@@ -12,6 +12,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@apollo/client": "^3.13.1",
+    "@bufbuild/buf": "^1.50.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@googlemaps/extended-component-library": "^0.6.13",
@@ -46,6 +48,8 @@
     "framer-motion": "^11.17.0",
     "get-starknet-core": "^4.0.0",
     "graceful-fs": "^4.2.11",
+    "graphql": "^16.10.0",
+    "graphql-request": "^7.1.2",
     "jotai": "^2.8.2",
     "lodash-es": "^4.17.21",
     "lottie-react": "^2.4.0",
