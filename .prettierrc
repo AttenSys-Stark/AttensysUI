@@ -2,7 +2,7 @@
   "useTabs": false,
   "trailingComma": "all",
   "singleQuote": false,
-  "semi": false,
+  "semi": true,
   "overrides": [
     {
       "files": "*.md",

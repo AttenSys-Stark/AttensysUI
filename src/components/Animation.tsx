@@ -1,10 +1,9 @@
-import React, { useRef } from "react"
-import Lottie, { LottieRefCurrentProps } from "lottie-react"
-import animationData from "./../assets/meet.json"
-
+import React, { useRef } from "react";
+import Lottie, { LottieRefCurrentProps } from "lottie-react";
+import animationData from "./../assets/meet.json";
 
 export default function Animation() {
-  const meetRef = useRef<LottieRefCurrentProps>(null)
+  const meetRef = useRef<LottieRefCurrentProps>(null);
   return (
     <div className="min-h-screen lg:w-[60%] flex items-center justify-center lg:mx-36 ">
       <div className="relative">
@@ -13,7 +12,7 @@ export default function Animation() {
           animationData={animationData}
           loop={false}
           onComplete={() => {
-            meetRef.current?.goToAndPlay(35, true)
+            meetRef.current?.goToAndPlay(35, true);
           }}
         />
 
@@ -22,5 +21,5 @@ export default function Animation() {
         </div>
       </div>
     </div>
-  )
+  );
 }

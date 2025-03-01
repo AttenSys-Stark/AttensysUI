@@ -1,5 +1,5 @@
 // import { signMessage, signMessageRcpMethod } from "@/services/signMessage"
-// import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
+// import { walletStarknetkit } from "@/state/connectedWalletStarknetkitLatest"
 // import {
 //   connectorDataAtom,
 //   walletStarknetkitNextAtom,
@@ -12,7 +12,7 @@
 // import { StarknetWindowObject } from "starknetkit-next"
 
 // const SignMessageLatest = () => {
-//   const wallet = useAtomValue(walletStarknetkitLatestAtom)
+//   const wallet = useAtomValue(walletStarknetkit)
 //   return <SignMessage account={wallet?.account as AccountInterface} />
 // }
 

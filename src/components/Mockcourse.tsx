@@ -1,5 +1,5 @@
-"use client"
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
+"use client";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import {
   connectorAtom,
   connectorDataAtom,
@@ -16,7 +16,12 @@ import { attensysCourseAbi } from '@/deployments/abi'
 import { attensysCourseAddress } from '@/deployments/contracts'
 import { sessionKeyModeAtom, sessionAccountAtom, sessionAtom } from "@/state/argentSessionState"
 
-
+const eventContract = new Contract(
+  attensysCourseAbi,
+  attensysCourseAddress,
+  provider,
+);
+      
 export default function Mockevent() {
   const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
   const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
@@ -226,18 +231,25 @@ export default function Mockevent() {
   return (
     <div>
       <div>
-        <h1 className="text-3xl font-bold text-red-700 underline" >mock course interaction here</h1>
+        <h1 className="text-3xl font-bold text-red-700 underline">
+          mock course interaction here
+        </h1>
       </div>
 
       <div>
-        <button onClick={handleCreateCourse} className="mt-2 bg-red-500 border-black">
+        <button
+          onClick={handleCreateCourse}
+          className="mt-2 bg-red-500 border-black"
+        >
           Create course button
         </button>
       </div>
 
-
       <div>
-        <button onClick={handleCourseAdd} className="mt-2 bg-red-500 border-black">
+        <button
+          onClick={handleCourseAdd}
+          className="mt-2 bg-red-500 border-black"
+        >
           Course Add button
         </button>
       </div>
@@ -259,6 +271,5 @@ export default function Mockevent() {
 
       </div>
     </div>
-
-  )
+  );
 }

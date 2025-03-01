@@ -1,5 +1,5 @@
-"use client"
-import { walletStarknetkitLatestAtom } from "@/state/connectedWalletStarknetkitLatest"
+"use client";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import {
   connectorAtom,
   connectorDataAtom,
@@ -167,16 +167,16 @@ export default function Mockevent() {
     let event_details = await eventContract.get_event_details(1);
     console.log("Specific event here", event_details);
   }
-
+  
   const get_all_events = async () => {
-    let all_event_details = await eventContract.get_all_events();
-    console.log("All events here", all_event_details);
-  }
+    const all_event_details = await eventContract.get_all_events();
+    console.info("All events here", all_event_details);
+  };
 
   const get_specific_event_nft_contract_details = async () => {
-    let event_nft_details = await eventContract.get_event_nft_contract(1);
-    console.log("All events here", event_nft_details);
-  }
+    const event_nft_details = await eventContract.get_event_nft_contract(1);
+    console.info("All events here", event_nft_details);
+  };
 
   const get_attendance_status = async () => {
     let attendance_stat = await eventContract.get_attendance_status("0x5a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154", 1)
@@ -305,43 +305,63 @@ export default function Mockevent() {
   return (
     <div>
       <div>
-        <h1 className="text-3xl font-bold text-red-700 underline" >mock event interaction here</h1>
+        <h1 className="text-3xl font-bold text-red-700 underline">
+          mock event interaction here
+        </h1>
         <div className="px-4 py-2 text-sm text-black bg-gray-200">
           Connected: {wallet?.account?.address}
         </div>
       </div>
 
       <div>
-        <button onClick={handleCreateEvent} className="mt-2 bg-red-500 border-black">
+        <button
+          onClick={handleCreateEvent}
+          className="mt-2 bg-red-500 border-black"
+        >
           Create event button
         </button>
       </div>
 
       <div>
-        <button onClick={handleRegisterEvent} className="mt-2 bg-red-500 border-black">
+        <button
+          onClick={handleRegisterEvent}
+          className="mt-2 bg-red-500 border-black"
+        >
           Register for event button
         </button>
       </div>
 
       <div>
-        <button onClick={handleMarkEventAttendance} className="mt-2 bg-red-500 border-black">
+        <button
+          onClick={handleMarkEventAttendance}
+          className="mt-2 bg-red-500 border-black"
+        >
           Mark attendance for event button
         </button>
       </div>
 
       <div>
-        <button onClick={handleEventBatchCertify} className="mt-2 bg-red-500 border-black">
+        <button
+          onClick={handleEventBatchCertify}
+          className="mt-2 bg-red-500 border-black"
+        >
           batch certify event proof button
         </button>
       </div>
       <div>
-        <button onClick={handleEndEvent} className="mt-2 bg-red-500 border-black">
+        <button
+          onClick={handleEndEvent}
+          className="mt-2 bg-red-500 border-black"
+        >
           End event button
         </button>
       </div>
 
       <div>
-        <button onClick={handleEventRegCommencement} className="mt-2 bg-red-500 border-black">
+        <button
+          onClick={handleEventRegCommencement}
+          className="mt-2 bg-red-500 border-black"
+        >
           Toggle the start and and of an event
         </button>
       </div>
@@ -355,6 +375,5 @@ export default function Mockevent() {
         <h1>specific event nft contract address console logged</h1>
       </div>
     </div>
-
-  )
+  );
 }

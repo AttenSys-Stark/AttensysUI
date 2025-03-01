@@ -5,7 +5,7 @@
 //   num,
 //   shortString,
 // } from "starknet"
-// // import { StarknetWindowObject } from "starknetkit-next"
+// import { StarknetWindowObject } from "starknetkit-next"
 
 // export const signMessage = async (
 //   account: Account | AccountInterface,

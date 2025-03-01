@@ -1,0 +1,45 @@
+name: UI Test
+
+on:
+  push:
+    branches:
+      - main-mirror
+  pull_request:
+    branches:
+      - main-mirror
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./
+
+    steps:
+      # Step 1: Checkout the code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js (specify the version)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.18.0
+          cache: "yarn"
+
+      # Step 3: Install dependencies using Yarn
+      - name: Install Dependencies
+        run: yarn install
+
+      # Step 4: Build the project for deployment or testing
+      - name: Build Project
+        run: yarn build
+
+      # Step 5: Upload build artifacts (optional, for debugging or deployment)
+      - name: Upload Build Artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: build/
