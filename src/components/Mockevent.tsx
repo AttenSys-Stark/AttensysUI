@@ -1,61 +1,55 @@
 "use client";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import {
-  connectorAtom,
-  connectorDataAtom,
-  walletStarknetkitNextAtom,
-} from "@/state/connectedWalletStarknetkitNext"
-import { useAtomValue, useSetAtom } from "jotai"
-import { RESET } from "jotai/utils"
-import { useEffect } from "react"
-import { useAtom } from "jotai"
-import { connect } from "starknetkit"
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants"
+import { useAtomValue } from "jotai";
+import { provider } from "@/constants";
 import { Contract } from "starknet";
-import { attensysEventAbi } from '@/deployments/abi'
-import { attensysEventAddress } from '@/deployments/contracts'
-import { sessionKeyModeAtom, sessionAccountAtom, sessionAtom } from "@/state/argentSessionState"
+import { attensysEventAbi } from "@/deployments/abi";
+import { attensysEventAddress } from "@/deployments/contracts";
+import {
+  sessionKeyModeAtom,
+  sessionAccountAtom,
+  sessionAtom,
+} from "@/state/argentSessionState";
 
 export default function Mockevent() {
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
-  const setConnectorData = useSetAtom(connectorDataAtom)
-  const setConnector = useSetAtom(connectorAtom)
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-  const sessionKeyMode = useAtomValue(sessionKeyModeAtom)
-  const sessionAccount = useAtomValue(sessionAccountAtom)
-  const session = useAtomValue(sessionAtom)
+  const wallet = useAtomValue(walletStarknetkit);
+  const sessionKeyMode = useAtomValue(sessionKeyModeAtom);
+  const sessionAccount = useAtomValue(sessionAccountAtom);
+  const session = useAtomValue(sessionAtom);
 
-  const eventContract = new Contract(attensysEventAbi, attensysEventAddress, provider);
-
-  useEffect(() => {
-    setWalletLatest(RESET)
-    setWalletNext(RESET)
-    setConnectorData(RESET)
-    setConnector(RESET)
-  }, [])
+  const eventContract = new Contract(
+    attensysEventAbi,
+    attensysEventAddress,
+    provider,
+  );
 
   const handleCreateEvent = async () => {
     try {
-      const myCall = eventContract.populate('create_event', ["0x05a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154", "kennyevent", "QmXGUbN7ccNtieggpCMTEQfnTqSP6Fb858sucaN2hjRsyv", "kennynft", "knt", 23, 100, 1]);
+      const myCall = eventContract.populate("create_event", [
+        "0x05a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154",
+        "kennyevent",
+        "QmXGUbN7ccNtieggpCMTEQfnTqSP6Fb858sucaN2hjRsyv",
+        "kennynft",
+        "knt",
+        23,
+        100,
+        1,
+      ]);
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
-        eventContract.connect(sessionAccount)
+        eventContract.connect(sessionAccount);
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysEventAddress,
           entrypoint: "create_event",
           calldata: myCall.calldata,
-        })
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
-        const result = await eventContract.create_event(
-          myCall.calldata,
-          {
-            maxFee,
-          },
-        )
-        await provider.waitForTransaction(result.transaction_hash)
+        });
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
+        const result = await eventContract.create_event(myCall.calldata, {
+          maxFee,
+        });
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
         eventContract.connect(wallet?.account);
 
@@ -65,29 +59,26 @@ export default function Mockevent() {
     } catch (error) {
       console.error("Error creating event:", error);
     }
-  }
+  };
 
   const handleRegisterEvent = async () => {
     try {
-      const myCall = eventContract.populate('register_for_event', [2]);
+      const myCall = eventContract.populate("register_for_event", [2]);
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
-        eventContract.connect(sessionAccount)
+        eventContract.connect(sessionAccount);
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysEventAddress,
           entrypoint: "register_for_event",
           calldata: myCall.calldata,
-        })
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
-        const result = await eventContract.register_for_event(
-          myCall.calldata,
-          {
-            maxFee,
-          },
-        )
-        await provider.waitForTransaction(result.transaction_hash)
+        });
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
+        const result = await eventContract.register_for_event(myCall.calldata, {
+          maxFee,
+        });
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
         eventContract.connect(wallet?.account);
 
@@ -97,29 +88,26 @@ export default function Mockevent() {
     } catch (error) {
       console.error("Error registering event:", error);
     }
-  }
+  };
 
   const handleMarkEventAttendance = async () => {
     try {
-      const myCall = eventContract.populate('mark_attendance', [1]);
+      const myCall = eventContract.populate("mark_attendance", [1]);
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
-        eventContract.connect(sessionAccount)
+        eventContract.connect(sessionAccount);
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysEventAddress,
           entrypoint: "mark_attendance",
           calldata: myCall.calldata,
-        })
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
-        const result = await eventContract.mark_attendance(
-          myCall.calldata,
-          {
-            maxFee,
-          },
-        )
-        await provider.waitForTransaction(result.transaction_hash)
+        });
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
+        const result = await eventContract.mark_attendance(myCall.calldata, {
+          maxFee,
+        });
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
         eventContract.connect(wallet?.account);
 
@@ -129,45 +117,47 @@ export default function Mockevent() {
     } catch (error) {
       console.error("Error marking event attendance:", error);
     }
-  }
+  };
 
   const handleEventBatchCertify = async () => {
     try {
-      const myCall = eventContract.populate('batch_certify_attendees', [1]);
+      const myCall = eventContract.populate("batch_certify_attendees", [1]);
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
-        eventContract.connect(sessionAccount)
+        eventContract.connect(sessionAccount);
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysEventAddress,
           entrypoint: "batch_certify_attendees",
           calldata: myCall.calldata,
-        })
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
+        });
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
         const result = await eventContract.batch_certify_attendees(
           myCall.calldata,
           {
             maxFee,
           },
-        )
-        await provider.waitForTransaction(result.transaction_hash)
+        );
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
         eventContract.connect(wallet?.account);
 
-        const res = await eventContract.batch_certify_attendees(myCall.calldata);
+        const res = await eventContract.batch_certify_attendees(
+          myCall.calldata,
+        );
         await provider.waitForTransaction(res.transaction_hash);
       }
     } catch (error) {
       console.error("Error batch certify event:", error);
     }
-  }
+  };
 
   const get_specific_event_details = async () => {
-    let event_details = await eventContract.get_event_details(1);
+    const event_details = await eventContract.get_event_details(1);
     console.log("Specific event here", event_details);
-  }
-  
+  };
+
   const get_all_events = async () => {
     const all_event_details = await eventContract.get_all_events();
     console.info("All events here", all_event_details);
@@ -179,44 +169,49 @@ export default function Mockevent() {
   };
 
   const get_attendance_status = async () => {
-    let attendance_stat = await eventContract.get_attendance_status("0x5a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154", 1)
-    console.log("attendance status here:", attendance_stat)
-  }
+    const attendance_stat = await eventContract.get_attendance_status(
+      "0x5a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154",
+      1,
+    );
+    console.log("attendance status here:", attendance_stat);
+  };
 
   const get_all_attended_event = async () => {
-    let all_attended_event = await eventContract.get_all_attended_events("0x5a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154")
-    console.log("all attended event here:", all_attended_event)
-  }
+    const all_attended_event = await eventContract.get_all_attended_events(
+      "0x5a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154",
+    );
+    console.log("all attended event here:", all_attended_event);
+  };
   const get_all_registered_event = async () => {
-    let all_registered_event = await eventContract.get_all_list_registered_events("0x5a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154")
-    console.log("all registered event here:", all_registered_event)
-  }
+    const all_registered_event =
+      await eventContract.get_all_list_registered_events(
+        "0x5a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154",
+      );
+    console.log("all registered event here:", all_registered_event);
+  };
 
   const get_nft_contract = async () => {
-    let nft_contract = await eventContract.get_event_nft_contract(1);
+    const nft_contract = await eventContract.get_event_nft_contract(1);
     console.log("nft contract address here:", nft_contract);
-  }
+  };
   const handleEndEvent = async () => {
     try {
-      const myCall = eventContract.populate('end_event', [1]);
+      const myCall = eventContract.populate("end_event", [1]);
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
-        eventContract.connect(sessionAccount)
+        eventContract.connect(sessionAccount);
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysEventAddress,
           entrypoint: "end_event",
           calldata: myCall.calldata,
-        })
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
-        const result = await eventContract.end_event(
-          myCall.calldata,
-          {
-            maxFee,
-          },
-        )
-        await provider.waitForTransaction(result.transaction_hash)
+        });
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
+        const result = await eventContract.end_event(myCall.calldata, {
+          maxFee,
+        });
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
         eventContract.connect(wallet?.account);
 
@@ -226,29 +221,26 @@ export default function Mockevent() {
     } catch (error) {
       console.error("Error creating organization profile:", error);
     }
-  }
+  };
 
   const handleEventRegCommencement = async () => {
     try {
-      const myCall = eventContract.populate('start_end_reg', [0, 2]);
+      const myCall = eventContract.populate("start_end_reg", [0, 2]);
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
-        eventContract.connect(sessionAccount)
+        eventContract.connect(sessionAccount);
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysEventAddress,
           entrypoint: "start_end_reg",
           calldata: myCall.calldata,
-        })
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
-        const result = await eventContract.start_end_reg(
-          myCall.calldata,
-          {
-            maxFee,
-          },
-        )
-        await provider.waitForTransaction(result.transaction_hash)
+        });
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
+        const result = await eventContract.start_end_reg(myCall.calldata, {
+          maxFee,
+        });
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
         eventContract.connect(wallet?.account);
 
@@ -258,49 +250,7 @@ export default function Mockevent() {
     } catch (error) {
       console.error("Error creating organization profile:", error);
     }
-  }
-
-  useEffect(() => {
-    const autoConnect = async () => {
-      try {
-        const { wallet: connectedWallet } = await connect({
-          provider,
-          modalMode: "neverAsk",
-          webWalletUrl: ARGENT_WEBWALLET_URL,
-          argentMobileOptions: {
-            dappName: "Attensys",
-            url: window.location.hostname,
-            chainId: CHAIN_ID,
-            icons: [],
-          },
-        })
-        //@todo make sure details update on the go, instead of waiting to reload
-        get_specific_event_details();
-        get_all_events();
-        get_specific_event_nft_contract_details();
-        get_attendance_status();
-        get_all_attended_event();
-        get_all_registered_event();
-        get_nft_contract();
-        setWallet(connectedWallet)
-      } catch (e) {
-        console.error(e)
-        alert((e as any).message)
-      }
-    }
-
-    if (!wallet) {
-      autoConnect()
-    }
-  }, [wallet])
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.addEventListener("wallet_disconnected", async () => {
-        setWallet(RESET)
-      })
-    }
-  }, [])
+  };
 
   return (
     <div>

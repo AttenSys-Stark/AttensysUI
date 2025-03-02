@@ -1,12 +1,34 @@
 import { useState } from "react";
 import { connect, disconnect } from "starknetkit";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom, useSetAtom, useAtomValue } from "jotai";
+import { connectorAtom } from "@/state/connectedWalletStarknetkitNext";
 import {
-  connectorAtom,
-  connectorDataAtom,
-} from "@/state/connectedWalletStarknetkitNext";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+  ARGENT_WEBWALLET_URL,
+  CHAIN_ID,
+  provider,
+  ARGENT_SESSION_SERVICE_BASE_URL,
+} from "@/constants";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+
+import {
+  sessionAtom,
+  sessionAccountAtom,
+  sessionKeyModeAtom,
+} from "@/state/argentSessionState";
+import { connectorDataAtom } from "@/state/connectedWalletStarknetkitNext";
+
+import {
+  allowedMethods,
+  expiry,
+  metaData,
+  dappKey,
+} from "@/helpers/openSession";
+import {
+  type CreateSessionParams,
+  createSession,
+  buildSessionAccount,
+  verifySession,
+} from "@argent/x-sessions";
 
 export interface WalletConnectionInfo {
   connected: boolean;
@@ -18,6 +40,54 @@ export const useWallet = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const setConnector = useSetAtom(connectorAtom);
+
+  const connectorData = useAtomValue(connectorDataAtom);
+  const setSession = useSetAtom(sessionAtom);
+  const setSessionAccount = useSetAtom(sessionAccountAtom);
+  const setSessionKeyMode = useSetAtom(sessionKeyModeAtom);
+
+  const createSessionKeys = async () => {
+    try {
+      if (!connectorData || !connectorData.account) {
+        throw new Error("No connector data");
+      }
+
+      const sessionParams: CreateSessionParams = {
+        allowedMethods,
+        expiry,
+        metaData: metaData(false),
+        sessionKey: dappKey,
+      };
+      const chainId = await provider.getChainId();
+      const session = await createSession({
+        address: connectorData.account,
+        chainId: chainId,
+        wallet: wallet as any,
+        sessionParams,
+      });
+
+      const sessionAccount = await buildSessionAccount({
+        session,
+        sessionKey: dappKey,
+        provider: provider,
+        argentSessionServiceBaseUrl: ARGENT_SESSION_SERVICE_BASE_URL,
+      });
+
+      if (!sessionAccount) {
+        console.error("Session account creation failed");
+        return;
+      }
+
+      console.log("verify:", verifySession({ session, sessionKey: dappKey }));
+
+      setSession(session);
+      setSessionAccount(sessionAccount);
+      setSessionKeyMode(true);
+    } catch (e) {
+      console.error("Session start failed:", e);
+      alert((e as any).message);
+    }
+  };
 
   const connectWallet = async () => {
     if (isConnecting) return;
@@ -68,6 +138,16 @@ export const useWallet = () => {
     }
   };
 
+  const clearSessionkeys = async () => {
+    try {
+      setSession(null);
+      setSessionKeyMode(false);
+      setSessionAccount(null);
+    } catch (error) {
+      console.error("Wallet clear error:", error);
+    }
+  };
+
   const autoConnectWallet = async () => {
     if (isConnecting || wallet) return;
     try {
@@ -102,5 +182,7 @@ export const useWallet = () => {
     autoConnectWallet,
     disconnectWallet,
     clearWalletInfo,
+    createSessionKeys,
+    clearSessionkeys,
   };
 };

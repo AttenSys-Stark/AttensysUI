@@ -6,9 +6,9 @@ import type {
 import { useAtomValue, useSetAtom, atom } from "jotai";
 import { atomWithReset } from "jotai/utils";
 import { useEffect } from "react";
-import { ConnectorData, StarknetWindowObject } from "starknetkit-next";
-import { Connector } from "starknetkit";
-import { FileObject } from "pinata";
+import type { ConnectorData, StarknetWindowObject } from "starknetkit-next";
+import type { Connector } from "starknetkit";
+import type { FileObject } from "pinata";
 import { number } from "starknet";
 
 const emptyData: FileObject = {
@@ -129,7 +129,7 @@ export const useWalletAccountChange = () => {
       chainId: prev?.chainId,
     }));
   };
-  
+
   const networkChangeHandler: NetworkChangeEventHandler = async (
     chainId?: ChainId,
     accounts?: string[],

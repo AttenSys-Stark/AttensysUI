@@ -1,38 +1,32 @@
 import { ConnectButton } from "@/components/connect/ConnectButton";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAtomValue } from "jotai";
+import { useEffect, useState } from "react";
+import { DisconnectButton } from "@/components/DisconnectButton";
+import { disconnect } from "starknetkit";
+import { provider } from "@/constants";
+import { AccountSection } from "@/components/AccountSection";
+import { attensysOrgAddress } from "./../deployments/contracts";
+import { attensysOrgAbi } from "./../deployments/abi";
+import { Contract } from "starknet";
 import {
-  connectorAtom,
-  connectorDataAtom,
-  walletStarknetkitNextAtom,
-} from "@/state/connectedWalletStarknetkitNext"
-import { useAtomValue, useSetAtom } from "jotai"
-import { RESET } from "jotai/utils"
-import { useEffect, useState } from "react"
-import { DisconnectButton } from "@/components/DisconnectButton"
-import { useAtom } from "jotai"
-import { disconnect } from "starknetkit"
-import { provider } from "@/constants"
-import { AccountSection } from "@/components/AccountSection"
-import { attensysOrgAddress } from "./../deployments/contracts"
-import { attensysOrgAbi } from "./../deployments/abi"
-import { Contract, } from "starknet"
-import { sessionAccountAtom, sessionAtom, sessionKeyModeAtom } from "@/state/argentSessionState"
-import { SessionKeys } from "./connect/SessionKeys"
+  sessionAccountAtom,
+  sessionAtom,
+  sessionKeyModeAtom,
+} from "@/state/argentSessionState";
+import { useWallet } from "@/hooks/useWallet";
 
 const MockOrganization = () => {
-  const setWalletLatest = useSetAtom(walletStarknetkitLatestAtom)
-  const setWalletNext = useSetAtom(walletStarknetkitNextAtom)
-  const setConnectorData = useSetAtom(connectorDataAtom)
-  const setConnector = useSetAtom(connectorAtom)
-  const [wallet, setWallet] = useAtom(walletStarknetkitLatestAtom)
-  const sessionKeyMode = useAtomValue(sessionKeyModeAtom)
-  const sessionAccount = useAtomValue(sessionAccountAtom)
-  const session = useAtomValue(sessionAtom)
-  const [inputValue, setInputValue] = useState("")
-  const [orgInputValue, setOrgInputValue] = useState("")
-  const [classOrgValue, setClassOrgValue] = useState("")
-  const [instructorValue, setInstructorValue] = useState("")
-  const [instructorInputValue, setInstructorInputValue] = useState("")
+  const wallet = useAtomValue(walletStarknetkit);
+  const { disconnectWallet } = useWallet();
+  const sessionKeyMode = useAtomValue(sessionKeyModeAtom);
+  const sessionAccount = useAtomValue(sessionAccountAtom);
+  const session = useAtomValue(sessionAtom);
+  const [inputValue, setInputValue] = useState("");
+  const [orgInputValue, setOrgInputValue] = useState("");
+  const [classOrgValue, setClassOrgValue] = useState("");
+  const [instructorValue, setInstructorValue] = useState("");
+  const [instructorInputValue, setInstructorInputValue] = useState("");
   const [orgData, setOrgData] = useState({
     address_of_org: "",
     nft_address: "",
@@ -53,42 +47,44 @@ const MockOrganization = () => {
   // core write and read functions
   const registerOrg = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
-      event.preventDefault()
+      event.preventDefault();
       const myCall = organizationContract.populate("create_org_profile", [
         "web3",
         "http://w3bnft.com",
         "cairo",
         "CAO",
-      ])
+      ]);
 
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
 
-        organizationContract.connect(sessionAccount)
+        organizationContract.connect(sessionAccount);
 
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysOrgAddress,
           entrypoint: "create_org_profile",
           calldata: myCall.calldata,
-        })
+        });
 
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
 
         const result = await organizationContract.create_org_profile(
           myCall.calldata,
           {
             maxFee,
           },
-        )
+        );
 
-        await provider.waitForTransaction(result.transaction_hash)
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
-        organizationContract.connect(wallet?.account)
+        organizationContract.connect(wallet?.account);
 
-        const result = await organizationContract.create_org_profile(myCall.calldata)
-        await provider.waitForTransaction(result.transaction_hash)
+        const result = await organizationContract.create_org_profile(
+          myCall.calldata,
+        );
+        await provider.waitForTransaction(result.transaction_hash);
       }
     } catch (error) {
       console.error("Error creating organization profile:", error);
@@ -112,47 +108,45 @@ const MockOrganization = () => {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     try {
-      event.preventDefault()
-      console.log(instructorValue)
+      event.preventDefault();
+      console.log(instructorValue);
 
       const myCall = organizationContract.populate("add_instructor_to_org", [
         instructorValue,
-      ])
+      ]);
 
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
 
-        organizationContract.connect(sessionAccount)
+        organizationContract.connect(sessionAccount);
 
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysOrgAddress,
           entrypoint: "add_instructor_to_org",
           calldata: myCall.calldata,
-        })
+        });
 
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
 
         const result = await organizationContract.add_instructor_to_org(
           myCall.calldata,
           {
             maxFee,
           },
-        )
+        );
 
-        await provider.waitForTransaction(result.transaction_hash)
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
-
-        organizationContract.connect(wallet?.account)
+        organizationContract.connect(wallet?.account);
 
         const res = await organizationContract.add_instructor_to_org(
           myCall.calldata,
-        )
+        );
 
-        await provider.waitForTransaction(res.transaction_hash)
+        await provider.waitForTransaction(res.transaction_hash);
       }
-
     } catch (error) {
       console.error("Error adding an instructor to organization:", error);
     }
@@ -186,43 +180,40 @@ const MockOrganization = () => {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     try {
-      event.preventDefault()
+      event.preventDefault();
 
       const myCall = organizationContract.populate("create_a_class", [
         classOrgValue,
-      ])
+      ]);
 
       if (sessionKeyMode) {
         if (!session || !sessionAccount) {
-          throw new Error("No open session")
+          throw new Error("No open session");
         }
 
-        organizationContract.connect(sessionAccount)
+        organizationContract.connect(sessionAccount);
 
         const { suggestedMaxFee } = await sessionAccount.estimateInvokeFee({
           contractAddress: attensysOrgAddress,
           entrypoint: "create_a_class",
           calldata: myCall.calldata,
-        })
+        });
 
-        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10)
+        const maxFee = (suggestedMaxFee * BigInt(15)) / BigInt(10);
 
         const result = await organizationContract.create_a_class(
           myCall.calldata,
           {
             maxFee,
           },
-        )
+        );
 
-        await provider.waitForTransaction(result.transaction_hash)
+        await provider.waitForTransaction(result.transaction_hash);
       } else {
+        organizationContract.connect(wallet?.account);
 
-        organizationContract.connect(wallet?.account)
-
-        const res = await organizationContract.create_a_class(
-          myCall.calldata,
-        )
-        await provider.waitForTransaction(res.transaction_hash)
+        const res = await organizationContract.create_a_class(myCall.calldata);
+        await provider.waitForTransaction(res.transaction_hash);
       }
     } catch (error) {
       console.error("Error creating a class:", error);
@@ -241,7 +232,7 @@ const MockOrganization = () => {
       myCall.calldata,
     );
     if (res != undefined) {
-      console.info(res)
+      console.info(res);
       //   setIsSuccess(true)
     }
   };
@@ -275,7 +266,6 @@ const MockOrganization = () => {
               disconnectWallet();
             }}
           />
-          <SessionKeys />
         </>
       ) : (
         <ConnectButton />
