@@ -72,6 +72,9 @@ const MockOrganization = () => {
 
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
         organizationContract.connect(wallet?.account);
 
         const result = await organizationContract.create_org_profile(
@@ -284,7 +287,7 @@ const MockOrganization = () => {
       )}
       <AccountSection
         address={wallet?.account?.address}
-        chainId={wallet?.chainId}
+        chainId={wallet?.chainId?.toString()}
       />
       <h1 className="text-3xl font-bold text-red-700 underline">
         Organization test

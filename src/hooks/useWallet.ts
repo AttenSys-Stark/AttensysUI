@@ -117,6 +117,7 @@ export const useWallet = () => {
           ...connectedWallet,
           account: account,
           selectedAddress: connectorData?.account,
+          chainId: connectorData?.chainId,
         });
       }
 
@@ -185,6 +186,7 @@ export const useWallet = () => {
           ...connectedWallet,
           account: account,
           selectedAddress: connectorData?.account,
+          chainId: connectorData?.chainId,
         });
       }
 
@@ -203,6 +205,7 @@ export const useWallet = () => {
 
   return {
     wallet,
+    setWallet,
     session,
     sessionAccount,
     sessionKeyMode,

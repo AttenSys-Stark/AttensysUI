@@ -24,7 +24,7 @@ import Landing from "@/components/homepage/Landing";
 import { useWallet } from "@/hooks/useWallet";
 
 export default function Home() {
-  const { autoConnectWallet, wallet } = useWallet();
+  const { autoConnectWallet, wallet, setWallet } = useWallet();
 
   useEffect(() => {
     if (wallet) return;

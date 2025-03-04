@@ -253,7 +253,8 @@ const Header = () => {
 
                   <div>
                     <p className="font-semibold text-gray-900">
-                      {wallet.account.name || "Connected User"}
+                      Connected User
+                      {/* To do consider using Starknet ID here  */}
                     </p>
                     <p className="text-[#9B51E0] text-sm">
                       {wallet.account.address

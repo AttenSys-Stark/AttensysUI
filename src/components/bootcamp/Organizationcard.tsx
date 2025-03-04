@@ -10,6 +10,7 @@ import { provider } from "@/constants";
 import { pinata } from "../../../utils/config";
 import type { GetCIDResponse } from "pinata";
 import type { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { useWallet } from "@/hooks/useWallet";
 
 interface OrganizationCardProp {
   name: string;

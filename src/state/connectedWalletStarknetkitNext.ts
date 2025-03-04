@@ -60,6 +60,7 @@ export const createBootcampInitState = atom(InitBootcampData);
 export interface ExtendedStarknetWindowObject extends StarknetWindowObject {
   account: AccountInterface | undefined;
   selectedAddress: string | undefined;
+  chainId: bigint | undefined;
 }
 
 export const walletStarknetkitNextAtom = atomWithReset<
