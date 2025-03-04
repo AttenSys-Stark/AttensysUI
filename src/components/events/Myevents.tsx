@@ -1,8 +1,10 @@
 "use client";
 import add from "@/assets/add.svg";
+import type React from "react";
+
 import calenderimage from "@/assets/calendar.svg";
 import ticket from "@/assets/ticket.svg";
-import { attensysEventAbi, attensysOrgAbi } from "@/deployments/abi";
+import { attensysEventAbi } from "@/deployments/abi";
 import { attensysEventAddress } from "@/deployments/contracts";
 import {
   createEventClickAtom,
@@ -16,14 +18,13 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FileObject } from "pinata";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { Contract } from "starknet";
 import { pinata } from "../../../utils/config";
 import Eventcard from "./Eventcard";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useAvnu } from "@/hooks/useAvnu";
-import GasTokenModal from "../GasTokenModal";
+import { useAvnuGasless } from "@/hooks/useAvnu";
+import GaslessNotification from "../GaslessNotification";
 
 const Myevents = (props: any) => {
   const { connectorDataAccount } = props;
@@ -65,17 +66,14 @@ const Myevents = (props: any) => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const {
+    isPaymasterAvailable,
+    compatibility,
     executeGaslessCalls,
     loading: gaslessLoading,
     error: gaslessError,
-    hasRewards,
-    selectedGasToken,
-    selectGasToken,
-    gasTokenPrices,
-    formattedMaxGasAmount,
-    refetchGasTokenPrices,
-  } = useAvnu(connectorDataAccount);
-  const [showGasTokenModal, setShowGasTokenModal] = useState(false);
+  } = useAvnuGasless(connectorDataAccount);
+  const [showGaslessNotification, setShowGaslessNotification] = useState(false);
+  const [transactionError, setTransactionError] = useState<string | null>(null);
 
   const handleImageClick = () => {
     // Trigger the file input on image click
@@ -131,9 +129,39 @@ const Myevents = (props: any) => {
 
     return unixTimestamp;
   };
+
+  const executeStandardTransaction = async (calls: any[]) => {
+    try {
+      const eventContract = new Contract(
+        attensysEventAbi,
+        attensysEventAddress,
+        connectorDataAccount,
+      );
+
+      const multiCall = await connectorDataAccount.execute(calls);
+
+      const transactionHash =
+        "transaction_hash" in multiCall
+          ? multiCall.transaction_hash
+          : multiCall.transactionHash;
+
+      if (!transactionHash) {
+        throw new Error("No transaction hash returned");
+      }
+
+      await connectorDataAccount?.provider.waitForTransaction(transactionHash);
+
+      return transactionHash;
+    } catch (error) {
+      console.error("Standard transaction failed:", error);
+      throw error;
+    }
+  };
+
   const handleCreateEventButton = async () => {
-    if (!hasRewards && !selectedGasToken) {
-      setShowGasTokenModal(true);
+    setTransactionError(null);
+    if (!isPaymasterAvailable || !compatibility?.isCompatible) {
+      setShowGaslessNotification(true);
       return;
     }
     const newErrors = {
@@ -185,7 +213,6 @@ const Myevents = (props: any) => {
         const startdateandtime = convertToUnixTimeStamp(startDate, startTime);
         const enddateandtime = convertToUnixTimeStamp(endDate, endTime);
 
-        // Prepare the call data
         const createEventCalldata = eventContract.populate("create_event", [
           wallet?.account?.address,
           eventName,
@@ -197,26 +224,27 @@ const Myevents = (props: any) => {
           true,
         ]);
 
-        // Execute the gasless transaction
-        const result = await executeGaslessCalls([
+        const calls = [
           {
             contractAddress: attensysEventAddress,
             entrypoint: "create_event",
             calldata: createEventCalldata.calldata,
           },
-        ]);
+        ];
 
-        // Get transaction hash safely considering both response types
-        const transactionHash =
-          "transaction_hash" in result
-            ? result.transaction_hash
-            : result.transactionHash;
+        let transactionHash;
+
+        if (isPaymasterAvailable && compatibility?.isCompatible) {
+          const response = await executeGaslessCalls(calls);
+          transactionHash = response.transactionHash;
+        } else {
+          transactionHash = await executeStandardTransaction(calls);
+        }
 
         if (!transactionHash) {
           throw new Error("No transaction hash returned");
         }
 
-        // Wait for transaction confirmation
         await connectorDataAccount?.provider
           .waitForTransaction(transactionHash)
           .then(() => {
@@ -236,10 +264,12 @@ const Myevents = (props: any) => {
           })
           .catch((e: any) => {
             console.log("Error: ", e);
+            throw e;
           });
       }
     } catch (error) {
       console.error("Failed to create event:", error);
+      setTransactionError("Failed to process transaction. Please try again.");
     } finally {
       setisSubmitting(false);
     }
@@ -334,7 +364,7 @@ const Myevents = (props: any) => {
                   </h1>
                   <div className="h-[394.44px] bg-[#3F3E58] border-[#DCDCDC] border-[1px] rounded-xl flex justify-center items-center w-full">
                     <Image
-                      src={add}
+                      src={add || "/placeholder.svg"}
                       alt="add"
                       onClick={handleImageClick}
                       className="cursor-pointer"
@@ -583,7 +613,7 @@ const Myevents = (props: any) => {
                 </h1>
                 <div className="w-[422px] h-[394.44px] bg-[#3F3E58] border-[#DCDCDC] border-[1px] rounded-xl flex justify-center items-center">
                   <Image
-                    src={add}
+                    src={add || "/placeholder.svg"}
                     alt="add"
                     onClick={handleImageClick}
                     className="cursor-pointer"
@@ -609,19 +639,6 @@ const Myevents = (props: any) => {
                     : "Create an Event"}
                 </Button>
               </div>
-              <GasTokenModal
-                isOpen={showGasTokenModal}
-                onClose={() => setShowGasTokenModal(false)}
-                onConfirm={() => {
-                  setShowGasTokenModal(false);
-                  handleCreateEventButton();
-                }}
-                gasTokenPrices={gasTokenPrices}
-                selectedGasToken={selectedGasToken}
-                selectGasToken={selectGasToken}
-                formattedMaxGasAmount={formattedMaxGasAmount}
-                refetchGasTokenPrices={refetchGasTokenPrices}
-              />
               <Button
                 onClick={handleCreateEventButton}
                 disabled={isSubmitting || gaslessLoading}
@@ -650,7 +667,11 @@ const Myevents = (props: any) => {
             {boiler()};
             {!Regstat && !existingeventStat && (
               <div className="h-[400px] w-[70%] flex flex-col mx-auto items-center justify-center mt-5">
-                <Image src={calenderimage} alt="calendar" className="mb-10" />
+                <Image
+                  src={calenderimage || "/placeholder.svg"}
+                  alt="calendar"
+                  className="mb-10"
+                />
                 <p className="mb-10 text-[16px] text-[#FFFFFF] leading-[22px] font-light w-[320px] text-center">
                   You have not created an event.{" "}
                   <span className="font-bold">
@@ -662,7 +683,11 @@ const Myevents = (props: any) => {
                   className="flex rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[170px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
                 >
                   <div className="flex space-x-4 items-center font-semibold text-[16px]">
-                    <Image src={ticket} alt="ticket" className="mr-2" />
+                    <Image
+                      src={ticket || "/placeholder.svg"}
+                      alt="ticket"
+                      className="mr-2"
+                    />
                   </div>
                   <div>Create an Event</div>
                 </Button>
@@ -718,7 +743,11 @@ const Myevents = (props: any) => {
             {boiler()};
             {!Regstat && !existingeventStat && (
               <div className="h-[400px] sm:w-[70%] flex flex-col mx-auto items-center justify-center mt-5">
-                <Image src={calenderimage} alt="calendar" className="mb-10" />
+                <Image
+                  src={calenderimage || "/placeholder.svg"}
+                  alt="calendar"
+                  className="mb-10"
+                />
                 <p className="mb-10 text-[16px] text-[#FFFFFF] leading-[22px] font-light text-center">
                   You have not created an event.
                   <span className="font-bold">
@@ -730,7 +759,11 @@ const Myevents = (props: any) => {
                   className="flex rounded-lg bg-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[170px] text-sm text-white data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
                 >
                   <div className="flex space-x-4 items-center font-semibold text-[16px]">
-                    <Image src={ticket} alt="ticket" className="mr-2" />
+                    <Image
+                      src={ticket || "/placeholder.svg"}
+                      alt="ticket"
+                      className="mr-2"
+                    />
                   </div>
                   <div>Create an Event</div>
                 </Button>
@@ -764,12 +797,15 @@ const Myevents = (props: any) => {
   useEffect(() => {
     const scrollY = sessionStorage.getItem("scrollPosition");
     if (scrollY) {
-      window.scrollTo(0, parseFloat(scrollY));
+      window.scrollTo(0, Number.parseFloat(scrollY));
     }
     if (props.section == "events") {
       window.scrollTo(0, 0);
     }
-  }, []);
+  }, [props.section]);
+
+  const isGaslessAvailable =
+    isPaymasterAvailable === true && compatibility?.isCompatible === true;
 
   return (
     <div
@@ -777,6 +813,18 @@ const Myevents = (props: any) => {
       className="w-[100%] bg-event-gradient my-8 "
     >
       {renderContent()}
+      <GaslessNotification
+        isOpen={showGaslessNotification}
+        onClose={() => setShowGaslessNotification(false)}
+        onConfirm={() => {
+          setShowGaslessNotification(false);
+          handleCreateEventButton();
+        }}
+        isAvailable={isGaslessAvailable}
+      />
+      {transactionError && (
+        <div className="text-red-500 text-sm mt-2">{transactionError}</div>
+      )}
     </div>
   );
 };
