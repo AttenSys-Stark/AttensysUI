@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import { Description, Field, Label, Select } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import clsx from "clsx";
 import AlleventCard from "./AlleventCard";
-import { allEventData } from "@/constants/data";
 import { useRouter } from "next/navigation";
 import { EventData } from "./DiscoverLanding";
 import Orange from "@/assets/Orange.svg";

@@ -6,8 +6,6 @@ import exclaim from "@/assets/exclaim.svg";
 import Logo from "@/assets/Logo.svg";
 import { Button } from "@headlessui/react";
 import {
-  modalstatus,
-  orguploadstatus,
   confirmationstatus,
   sendingstatus,
   successstatus,

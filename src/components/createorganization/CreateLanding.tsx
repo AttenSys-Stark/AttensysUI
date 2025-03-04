@@ -2,9 +2,8 @@ import React from "react";
 import Image from "next/image";
 import highfive from "@/assets/highfive.svg";
 import { Button } from "@headlessui/react";
-import createicon from "@/assets/createicon.svg";
 import { GoOrganization } from "react-icons/go";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const CreateLanding = () => {
   const router = useRouter();

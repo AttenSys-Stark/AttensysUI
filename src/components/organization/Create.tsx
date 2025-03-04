@@ -1,19 +1,16 @@
-import React, { ChangeEvent, useRef, useState, useEffect } from "react";
+import React, { type ChangeEvent, useRef, useState, useEffect } from "react";
 import { IoIosInformationCircleOutline, IoMdClose } from "react-icons/io";
 import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom } from "jotai";
-import { Button, Field, Input, Label } from "@headlessui/react";
+import { useAtom, useSetAtom } from "jotai";
+import { Button, Field, Input } from "@headlessui/react";
 import clsx from "clsx";
 import TargetCategory from "./TargetCategory";
-import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import "rc-time-picker/assets/index.css";
 import moment from "moment";
-import TimePicker from "rc-time-picker";
 import BootcampTime from "./BootcampTime";
 import { FaPlus } from "react-icons/fa6";
-import { RiArrowDropDownLine } from "react-icons/ri";
 import Toggle from "react-toggle";
 import cloud from "@/assets/cloud.svg";
 import Image from "next/image";
@@ -21,20 +18,20 @@ import dividers from "@/assets/Dividers.svg";
 import { useRouter } from "next/navigation";
 import add from "@/assets/add.svg";
 import { createBootcampInitState } from "@/state/connectedWalletStarknetkitNext";
-import { FileObject } from "pinata";
+import type { FileObject } from "pinata";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import { FcCancel } from "react-icons/fc";
 import { pinata } from "../../../utils/config";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import { connect } from "starknetkit";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { Contract } from "starknet";
+import { useWallet } from "@/hooks/useWallet";
 
 const format = "h:mm a";
 const now = moment().hour(0).minute(0);
@@ -74,11 +71,10 @@ const ResetBootcampData = {
 
 const Create = (props: any) => {
   // { height }: { height: number | null }
+  const { wallet, session, sessionAccount, sessionKeyMode } = useWallet();
+
   const { height, organizationName } = props;
-  const [createOverlayStat, setCreateOverlayStat] = useAtom(
-    createbootcampoverlay,
-  );
-  const [value, onChange] = useState<Value>(new Date());
+  const setCreateOverlayStat = useSetAtom(createbootcampoverlay);
   const [startdateStat, SetStartDateStatus] = React.useState<Dayjs | null>(
     dayjs(),
   );
@@ -90,39 +86,9 @@ const Create = (props: any) => {
   const logoInputRef = useRef<HTMLInputElement | null>(null);
   const [bootcampData, setBootcampData] = useAtom(createBootcampInitState);
   const [uploading, setUploading] = useState(false);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [numOfClassesToCreate, setNumOfClassesToCreate] = useState<
     number | any
   >(1);
-
-  useEffect(() => {
-    const autoConnect = async () => {
-      try {
-        const { wallet: connectedWallet, connector } = await connect({
-          //@ts-ignore
-          provider,
-          modalMode: "neverAsk",
-          webWalletUrl: ARGENT_WEBWALLET_URL,
-          argentMobileOptions: {
-            dappName: "Attensys",
-            url: window.location.hostname,
-            chainId: CHAIN_ID,
-            icons: [],
-          },
-        });
-
-        // console.log(connector.wallet.account )
-        setWallet(connectedWallet);
-      } catch (e) {
-        console.error(e);
-        alert((e as any).message);
-      }
-    };
-
-    if (!wallet) {
-      autoConnect();
-    }
-  }, [wallet]);
 
   // console.dir(bootcampData, {depth: null})
   // console.dir(bootcampTimes, {depth: null})
@@ -212,42 +178,48 @@ const Create = (props: any) => {
 
   const handlePublishButton = async () => {
     setUploading(true);
-    const bootcamplogo = await pinata.upload.file(bootcampData.BootcampLogo);
-    const Nftimage = await pinata.upload.file(bootcampData.bootcampNftImage);
-    const Dataupload = await pinata.upload.json({
-      BootcampName: bootcampData.bootcampName,
-      BootcampLogo: bootcamplogo.IpfsHash,
-      BootcampDescription: bootcampData.bootcampDescription,
-      Bootcamplecturedata: bootcampData.bootcampLecture,
-      BootcampStartDate: bootcampData.bootcampStartdate,
-      BootEndDate: bootcampData.bootcampEndDate,
-      BootcampNFTname: bootcampData.bootcampNftName,
-      BootcampNFTsymbol: bootcampData.bootCampNftSymbol,
-      BootcampNftImage: Nftimage.IpfsHash,
-      Organizer: bootcampData.bootcampOrganization,
-      PriceStaus: bootcampData.price,
-      BootcampPrice: bootcampData.bootcampPrice,
-      targetAudience: bootcampData.targetAudience,
-    });
 
-    if (Dataupload) {
+    try {
+      // Upload images to Pinata
+      const bootcamplogo = await pinata.upload.file(bootcampData.BootcampLogo);
+      const Nftimage = await pinata.upload.file(bootcampData.bootcampNftImage);
+
+      // Upload bootcamp metadata to Pinata
+      const Dataupload = await pinata.upload.json({
+        BootcampName: bootcampData.bootcampName,
+        BootcampLogo: bootcamplogo.IpfsHash,
+        BootcampDescription: bootcampData.bootcampDescription,
+        Bootcamplecturedata: bootcampData.bootcampLecture,
+        BootcampStartDate: bootcampData.bootcampStartdate,
+        BootEndDate: bootcampData.bootcampEndDate,
+        BootcampNFTname: bootcampData.bootcampNftName,
+        BootcampNFTsymbol: bootcampData.bootCampNftSymbol,
+        BootcampNftImage: Nftimage.IpfsHash,
+        Organizer: bootcampData.bootcampOrganization,
+        PriceStaus: bootcampData.price,
+        BootcampPrice: bootcampData.bootcampPrice,
+        targetAudience: bootcampData.targetAudience,
+      });
+
+      if (!Dataupload) {
+        throw new Error("Failed to upload bootcamp metadata to Pinata.");
+      }
+
       console.info("Data upload here", Dataupload);
       console.info(
-        "Create bootcamp Cid to send to contract ",
+        "Create bootcamp CID to send to contract",
         Dataupload.IpfsHash,
       );
-      // setUploading(false);
-      // router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`)
-      // setCreateOverlayStat(false);
-      // setBootcampData(ResetBootcampData)
 
+      // Initialize contract
       const organizationContract = new Contract(
         attensysOrgAbi,
         attensysOrgAddress,
-        wallet?.account,
+        provider,
       );
 
-      const create_bootcamp_calldata = organizationContract.populate(
+      // Prepare calldata
+      const createBootcampCalldata = organizationContract.populate(
         "create_bootcamp",
         [
           organizationName,
@@ -260,27 +232,41 @@ const Create = (props: any) => {
         ],
       );
 
-      const callContract = await wallet?.account.execute([
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "create_bootcamp",
-          calldata: create_bootcamp_calldata.calldata,
-        },
-      ]);
+      let result: { transaction_hash: string };
 
-      //@ts-ignore
-      wallet?.account?.provider
-        .waitForTransaction(callContract.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.error("Error: ", e);
-        })
-        .finally(() => {
-          setUploading(false);
-          router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`);
-          setCreateOverlayStat(false);
-          setBootcampData(ResetBootcampData);
-        });
+      // Use session account if present
+      if (sessionKeyMode && session && sessionAccount) {
+        result = await sessionAccount.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "create_bootcamp",
+            calldata: createBootcampCalldata.calldata,
+          },
+        ]);
+      } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
+        result = await wallet.account.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "create_bootcamp",
+            calldata: createBootcampCalldata.calldata,
+          },
+        ]);
+      }
+
+      // Wait for transaction confirmation
+      await provider.waitForTransaction(result.transaction_hash);
+
+      setBootcampData(ResetBootcampData);
+      setCreateOverlayStat(false);
+      router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`);
+    } catch (e) {
+      console.error("Error in handlePublishButton:", e);
+    } finally {
+      setUploading(false);
     }
   };
 

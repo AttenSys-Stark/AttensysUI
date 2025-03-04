@@ -1,10 +1,6 @@
 import React from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-import { caroselldata } from "@/constants/data";
-import Image from "next/image";
-import drop from "@/assets/droporg.svg";
-import { IoIosArrowDropdown } from "react-icons/io";
 import Carosellcard from "@/components/bootcamp/Carosellcard";
 
 const Ongoingcarousell = (props: any) => {

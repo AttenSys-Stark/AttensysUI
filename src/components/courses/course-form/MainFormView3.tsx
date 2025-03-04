@@ -1,13 +1,11 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
-import Dropdown from "../Dropdown";
 import Image from "next/image";
 import upload from "@/assets/upload.svg";
 import upload_other from "@/assets/upload_other.svg";
 import tick_circle from "@/assets/tick-circle.svg";
 import trash from "@/assets/trash.svg";
 import film from "@/assets/film.svg";
-import { IoMdCheckmark } from "@react-icons/all-files/io/IoMdCheckmark";
 import CourseSideBar from "./SideBar";
 import { handleCreateCourse } from "@/utils/helpers";
 import { useRouter } from "next/navigation";

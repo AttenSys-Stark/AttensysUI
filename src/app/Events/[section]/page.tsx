@@ -2,17 +2,13 @@
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import Coursedropdown from "@/components/courses/Coursedropdown";
 import Eventslanding from "@/components/events/Eventslanding";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import {
   bootcampdropdownstatus,
-  connectorAtom,
   connectorDataAtom,
   coursestatusAtom,
-  walletStarknetkitNextAtom,
 } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { useParams } from "next/navigation";
-import { useState } from "react";
 
 const Index = () => {
   const [status, setstatus] = useAtom(coursestatusAtom);
@@ -21,12 +17,6 @@ const Index = () => {
   );
   const params = useParams();
   const section = params.section;
-
-  const [connector] = useAtom(connectorAtom);
-
-  const [connectorDataAccount] = useState<null | any>(
-    connector?.wallet.account,
-  );
 
   const handlePageClick = () => {
     setbootcampdropstat(false);
@@ -47,10 +37,7 @@ const Index = () => {
       <div onClick={(e) => e.stopPropagation()}>
         <Bootcampdropdown />
       </div>
-      <Eventslanding
-        connectorDataAccount={connectorDataAccount}
-        section={section}
-      />
+      <Eventslanding section={section} />
     </div>
   );
 };

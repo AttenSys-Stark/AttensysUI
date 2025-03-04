@@ -10,7 +10,6 @@ import Switch from "react-switch";
 import Lectures from "../Lectures";
 import CourseSideBar from "./SideBar";
 import { MdOutlineDiamond } from "react-icons/md";
-import { IoSearchOutline, IoMenuOutline } from "react-icons/io5";
 
 const MainFormView5 = () => {
   const [isActivated, setIsActivated] = useState(false);

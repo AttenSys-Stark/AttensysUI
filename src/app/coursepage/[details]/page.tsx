@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
@@ -9,7 +9,6 @@ import { useAtom } from "jotai";
 import Coursedropdown from "@/components/courses/Coursedropdown";
 import { useParams } from "next/navigation";
 import CourseLanding from "@/components/courses/CourseLanding";
-import CourseNews from "@/components/courses/CourseNews";
 
 const Index = () => {
   const [status, setstatus] = useAtom(coursestatusAtom);

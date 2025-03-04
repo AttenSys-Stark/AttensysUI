@@ -8,20 +8,19 @@ import {
   orgowneraddress,
 } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import { Contract } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { pinata } from "../../../utils/config";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { provider } from "@/constants";
 import { useSearchParams } from "next/navigation";
+import { useWallet } from "@/hooks/useWallet";
 
 const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
 
 const Outline = () => {
   const [dataStat, setDataStat] = useState(false);
   const [addClass, setAddclass] = useAtom(addclassmodal);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [bootcampid, setbootcampid] = useAtom(currentID);
   const [ownerAddress, setowneraddress] = useAtom(orgowneraddress);
   const [videoarray, setVideoArray] = useState([]);
@@ -38,7 +37,7 @@ const Outline = () => {
   };
 
   const getUploadedVideo = async () => {
-    let video_data = await orgContract.get_bootcamp_uploaded_video_link(
+    const video_data = await orgContract.get_bootcamp_uploaded_video_link(
       org,
       id,
     );

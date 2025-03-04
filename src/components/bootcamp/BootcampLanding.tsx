@@ -3,16 +3,14 @@ import BootcampHero from "./BootcampHero";
 import BootcampCarousell from "./BootcampCarousell";
 import Organizations from "./Organizations";
 import { FavoriteCourse } from "./FavoriteCourse";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useAtom } from "jotai";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
-import { pinata } from "../../../utils/config";
+import { provider } from "@/constants";
+import { Contract } from "starknet";
+import { useWallet } from "@/hooks/useWallet";
 
 const BootcampLanding = () => {
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [bootcampDataInfo, setBootcampdataInfo] = useState([]);
   const [allorgInfo, setAllorgInfo] = useState([]);
 

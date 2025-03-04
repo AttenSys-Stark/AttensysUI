@@ -8,7 +8,6 @@ import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { useState } from "react";
 import {
-  walletStarknetkitNextAtom,
   organzationInitState,
   isinputError,
 } from "@/state/connectedWalletStarknetkitNext";

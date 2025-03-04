@@ -1,34 +1,24 @@
-import React, { ChangeEvent, useRef, useState } from "react";
+import type React from "react";
+import { type ChangeEvent, useRef, useState } from "react";
 import Image from "next/image";
 import add from "@/assets/add.svg";
 import {
-  walletStarknetkitNextAtom,
   organzationInitState,
   isinputError,
 } from "@/state/connectedWalletStarknetkitNext";
-import {
-  Button,
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-  Field,
-  Input,
-  Label,
-} from "@headlessui/react";
+import { Button, Field, Input } from "@headlessui/react";
 import clsx from "clsx";
 import Category from "./Category";
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { pinata } from "../../../utils/config";
 import backArrow from "../../../public/backArrow.svg";
+import { useWallet } from "@/hooks/useWallet";
 
 const Basicinfo = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const logofileInputRef = useRef<HTMLInputElement | null>(null);
   const router = useRouter();
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [organizationData, setOrganizationData] = useAtom(organzationInitState);
   const [inputError, setInputError] = useState(false);
   const [logoinputError, setlogoiInputError] = useState(false);

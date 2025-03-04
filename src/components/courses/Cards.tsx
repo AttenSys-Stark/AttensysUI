@@ -1,16 +1,6 @@
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  Typography,
-  Button,
-  CardProps,
-} from "@material-tailwind/react";
-
 import robotImg from "../../assets/robot.svg";
 import Image from "next/image";
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
-import { handleCourse, handleCoursehome } from "@/utils/helpers";
+import { handleCoursehome } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import StarRating from "../bootcamp/StarRating";
 

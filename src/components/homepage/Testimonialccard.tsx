@@ -1,5 +1,4 @@
 import React from "react";
-import nikolas from "@/assets/nikolas.svg";
 import Image from "next/image";
 import {
   StaticImageData,

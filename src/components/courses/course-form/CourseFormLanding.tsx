@@ -7,7 +7,6 @@ import MainFormView2 from "./MainFormView2";
 import MainFormView3 from "./MainFormView3";
 import MainFormView4 from "./MainFormView4";
 import MainFormView5 from "./MainFormView5";
-import { courseQuestions } from "@/constants/data";
 import LandingPage from "../LandingPage";
 
 const CourseFormLanding = (prop: any) => {

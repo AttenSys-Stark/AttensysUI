@@ -6,7 +6,6 @@ import youtube from "@/assets/youtube.svg";
 import podcast from "@/assets/Podcast.svg";
 import rich from "@/assets/Richin2024.svg";
 import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
-import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck";
 import { GiBackwardTime } from "@react-icons/all-files/gi/GiBackwardTime";
 import { FaPlay } from "@react-icons/all-files/fa/FaPlay";
 import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond";

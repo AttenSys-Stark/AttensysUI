@@ -4,24 +4,23 @@ import {
   isRegisteredatom,
   orgnameatom,
 } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom, useSetAtom } from "jotai";
-import { VscNewFile } from "react-icons/vsc";
+import { useAtom } from "jotai";
 import bootsearch from "@/assets/bootsearch.svg";
 import bootcreate from "@/assets/bootcreate.svg";
 import Image from "next/image";
 import people from "@/assets/people.svg";
 import { useRouter } from "next/navigation";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import { Contract } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { provider } from "@/constants";
+import { useWallet } from "@/hooks/useWallet";
 
 const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
 
 const Bootcampdropdown = () => {
   const [bootcampdropstat] = useAtom(bootcampdropdownstatus);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [isreg, setisRegistered] = useAtom(isRegisteredatom);
   const [orgname, setOrgname] = useAtom(orgnameatom);
   const router = useRouter();

@@ -5,12 +5,9 @@ import {
   CardFooter,
   Typography,
   Button,
-  CardProps,
 } from "@material-tailwind/react";
 
-import robotImg from "../../assets/roboy.png";
 import Image from "next/image";
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
 import StarRating from "./StarRating";
 
 interface favoritecourseprop {

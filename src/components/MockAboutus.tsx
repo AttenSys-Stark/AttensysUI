@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import Animation from "@/components/Animation";
-import Logo from "@/assets/Attensys.png";
-import Image from "next/image";
 
 const MockAboutus = () => {
   const [isCourseOpen, setIsCourseOpen] = useState(false);

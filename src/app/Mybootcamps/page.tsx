@@ -6,7 +6,6 @@ import {
   coursestatusAtom,
   bootcampdropdownstatus,
 } from "@/state/connectedWalletStarknetkitNext";
-import ExplorePage from "@/components/explorer/ExplorePage";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import MybootcampLanding from "@/components/mybootcamp/MybootcampLanding";
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
 import { useAtom } from "jotai";
 import {

@@ -1,20 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "@/components/organization/Heading";
 import Panel from "@/components/organization/Panel";
-import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom } from "jotai";
 import Userbootcamps from "./Userbootcamps";
 import Registered from "./Registered";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { Contract } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { provider } from "@/constants";
 import { pinata } from "../../../utils/config";
 import { useSearchParams } from "next/navigation";
+import { useWallet } from "@/hooks/useWallet";
 
 const Explorebootcampdetails = () => {
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [logoImagesource, setLogoImage] = useState<string | null>(null);
   const [bannerImagesource, setBannerImage] = useState<string | null>(null);
   const [organizationName, setOrgName] = useState<string | null>(null);

@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { HighlightData } from "@/constants/data";
 import Highlightcard from "./Highlightcard";
 

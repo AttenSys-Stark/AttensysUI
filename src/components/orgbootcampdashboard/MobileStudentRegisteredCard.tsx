@@ -1,13 +1,12 @@
 "use client";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { useAtom } from "jotai";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { pinata } from "../../../utils/config";
 import book from "@/assets/book.svg";
+import { useWallet } from "@/hooks/useWallet";
 
 const MobileStudentRegisteredCard = (props: any) => {
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
 
@@ -28,7 +27,7 @@ const MobileStudentRegisteredCard = (props: any) => {
   }, [wallet]);
 
   function truncateAddress(address: any): string {
-    let formatedAddress = decimalToHexAddress(address);
+    const formatedAddress = decimalToHexAddress(address);
 
     const start = formatedAddress?.slice(0, 10);
     const end = formatedAddress?.slice(-10);
@@ -60,7 +59,7 @@ const MobileStudentRegisteredCard = (props: any) => {
           </div>
         )}
       </div>
-      <div className="flex items-center justify-between  ">
+      <div className="flex items-center justify-between ">
         <p className="text-[14px] leading-[17px] text-[#9B51E0] font-medium">
           {email}
         </p>

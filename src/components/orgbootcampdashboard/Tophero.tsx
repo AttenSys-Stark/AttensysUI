@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import flier from "@/assets/flierd.svg";
 import { Button } from "@headlessui/react";
 import { LuCalendarDays } from "react-icons/lu";
 import { RiEditFill } from "react-icons/ri";
@@ -8,17 +7,17 @@ import { FiLink } from "react-icons/fi";
 import { createMeeting } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import { Contract } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { provider } from "@/constants";
 import { pinata } from "../../../utils/config";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { useWallet } from "@/hooks/useWallet";
 
 const Tophero = () => {
   const [meetingCreation, setMeetingCreation] = useAtom(createMeeting);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [bootcampInfo, setBootcampInfo] = useState([]);
   const [bootcampname, setBootcampName] = useState("");
   const [organizer, setOrganizers] = useState("");
@@ -69,7 +68,7 @@ const Tophero = () => {
       console.log("ip data here", data);
       //@ts-ignore
       // setBootcampDescription(data?.data?.BootcampDescription);
-      let formatedDate = formatBootcampDates(data?.data);
+      const formatedDate = formatBootcampDates(data?.data);
       //@ts-ignore
       setDate(formatedDate);
       setImageSource(objectURL);
@@ -113,7 +112,7 @@ const Tophero = () => {
         <Image
           src={Imagesource}
           alt="flier"
-          className="h-full w-full object-cover rounded-xl"
+          className="object-cover w-full h-full rounded-xl"
           width={500}
           height={500}
         />
@@ -122,7 +121,7 @@ const Tophero = () => {
       <div
         className={`bg-[url('/dashbordbg.svg')] h-full w-full lg:w-[78%] rounded-xl bg-cover p-6 lg:px-10 space-y-6 lg:space-y-20 flex flex-col justify-center`}
       >
-        <div className="flex flex-col lg:flex-row space-y-6 justify-between">
+        <div className="flex flex-col justify-between space-y-6 lg:flex-row">
           <div className="space-y-1">
             <h1 className="text-[#FFFFFF] text-[16px] leading-[22px] font-medium">
               Bootcamp ID : {id}
@@ -154,14 +153,14 @@ const Tophero = () => {
             <div className="h-[7px] w-[7px] rounded-full bg-[#DC1D16]"></div>
           </div>
           <div className="flex justify-between">
-            <div className="flex space-x-1 items-center">
+            <div className="flex items-center space-x-1">
               <LuCalendarDays className="text-[#FFFFFF] h-[21px] w-[19px]" />
               <h1 className="text-[#FFFFFF] text-[16px] leading-[22px] font-medium">
                 {bootcampDate}
               </h1>
             </div>
 
-            <div className="hidden lg:flex space-x-1 items-center">
+            <div className="items-center hidden space-x-1 lg:flex">
               <h1 className="text-[#FFFFFF] text-[17px] leading-[25px] font-black">
                 Edit bootcamp page
               </h1>

@@ -2,7 +2,6 @@
 
 import { RESET } from "jotai/utils";
 import { useEffect } from "react";
-import { useAtom } from "jotai";
 /*import { connect } from "starknetkit";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 
@@ -23,11 +22,9 @@ import Explore from "@/components/courses/Explore";
 */
 import Landing from "@/components/homepage/Landing";
 import { useWallet } from "@/hooks/useWallet";
-import { walletStarknetkitNextAtom } from "@/state/connectedWalletStarknetkitNext";
 
 export default function Home() {
-  const [wallet, setWallet] = useAtom(walletStarknetkitNextAtom);
-  const { autoConnectWallet } = useWallet();
+  const { autoConnectWallet, wallet } = useWallet();
 
   useEffect(() => {
     if (wallet) return;

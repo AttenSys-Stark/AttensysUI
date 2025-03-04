@@ -1,8 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
-import blucecirle from "@/assets/bluecircle.svg";
-import { Calendar } from "@nextui-org/react";
-import type { DateValue } from "@react-types/calendar";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import eventlog from "@/assets/eventlogo.svg";
 import fire from "@/assets/fire.svg";
@@ -17,7 +14,7 @@ interface MyeventCardProp {
 }
 
 const Eventcard: React.FC<MyeventCardProp> = (props) => {
-  let defaultDate = today(getLocalTimeZone());
+  const defaultDate = today(getLocalTimeZone());
   // let [focusedDate, setFocusedDate] = useState<DateValue>(defaultDate);
   return (
     <div className="flex max-w-[747px] gap-4 relative px-4 mb-8">

@@ -7,8 +7,6 @@ import { useAtomValue } from "jotai";
 import { FC } from "react";
 import { constants, num } from "starknet";
 // import { Section } from "./Section"
-import { CHAIN_ID } from "@/constants";
-import { ChainId } from "@starknet-io/types-js";
 
 interface AccountSectionProps {
   address?: string;

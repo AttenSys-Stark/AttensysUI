@@ -1,13 +1,11 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
 import { useParams, useRouter } from "next/navigation";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
-  connectorAtom,
 } from "@/state/connectedWalletStarknetkitNext";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import { useAtom } from "jotai";
 import Basicinfo from "@/components/createorganization/Basicinfo";
@@ -18,6 +16,7 @@ import Congratulations from "@/components/createorganization/Congratulations";
 import WalletisConnected from "@/components/createorganization/WalletisConnected";
 import Image from "next/image";
 import backArrow from "../../../../public/backArrow.svg";
+import { useWallet } from "@/hooks/useWallet";
 
 const Index = () => {
   const [status, setstatus] = useAtom(coursestatusAtom);
@@ -28,12 +27,7 @@ const Index = () => {
   const params = useParams();
   const section = params.info;
 
-  const [wallet] = useAtom(walletStarknetkit);
-  const [connector] = useAtom(connectorAtom);
-
-  const [connectorDataAccount] = useState<null | any>(
-    connector?.wallet.account,
-  );
+  const { wallet } = useWallet();
 
   const handlePageClick = () => {
     setbootcampdropstat(false);
@@ -65,7 +59,7 @@ const Index = () => {
       case "add-instructors":
         return (
           <>
-            <Addinstructor connectorDataAccount={connectorDataAccount} />
+            <Addinstructor />
           </>
         );
 

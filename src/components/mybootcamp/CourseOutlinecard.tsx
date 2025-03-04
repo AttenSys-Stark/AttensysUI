@@ -6,7 +6,6 @@ import { IoMdCalendar } from "react-icons/io";
 import { GoEye } from "react-icons/go";
 import { MdOutlineAssignment } from "react-icons/md";
 import { BsFillFileEarmarkSpreadsheetFill } from "react-icons/bs";
-import { IoIosPeople } from "react-icons/io";
 import { MdOutlinePending } from "react-icons/md";
 import { AiFillSignature } from "react-icons/ai";
 import { PiVideo } from "react-icons/pi";

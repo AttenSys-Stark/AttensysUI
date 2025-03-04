@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import OverviewDiscover from "./OverviewDiscover";
 import Tab from "./Tab";
 import Content from "./Content";

@@ -2,7 +2,6 @@ import React from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import Carosellcard from "./Carosellcard";
-import { caroselldata } from "@/constants/data";
 
 const BootcampCarousell = (props: any) => {
   const responsive = {

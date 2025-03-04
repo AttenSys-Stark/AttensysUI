@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import largeflier from "@/assets/largeflier.svg";
 import { FaTags } from "react-icons/fa";
 import { CiCalendarDate } from "react-icons/ci";
 import { IoTimeSharp } from "react-icons/io5";
@@ -14,18 +13,18 @@ import RegisterModal from "./RegisterModal";
 import { registerModal } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import { provider } from "@/constants";
+import { Contract } from "starknet";
 import { pinata } from "../../../utils/config";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { useWallet } from "@/hooks/useWallet";
 
 const RegisterLanding = (props: any) => {
   const [regModal, setRegModal] = useAtom(registerModal);
   const decodedName = decodeURIComponent(props.regname);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [bootcampDataInfo, setBootcampdataInfo] = useState([]);
   const [bootcampInfo, setBootcampInfo] = useState([]);
   const [bootcampname, setBootcampName] = useState("");
@@ -92,7 +91,7 @@ const RegisterLanding = (props: any) => {
       console.log("ip data here", data);
       //@ts-ignore
       setBootcampDescription(data?.data?.BootcampDescription);
-      let formatedDate = formatBootcampDates(data?.data);
+      const formatedDate = formatBootcampDates(data?.data);
       //@ts-ignore
       setDate(formatedDate);
       setImageSource(objectURL);
@@ -148,12 +147,12 @@ const RegisterLanding = (props: any) => {
           <div className="truncate">{decodedName}</div>
         </div>
 
-        <div className="h-auto w-full py-4 px-4 lg:px-8 flex flex-col items-start justify-start space-y-8 space-x-0 md:flex-row md:space-x-6 md:space-y-0 md:justify-between md:items-stretch mt-8">
+        <div className="flex flex-col items-start justify-start w-full h-auto px-4 py-4 mt-8 space-x-0 space-y-8 lg:px-8 md:flex-row md:space-x-6 md:space-y-0 md:justify-between md:items-stretch">
           <div className="h-auto w-full md:w-[50%] lg:w-[40%] rounded-lg border-[1px] border-[#B8B9BA]">
             <Image
               src={Imagesource}
               alt="flier"
-              className="h-full w-full object-cover rounded-lg"
+              className="object-cover w-full h-full rounded-lg"
               width={500}
               height={300}
             />
@@ -175,9 +174,9 @@ const RegisterLanding = (props: any) => {
                 </div>
               </div>
             </div>
-            <div className="px-4 lg:px-8 grid grid-cols-1 sm:grid-cols-2 gap-4 items-start mt-8 w-full">
-              <div className="space-y-2 w-full col-span-1 flex flex-none flex-col pb-4">
-                <div className="flex space-x-2 items-center">
+            <div className="grid items-start w-full grid-cols-1 gap-4 px-4 mt-8 lg:px-8 sm:grid-cols-2">
+              <div className="flex flex-col flex-none w-full col-span-1 pb-4 space-y-2">
+                <div className="flex items-center space-x-2">
                   <CiCalendarDate className="h-[20px] w-[20px]" />
                   <h1 className="text-xs text-[#2D3A4B] font-light">
                     Bootcamp Date{" "}
@@ -188,8 +187,8 @@ const RegisterLanding = (props: any) => {
                 </h1>
               </div>
 
-              <div className="space-y-2 w-full col-span-1 flex flex-none flex-col pb-4">
-                <div className="flex space-x-2 items-center">
+              <div className="flex flex-col flex-none w-full col-span-1 pb-4 space-y-2">
+                <div className="flex items-center space-x-2">
                   <CiCalendarDate className="h-[20px] w-[20px]" />
                   <h1 className="text-[14px] text-[#2D3A4B] font-light">
                     Organizers
@@ -200,8 +199,8 @@ const RegisterLanding = (props: any) => {
                 </h1>
               </div>
 
-              <div className="space-y-2 w-full col-span-1 flex flex-none flex-col pb-4">
-                <div className="flex space-x-2 items-center">
+              <div className="flex flex-col flex-none w-full col-span-1 pb-4 space-y-2">
+                <div className="flex items-center space-x-2">
                   <IoTimeSharp className="h-[20px] w-[20px]" />
                   <h1 className="text-[14px] text-[#2D3A4B] font-light">
                     Time
@@ -212,8 +211,8 @@ const RegisterLanding = (props: any) => {
                 </h1>
               </div>
 
-              <div className="space-y-2 w-full col-span-1 flex flex-none flex-col pb-4">
-                <div className="flex space-x-2 items-center">
+              <div className="flex flex-col flex-none w-full col-span-1 pb-4 space-y-2">
+                <div className="flex items-center space-x-2">
                   <IoPeopleSharp className="h-[20px] w-[20px]" />
                   <h1 className="text-[14px] text-[#2D3A4B] font-light">
                     Bootcamp capacity
@@ -224,8 +223,8 @@ const RegisterLanding = (props: any) => {
                 </h1>
               </div>
 
-              <div className="space-y-2 w-full col-span-1 flex flex-none flex-col pb-4">
-                <div className="flex space-x-2 items-center">
+              <div className="flex flex-col flex-none w-full col-span-1 pb-4 space-y-2">
+                <div className="flex items-center space-x-2">
                   <FaRegHourglass className="h-[20px] w-[20px]" />
                   <h1 className="text-[14px] text-[#2D3A4B] font-light">
                     Registeration Deadline
@@ -236,7 +235,7 @@ const RegisterLanding = (props: any) => {
                 </h1>
               </div>
 
-              <div className="space-y-2 w-full col-span-1 flex flex-none flex-col pb-4">
+              <div className="flex flex-col flex-none w-full col-span-1 pb-4 space-y-2">
                 <h1 className="text-[#2D3A4B] text-md font-semibold">
                   Certification requirements
                 </h1>

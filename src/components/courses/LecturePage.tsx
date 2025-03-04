@@ -4,7 +4,6 @@ import { CardWithLink } from "./Cards";
 import { Button } from "@material-tailwind/react";
 import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
 import Image from "next/image";
-import stream_video from "@/assets/stream_video.svg";
 import graduate from "@/assets/grad.svg";
 import profile_pic from "@/assets/profile_pic.png";
 import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck";

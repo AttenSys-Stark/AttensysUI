@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@headlessui/react";
-import { IoSettingsSharp } from "react-icons/io5";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useAtom } from "jotai";
 import { pinata } from "../../../utils/config";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import { GetCIDResponse } from "pinata";
+import type { StaticImport } from "next/dist/shared/lib/get-img-props";
+import type { GetCIDResponse } from "pinata";
+import { useWallet } from "@/hooks/useWallet";
 
 // interface CarousellCardProp {
 //   name : string,
@@ -21,7 +19,7 @@ import { GetCIDResponse } from "pinata";
 // }
 
 const MobilepublicBootcampCard = (props: any) => {
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
   const [NFTImagesource, setNFTLogoImage] = useState<string | StaticImport>("");
   const [date, setDate] = useState<string | null>(null);

@@ -15,7 +15,6 @@ import companylogo from "@/assets/companylogo.svg";
 import bootcamp1 from "@/assets/project.svg";
 import bootcamp2 from "@/assets/graphicsdesign.svg";
 import bootcamp3 from "@/assets/flier.svg";
-import bootcamp4 from "@/assets/effects.png";
 import testlogo from "@/assets/testlogo.svg";
 import handshake from "@/assets/handshake.svg";
 import world from "@/assets/world.svg";
@@ -40,7 +39,6 @@ import free_books from "@/assets/free_books.svg";
 import notifications from "@/assets/notifications.svg";
 import f7_tickets from "@/assets/f7_tickets.svg";
 import token from "@/assets/token-branded_nftb.svg";
-import videoHero from "@/assets/video.svg";
 import videoClip from "@/assets/video_clip.svg";
 import certIcon from "@/assets/certificate-outline.svg";
 

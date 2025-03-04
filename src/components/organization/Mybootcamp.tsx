@@ -2,7 +2,6 @@ import React from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import Mybootcampcarousel from "./Mybootcampcarousel";
-import { caroselldata } from "@/constants/data";
 import { useRouter } from "next/navigation";
 import {
   currentID,

@@ -1,7 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
-import { useRouter } from "next/router";
-import { useParams } from "next/navigation";
+import React from "react";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,

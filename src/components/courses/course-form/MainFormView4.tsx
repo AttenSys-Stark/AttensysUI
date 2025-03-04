@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
-import Dropdown from "../Dropdown";
 import Image from "next/image";
 import free from "@/assets/free.svg";
 import paid from "@/assets/paid.svg";

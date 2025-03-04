@@ -1,21 +1,23 @@
 import { useState } from "react";
-import { connect, disconnect } from "starknetkit";
-import { useAtom, useSetAtom, useAtomValue } from "jotai";
-import { connectorAtom } from "@/state/connectedWalletStarknetkitNext";
+import { connect, disconnect } from "starknetkit-next";
+import { useAtom, useSetAtom } from "jotai";
+import {
+  connectorAtom,
+  connectorDataAtom,
+  walletStarknetkitNextAtom,
+} from "@/state/connectedWalletStarknetkitNext";
 import {
   ARGENT_WEBWALLET_URL,
   CHAIN_ID,
   provider,
   ARGENT_SESSION_SERVICE_BASE_URL,
 } from "@/constants";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 
 import {
   sessionAtom,
   sessionAccountAtom,
   sessionKeyModeAtom,
 } from "@/state/argentSessionState";
-import { connectorDataAtom } from "@/state/connectedWalletStarknetkitNext";
 
 import {
   allowedMethods,
@@ -38,13 +40,13 @@ export interface WalletConnectionInfo {
 
 export const useWallet = () => {
   const [isConnecting, setIsConnecting] = useState(false);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const [wallet, setWallet] = useAtom(walletStarknetkitNextAtom);
   const setConnector = useSetAtom(connectorAtom);
 
-  const connectorData = useAtomValue(connectorDataAtom);
-  const setSession = useSetAtom(sessionAtom);
-  const setSessionAccount = useSetAtom(sessionAccountAtom);
-  const setSessionKeyMode = useSetAtom(sessionKeyModeAtom);
+  const [connectorData, setConnectorData] = useAtom(connectorDataAtom);
+  const [session, setSession] = useAtom(sessionAtom);
+  const [sessionAccount, setSessionAccount] = useAtom(sessionAccountAtom);
+  const [sessionKeyMode, setSessionKeyMode] = useAtom(sessionKeyModeAtom);
 
   const createSessionKeys = async () => {
     try {
@@ -97,7 +99,6 @@ export const useWallet = () => {
 
       const res = await connect({
         modalMode: "alwaysAsk",
-        provider,
         webWalletUrl: ARGENT_WEBWALLET_URL,
         argentMobileOptions: {
           dappName: "Attensys",
@@ -107,10 +108,21 @@ export const useWallet = () => {
         },
       });
 
-      const { wallet: connectedWallet, connector } = res;
-      //@ts-ignore
-      setWallet(connectedWallet);
+      const { wallet: connectedWallet, connectorData, connector } = res;
+
+      const account = await connector?.account(provider);
+
+      if (connectedWallet) {
+        setWallet({
+          ...connectedWallet,
+          account: account,
+          selectedAddress: connectorData?.account,
+        });
+      }
+
       setConnector(connector);
+      setConnectorData(connectorData);
+
       return connectedWallet;
     } catch (error) {
       console.error("Wallet connection error:", error);
@@ -151,8 +163,11 @@ export const useWallet = () => {
   const autoConnectWallet = async () => {
     if (isConnecting || wallet) return;
     try {
-      const { wallet: connectedWallet, connector } = await connect({
-        provider,
+      const {
+        wallet: connectedWallet,
+        connector,
+        connectorData,
+      } = await connect({
         modalMode: "neverAsk",
         webWalletUrl: ARGENT_WEBWALLET_URL,
         argentMobileOptions: {
@@ -162,9 +177,19 @@ export const useWallet = () => {
           icons: [],
         },
       });
-      // console.log("res ato", connectedWallet, connector, connectorData);
-      //@ts-ignore
-      setWallet(connectedWallet);
+
+      const account = await connector?.account(provider);
+
+      if (connectedWallet) {
+        setWallet({
+          ...connectedWallet,
+          account: account,
+          selectedAddress: connectorData?.account,
+        });
+      }
+
+      setConnector(connector);
+      setConnectorData(connectorData);
       setConnector(connector);
 
       if (!connectedWallet) {
@@ -177,6 +202,10 @@ export const useWallet = () => {
   };
 
   return {
+    wallet,
+    session,
+    sessionAccount,
+    sessionKeyMode,
     isConnecting,
     connectWallet,
     autoConnectWallet,

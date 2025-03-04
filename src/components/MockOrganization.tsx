@@ -1,7 +1,6 @@
 import { ConnectButton } from "@/components/connect/ConnectButton";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useAtomValue } from "jotai";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DisconnectButton } from "@/components/DisconnectButton";
 import { disconnect } from "starknetkit";
 import { provider } from "@/constants";
@@ -9,19 +8,13 @@ import { AccountSection } from "@/components/AccountSection";
 import { attensysOrgAddress } from "./../deployments/contracts";
 import { attensysOrgAbi } from "./../deployments/abi";
 import { Contract } from "starknet";
-import {
-  sessionAccountAtom,
-  sessionAtom,
-  sessionKeyModeAtom,
-} from "@/state/argentSessionState";
 import { useWallet } from "@/hooks/useWallet";
+import { walletStarknetkitNextAtom } from "@/state/connectedWalletStarknetkitNext";
 
 const MockOrganization = () => {
-  const wallet = useAtomValue(walletStarknetkit);
-  const { disconnectWallet } = useWallet();
-  const sessionKeyMode = useAtomValue(sessionKeyModeAtom);
-  const sessionAccount = useAtomValue(sessionAccountAtom);
-  const session = useAtomValue(sessionAtom);
+  const wallet = useAtomValue(walletStarknetkitNextAtom);
+  const { session, sessionAccount, sessionKeyMode, disconnectWallet } =
+    useWallet();
   const [inputValue, setInputValue] = useState("");
   const [orgInputValue, setOrgInputValue] = useState("");
   const [classOrgValue, setClassOrgValue] = useState("");
@@ -93,6 +86,9 @@ const MockOrganization = () => {
 
   const handleOnSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!wallet?.account) {
+      throw new Error("Wallet not connected");
+    }
     organizationContract.connect(wallet?.account);
     const myCall = organizationContract.populate("get_org_info", [
       wallet?.account.address,
@@ -139,6 +135,10 @@ const MockOrganization = () => {
 
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         organizationContract.connect(wallet?.account);
 
         const res = await organizationContract.add_instructor_to_org(
@@ -154,6 +154,9 @@ const MockOrganization = () => {
 
   const handleGetAllOrg = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!wallet?.account) {
+      throw new Error("Wallet not connected");
+    }
     organizationContract.connect(wallet?.account);
     const myCall = organizationContract.populate("get_all_org_info", []);
     const res = await organizationContract.get_all_org_info(myCall.calldata);
@@ -166,6 +169,9 @@ const MockOrganization = () => {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
+    if (!wallet?.account) {
+      throw new Error("Wallet not connected");
+    }
     organizationContract.connect(wallet?.account);
     const myCall = organizationContract.populate("get_org_instructors", [
       orgInputValue,
@@ -210,6 +216,9 @@ const MockOrganization = () => {
 
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
         organizationContract.connect(wallet?.account);
 
         const res = await organizationContract.create_a_class(myCall.calldata);
@@ -224,6 +233,9 @@ const MockOrganization = () => {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
+    if (!wallet?.account) {
+      throw new Error("Wallet not connected");
+    }
     organizationContract.connect(wallet?.account);
     const myCall = organizationContract.populate("get_instructor_part_of_org", [
       instructorInputValue,

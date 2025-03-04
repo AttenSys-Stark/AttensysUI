@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from "react";
-import handshake from "@/assets/handshake.svg";
 import Image from "next/image";
-import testlogo from "@/assets/testlogo.svg";
 import StarRating from "./StarRating";
 import { Button } from "@headlessui/react";
 import { useRouter } from "next/navigation";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import { Contract } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { provider } from "@/constants";
 import { pinata } from "../../../utils/config";
-import axios from "axios";
-import { GetCIDResponse } from "pinata";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useAtom } from "jotai";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import type { GetCIDResponse } from "pinata";
+import type { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 interface OrganizationCardProp {
   name: string;
@@ -32,7 +27,7 @@ const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
 
 const Organizationcard = (props: any) => {
   const router = useRouter();
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
   const [bannerImagesource, setBannerImage] = useState<string | StaticImport>(
     "",

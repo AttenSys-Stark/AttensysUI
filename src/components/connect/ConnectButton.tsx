@@ -1,16 +1,8 @@
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useSetAtom } from "jotai";
-import { useRouter } from "next/navigation";
 import { FC } from "react";
-import { connect } from "starknetkit";
 import { Button } from "@headlessui/react";
-import World from "@/assets/Vector.svg";
 import { useWallet } from "@/hooks/useWallet";
 
 const ConnectButton: FC = () => {
-  const setWallet = useSetAtom(walletStarknetkit);
-  const navigate = useRouter();
   const { connectWallet, isConnecting } = useWallet();
 
   /*   const connectFn = async () => {

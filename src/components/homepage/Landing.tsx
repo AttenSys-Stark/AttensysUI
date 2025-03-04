@@ -5,7 +5,7 @@ import {
   coursestatusAtom,
   bootcampdropdownstatus,
 } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import Herosection from "./Herosection";
 import Cardsection from "./Cardsection";
 import Mantrasection from "./Mantrasection";

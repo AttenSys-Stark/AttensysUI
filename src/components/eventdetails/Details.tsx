@@ -8,7 +8,6 @@ import key from "@/assets/key.svg";
 import location from "@/assets/locationn.svg";
 import calendar from "@/assets/calendarr.svg";
 import top from "@/assets/top.svg";
-import Locator from "./Locator";
 import citymap from "@/assets/citymap.svg";
 import Modal from "./Modal";
 import { modalstatus } from "@/state/connectedWalletStarknetkitNext";
@@ -23,7 +22,6 @@ import { EventData } from "../discoverevents/DiscoverLanding";
 import { decimalToHexAddress, FormatDateFromUnix } from "@/utils/formatAddress";
 
 const Details = (props: any) => {
-  const { connectorDataAccount } = props;
   const [eventData, seteventData] = useState<EventData | null>(null);
   const [modalstat, setModalstatus] = useAtom(modalstatus);
   const params = useParams();
@@ -59,7 +57,7 @@ const Details = (props: any) => {
     const eventContract = new Contract(
       attensysEventAbi,
       attensysEventAddress,
-      connectorDataAccount,
+      provider,
     );
     //This is calling the register_for_event function from the contract using an hardcoded event_identifier value of 1
     const registerEventCall = eventContract.populate("register_for_event", [1]);
@@ -68,7 +66,7 @@ const Details = (props: any) => {
       registerEventCall.calldata,
     );
     //@ts-ignore
-    connectorDataAccount?.provider
+    provider
       .waitForTransaction(result.transaction_hash)
       .then(() => {})
       .catch((e: any) => {
@@ -93,7 +91,7 @@ const Details = (props: any) => {
                 This event is hosted by :
               </h1>
 
-              <div className="mt-4 flex space-x-5 justify-center items-center">
+              <div className="flex items-center justify-center mt-4 space-x-5">
                 <div className="w-[49px] h-[49px] rounded-[100%]">
                   <Image src={live} alt="story" objectFit="cover" />
                 </div>
@@ -111,7 +109,7 @@ const Details = (props: any) => {
                 return (
                   <div
                     key={index}
-                    className="mt-3 flex space-x-5 justify-center items-center"
+                    className="flex items-center justify-center mt-3 space-x-5"
                   >
                     <div className="w-[49px] h-[49px] rounded-[100%]">
                       <Image src={data.icon} alt="story" objectFit="cover" />
@@ -140,7 +138,7 @@ const Details = (props: any) => {
             </div>
           </div>
 
-          <div className="space-y-8   ">
+          <div className="space-y-8 ">
             <div className="md:w-[720px] w-[95%] mx-auto md:mx-0 h-[222px] md:h-[94px] md:flex-row flex-col bg-details-gradient rounded-xl flex  justify-center items-center px-6 lg:mt-0 mt-[10%] gap-4  ">
               <div className="flex gap-4 ">
                 <Image src={key} alt="key" />
@@ -188,7 +186,7 @@ const Details = (props: any) => {
             </div>
 
             <div className="md:w-[720px] w-[95%] mx-auto md:mx-0 h-[328px] md:h-[213px] bg-oneclick-gradient rounded-xl flex flex-col justify-center px-6 space-y-4 border-[#FFFFFF7D] border-[1px]">
-              <div className="space-y-2 flex justify-between">
+              <div className="flex justify-between space-y-2">
                 <div>
                   <h1 className="text-[#FFFFFF] text-[16px] font-semibold leading-[22px]">
                     Register for this event

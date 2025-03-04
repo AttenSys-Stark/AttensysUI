@@ -1,40 +1,28 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
   Input,
 } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import Logo from "@/assets/Logo.svg";
 import Image from "next/image";
 import { ConnectButton } from "./connect/ConnectButton";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import {
-  connectorAtom,
-  connectorDataAtom,
-  walletStarknetkitNextAtom,
-} from "@/state/connectedWalletStarknetkitNext";
-import { RESET } from "jotai/utils";
+import { walletStarknetkitNextAtom } from "@/state/connectedWalletStarknetkitNext";
 import { DisconnectButton } from "./DisconnectButton";
-import { connect, disconnect } from "starknetkit";
-import Coursedropdown from "./courses/Coursedropdown";
+import { disconnect } from "starknetkit";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
 } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { handleSubmit } from "@/utils/helpers";
 import { ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 
-import ImagenCourses1 from "@/assets/ImagenCourses1.png";
 import ImagenCourses2 from "@/assets/ImagenCourses2.png";
 import ImagenCourses3 from "@/assets/ImagenCourses3.png";
 
@@ -58,7 +46,7 @@ function classNames(...classes: any[]) {
 
 const Header = () => {
   const router = useRouter();
-  const [wallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [searchValue, setSearchValue] = useState("");
   const [coursestatus, setcourseStatus] = useAtom(coursestatusAtom);
   const [status] = useAtom(coursestatusAtom);

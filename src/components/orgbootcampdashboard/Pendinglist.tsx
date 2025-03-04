@@ -4,25 +4,25 @@ import ex from "@/assets/ex.svg";
 import correct from "@/assets/correct.png";
 import Image from "next/image";
 import { pinata } from "../../../utils/config";
-import { useAtom } from "jotai";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useSearchParams } from "next/navigation";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { Contract } from "starknet";
+import { useWallet } from "@/hooks/useWallet";
+import { provider } from "@/constants";
 
 const Pendinglist = (props: any) => {
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet, session, sessionAccount, sessionKeyMode } = useWallet();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const [loading, setLoading] = useState(false);
 
   const organizationContract = new Contract(
     attensysOrgAbi,
     attensysOrgAddress,
-    wallet?.account,
+    provider,
   );
 
   const getIpfsData = async () => {
@@ -39,69 +39,121 @@ const Pendinglist = (props: any) => {
   };
 
   const handleApprove = async () => {
-    const approve_calldata = organizationContract.populate(
-      "approve_registration",
-      [props?.info?.address_of_student, id],
-    );
-    const callContract = await wallet?.account.execute([
-      {
-        contractAddress: attensysOrgAddress,
-        entrypoint: "approve_registration",
-        calldata: approve_calldata.calldata,
-      },
-    ]);
-    //@ts-ignore
-    wallet?.account?.provider
-      .waitForTransaction(callContract.transaction_hash)
-      .then(() => {})
-      .catch((e: any) => {
-        console.error("Error: ", e);
-      })
-      .finally(() => {
-        //@todo set loading state here
-      });
+    setLoading(true); // Set loading state
+
+    try {
+      if (!props?.info?.address_of_student || !id) {
+        throw new Error("Missing student address or ID.");
+      }
+
+      // Populate calldata
+      const approveCalldata = organizationContract.populate(
+        "approve_registration",
+        [props.info.address_of_student, id],
+      );
+
+      let result: { transaction_hash: string };
+
+      // Use session account if present
+      if (sessionKeyMode && session && sessionAccount) {
+        result = await sessionAccount.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "approve_registration",
+            calldata: approveCalldata.calldata,
+          },
+        ]);
+      } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
+        result = await wallet.account.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "approve_registration",
+            calldata: approveCalldata.calldata,
+          },
+        ]);
+      }
+
+      // Wait for transaction confirmation
+      await provider.waitForTransaction(result.transaction_hash);
+
+      console.info("Student registration approved successfully.");
+    } catch (e) {
+      console.error("Error in handleApprove:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDecline = async () => {
-    const approve_calldata = organizationContract.populate(
-      "decline_registration",
-      [props?.info?.address_of_student, id],
-    );
-    const callContract = await wallet?.account.execute([
-      {
-        contractAddress: attensysOrgAddress,
-        entrypoint: "decline_registration",
-        calldata: approve_calldata.calldata,
-      },
-    ]);
-    //@ts-ignore
-    wallet?.account?.provider
-      .waitForTransaction(callContract.transaction_hash)
-      .then(() => {})
-      .catch((e: any) => {
-        console.error("Error: ", e);
-      })
-      .finally(() => {
-        //@todo set loading state here
-      });
+    setLoading(true); // Set loading state
+
+    try {
+      if (!props?.info?.address_of_student || !id) {
+        throw new Error("Missing student address or ID.");
+      }
+
+      // Populate calldata
+      const declineCalldata = organizationContract.populate(
+        "decline_registration",
+        [props.info.address_of_student, id],
+      );
+
+      let result: { transaction_hash: string };
+
+      // Use session account if present
+      if (sessionKeyMode && session && sessionAccount) {
+        result = await sessionAccount.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "decline_registration",
+            calldata: declineCalldata.calldata,
+          },
+        ]);
+      } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
+        result = await wallet.account.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "decline_registration",
+            calldata: declineCalldata.calldata,
+          },
+        ]);
+      }
+
+      // Wait for transaction confirmation
+      await provider.waitForTransaction(result.transaction_hash);
+
+      console.info("Student registration declined successfully.");
+    } catch (e) {
+      console.error("Error in handleDecline:", e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderButton = (arg: any) => {
     if (arg == "both") {
       return (
         <>
-          <div className="flex space-x-3 items-center justify-center">
+          <div className="flex items-center justify-center space-x-3">
             <Image
               src={ex}
               alt="cancel"
               onClick={handleDecline}
-              className=" cursor-pointer"
+              className="cursor-pointer "
             />
             <Image
               src={correct}
               alt="check"
               onClick={handleApprove}
-              className=" cursor-pointer"
+              className="cursor-pointer "
             />
           </div>
         </>
@@ -110,7 +162,7 @@ const Pendinglist = (props: any) => {
       return (
         <>
           <div className="flex items-center justify-center">
-            <Image src={correct} alt="check" className=" cursor-not-allowed" />
+            <Image src={correct} alt="check" className="cursor-not-allowed " />
           </div>
         </>
       );
@@ -118,7 +170,7 @@ const Pendinglist = (props: any) => {
       return (
         <>
           <div className="flex items-center justify-center">
-            <Image src={ex} alt="cancel" className=" cursor-not-allowed" />
+            <Image src={ex} alt="cancel" className="cursor-not-allowed " />
           </div>
         </>
       );

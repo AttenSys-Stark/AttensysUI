@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button, Input } from "@headlessui/react";
-import filter from "@/assets/filter.png";
 import exportimg from "@/assets/export.svg";
 import Studentlist from "./Studentlist";
 import Pendinglist from "./Pendinglist";
 import MobileStudentApprovalCard from "./MobileStudentApprovalCard";
 import MobileStudentRegisteredCard from "./MobileStudentRegisteredCard";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { Contract } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { pinata } from "../../../utils/config";
+import { provider } from "@/constants";
 import { useSearchParams } from "next/navigation";
-import { useAtom } from "jotai";
-
+import { useWallet } from "@/hooks/useWallet";
 const Students = () => {
   const [pendingclickstat, setPendingclickstat] = useState(true);
   const [registeredclick, setRegisteredClick] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [pendingStudent, setPendingStudent] = useState([]);
   const [pendingStudentStatus, setpendingStudentStatus] = useState(false);
   const searchParams = useSearchParams();
@@ -81,7 +77,7 @@ const Students = () => {
 
       {pendingclickstat && (
         <div>
-          <div className="lg:hidden w-full py-7 space-y-4">
+          <div className="w-full space-y-4 lg:hidden py-7">
             <h1 className="text-[18px] leading-[23px] font-semibold  text-[#5801A9] mt-2">
               Pending Approval
             </h1>
@@ -188,7 +184,7 @@ const Students = () => {
                   </table>
                 ) : (
                   <div className="flex h-[400px] w-full justify-center items-center">
-                    <h1 className="text-center text-lg font-semibold">
+                    <h1 className="text-lg font-semibold text-center">
                       No pending application
                     </h1>
                   </div>
@@ -201,7 +197,7 @@ const Students = () => {
 
       {registeredclick && (
         <div>
-          <div className="lg:hidden w-full py-7 space-y-4">
+          <div className="w-full space-y-4 lg:hidden py-7">
             <h1 className="text-[18px] leading-[23px] font-semibold  text-[#5801A9] mt-2">
               Registered Students (210)
             </h1>
@@ -265,7 +261,7 @@ const Students = () => {
                       viewBox="0 0 24 24"
                       strokeWidth="1.5"
                       stroke="currentColor"
-                      className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+                      className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2"
                     >
                       <path
                         strokeLinecap="round"
@@ -337,7 +333,7 @@ const Students = () => {
                 </table>
               ) : (
                 <div className="flex h-[400px] w-full justify-center items-center">
-                  <h1 className="text-center text-lg font-semibold">
+                  <h1 className="text-lg font-semibold text-center">
                     No pending application
                   </h1>
                 </div>

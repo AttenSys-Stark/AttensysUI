@@ -7,32 +7,23 @@ import {
   detailsEntryLoading,
   registrationsuccess,
 } from "@/state/connectedWalletStarknetkitNext";
-import {
-  Button,
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-  Field,
-  Input,
-  Label,
-} from "@headlessui/react";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { Button, Field, Input } from "@headlessui/react";
 import { Contract } from "starknet";
 import { pinata } from "../../../utils/config";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
+import { useWallet } from "@/hooks/useWallet";
+import { provider } from "@/constants";
 
 const RegistrationDetails = (props: any) => {
   const [regModal, setRegModal] = useAtom(registerModal);
+  const { wallet, session, sessionAccount, sessionKeyMode } = useWallet();
   const [inputValue, setInputValue] = useState<number | string>("");
   const [detailsEntrystatus, setDetailsEntryStatus] = useAtom(detailsEntryStat);
   const [detailsEntryLoadingstatus, setDetailsEntryLoadingStatus] =
     useAtom(detailsEntryLoading);
   const [registrationsuccessstatus, setregistrationsuccessstatus] =
     useAtom(registrationsuccess);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [fullname, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -56,53 +47,80 @@ const RegistrationDetails = (props: any) => {
   };
 
   const handlePay = async () => {
-    setDetailsEntryStatus(false);
-    setDetailsEntryLoadingStatus(true);
-    const studentDataUpload = await pinata.upload.json({
-      student_name: fullname,
-      student_email: email,
-    });
-    if (studentDataUpload) {
-      console.log(studentDataUpload);
+    setDetailsEntryStatus(false); // Hide details entry UI
+    setDetailsEntryLoadingStatus(true); // Show loading status
+
+    try {
+      if (!fullname || !email) {
+        throw new Error("Full name and email are required.");
+      }
+
+      // Upload student data to Pinata
+      const studentDataUpload = await pinata.upload.json({
+        student_name: fullname,
+        student_email: email,
+      });
+
+      if (!studentDataUpload) {
+        throw new Error("Failed to upload student data to Pinata.");
+      }
+
+      console.log("Student data uploaded:", studentDataUpload);
+
+      // Initialize contract
       const organizationContract = new Contract(
         attensysOrgAbi,
         attensysOrgAddress,
-        wallet?.account,
+        provider,
       );
 
-      const register_calldata = organizationContract.populate(
+      // Prepare calldata
+      const registerCalldata = organizationContract.populate(
         "register_for_bootcamp",
         [props.org_info, props.id_info, studentDataUpload.IpfsHash],
       );
-      const callContract = await wallet?.account.execute([
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "register_for_bootcamp",
-          calldata: register_calldata.calldata,
-        },
-      ]);
 
-      //@ts-ignore
-      wallet?.account?.provider
-        .waitForTransaction(callContract.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.error("Error: ", e);
-        })
-        .finally(() => {
-          setDetailsEntryLoadingStatus(false);
-          setregistrationsuccessstatus(true);
-        });
+      let result: { transaction_hash: string };
+
+      // Use session account if present
+      if (sessionKeyMode && session && sessionAccount) {
+        result = await sessionAccount.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "register_for_bootcamp",
+            calldata: registerCalldata.calldata,
+          },
+        ]);
+      } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected.");
+        }
+
+        result = await wallet.account.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "register_for_bootcamp",
+            calldata: registerCalldata.calldata,
+          },
+        ]);
+      }
+
+      // Wait for transaction confirmation
+      await provider.waitForTransaction(result.transaction_hash);
+
+      console.info("Student successfully registered for bootcamp.");
+
+      // Set success state
+      setregistrationsuccessstatus(true);
+    } catch (e) {
+      console.error("Error in handlePay:", e);
+    } finally {
+      setDetailsEntryLoadingStatus(false); // Hide loading status
     }
-
-    // setTimeout(() => {
-    //   setDetailsEntryLoadingStatus(false);
-    //   setregistrationsuccessstatus(true);
-    // }, 2000);
   };
 
   return (
-    <div className="w-full px-4 md:px-8 space-y-4 mt-8">
+    <div className="w-full px-4 mt-8 space-y-4 md:px-8">
       <div className="space-y-1.5">
         <h1 className="text-md text-[#2D3A4B] font-light">Full name</h1>
         <Field>
@@ -135,9 +153,9 @@ const RegistrationDetails = (props: any) => {
         </Field>
       </div>
 
-      <div className="w-full h-auto py-4 rounded-xl bg-amount-gradient flex flex-col justify-center space-y-6">
+      <div className="flex flex-col justify-center w-full h-auto py-4 space-y-6 rounded-xl bg-amount-gradient">
         <div className="text-[#FFFFFF] flex flex-col items-center justify-center">
-          <div className="flex space-x-1 items-center">
+          <div className="flex items-center space-x-1">
             <Input
               onChange={handleAmountChange}
               placeholder="0"
@@ -148,9 +166,9 @@ const RegistrationDetails = (props: any) => {
                 width: `${Math.max(2, inputValue.toString().length || 1)}ch`,
               }}
             />
-            <h1 className="text-3xl lg:text-4xl font-bold">USDT</h1>
+            <h1 className="text-3xl font-bold lg:text-4xl">USDT</h1>
           </div>
-          <p className="text-md font-normal">$0.00</p>
+          <p className="font-normal text-md">$0.00</p>
         </div>
 
         <div className="flex justify-between px-4">

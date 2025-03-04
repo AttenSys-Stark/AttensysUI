@@ -1,22 +1,13 @@
 "use client";
-import {
-  ChangeEvent,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
   Button,
   Dialog,
   DialogBackdrop,
   DialogPanel,
-  DialogTitle,
   Field,
   Input,
-  Label,
 } from "@headlessui/react";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import cancel from "@/assets/cancel.svg";
@@ -29,8 +20,9 @@ import axios from "axios";
 import { Contract } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { pinata } from "../../../utils/config";
+import { useWallet } from "@/hooks/useWallet";
+import { provider } from "@/constants";
 interface FormData {
   topic: string;
   description: string;
@@ -47,9 +39,9 @@ interface UploadStatus {
 }
 
 export default function UploadModal(prop: any) {
+  const { wallet, session, sessionAccount, sessionKeyMode } = useWallet();
   const [open, setOpen] = useState(prop.status.modalstatus);
   const [addClass, setAddclass] = useAtom(addclassmodal);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [uploadStatus, setUploadStatus] = useState({
     video: {
       success: false,
@@ -191,49 +183,77 @@ export default function UploadModal(prop: any) {
   };
 
   const handleSave = async () => {
-    const Dataupload = await pinata.upload.json({
-      videocid: uploadhash,
-      courseData: formData,
-    });
+    setOpen(true); // Indicate that the process has started
 
-    if (Dataupload) {
+    try {
+      if (!uploadhash || !formData) {
+        throw new Error("Missing video hash or form data.");
+      }
+
+      // Upload video metadata to Pinata
+      const Dataupload = await pinata.upload.json({
+        videocid: uploadhash,
+        courseData: formData,
+      });
+
+      if (!Dataupload) {
+        throw new Error("Failed to upload video data to Pinata.");
+      }
+
+      // Initialize contract
       const organizationContract = new Contract(
         attensysOrgAbi,
         attensysOrgAddress,
-        wallet?.account,
+        provider,
       );
 
-      const videolink_calldata = organizationContract.populate(
+      // Prepare calldata
+      const videoLinkCalldata = organizationContract.populate(
         "add_uploaded_video_link",
         [
           Dataupload.IpfsHash,
           true,
-          //@ts-ignore
-          wallet?.selectedAddress,
+          wallet?.selectedAddress || "",
           prop.status.idnumber,
         ],
       );
 
-      const callContract = await wallet?.account.execute([
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "add_uploaded_video_link",
-          calldata: videolink_calldata.calldata,
-        },
-      ]);
+      let result: { transaction_hash: string };
 
-      //@ts-ignore
-      wallet?.account?.provider
-        .waitForTransaction(callContract.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.error("Error: ", e);
-        })
-        .finally(() => {
-          console.info("Saving form data:", formData);
-          setOpen(false);
-          setAddclass((prev) => ({ ...prev, modalstatus: false }));
-        });
+      // Use session account if present
+      if (sessionKeyMode && session && sessionAccount) {
+        result = await sessionAccount.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "add_uploaded_video_link",
+            calldata: videoLinkCalldata.calldata,
+          },
+        ]);
+      } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
+        result = await wallet.account.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "add_uploaded_video_link",
+            calldata: videoLinkCalldata.calldata,
+          },
+        ]);
+      }
+
+      // Wait for transaction confirmation
+      await provider.waitForTransaction(result.transaction_hash);
+
+      console.info("Saving form data:", formData);
+
+      // Reset modal state after successful execution
+      setAddclass((prev) => ({ ...prev, modalstatus: false }));
+    } catch (e) {
+      console.error("Error in handleSave:", e);
+    } finally {
+      setOpen(false); // Indicate that the process has completed
     }
   };
 

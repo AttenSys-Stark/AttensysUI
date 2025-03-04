@@ -2,13 +2,11 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { useAtom } from "jotai";
 import { useWallet } from "@/hooks/useWallet";
-import { walletStarknetkitNextAtom } from "@/state/connectedWalletStarknetkitNext";
 
 export function AutoConnect() {
   const pathname = usePathname();
-  const [wallet, setWallet] = useAtom(walletStarknetkitNextAtom);
+  const { wallet } = useWallet();
   const { isConnecting, autoConnectWallet, clearWalletInfo } = useWallet();
 
   useEffect(() => {

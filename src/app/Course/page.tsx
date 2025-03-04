@@ -1,13 +1,11 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
 import { useAtom } from "jotai";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
 } from "@/state/connectedWalletStarknetkitNext";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import Explore from "@/components/courses/Explore";
 import CourseNews from "@/components/courses/CourseNews";
@@ -17,9 +15,6 @@ const Index = () => {
   const [bootcampdropstat, setbootcampdropstat] = useAtom(
     bootcampdropdownstatus,
   );
-
-  const [wallet] = useAtom(walletStarknetkit);
-
   const handlePageClick = () => {
     setbootcampdropstat(false);
     setstatus(false);

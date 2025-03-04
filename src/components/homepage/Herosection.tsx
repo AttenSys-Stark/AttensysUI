@@ -3,19 +3,9 @@ import Image from "next/image";
 import { Button } from "@headlessui/react";
 
 // Image imports
-import combinedHero from "@/assets/combined-hero.png";
 import combinedHeroBig from "@/assets/combined-heroBig.png";
 import line from "@/assets/line.svg";
 
-import model from "@/assets/model.svg";
-import rectangle from "@/assets/rectangle.svg";
-import bg from "@/assets/bg.svg";
-import star from "@/assets/star.svg";
-import circle from "@/assets/circle.svg";
-import leftrectangle from "@/assets/leftrectangle.svg";
-import ship from "@/assets/ship.svg";
-import kite from "@/assets/kite.svg";
-import splitline from "@/assets/splitline.svg";
 import bluesplit from "@/assets/bluesplit.svg";
 
 const Herosection = () => {

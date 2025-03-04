@@ -7,9 +7,9 @@ import { useAtomValue, useSetAtom, atom } from "jotai";
 import { atomWithReset } from "jotai/utils";
 import { useEffect } from "react";
 import type { ConnectorData, StarknetWindowObject } from "starknetkit-next";
-import type { Connector } from "starknetkit";
+import type { Connector } from "starknetkit-next";
 import type { FileObject } from "pinata";
-import { number } from "starknet";
+import { AccountInterface } from "starknet";
 
 const emptyData: FileObject = {
   name: "",
@@ -57,8 +57,13 @@ export const organzationInitState = atom(InitOrganizationRegstrationData);
 //bootcamp data state
 export const createBootcampInitState = atom(InitBootcampData);
 
+export interface ExtendedStarknetWindowObject extends StarknetWindowObject {
+  account: AccountInterface | undefined;
+  selectedAddress: string | undefined;
+}
+
 export const walletStarknetkitNextAtom = atomWithReset<
-  StarknetWindowObject | null | undefined
+  ExtendedStarknetWindowObject | null | undefined
 >(undefined);
 
 export const connectorDataAtom = atomWithReset<ConnectorData | null>(null);

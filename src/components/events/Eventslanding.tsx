@@ -8,10 +8,7 @@ const Eventslanding = (props: any) => {
     <div className="h-auto w-full bg-[#F5F7FA]">
       <Discoversection />
       <Createevents />
-      <Myevents
-        connectorDataAccount={props.connectorDataAccount}
-        section={props.section}
-      />
+      <Myevents section={props.section} />
     </div>
   );
 };

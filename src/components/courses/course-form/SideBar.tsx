@@ -1,24 +1,5 @@
 import React from "react";
 
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  Typography,
-  Button,
-} from "@material-tailwind/react";
-import Image from "next/image";
-import profilePic from "../../assets/profile_pic.png";
-import { IoMdArrowDropdown } from "@react-icons/all-files/io/IoMdArrowDropdown";
-import { IoMdCheckmark } from "@react-icons/all-files/io/IoMdCheckmark";
-import { BsFillExclamationCircleFill } from "@react-icons/all-files/bs/BsFillExclamationCircleFill";
-import {
-  sideProperties,
-  coursesProgress,
-  certificateEarned,
-  certSideProperties,
-} from "@/constants/data";
-
 interface CourseSideBarProps {
   page: string; // or another type like `number` or a union type
   selected: string; // Replace with appropriate type

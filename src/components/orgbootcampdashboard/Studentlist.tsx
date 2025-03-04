@@ -1,11 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useAtom } from "jotai";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { pinata } from "../../../utils/config";
+import { useWallet } from "@/hooks/useWallet";
 
 const Studentlist = (props: any) => {
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
 
@@ -26,7 +25,7 @@ const Studentlist = (props: any) => {
   }, [wallet]);
 
   function truncateAddress(address: any): string {
-    let formatedAddress = decimalToHexAddress(address);
+    const formatedAddress = decimalToHexAddress(address);
 
     const start = formatedAddress?.slice(0, 10);
     const end = formatedAddress?.slice(-10);

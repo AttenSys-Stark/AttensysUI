@@ -1,21 +1,12 @@
 "use client";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useAtomValue } from "jotai";
 import { provider } from "@/constants";
 import { Contract } from "starknet";
 import { attensysEventAbi } from "@/deployments/abi";
 import { attensysEventAddress } from "@/deployments/contracts";
-import {
-  sessionKeyModeAtom,
-  sessionAccountAtom,
-  sessionAtom,
-} from "@/state/argentSessionState";
+import { useWallet } from "@/hooks/useWallet";
 
 export default function Mockevent() {
-  const wallet = useAtomValue(walletStarknetkit);
-  const sessionKeyMode = useAtomValue(sessionKeyModeAtom);
-  const sessionAccount = useAtomValue(sessionAccountAtom);
-  const session = useAtomValue(sessionAtom);
+  const { wallet, session, sessionAccount, sessionKeyMode } = useWallet();
 
   const eventContract = new Contract(
     attensysEventAbi,
@@ -51,6 +42,10 @@ export default function Mockevent() {
         });
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         eventContract.connect(wallet?.account);
 
         const res = await eventContract.create_event(myCall.calldata);
@@ -80,6 +75,10 @@ export default function Mockevent() {
         });
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         eventContract.connect(wallet?.account);
 
         const res = await eventContract.register_for_event(myCall.calldata);
@@ -109,6 +108,10 @@ export default function Mockevent() {
         });
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         eventContract.connect(wallet?.account);
 
         const res = await eventContract.mark_attendance(myCall.calldata);
@@ -141,6 +144,10 @@ export default function Mockevent() {
         );
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         eventContract.connect(wallet?.account);
 
         const res = await eventContract.batch_certify_attendees(
@@ -213,6 +220,10 @@ export default function Mockevent() {
         });
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         eventContract.connect(wallet?.account);
 
         const res = await eventContract.end_event(1);
@@ -242,6 +253,9 @@ export default function Mockevent() {
         });
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
         eventContract.connect(wallet?.account);
 
         const res = await eventContract.start_end_reg(myCall.calldata);

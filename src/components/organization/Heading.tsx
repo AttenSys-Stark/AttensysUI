@@ -1,7 +1,5 @@
 import React from "react";
-import handshake from "@/assets/shakeee.svg";
 import Image from "next/image";
-import companylogo from "@/assets/companylogo.svg";
 import placeholder from "@/assets/placeholder.jpg";
 
 const Heading = (props: any) => {

@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
-import { useRouter } from "next/router";
 import { useParams } from "next/navigation";
 import {
   coursestatusAtom,

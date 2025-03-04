@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Organizationcard from "./Organizationcard";
-import { organizationData } from "@/constants/data";
 
 const Organizations = (props: any) => {
   const [currentPage, setCurrentPage] = useState(1);

@@ -1,26 +1,12 @@
-import React, { ChangeEvent, useRef } from "react";
-import walletimage from "@/assets/walletcrop.jpg";
-import Image from "next/image";
-import { ConnectButton } from "../connect/ConnectButton";
-import { Button, Field, Input } from "@headlessui/react";
+import React from "react";
+import { Button } from "@headlessui/react";
 import { useRouter } from "next/navigation";
-import clsx from "clsx";
-import add from "@/assets/add.svg";
 import TrueFocus from "./TrueFocus";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import {
-  walletStarknetkitNextAtom,
-  organzationInitState,
-} from "@/state/connectedWalletStarknetkitNext";
-
-import { useAtom } from "jotai";
+import { useWallet } from "@/hooks/useWallet";
 
 const WalletisConnected = () => {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
-  const [organizationData, setOrganizationData] = useAtom(organzationInitState);
-
+  const { wallet } = useWallet();
   // console.dir(organizationData, {depth : null})
 
   const handlerouting = (prop: string) => {
@@ -41,7 +27,7 @@ const WalletisConnected = () => {
   }
 
   return (
-    <div className="h-auto w-full flex flex-col justify-center items-center space-y-8">
+    <div className="flex flex-col items-center justify-center w-full h-auto space-y-8">
       <div className="w-[60%] h-[430px] flex flex-col items-center justify-center space-y-4">
         <h1 className="text-[20px] text-[#2D3A4B] font-light leading-[23px]">
           Connected Address : {trimAddress(wallet?.selectedAddress)}{" "}

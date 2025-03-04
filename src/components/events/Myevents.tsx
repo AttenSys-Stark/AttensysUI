@@ -2,7 +2,7 @@
 import add from "@/assets/add.svg";
 import calenderimage from "@/assets/calendar.svg";
 import ticket from "@/assets/ticket.svg";
-import { attensysEventAbi, attensysOrgAbi } from "@/deployments/abi";
+import { attensysEventAbi } from "@/deployments/abi";
 import { attensysEventAddress } from "@/deployments/contracts";
 import {
   createEventClickAtom,
@@ -16,19 +16,16 @@ import clsx from "clsx";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FileObject } from "pinata";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import { Contract } from "starknet";
 import { pinata } from "../../../utils/config";
 import Eventcard from "./Eventcard";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useWallet } from "@/hooks/useWallet";
+import { provider } from "@/constants";
 
 const Myevents = (props: any) => {
-  const { connectorDataAccount } = props;
-
   const [isSubmitting, setisSubmitting] = useState(false);
-
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet, session, sessionAccount, sessionKeyMode } = useWallet();
   const [eventName, setEventName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -39,6 +36,7 @@ const Myevents = (props: any) => {
   const [nftSymbol, setNftSymbol] = useState("");
   const [description, setDescription] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [errors, setErrors] = useState({
     eventName: "",
     startDate: "",
@@ -70,12 +68,17 @@ const Myevents = (props: any) => {
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+
     if (
       file &&
       (file.type === "image/jpeg" ||
         file.type === "image/png" ||
         file.type === "image/jpg")
     ) {
+      const objectUrl = URL.createObjectURL(file);
+
+      setImageUrl(objectUrl);
+
       setSelectedFile(file);
       setErrors((prev) => ({ ...prev, file: "" }));
       console.log("Selected file:", file);
@@ -119,6 +122,9 @@ const Myevents = (props: any) => {
   };
 
   const handleCreateEventButton = async () => {
+    console.log("Here");
+
+    // Validate form inputs
     const newErrors = {
       eventName: !eventName.trim() ? "Event name is required" : "",
       startDate: !startDate ? "Start date is required" : "",
@@ -138,36 +144,46 @@ const Myevents = (props: any) => {
     }
 
     setErrors(newErrors);
-
     if (Object.values(newErrors).some((error) => error)) return;
 
     setisSubmitting(true);
 
-    const eventDesignUpload = await pinata.upload.file(selectedFile!);
+    try {
+      // Upload event image
+      const eventDesignUpload = await pinata.upload.file(selectedFile!);
 
-    const Dataupload = await pinata.upload.json({
-      name: eventName,
-      startday: startDate,
-      endday: endDate,
-      starttime: startTime,
-      endtime: endTime,
-      location: location,
-      nftname: nftName,
-      nftsymbol: nftSymbol,
-      description: description,
-      eventDesign: eventDesignUpload.IpfsHash,
-    });
-    if (Dataupload) {
+      // Upload event metadata
+      const Dataupload = await pinata.upload.json({
+        name: eventName,
+        startday: startDate,
+        endday: endDate,
+        starttime: startTime,
+        endtime: endTime,
+        location: location,
+        nftname: nftName,
+        nftsymbol: nftSymbol,
+        description: description,
+        eventDesign: eventDesignUpload.IpfsHash,
+      });
+
+      if (!Dataupload) {
+        throw new Error("Failed to upload event metadata to Pinata");
+      }
+
+      // Initialize contract
       const eventContract = new Contract(
         attensysEventAbi,
         attensysEventAddress,
-        connectorDataAccount,
+        provider,
       );
-
       const startdateandtime = convertToUnixTimeStamp(startDate, startTime);
-
       const enddateandtime = convertToUnixTimeStamp(endDate, endTime);
 
+      if (!wallet?.account) {
+        throw new Error("Wallet not connected");
+      }
+
+      // Prepare calldata
       const createEventCall = eventContract.populate("create_event", [
         wallet?.account?.address,
         eventName,
@@ -179,30 +195,47 @@ const Myevents = (props: any) => {
         true,
       ]);
 
-      const result = await eventContract.create_event(createEventCall.calldata);
-      //@ts-ignore
-      connectorDataAccount?.provider
-        .waitForTransaction(result.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.log("Error: ", e);
-        })
-        .finally(() => {
-          //Resets all event data input
-          setEventName("");
-          setStartDate("");
-          setStartTime("");
-          setEndDate("");
-          setEndTime("");
-          setLocation("");
-          setNftName("");
-          setNftSymbol("");
-          setDescription("");
-          setSelectedFile(null);
+      let result: { transaction_hash: string };
 
-          setisSubmitting(false);
-          router.push(`/Overview/${eventName}/insight`);
-        });
+      // Use session account if present
+      if (sessionKeyMode && session && sessionAccount) {
+        result = await sessionAccount.execute([
+          {
+            contractAddress: attensysEventAddress,
+            entrypoint: "create_event",
+            calldata: createEventCall.calldata,
+          },
+        ]);
+      } else {
+        result = await wallet.account.execute([
+          {
+            contractAddress: attensysEventAddress,
+            entrypoint: "create_event",
+            calldata: createEventCall.calldata,
+          },
+        ]);
+      }
+
+      // Wait for transaction confirmation
+      await provider.waitForTransaction(result.transaction_hash);
+
+      // Reset form fields
+      setEventName("");
+      setStartDate("");
+      setStartTime("");
+      setEndDate("");
+      setEndTime("");
+      setLocation("");
+      setNftName("");
+      setNftSymbol("");
+      setDescription("");
+      setSelectedFile(null);
+
+      router.push(`/Overview/${eventName}/insight`);
+    } catch (e) {
+      console.error("Error in handleCreateEventButton:", e);
+    } finally {
+      setisSubmitting(false); // Ensure state is reset in all cases
     }
   };
 
@@ -278,7 +311,7 @@ const Myevents = (props: any) => {
           <>
             <div className="h-full sm:w-[85%] mx-auto flex justify-between py-16 flex-col md:flex-row">
               <div className="w-full md:w-[60%]">
-                <div className="flex space-x-4 items-center">
+                <div className="flex items-center space-x-4">
                   <div className="w-[6px] sm:h-[69px] bg-[#9B51E0]"></div>
                   <div>
                     <h1 className="text-[#FFFFFF] font-bold text-[24px] leading-[39px]">
@@ -294,12 +327,23 @@ const Myevents = (props: any) => {
                     Add an event design
                   </h1>
                   <div className="h-[394.44px] bg-[#3F3E58] border-[#DCDCDC] border-[1px] rounded-xl flex justify-center items-center w-full">
-                    <Image
-                      src={add}
-                      alt="add"
-                      onClick={handleImageClick}
-                      className="cursor-pointer"
-                    />
+                    {imageUrl ? (
+                      <Image
+                        src={imageUrl}
+                        alt="add"
+                        onClick={handleImageClick}
+                        className="cursor-pointer"
+                        width={100}
+                        height={100}
+                      />
+                    ) : (
+                      <Image
+                        src={add}
+                        alt="add"
+                        onClick={handleImageClick}
+                        className="cursor-pointer"
+                      />
+                    )}
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -324,14 +368,14 @@ const Myevents = (props: any) => {
                     }}
                   />
                   {errors.eventName && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p className="mt-1 text-sm text-red-500">
                       {errors.eventName}
                     </p>
                   )}
                 </div>
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
-                    <Label className="text-sm/6 font-medium text-white">
+                    <Label className="font-medium text-white text-sm/6">
                       Start Day
                     </Label>
                     <Input
@@ -347,7 +391,7 @@ const Myevents = (props: any) => {
                       )}
                     />
                     {errors.startDate && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p className="mt-1 text-sm text-red-500">
                         {errors.startDate}
                       </p>
                     )}
@@ -355,7 +399,7 @@ const Myevents = (props: any) => {
                 </div>
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
-                    <Label className="text-sm/6 font-medium text-white">
+                    <Label className="font-medium text-white text-sm/6">
                       End day
                     </Label>
                     <Input
@@ -371,7 +415,7 @@ const Myevents = (props: any) => {
                       )}
                     />
                     {errors.endDate && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p className="mt-1 text-sm text-red-500">
                         {errors.endDate}
                       </p>
                     )}
@@ -379,7 +423,7 @@ const Myevents = (props: any) => {
                 </div>
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
-                    <Label className="text-sm/6 font-medium text-white">
+                    <Label className="font-medium text-white text-sm/6">
                       Start time
                     </Label>
                     <Input
@@ -396,7 +440,7 @@ const Myevents = (props: any) => {
                       }}
                     />
                     {errors.startTime && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p className="mt-1 text-sm text-red-500">
                         {errors.startTime}
                       </p>
                     )}
@@ -405,7 +449,7 @@ const Myevents = (props: any) => {
 
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
-                    <Label className="text-sm/6 font-medium text-white">
+                    <Label className="font-medium text-white text-sm/6">
                       End Time
                     </Label>
                     <Input
@@ -422,7 +466,7 @@ const Myevents = (props: any) => {
                       }}
                     />
                     {errors.endTime && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p className="mt-1 text-sm text-red-500">
                         {errors.endTime}
                       </p>
                     )}
@@ -431,7 +475,7 @@ const Myevents = (props: any) => {
 
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
-                    <Label className="text-sm/6 font-medium text-white">
+                    <Label className="font-medium text-white text-sm/6">
                       Add Event Location
                     </Label>
                     <Description className="text-sm/6 text-white/50">
@@ -450,7 +494,7 @@ const Myevents = (props: any) => {
                       }}
                     />
                     {errors.location && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p className="mt-1 text-sm text-red-500">
                         {errors.location}
                       </p>
                     )}
@@ -459,7 +503,7 @@ const Myevents = (props: any) => {
 
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
-                    <Label className="text-sm/6 font-medium text-white">
+                    <Label className="font-medium text-white text-sm/6">
                       Add NFT Name
                     </Label>
                     <Description className="text-sm/6 text-white/50">
@@ -477,7 +521,7 @@ const Myevents = (props: any) => {
                       )}
                     />
                     {errors.nftName && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p className="mt-1 text-sm text-red-500">
                         {errors.nftName}
                       </p>
                     )}
@@ -485,7 +529,7 @@ const Myevents = (props: any) => {
                 </div>
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
-                    <Label className="text-sm/6 font-medium text-white">
+                    <Label className="font-medium text-white text-sm/6">
                       Add NFT Symbol
                     </Label>
                     <Description className="text-sm/6 text-white/50">
@@ -503,7 +547,7 @@ const Myevents = (props: any) => {
                       )}
                     />
                     {errors.nftSymbol && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p className="mt-1 text-sm text-red-500">
                         {errors.nftSymbol}
                       </p>
                     )}
@@ -511,7 +555,7 @@ const Myevents = (props: any) => {
                 </div>
                 <div className="w-full max-w-lg px-4 mt-4">
                   <Field>
-                    <Label className="text-sm/6 font-medium text-white">
+                    <Label className="font-medium text-white text-sm/6">
                       Add Description
                     </Label>
                     <Description className="text-sm/6 text-white/50">
@@ -530,7 +574,7 @@ const Myevents = (props: any) => {
                       }}
                     />
                     {errors.description && (
-                      <p className="text-red-500 text-sm mt-1">
+                      <p className="mt-1 text-sm text-red-500">
                         {errors.description}
                       </p>
                     )}
@@ -557,7 +601,7 @@ const Myevents = (props: any) => {
                     style={{ display: "none" }} // Hide the input
                   />
                   {errors.file && (
-                    <p className="text-red-500 text-sm mt-1">{errors.file}</p>
+                    <p className="mt-1 text-sm text-red-500">{errors.file}</p>
                   )}
                 </div>
                 <Button

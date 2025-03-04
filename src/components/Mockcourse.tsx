@@ -1,22 +1,13 @@
 "use client";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useAtomValue } from "jotai";
-import { useAtom } from "jotai";
 import { provider } from "@/constants";
 import { Contract } from "starknet";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
-import {
-  sessionKeyModeAtom,
-  sessionAccountAtom,
-  sessionAtom,
-} from "@/state/argentSessionState";
+import { useWallet } from "@/hooks/useWallet";
 
 export default function Mockevent() {
-  const [wallet] = useAtom(walletStarknetkit);
-  const sessionKeyMode = useAtomValue(sessionKeyModeAtom);
-  const sessionAccount = useAtomValue(sessionAccountAtom);
-  const session = useAtomValue(sessionAtom);
+  const { session, sessionAccount, sessionKeyMode, wallet } = useWallet();
+
   const courseContract = new Contract(
     attensysCourseAbi,
     attensysCourseAddress,
@@ -54,6 +45,10 @@ export default function Mockevent() {
 
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         courseContract.connect(wallet?.account);
 
         const res = await courseContract.create_course(myCall.calldata);
@@ -97,6 +92,10 @@ export default function Mockevent() {
 
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         courseContract.connect(wallet?.account);
         const res = await courseContract.add_replace_course_content(
           myCall.calldata,
@@ -139,6 +138,10 @@ export default function Mockevent() {
 
         await provider.waitForTransaction(result.transaction_hash);
       } else {
+        if (!wallet?.account) {
+          throw new Error("Wallet not connected");
+        }
+
         courseContract.connect(wallet?.account);
 
         const res = await courseContract.finish_course_claim_certification(

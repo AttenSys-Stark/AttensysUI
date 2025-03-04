@@ -1,8 +1,7 @@
 import React from "react";
 import { coursestatusAtom } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import { VscNewFile } from "react-icons/vsc";
-import { handleMyCourse } from "@/utils/helpers";
 import { courseQuestions } from "@/constants/data";
 import { useRouter } from "next/navigation";
 

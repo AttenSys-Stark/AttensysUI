@@ -4,16 +4,7 @@ import exclaim from "@/assets/exclaim.svg";
 import clsx from "clsx";
 import checkmark from "@/assets/checkmark.svg";
 import Image from "next/image";
-import {
-  Button,
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-  Field,
-  Input,
-  Label,
-} from "@headlessui/react";
+import { Button, Field, Input } from "@headlessui/react";
 import {
   orguploadstatus,
   confirmationstatus,

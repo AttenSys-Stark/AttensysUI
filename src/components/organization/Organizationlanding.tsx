@@ -5,20 +5,19 @@ import Organizationtabs from "./Organizationtabs";
 import Create from "./Create";
 import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import { Contract } from "starknet";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { provider } from "@/constants";
 import { pinata } from "../../../utils/config";
-import axios from "axios";
 import { GetCIDResponse } from "pinata";
+import { useWallet } from "@/hooks/useWallet";
 
 const Organizationlanding = (prop: any) => {
   const [createOverlayStat] = useAtom(createbootcampoverlay);
   const [orgHeight, setOrgHeight] = useState<number | null>(null); // State to store the height
   const landingRef = useRef<HTMLDivElement>(null); // Ref for OrganizationLanding
-  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const { wallet } = useWallet();
   const [logoImagesource, setLogoImage] = useState<string | null>(null);
   const [bannerImagesource, setBannerImage] = useState<string | null>(null);
   const [organizationName, setOrgName] = useState<string | null>(null);

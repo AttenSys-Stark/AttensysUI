@@ -1,8 +1,6 @@
 import React from "react";
 import plane from "@/assets/plane.svg";
 import thoughts from "@/assets/thoughts.png";
-import group10 from "@/assets/Group 10.png";
-import cloud from "@/assets/3d-techny-international-transportation-and-delivery-logistics 1.png";
 import Image from "next/image";
 
 const World = () => {

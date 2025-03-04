@@ -1,6 +1,5 @@
 import { Button, Input } from "@headlessui/react";
 import React, { useState } from "react";
-import scan from "@/assets/scan.svg";
 import Image from "next/image";
 import check from "@/assets/check.svg";
 import { attendanceData } from "@/constants/data";
