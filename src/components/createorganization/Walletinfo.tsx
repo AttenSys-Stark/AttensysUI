@@ -5,9 +5,11 @@ import { ConnectButton } from "../connect/ConnectButton";
 import { Button } from "@headlessui/react";
 import { useRouter } from "next/navigation";
 import backArrow from "../../../public/backArrow.svg";
+import { useWallet } from "@/hooks/useWallet";
 
 const Walletinfo = () => {
   const router = useRouter();
+  const { setIsCorrectNetwork } = useWallet();
 
   const handlerouting = (prop: string) => {
     router.push(`/Createorganization/${prop}`);
@@ -45,7 +47,7 @@ const Walletinfo = () => {
             <p>&bull; Issue and receive NFT certifications</p>
           </div>
 
-          <ConnectButton />
+          <ConnectButton setIsCorrectNetwork={setIsCorrectNetwork} />
         </div>
 
         <Button

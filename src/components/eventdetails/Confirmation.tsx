@@ -13,6 +13,7 @@ import {
   successstatus,
 } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const Confirmation = () => {
   const [confirmationstat, setConfirmationStat] = useAtom(confirmationstatus);
@@ -96,10 +97,17 @@ const Confirmation = () => {
           </div>
           <div className="w-full md:pt-[420px]">
             <Button
-              onClick={handleConfirmation}
-              className=" justify-center flex rounded-lg bg-[#4A90E2] px-4 h-[50px] items-center w-full text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+              onClick={!sendingstat ? handleConfirmation : undefined}
+              disabled={sendingstat}
+              className={`justify-center flex rounded-lg px-4 h-[50px] items-center w-full text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700 ${
+                sendingstat ? "bg-[#357ABD] cursor-not-allowed" : "bg-[#4A90E2]"
+              }`}
             >
-              <div>Confirm Sponsorship</div>
+              {sendingstat ? (
+                <LoadingSpinner size="sm" colorVariant="white" />
+              ) : (
+                "Confirm Sponsorship"
+              )}
             </Button>
           </div>
         </div>

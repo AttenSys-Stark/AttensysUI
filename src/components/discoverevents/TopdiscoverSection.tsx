@@ -1,20 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import moon from "@/assets/material.svg";
 import upcoming from "@/assets/discoverlight.svg";
 import top from "@/assets/top.svg";
 import { useRouter } from "next/navigation";
+import { useCreatedEvents } from "@/hooks/useEvents";
 
 const Discoversection = () => {
   const router = useRouter();
 
   const handlerouting = () => {
-    router.push("/Events/events");
+    router.push("/Events/createdevent");
   };
-  //   const handleDiscover = () => {
-  //     router.push('/Discoverevent')
-
-  //   }
 
   return (
     <div className="h-[90px] clg:h-[80px] lg:[70px] lclg:[60px] flex justify-between w-[90%] mx-auto items-center">

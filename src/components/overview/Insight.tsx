@@ -8,12 +8,69 @@ import cross from "@/assets/cross.svg";
 import share from "@/assets/share.svg";
 import del from "@/assets/delete.svg";
 import ChartData from "./ChartData";
+import { Contract } from "starknet";
+import { attensysEventAbi } from "@/deployments/abi";
+import { attensysEventAddress } from "@/deployments/contracts";
+import { useAtom } from "jotai";
+import { connectorAtom } from "@/state/connectedWalletStarknetkitNext";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useSearchParams } from "next/navigation";
 
-const Insight = () => {
+const Insight = (props: any) => {
   const [emailList, setEmailList] = useState<string[]>([]);
+  const [connector] = useAtom(connectorAtom);
+  const [isStartingReg, setIsStartingReg] = useState(false);
+  const [isEndingReg, setIsEndingReg] = useState(false);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
+  const [connectorDataAccount] = useState<null | any>(
+    connector?.wallet.account,
+  );
 
   const handleEmailsChange = (emails: string[]) => {
     setEmailList(emails);
+  };
+
+  const handleStartAndEndRegistration = async ({
+    start,
+    eventId = Number(id),
+  }: {
+    start: boolean;
+    eventId?: number;
+  }) => {
+    const loadingState = start ? setIsStartingReg : setIsEndingReg;
+    loadingState(true);
+
+    try {
+      if (!connectorDataAccount) {
+        alert("Please make sure you are connected to a wallet");
+        return;
+      }
+
+      const eventContract = new Contract(
+        attensysEventAbi,
+        attensysEventAddress,
+        connectorDataAccount,
+      );
+
+      const startEndRegistration = eventContract.populate("start_end_reg", [
+        start,
+        eventId,
+      ]);
+
+      const result = await eventContract.start_end_reg(
+        startEndRegistration.calldata,
+      );
+
+      await connectorDataAccount?.provider.waitForTransaction(
+        result.transaction_hash,
+      );
+    } catch (error) {
+      console.error("Registration state change failed:", error);
+    } finally {
+      loadingState(false);
+    }
   };
 
   return (
@@ -23,7 +80,7 @@ const Insight = () => {
           <Image src={story} alt="story" objectFit="cover" layout="fill" />
         </div>
         <h1 className="mt-4 text-[#ABADBA] text-[29.7px] font-bold leading-[68px]">
-          Event Name
+          {props.eventname}
         </h1>
         <div className="mt-8">
           <div className="flex flex-col md:flex-row gap-2">
@@ -139,7 +196,40 @@ const Insight = () => {
               </div>
             </div>
           </div>
-          <div className="flex justify-center md:justify-end w-full">
+          <div className="flex justify-center md:justify-end w-full gap-4">
+            <Button
+              onClick={() =>
+                !isStartingReg && handleStartAndEndRegistration({ start: true })
+              }
+              disabled={isStartingReg}
+              className={`font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5 ${
+                isStartingReg
+                  ? "bg-green-400 cursor-not-allowed"
+                  : "bg-green-500"
+              } text-white`}
+            >
+              {isStartingReg ? (
+                <LoadingSpinner size="sm" colorVariant="white" />
+              ) : (
+                "Start Registration"
+              )}
+            </Button>
+
+            <Button
+              onClick={() =>
+                !isEndingReg && handleStartAndEndRegistration({ start: false })
+              }
+              disabled={isEndingReg}
+              className={`font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5 ${
+                isEndingReg ? "bg-red-600 cursor-not-allowed" : "bg-red-700"
+              } text-white`}
+            >
+              {isEndingReg ? (
+                <LoadingSpinner size="sm" colorVariant="white" />
+              ) : (
+                "End Registration"
+              )}
+            </Button>
             <Button className="bg-[#E0515152] text-[#730404] font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5">
               <Image src={del} alt="drop" className="mr-2" />
               Cancel Event

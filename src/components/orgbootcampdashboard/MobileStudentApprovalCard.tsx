@@ -11,6 +11,7 @@ import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { Contract } from "starknet";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const MobileStudentApprovalCard = (props: any) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -38,39 +39,61 @@ const MobileStudentApprovalCard = (props: any) => {
     }
   };
 
+  const [isApproving, setIsApproving] = useState(false);
+  const [isDeclining, setIsDeclining] = useState(false);
+
   const handleApprove = async () => {
-    const approve_calldata = organizationContract.populate(
-      "approve_registration",
-      [props?.info?.address_of_student, id],
-    );
-    const callContract = await wallet?.account.execute([
-      {
-        contractAddress: attensysOrgAddress,
-        entrypoint: "approve_registration",
-        calldata: approve_calldata.calldata,
-      },
-    ]);
-    //@ts-ignore
-    wallet?.account?.provider
-      .waitForTransaction(callContract.transaction_hash)
-      .then(() => {})
-      .catch((e: any) => {
-        console.error("Error: ", e);
-      })
-      .finally(() => {
-        //@todo set loading state here
-      });
+    setIsApproving(true);
+    try {
+      const approve_calldata = organizationContract.populate(
+        "approve_registration",
+        [props?.info?.address_of_student, id],
+      );
+      const callContract = await wallet?.account.execute([
+        {
+          contractAddress: attensysOrgAddress,
+          entrypoint: "approve_registration",
+          calldata: approve_calldata.calldata,
+        },
+      ]);
+      await wallet?.account?.provider.waitForTransaction(
+        callContract.transaction_hash,
+      );
+    } catch (error) {
+      console.error("Approval failed:", error);
+    } finally {
+      setIsApproving(false);
+    }
   };
 
   const renderButton = (arg: any) => {
     if (arg == "both") {
       return (
-        <>
-          <div className="flex space-x-3 items-center justify-center">
-            <Image src={ex} alt="cancel" />
-            <Image src={correct} alt="check" onClick={handleApprove} />
+        <div className="flex space-x-3 items-center justify-center">
+          <div className="relative">
+            {isDeclining ? (
+              <LoadingSpinner size="sm" colorVariant="primary" />
+            ) : (
+              <Image
+                src={ex}
+                alt="cancel"
+                className={`cursor-pointer ${isDeclining ? "opacity-50" : ""}`}
+              />
+            )}
           </div>
-        </>
+          <div className="relative">
+            {isApproving ? (
+              <LoadingSpinner size="sm" colorVariant="primary" />
+            ) : (
+              <Image
+                src={correct}
+                alt="check"
+                onClick={handleApprove}
+                className={`cursor-pointer ${isApproving ? "opacity-50" : ""}`}
+              />
+            )}
+          </div>
+        </div>
       );
     } else if (arg == "check") {
       return (

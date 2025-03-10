@@ -23,11 +23,13 @@ import { attensysOrgAddress } from "./../deployments/contracts";
 import { attensysOrgAbi } from "./../deployments/abi";
 import { RpcProvider, Contract, Account, ec, json } from "starknet";
 import { useWallet } from "@/hooks/useWallet";
+import { NetworkSwitchButton } from "./connect/NetworkSwitchButton";
 
 const MockOrganization = () => {
   const [wallet] = useAtom(walletStarknetkit);
 
-  const { disconnectWallet } = useWallet();
+  const { disconnectWallet, isCorrectNetwork, setIsCorrectNetwork } =
+    useWallet();
   const [inputValue, setInputValue] = useState("");
   const [orgInputValue, setOrgInputValue] = useState("");
   const [classOrgValue, setClassOrgValue] = useState("");
@@ -182,16 +184,26 @@ const MockOrganization = () => {
   return (
     <div>
       {wallet ? (
-        <>
-          <DisconnectButton
-            disconnectFn={disconnect}
-            resetFn={() => {
-              disconnectWallet();
-            }}
-          />
-        </>
+        isCorrectNetwork ? (
+          <>
+            <NetworkSwitchButton
+              isCorrectNetwork={isCorrectNetwork}
+              setIsCorrectNetwork={setIsCorrectNetwork}
+              connectedWallet={wallet}
+            />
+          </>
+        ) : (
+          <>
+            <DisconnectButton
+              disconnectFn={disconnect}
+              resetFn={() => {
+                disconnectWallet();
+              }}
+            />
+          </>
+        )
       ) : (
-        <ConnectButton />
+        <ConnectButton setIsCorrectNetwork={setIsCorrectNetwork} />
       )}
       <AccountSection
         address={wallet?.account?.address}

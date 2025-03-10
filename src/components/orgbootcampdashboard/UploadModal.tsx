@@ -31,6 +31,7 @@ import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { pinata } from "../../../utils/config";
+import LoadingSpinner from "../ui/LoadingSpinner";
 interface FormData {
   topic: string;
   description: string;
@@ -47,6 +48,7 @@ interface UploadStatus {
 }
 
 export default function UploadModal(prop: any) {
+  const [isSaving, setIsSaving] = useState(false);
   const [open, setOpen] = useState(prop.status.modalstatus);
   const [addClass, setAddclass] = useAtom(addclassmodal);
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -191,49 +193,54 @@ export default function UploadModal(prop: any) {
   };
 
   const handleSave = async () => {
-    const Dataupload = await pinata.upload.json({
-      videocid: uploadhash,
-      courseData: formData,
-    });
+    setIsSaving(true);
+    try {
+      const Dataupload = await pinata.upload.json({
+        videocid: uploadhash,
+        courseData: formData,
+      });
 
-    if (Dataupload) {
-      const organizationContract = new Contract(
-        attensysOrgAbi,
-        attensysOrgAddress,
-        wallet?.account,
-      );
+      if (Dataupload) {
+        const organizationContract = new Contract(
+          attensysOrgAbi,
+          attensysOrgAddress,
+          wallet?.account,
+        );
 
-      const videolink_calldata = organizationContract.populate(
-        "add_uploaded_video_link",
-        [
-          Dataupload.IpfsHash,
-          true,
+        const videolink_calldata = organizationContract.populate(
+          "add_uploaded_video_link",
+          [
+            Dataupload.IpfsHash,
+            true,
+            //@ts-ignore
+            wallet?.selectedAddress,
+            prop.status.idnumber,
+          ],
+        );
+
+        const callContract = await wallet?.account.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "add_uploaded_video_link",
+            calldata: videolink_calldata.calldata,
+          },
+        ]);
+
+        try {
           //@ts-ignore
-          wallet?.selectedAddress,
-          prop.status.idnumber,
-        ],
-      );
-
-      const callContract = await wallet?.account.execute([
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "add_uploaded_video_link",
-          calldata: videolink_calldata.calldata,
-        },
-      ]);
-
-      //@ts-ignore
-      wallet?.account?.provider
-        .waitForTransaction(callContract.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.error("Error: ", e);
-        })
-        .finally(() => {
-          console.info("Saving form data:", formData);
-          setOpen(false);
-          setAddclass((prev) => ({ ...prev, modalstatus: false }));
-        });
+          await wallet?.account?.provider.waitForTransaction(
+            callContract.transaction_hash,
+          );
+        } catch (error) {
+          console.error("Transaction confirmation failed:", error);
+        }
+      }
+    } catch (error) {
+      console.error("Error during save:", error);
+    } finally {
+      setIsSaving(false); // Ensure loading stops
+      setOpen(false);
+      setAddclass((prev) => ({ ...prev, modalstatus: false }));
     }
   };
 
@@ -450,12 +457,18 @@ export default function UploadModal(prop: any) {
 
             <div className="flex justify-end px-16 my-5">
               <div
-                onClick={handleSave}
-                className="h-[47px] w-[342px] rounded-xl bg-[#9B51E0] flex items-center justify-center cursor-pointer"
+                onClick={!isSaving ? handleSave : undefined}
+                className={`h-[47px] w-[342px] rounded-xl flex items-center justify-center cursor-pointer ${
+                  isSaving ? "bg-[#822DBF]" : "bg-[#9B51E0]"
+                }`}
               >
-                <h1 className="text-[#FFFFFF] text-[14px] font-semibold leading-[16px]">
-                  Save updates
-                </h1>
+                {isSaving ? (
+                  <LoadingSpinner size="sm" />
+                ) : (
+                  <h1 className="text-white text-[14px] font-semibold">
+                    Save updates
+                  </h1>
+                )}
               </div>
             </div>
           </DialogPanel>

@@ -5,7 +5,7 @@ import red_love from "@/assets/red_love.svg";
 import love from "@/assets/love.svg";
 import { certContent } from "@/constants/data";
 
-const MyCertifications = () => {
+const MyCertifications = (props: any) => {
   const [selected, setSelected] = useState("");
   const [page, setPage] = useState("");
 
@@ -17,6 +17,8 @@ const MyCertifications = () => {
     return (
       <div className="lg:flex max-w-screen-2xl xl:mx-auto">
         <UserSideBar
+          wallet={props.wallet}
+          courseData={props.courseData}
           page={page}
           selected={selected}
           setSelected={setSelected}
@@ -93,7 +95,13 @@ const MyCertifications = () => {
 
   return (
     <div className="flex flex-row mx-20 my-8">
-      <UserSideBar page={page} selected={selected} setSelected={setSelected} />
+      <UserSideBar
+        wallet={props.wallet}
+        courseData={props.courseData}
+        page={page}
+        selected={selected}
+        setSelected={setSelected}
+      />
 
       <div className="mx-20 my-12">
         {certContent.map((item, i) =>

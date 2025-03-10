@@ -1,5 +1,4 @@
-import React from "react";
-import video from "@/assets/video.png";
+import React, { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import Lectures from "./Lectures";
 import youtube from "@/assets/youtube.svg";
@@ -16,8 +15,59 @@ import { useRouter } from "next/navigation";
 import StarRating from "../bootcamp/StarRating";
 import { HiOutlineCheckBadge } from "react-icons/hi2";
 import { LuBadgeCheck } from "react-icons/lu";
+import { FileObject } from "pinata";
 
-const LandingPage = () => {
+interface ChildComponentProps {
+  courseData: any;
+  setCourseData: any;
+  wallet: any;
+}
+
+// file setup
+const emptyData: FileObject = {
+  name: "",
+  type: "",
+  size: 0,
+  lastModified: 0,
+  arrayBuffer: async () => {
+    return new ArrayBuffer(0);
+  },
+};
+interface Lecture {
+  name: string;
+  description: string;
+  video: File | null;
+}
+
+const ResetCourseRegistrationData = {
+  primaryGoal: "",
+  targetAudience: "",
+  courseArea: "",
+  courseName: "",
+  courseCreator: "",
+  courseDescription: "",
+  courseCategory: "",
+  difficultyLevel: "",
+  studentRequirements: "",
+  learningObjectives: "",
+  targetAudienceDesc: "",
+  courseImage: emptyData,
+  courseCurriculum: [] as Lecture[],
+  coursePricing: "",
+  promoAndDiscount: "",
+  publishWithCertificate: false,
+};
+
+const LandingPage: React.FC<ChildComponentProps> = ({
+  courseData,
+  setCourseData,
+  wallet,
+}) => {
+  const dataRef = useRef(courseData);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+
+  console.log("The data hooked", dataRef.current);
+  console.log("The data hooked", dataRef.current.courseData?.courseCreator);
   const router = useRouter();
   const lectures = [
     {
@@ -39,6 +89,24 @@ const LandingPage = () => {
       timing: 8,
     },
   ];
+
+  useEffect(() => {
+    // dataRef.current = data;
+    setCourseData(ResetCourseRegistrationData);
+
+    // Check if file is a valid File object
+    if (dataRef.current.courseImage instanceof File) {
+      // Create a temporary URL for the fetched image
+      const imageUrl = URL.createObjectURL(dataRef.current.courseImage);
+      setImageSrc(imageUrl);
+
+      // Clean up the URL object to free up memory
+      return () => {
+        URL.revokeObjectURL(imageUrl);
+      };
+    }
+  }, [courseData]);
+
   return (
     <div className="pb-14 bg-[#F5F8FA]">
       <div
@@ -47,8 +115,23 @@ const LandingPage = () => {
         <div className="flex justify-center xl:grid xl:grid-cols-2 gap-4 sm:mx-20">
           {/* Course Image */}
           <div className="text-sm">
-            <p className="font-bold mb-2">Technology | Web development</p>
-            <Image src={video} alt="hero" />
+            <p className="font-bold mb-2">
+              {dataRef.current.courseCategory} | Web development
+            </p>
+            <div className="relative h-[338px]  w-[338px]">
+              {imageSrc ? (
+                <Image
+                  src={(imageSrc as string) || "/placeholder.svg"}
+                  alt="Fetched Image"
+                  // layout="fill"
+                  width={400} // Explicit width
+                  height={400} // Explicit height
+                  className="object-cover"
+                />
+              ) : (
+                <p>Loading image...</p>
+              )}
+            </div>
           </div>
 
           {/* Course information */}
@@ -66,18 +149,18 @@ const LandingPage = () => {
             </div>
 
             <h4
-              className="text-[39px] leading-[39px] w-[393px] h-[78px] my-5 font-bold text-black xl:text-white cursor-pointer"
+              className="text-[39px] leading-[39px] h-[78px] my-5 font-bold text-black xl:text-white cursor-pointer"
               onClick={(e) =>
                 handleCourse(e, e.currentTarget.textContent, router)
               }
             >
-              Introduction to Web Development
+              {dataRef.current.courseName}
             </h4>
 
             <div className="flex">
               <div className="bg-[#5801A9] py-2 text-white w-[200px] mb-4 text-center Sm:w-[50%] rounded-xl">
                 <p className="text-[14px] font-extrabold leading-[22px]">
-                  Tech Innovators Academy
+                  {dataRef.current.courseCreator}
                 </p>
               </div>
 
@@ -107,7 +190,10 @@ const LandingPage = () => {
             <div className="flex space-x-14 sm:flex sm:text-center mt-12 mb-4">
               <div className="">
                 <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-                  Created by <span className="underline">Akinbola Kehinde</span>
+                  Created by{" "}
+                  <span className="underline">
+                    {dataRef.current.courseCreator}
+                  </span>
                 </p>
               </div>
 
@@ -130,7 +216,7 @@ const LandingPage = () => {
               <div className="flex sm:ml-5 space-x-2 items-center">
                 <GrDiamond color="#2D3A4B" className="h-[14px] w-[14px]" />
                 <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-                  Difficulty level: Elementary
+                  Difficulty level: {dataRef.current.difficultyLevel}
                 </p>
               </div>
             </div>
@@ -165,13 +251,13 @@ const LandingPage = () => {
           className="text-[39px] leading-[39px] w-[393px] h-[78px] my-5 font-bold text-black xl:text-white cursor-pointer"
           onClick={(e) => handleCourse(e, e.currentTarget.textContent, router)}
         >
-          Introduction to Web Development
+          {dataRef.current.courseName}
         </h4>
 
         <div className="flex">
           <div className="bg-[#5801A9] py-2 text-white w-[200px] mb-4 text-center Sm:w-[50%] rounded-xl ">
             <p className="text-[14px] font-extrabold leading-[22px]">
-              Tech Innovators Academy
+              {dataRef.current.courseCreator}
             </p>
           </div>
 
@@ -199,7 +285,8 @@ const LandingPage = () => {
         <div className="flex flex-col xl:flex-row items-start space-x-0 xl:space-x-14 sm:flex sm:text-center mt-12">
           <div>
             <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-              Created by <span className="underline">Akinbola Kehinde</span>
+              Created by{" "}
+              <span className="underline">{dataRef.current.courseCreator}</span>
             </p>
           </div>
 
@@ -252,11 +339,14 @@ const LandingPage = () => {
             Student Requirements
           </h4>
 
-          <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
+          {/* <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
             <li>A computer with internet access</li>
             <li>Basic computer skills</li>
             <li>Willingness to learn and experiment</li>
-          </ul>
+          </ul> */}
+          <div>
+            <p>{dataRef.current.studentRequirements}</p>
+          </div>
         </div>
 
         <div className="py-5">
@@ -265,16 +355,18 @@ const LandingPage = () => {
             Target Audience
           </h4>
 
-          <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
-            <li>Beginners interested in web development</li>
-            <li>Aspiring web developers looking to start their journey</li>
-            <li>Anyone wanting to create their own websites</li>
-          </ul>
+          <div>
+            <p>{dataRef.current.targetAudience}</p>
+          </div>
         </div>
       </div>
 
       <div className="px-6 lg:mx-48 sm:mt-4 xl:mt-32 mb-10">
-        <Lectures lectures={lectures} />
+        <Lectures
+          lectures={lectures}
+          courseData={courseData}
+          learningObj={courseData.learningObjectives}
+        />
       </div>
 
       {/* rating */}
@@ -330,7 +422,7 @@ const LandingPage = () => {
         </div>
 
         <div className="mx-24 sm:mx-48 my-6">
-          <CarouselComp />
+          <CarouselComp wallet={wallet} />
         </div>
       </div>
     </div>

@@ -9,7 +9,17 @@ import { handleCreateCourse } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import Stepper from "@/components/Stepper";
 
-const MainFormView4 = () => {
+interface ChildComponentProps {
+  courseData: any;
+  handleCoursePricing: (event: string) => void;
+  handleCoursePromoCode: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const MainFormView4: React.FC<ChildComponentProps> = ({
+  courseData,
+  handleCoursePricing,
+  handleCoursePromoCode,
+}) => {
   const router = useRouter();
   const [selectedPricing, setSelectedPricing] = useState<string | null>(null);
   const [pricingError, setPricingError] = useState("");
@@ -34,7 +44,7 @@ const MainFormView4 = () => {
     setPricingError("");
 
     // Validate pricing selection
-    if (!selectedPricing) {
+    if (!courseData.coursePricing) {
       setPricingError("Please select a pricing option");
       return;
     }
@@ -51,7 +61,7 @@ const MainFormView4 = () => {
   return (
     <div className="flex">
       <div className="hidden lg:block">
-        <CourseSideBar />
+        <CourseSideBar courseData={courseData} />
       </div>
 
       <div className="flex-1 w-full">
@@ -94,15 +104,15 @@ const MainFormView4 = () => {
                   <p className="text-red-500 text-sm mt-1">{pricingError}</p>
                 )}
                 <div className="sm:flex my-12">
-                  {pricing.map((item, id) => (
+                  {pricing.map((item, id: number) => (
                     <div
                       key={id}
                       className={`relative border mr-12 px-5 py-5 rounded-xl sm:my-0 my-8 cursor-pointer ${
-                        selectedPricing === item.cost
+                        courseData.coursePricing === item.cost
                           ? "border-2 border-[#4A90E2]"
                           : "border-[#00000033]"
                       }`}
-                      onClick={() => handlePricingSelection(item.cost)}
+                      onClick={() => handleCoursePricing(item.cost)}
                     >
                       <div className="flex content-start">
                         <div>
@@ -121,8 +131,10 @@ const MainFormView4 = () => {
                         <input
                           type="radio"
                           name="pricing"
-                          checked={selectedPricing === item.cost}
-                          onChange={() => {}}
+                          id={item.cost}
+                          value={item.cost}
+                          checked={courseData.coursePricing === item.cost}
+                          onChange={() => handleCoursePricing(item.cost)}
                           className="w-4 h-4 text-[#4A90E2]"
                         />
                       </div>
@@ -148,6 +160,8 @@ const MainFormView4 = () => {
                     type="text"
                     placeholder="Create Promo Code"
                     className="rounded-[5px] flex-1 h-[52px] mr-4 bg-white text-[#2d3a4b] border-[#c0c0c0] border-[1px] py-2 pl-10 w-full md:w-auto"
+                    value={courseData.promoAndDiscount}
+                    onChange={handleCoursePromoCode}
                   />
                   <button className="rounded-[5px] bg-white font-normal h-[55px] text-[13px] text-[#2D3A4B] leading-[21px] border-[#d0d5dd] mt-5 sm:mt-0 border-[1px]  py-3 px-6">
                     + Add Promo Code

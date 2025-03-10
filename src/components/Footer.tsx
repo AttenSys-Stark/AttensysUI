@@ -5,8 +5,8 @@ import Logo from "@/assets/Logo.svg";
 
 const Footer = () => {
   return (
-    <div className="px-4 sm:px-8 md:px-12 xl:px-16 flex items-start lg:items-stretch flex-col space-y-8 space-x-0 lg:flex-row lg:space-y-0 lg:space-x-8 justify-between py-8 w-[100%]">
-      <div className="bg-[#161313] rounded-lg w-full h-auto flex items-start lg:items-center justify-start lg:justify-center text-white py-8 lg:py-16 px-8">
+    <div className="px-4 sm:px-8 md:px-12 xl:px-16 flex items-start lg:items-stretch flex-col space-y-0 space-x-0 lg:flex-row lg:space-y-0 lg:space-x-8 justify-between py-8 w-[100%]">
+      <div className="bg-[#161313] rounded-t-lg lg:rounded-lg w-full h-auto flex items-start lg:items-center justify-start lg:justify-center text-white py-8 lg:py-16 px-8">
         <div className="w-full space-y-2 lg:max-w-[400px]">
           <h1 className="font-semibold text-xl sm:text-3xl flex text-left">
             Built by Geniuses, for Geniuses.
@@ -38,9 +38,9 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="bg-[#F4E8FF] rounded-lg w-full h-auto flex flex-col items-start justify-start px-4 sm:px-8 xl:px-16 py-6">
+      <div className="bg-[#F4E8FF] rounded-b-lg lg:rounded-lg w-full h-auto flex flex-col items-start justify-start px-4 sm:px-8 xl:px-16 py-6">
         <div className="w-full grid grid-cols-12 gap-y-12 gap-x-4 items-start py-10">
-          <div className="space-y-4 flex flex-col w-full col-span-12 sm:col-span-4 md:col-span-3">
+          <div className="space-y-4 hidden lg:flex lg:flex-col w-full col-span-12 sm:col-span-4 md:col-span-3">
             <h1 className="text-md text-[#8D8484] font-medium w-full">
               Product
             </h1>
@@ -51,7 +51,7 @@ const Footer = () => {
               <h1>Certifcations</h1>
             </div>
           </div>
-          <div className="space-y-4 flex flex-col w-full col-span-12 sm:col-span-4 md:col-span-3">
+          <div className="space-y-4 hidden lg:flex lg:flex-col w-full col-span-12 sm:col-span-4 md:col-span-3">
             <h1 className="text-md text-[#8D8484] font-medium w-full">Learn</h1>
             <div className="space-y-4 text-sm font-medium w-full">
               <h1>Courses</h1>
@@ -60,7 +60,7 @@ const Footer = () => {
               <h1>Game Design</h1>
             </div>
           </div>
-          <div className="space-y-4 flex flex-col w-full col-span-12 sm:col-span-4 md:col-span-3">
+          <div className="space-y-4 hidden lg:flex lg:flex-col w-full col-span-12 sm:col-span-4 md:col-span-3">
             <h1 className="text-md text-[#8D8484] font-medium w-full">
               Community
             </h1>

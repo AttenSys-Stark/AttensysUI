@@ -24,7 +24,7 @@ const Outline = () => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [bootcampid, setbootcampid] = useAtom(currentID);
   const [ownerAddress, setowneraddress] = useAtom(orgowneraddress);
-  const [videoarray, setVideoArray] = useState([]);
+  const [videoarray, setVideoArray] = useState<any[]>([]);
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const org = searchParams.get("org");
@@ -44,11 +44,29 @@ const Outline = () => {
     );
     console.log("video data here", video_data);
 
-    if (video_data?.length == 0) {
+    if (video_data?.length === 0) {
       setDataStat(true);
     } else {
-      setVideoArray(video_data);
+      Promise.all(
+        video_data.map(async (item: any) => {
+          return await getIPfsVideodata(item);
+        }),
+      )
+        .then((resolvedData) => {
+          setVideoArray(resolvedData);
+        })
+        .catch((error) => {
+          console.error("Error fetching video data:", error);
+        });
     }
+  };
+
+  const getIPfsVideodata = async (CID: string) => {
+    const data = await pinata.gateways.get(CID);
+    console.log(data);
+    //@ts-ignore
+    console.log("url", data?.data?.courseData?.videoUrl);
+    return data;
   };
 
   useEffect(() => {
@@ -65,7 +83,16 @@ const Outline = () => {
       {!dataStat && (
         <div className="h-[600px] w-full overflow-y-scroll pt-10 px-10">
           {videoarray?.map((data, index) => {
-            return <OutlineCard key={index} />;
+            return (
+              <OutlineCard
+                key={index}
+                videolink={data?.data?.courseData?.videoUrl}
+                thumbnail={data?.data?.courseData?.thumbnailUrl}
+                description={data?.data?.courseData?.description}
+                topic={data?.data?.courseData?.topic}
+                assignment={data?.data?.courseData?.assignment}
+              />
+            );
           })}
         </div>
       )}

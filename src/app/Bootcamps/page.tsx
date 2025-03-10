@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
+  universalloadingstatus,
 } from "@/state/connectedWalletStarknetkitNext";
 
 import Coursedropdown from "@/components/courses/Coursedropdown";
@@ -17,11 +18,16 @@ const Index = () => {
   const [bootcampDropdown, setBootcampDropdown] = useAtom(
     bootcampdropdownstatus,
   );
+  const [universalLoad, setuniversalLoad] = useAtom(universalloadingstatus);
 
   const handlePageClick = () => {
     setBootcampDropdown(false);
     setCourseDropdown(false);
   };
+  useEffect(() => {
+    setuniversalLoad(false);
+  });
+
   return (
     <div onClick={handlePageClick}>
       {courseDropdown && (

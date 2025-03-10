@@ -6,6 +6,7 @@ interface Props {
   onSelect: (option: string) => void;
   required?: boolean;
   errorMessage?: string;
+  functionToChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 const Dropdown = ({
   options,
@@ -13,6 +14,7 @@ const Dropdown = ({
   onSelect,
   required,
   errorMessage,
+  functionToChange,
 }: Props) => {
   const [selectedValue, setSelectedValue] = useState(selectedOption || "");
 
@@ -20,6 +22,7 @@ const Dropdown = ({
     const newSelectedValue = event.target.value;
     setSelectedValue(newSelectedValue);
     onSelect(newSelectedValue);
+    functionToChange(event);
   };
 
   return (

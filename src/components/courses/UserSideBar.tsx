@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import {
   Card,
@@ -19,8 +19,16 @@ import {
   certSideProperties,
 } from "@/constants/data";
 import { IoMdInformationCircleOutline } from "react-icons/io";
+import { coursesDetails, learningDetails } from "@/constants/data";
+import CoursesCreated from "./CoursesCreated";
+import LearningJourney from "./LearningJourney";
+import Notification from "./Notification";
+import CreateACourse from "./CreateACourse";
+import { shortHex } from "@/utils/helpers";
 
 interface UserSideBarProps {
+  wallet: any;
+  courseData: any;
   page: string; // or another type like `number` or a union type
   selected: string; // Replace with appropriate type
   setSelected: (value: string) => void; // Function that sets a value
@@ -29,7 +37,13 @@ interface argprop {
   no: number;
   title: string;
 }
-const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
+const UserSideBar = ({
+  wallet,
+  courseData,
+  page,
+  selected,
+  setSelected,
+}: UserSideBarProps) => {
   const renderItem = (arg: argprop) => {
     if (arg.title == "Courses") {
       return (
@@ -52,11 +66,45 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
     } else if (arg.title == "Created") {
       return (
         <div className="text-[12px] ">
-          <span>{arg.no}</span> Course{arg.no > 1 ? "(s)" : ""}
+          <span>{courseData.length}</span> Course{arg.no > 1 ? "(s)" : ""}
         </div>
       );
     }
   };
+
+  function generateDummyName() {
+    const firstNames = [
+      "John",
+      "Alice",
+      "Michael",
+      "Sarah",
+      "David",
+      "Emma",
+      "James",
+      "Olivia",
+      "Daniel",
+      "Sophia",
+    ];
+    const lastNames = [
+      "Smith",
+      "Johnson",
+      "Brown",
+      "Williams",
+      "Jones",
+      "Miller",
+      "Davis",
+      "Garcia",
+      "Rodriguez",
+      "Wilson",
+    ];
+
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+
+    return `${firstName} ${lastName}`;
+  }
+
+  useEffect(() => {}, [wallet]);
 
   return (
     <>
@@ -82,10 +130,18 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
                 </div>
                 <div className="xl:w-[200px]">
                   <p className="text-[13px] text-[#2D3A4B] font-bold leading-[22px]">
-                    Akinbola Kehinde
+                    {!!wallet?.selectedAddress &&
+                    typeof wallet.selectedAddress === "string" &&
+                    wallet.selectedAddress.trim() !== ""
+                      ? generateDummyName()
+                      : "No User"}
                   </p>
                   <p className="text-[#A01B9B] text-[12px] font-normal leading-[24px]">
-                    0xb3...1ce
+                    {!!wallet?.selectedAddress &&
+                    typeof wallet.selectedAddress === "string" &&
+                    wallet.selectedAddress.trim() !== ""
+                      ? shortHex(wallet.selectedAddress)
+                      : "Connect Wallet"}
                   </p>
                 </div>
               </div>
@@ -111,7 +167,7 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
                   </div>
 
                   <div className="text-purple-400">
-                    <p>{renderItem(item)}</p>
+                    <div>{renderItem(item)}</div>
                   </div>
                 </div>
               ))}
@@ -142,33 +198,66 @@ const UserSideBar = ({ page, selected, setSelected }: UserSideBarProps) => {
 
         {page == "myCourse" &&
           sideProperties.map((item, i) => (
-            <div
-              className={`bg-white py-4 px-8 rounded-xl border-[1px] border-[#BCBCBC] my-2 cursor-pointer hover:bg-violet-600 active:bg-violet-700 ${selected == item.title ? "focus:outline-none focus:ring focus:ring-violet-300" : ""} `}
-              key={i}
-            >
+            <div key={i}>
               <div
-                className="flex justify-between text-sm items-start "
-                onClick={() => {
-                  setSelected(item.title);
-                }}
+                className={`bg-white py-4 px-8 rounded-xl border-[1px] border-[#BCBCBC] my-2 cursor-pointer hover:bg-violet-600 active:bg-violet-700 ${
+                  selected == item.title
+                    ? "focus:outline-none focus:ring focus:ring-violet-300"
+                    : ""
+                } `}
+                onClick={() => setSelected(item.title)}
               >
-                <div className="flex items-center">
-                  <div className="h-[15px] w-[18px]">
-                    <Image
-                      src={item.url}
-                      alt={item.title}
-                      className="h-full w-full object-cover"
-                    />
+                <div className="flex justify-between text-sm items-start">
+                  <div className="flex items-center">
+                    <div className="h-[15px] w-[18px]">
+                      <Image
+                        src={item.url}
+                        alt={item.title}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <p className="ml-3 text-[14px] text-[#2D3A4B] font-bold leading-[19px]">
+                      {item.title}{" "}
+                      {item.no == 0 ? null : <span>({item.no})</span>}
+                    </p>
                   </div>
-                  <p className="ml-3 text-[14px] text-[#2D3A4B] font-bold leading-[19px]">
-                    {item.title}{" "}
-                    {item.no == 0 ? null : <span>({item.no})</span>}
-                  </p>
-                </div>
-
-                <div>
                   <IoMdArrowDropdown />
                 </div>
+              </div>
+
+              <div className="sm:hidden">
+                {selected === item.title && (
+                  <>
+                    {coursesDetails.some((course) => course.tag === selected) &&
+                      coursesDetails
+                        .filter((course) => course.tag === selected)
+                        .map((course, index) => (
+                          <CoursesCreated
+                            courseData={courseData}
+                            key={index}
+                            item={course}
+                            selected={selected}
+                          />
+                        ))}
+
+                    {learningDetails.some(
+                      (journey) => journey.tag === selected,
+                    ) &&
+                      learningDetails.map((item, i) =>
+                        item && item.tag == selected ? (
+                          <LearningJourney
+                            item={item}
+                            selected={selected}
+                            key={i}
+                          />
+                        ) : null,
+                      )}
+
+                    {selected === "Create a course" && <CreateACourse />}
+
+                    {selected === "Notification" && <Notification />}
+                  </>
+                )}
               </div>
             </div>
           ))}

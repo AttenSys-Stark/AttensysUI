@@ -8,7 +8,7 @@ const OverviewLanding = (props: any) => {
     <div className="h-auto w-full bg-[#F5F7FA]">
       <OverviewDiscover eventsname={props.eventname} />
       <Tab />
-      <Content tabsection={props.tab} />
+      <Content eventname={props.eventname} tabsection={props.tab} />
     </div>
   );
 };

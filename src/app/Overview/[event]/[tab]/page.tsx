@@ -16,7 +16,7 @@ const Index = () => {
     bootcampdropdownstatus,
   );
   const params = useParams();
-  const event = params.event;
+  const event = decodeURIComponent(params?.event?.toString() || "");
   const tab = params.tab;
 
   const handlePageClick = () => {

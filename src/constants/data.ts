@@ -43,6 +43,56 @@ import token from "@/assets/token-branded_nftb.svg";
 import videoHero from "@/assets/video.svg";
 import videoClip from "@/assets/video_clip.svg";
 import certIcon from "@/assets/certificate-outline.svg";
+import rich from "@/assets/Richin2024.svg";
+
+export const courseSetup = [
+  {
+    head: "Course Setup (Basic info)",
+    items: [
+      "Course name",
+      "Course description",
+      "Course category",
+      "Course level",
+    ],
+  },
+  {
+    head: "Learning outcomes",
+    items: ["Student requirements", "Learning objectives", "Target audience"],
+  },
+  {
+    head: "Course & curriculum",
+    items: ["Course creative", "Course Curriculum"],
+  },
+  {
+    head: "Pricing & Discounts",
+    items: ["Course pricing", "Promos and discounts"],
+  },
+  {
+    head: "Review & Publish",
+    items: ["Publish course"],
+  },
+];
+
+export const lectures = [
+  {
+    img: rich,
+    title: "What is Web Development?",
+    desc: "An introduction to the world of web development, covering the basics of how websites...",
+    timing: 8,
+  },
+  {
+    img: youtube,
+    title: "What is Web Development?",
+    desc: "An introduction to the world of web development, covering the basics of how websites...",
+    timing: 8,
+  },
+  {
+    img: podcast,
+    title: "What is Web Development?",
+    desc: "An introduction to the world of web development, covering the basics of how websites...",
+    timing: 8,
+  },
+];
 
 export const notifCategory = [
   {
@@ -637,6 +687,81 @@ export const pendingsponsors = [
 ];
 
 export const HighlightData = [
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: saibat,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: stunt,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: social,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: grapic,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: last,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: saibat,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: stunt,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: social,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: grapic,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: last,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: saibat,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: stunt,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: social,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: grapic,
+  },
+  {
+    name: "The Ari Experience",
+    time: "Wed, Oct 30,4pm",
+    image: last,
+  },
   {
     name: "The Ari Experience",
     time: "Wed, Oct 30,4pm",

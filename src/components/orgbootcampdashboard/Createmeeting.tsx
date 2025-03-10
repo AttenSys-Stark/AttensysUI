@@ -33,6 +33,7 @@ import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { useSearchParams } from "next/navigation";
 import { pinata } from "../../../utils/config";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export default function Createmeeting(prop: any) {
   const [open, setOpen] = useState(prop.status);
@@ -84,7 +85,7 @@ export default function Createmeeting(prop: any) {
         },
       ]);
       //@ts-ignore
-      wallet?.account?.provider
+      await wallet?.account?.provider
         .waitForTransaction(callContract.transaction_hash)
         .then(() => {})
         .catch((e: any) => {
@@ -149,12 +150,18 @@ export default function Createmeeting(prop: any) {
               </div>
 
               <div
-                onClick={handleUploadActiveMeetLink}
-                className="h-[47px] w-[103px] rounded-xl bg-[#9B51E0] flex items-center justify-center cursor-pointer"
+                onClick={!status ? handleUploadActiveMeetLink : undefined}
+                className={`h-[47px] w-[103px] rounded-xl flex items-center justify-center cursor-pointer ${
+                  status ? "bg-[#822DBF] cursor-not-allowed" : "bg-[#9B51E0]"
+                }`}
               >
-                <h1 className="text-[#FFFFFF] text-[14px] font-semibold leading-[16px]">
-                  {status ? "Setting link" : "Post link"}
-                </h1>
+                {status ? (
+                  <LoadingSpinner size="sm" colorVariant="primary" />
+                ) : (
+                  <h1 className="text-[#FFFFFF] text-[14px] font-semibold leading-[16px]">
+                    Post link
+                  </h1>
+                )}
               </div>
             </div>
           </DialogPanel>

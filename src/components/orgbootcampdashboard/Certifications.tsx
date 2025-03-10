@@ -3,12 +3,86 @@ import React, { useState } from "react";
 import Image from "next/image";
 import batch from "@/assets/batch.svg";
 import single from "@/assets/single.svg";
+import { attensysOrgAbi } from "@/deployments/abi";
+import { attensysOrgAddress } from "@/deployments/contracts";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { Contract } from "starknet";
+import { useAtom } from "jotai";
+import { useSearchParams } from "next/navigation";
 
 const Certifications = () => {
   const [inputValue, setinputValue] = useState("");
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+  const org = searchParams.get("org");
+  const [awarding, setAwarding] = useState(false);
+  const [batchawarding, setbatchawarding] = useState(false);
+
+  const organizationContract = new Contract(
+    attensysOrgAbi,
+    attensysOrgAddress,
+    wallet?.account,
+  );
 
   const handleChange = (event: { target: { value: any } }) => {
     setinputValue(event.target.value);
+  };
+
+  const handleAwardSingleCertificate = async () => {
+    setAwarding(true);
+    const cerify_calldata = organizationContract.populate(
+      "single_certify_student",
+      //@ts-ignore
+      [org, id, inputValue],
+    );
+
+    const callContract = await wallet?.account.execute([
+      {
+        contractAddress: attensysOrgAddress,
+        entrypoint: "single_certify_student",
+        calldata: cerify_calldata.calldata,
+      },
+    ]);
+
+    //@ts-ignore
+    wallet?.account?.provider
+      .waitForTransaction(callContract.transaction_hash)
+      .then(() => {})
+      .catch((e: any) => {
+        console.error("Error: ", e);
+      })
+      .finally(() => {
+        setAwarding(false);
+      });
+  };
+
+  const handlebatchCertify = async () => {
+    setbatchawarding(true);
+    const cerify_calldata = organizationContract.populate(
+      "batch_certify_students",
+      //@ts-ignore
+      [org, id],
+    );
+
+    const callContract = await wallet?.account.execute([
+      {
+        contractAddress: attensysOrgAddress,
+        entrypoint: "batch_certify_students",
+        calldata: cerify_calldata.calldata,
+      },
+    ]);
+
+    //@ts-ignore
+    wallet?.account?.provider
+      .waitForTransaction(callContract.transaction_hash)
+      .then(() => {})
+      .catch((e: any) => {
+        console.error("Error: ", e);
+      })
+      .finally(() => {
+        setbatchawarding(false);
+      });
   };
 
   return (
@@ -30,8 +104,11 @@ const Certifications = () => {
           </div>
         </div>
 
-        <div className="h-[48px] w-[155px] rounded-xl bg-[#9B51E0] text-[#FFFFFF] text-[12px] font-medium leading-[17px] flex items-center justify-center">
-          Award certificate
+        <div
+          onClick={handleAwardSingleCertificate}
+          className="cursor-pointer h-[48px] w-[155px] rounded-xl bg-[#9B51E0] text-[#FFFFFF] text-[12px] font-medium leading-[17px] flex items-center justify-center"
+        >
+          {awarding ? "Awarding..." : "Award certificate"}
         </div>
 
         <div className="flex flex-col md:flex-row md:items-center h-full md:space-x-6 space-y-5 md:space-y-0">
@@ -63,7 +140,7 @@ const Certifications = () => {
             Choose your prefered Certification method.
           </p>
           <div className="w-full mt-8 flex-col md:flex-row md:space-x-5 space-y-9 md:space-y-0 flex">
-            <div className="h-[246px] w-[243px] bg-[#FFFFFF] rounded-lg border-[1px] border-[#CACACA] px-6 flex flex-col justify-center space-y-4">
+            {/* <div className="h-[246px] w-[243px] bg-[#FFFFFF] rounded-lg border-[1px] border-[#CACACA] px-6 flex flex-col justify-center space-y-4">
               <Image src={single} alt="single" />
               <div className="space-y-1">
                 <h1 className="text-[15px] leading-[19px] font-semibold text-[#5801A9]">
@@ -76,7 +153,7 @@ const Certifications = () => {
               <div className="w-[155px] h-[35px] rounded-lg bg-[#2D3A4B] text-[#FFFFFF] text-[12px] font-medium leading-[17px] flex justify-center items-center">
                 Award Certifications
               </div>
-            </div>
+            </div> */}
 
             <div className="h-[246px] w-[243px] bg-[#FFFFFF] rounded-lg border-[1px] border-[#CACACA]  px-6 flex flex-col justify-center space-y-4">
               <Image src={batch} alt="single" />
@@ -88,8 +165,11 @@ const Certifications = () => {
                   Award All student
                 </p>
               </div>
-              <div className="w-[155px] h-[35px] rounded-lg bg-[#2D3A4B] text-[#FFFFFF] text-[12px] font-medium leading-[17px] flex justify-center items-center">
-                Award Certifications
+              <div
+                onClick={handlebatchCertify}
+                className=" cursor-pointer w-[155px] h-[35px] rounded-lg bg-[#2D3A4B] text-[#FFFFFF] text-[12px] font-medium leading-[17px] flex justify-center items-center"
+              >
+                {batchawarding ? "Batch awarding..." : "Award Certifications"}
               </div>
             </div>
           </div>

@@ -76,7 +76,7 @@ const Mybootcampcarousel = (props: any) => {
         <Button className="hidden absolute top-3 right-6 justify-center lg:flex rounded-lg bg-[#9B51E0] text-[#FFFCFC] py-2 px-4 lg:h-[23px] items-center lg:w-[50px] text-sm data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
           <div className="text-[7px]">{props.action}</div>
         </Button>
-        <div className="absolute bottom-0 z-20 flex items-center justify-center w-full pb-4 text-center bg-carousell-gradient">
+        <div className="absolute bottom-0 z-20 flex px-6 w-full pb-4 bg-carousell-gradient">
           <div className="flex mt-20 space-x-3">
             <div className="rounded-full h-[24px] w-[24px]">
               <Image

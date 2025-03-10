@@ -9,7 +9,7 @@ const Discoversection = () => {
   const router = useRouter();
 
   const handlerouting = () => {
-    router.push("/Events/events");
+    router.push("/Events/createdevent");
   };
   const handleDiscover = () => {
     router.push("/Discoverevent");

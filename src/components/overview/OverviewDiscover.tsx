@@ -7,15 +7,18 @@ import { useRouter } from "next/navigation";
 import { Button } from "@headlessui/react";
 import edit from "@/assets/edit.svg";
 import goto from "@/assets/goto.svg";
+import { useSearchParams } from "next/navigation";
 
 const OverviewDiscover = (props: any) => {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const router = useRouter();
 
   const handlerouting = () => {
     router.push("/Events/events");
   };
   const handleEventPage = () => {
-    router.push(`/Eventpage/${props.eventsname}`);
+    router.push(`/Eventpage/${props.eventsname}/?id=${id}`);
   };
 
   const handleDiscover = () => {

@@ -19,17 +19,32 @@ import {
   confirmationstatus,
 } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const UploadOrglogo = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [inputValue, setInputValue] = useState<number | string>("");
   const [orguploadstat, setOrguploadStat] = useAtom(orguploadstatus);
   const [confirmationstat, setConfirmationStat] = useAtom(confirmationstatus);
+  const [isUpLoading, setIsUploading] = useState(false);
+  const [isTransferring, setIsTransferring] = useState(false);
 
-  const handleNext = () => {
-    setOrguploadStat(false);
-    setConfirmationStat(true);
+  const handleNext = async () => {
+    setIsTransferring(true);
+
+    try {
+      // Simulate a delay for blockchain transaction
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      setOrguploadStat(false);
+      setConfirmationStat(true);
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    } finally {
+      setIsTransferring(false);
+    }
   };
+
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     // Validate numeric input or clear it
@@ -43,7 +58,7 @@ const UploadOrglogo = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (
       file &&
@@ -51,8 +66,17 @@ const UploadOrglogo = () => {
         file.type === "image/png" ||
         file.type === "image/jpg")
     ) {
-      // Process the file
-      console.info("Selected file:", file);
+      setIsUploading(true);
+
+      try {
+        // simulate an upload delay (replace with actual logic when implemented)
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        console.info("Selected file:", file);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      } finally {
+        setIsUploading(false);
+      }
     } else {
       console.error("Please select a valid image file (JPEG, JPG, or PNG).");
     }
@@ -65,12 +89,17 @@ const UploadOrglogo = () => {
           Organization Logo
         </h1>
         <div className="md:w-[342px] w-[100%] h-[261px] md:h-[320px] bg-[#3F3E58] border-[#DCDCDC] border-[1px] rounded-xl flex justify-center items-center">
-          <Image
-            src={add}
-            alt="add"
-            onClick={handleImageClick}
-            className="cursor-pointer"
-          />
+          {isUpLoading ? (
+            <LoadingSpinner size="md" colorVariant="white" />
+          ) : (
+            <Image
+              src={add}
+              alt="add"
+              onClick={handleImageClick}
+              className="cursor-pointer"
+            />
+          )}
+
           <input
             ref={fileInputRef}
             type="file"
@@ -163,10 +192,17 @@ const UploadOrglogo = () => {
         </div>
 
         <Button
-          onClick={handleNext}
-          className=" justify-center lg:flex rounded-lg bg-[#4A90E2] px-4 h-[50px] items-center w-full text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700 "
+          onClick={!isTransferring ? handleNext : undefined}
+          disabled={isTransferring}
+          className={`justify-center lg:flex rounded-lg px-4 h-[50px] items-center w-full text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700 ${
+            isTransferring ? "bg-[#357ABD] cursor-not-allowed" : "bg-[#4A90E2]"
+          }`}
         >
-          <div>Send funds</div>
+          {isTransferring ? (
+            <LoadingSpinner size="sm" colorVariant="white" />
+          ) : (
+            "Send funds"
+          )}
         </Button>
       </div>
     </div>

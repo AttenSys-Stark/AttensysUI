@@ -23,6 +23,7 @@ import { Contract } from "starknet";
 import { pinata } from "../../../utils/config";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const RegistrationDetails = (props: any) => {
   const [regModal, setRegModal] = useAtom(registerModal);
@@ -36,6 +37,7 @@ const RegistrationDetails = (props: any) => {
   const [fullname, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -56,49 +58,44 @@ const RegistrationDetails = (props: any) => {
   };
 
   const handlePay = async () => {
-    setDetailsEntryStatus(false);
-    setDetailsEntryLoadingStatus(true);
-    const studentDataUpload = await pinata.upload.json({
-      student_name: fullname,
-      student_email: email,
-    });
-    if (studentDataUpload) {
-      console.log(studentDataUpload);
-      const organizationContract = new Contract(
-        attensysOrgAbi,
-        attensysOrgAddress,
-        wallet?.account,
-      );
+    setIsRegistering(true);
+    try {
+      setDetailsEntryStatus(false);
+      setDetailsEntryLoadingStatus(true);
 
-      const register_calldata = organizationContract.populate(
-        "register_for_bootcamp",
-        [props.org_info, props.id_info, studentDataUpload.IpfsHash],
-      );
-      const callContract = await wallet?.account.execute([
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "register_for_bootcamp",
-          calldata: register_calldata.calldata,
-        },
-      ]);
+      const studentDataUpload = await pinata.upload.json({
+        student_name: fullname,
+        student_email: email,
+      });
 
-      //@ts-ignore
-      wallet?.account?.provider
-        .waitForTransaction(callContract.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.error("Error: ", e);
-        })
-        .finally(() => {
-          setDetailsEntryLoadingStatus(false);
-          setregistrationsuccessstatus(true);
-        });
+      if (studentDataUpload) {
+        const organizationContract = new Contract(
+          attensysOrgAbi,
+          attensysOrgAddress,
+          wallet?.account,
+        );
+        const register_calldata = organizationContract.populate(
+          "register_for_bootcamp",
+          [props.org_info, props.id_info, studentDataUpload.IpfsHash],
+        );
+        const callContract = await wallet?.account.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "register_for_bootcamp",
+            calldata: register_calldata.calldata,
+          },
+        ]);
+
+        await wallet?.account?.provider.waitForTransaction(
+          callContract.transaction_hash,
+        );
+      }
+    } catch (error) {
+      console.error("Registration failed:", error);
+    } finally {
+      setIsRegistering(false);
+      setregistrationsuccessstatus(true);
     }
-
-    // setTimeout(() => {
-    //   setDetailsEntryLoadingStatus(false);
-    //   setregistrationsuccessstatus(true);
-    // }, 2000);
   };
 
   return (
@@ -169,10 +166,17 @@ const RegistrationDetails = (props: any) => {
         </div>
       </div>
       <Button
-        onClick={handlePay}
-        className="h-[47px] w-full rounded-xl bg-[#4A90E2] text-[#FFFFFF] text-[14px] leading-md font-semibold flex items-center justify-center"
+        onClick={!isRegistering ? handlePay : undefined}
+        disabled={isRegistering}
+        className={`h-[47px] w-full rounded-xl text-[#FFFFFF] text-[14px] leading-md font-semibold flex items-center justify-center ${
+          isRegistering ? "bg-[#357ABD] cursor-not-allowed" : "bg-[#4A90E2]"
+        }`}
       >
-        Register & pay
+        {isRegistering ? (
+          <LoadingSpinner size="sm" colorVariant="white" />
+        ) : (
+          "Register & pay"
+        )}
       </Button>
     </div>
   );

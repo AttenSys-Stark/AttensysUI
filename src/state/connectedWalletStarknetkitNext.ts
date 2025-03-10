@@ -21,6 +21,12 @@ const emptyData: FileObject = {
   },
 };
 
+export const lectureData = {
+  lectureName: "",
+  description: "",
+  video: emptyData,
+};
+
 const InitOrganizationRegstrationData = {
   organizationBanner: emptyData,
   organizationName: "",
@@ -52,10 +58,45 @@ const InitBootcampData = {
   bootcampNftImage: emptyData,
 };
 
+const InitBootcampNftData = {
+  organizationNftName: "",
+  organizationNftSymbol: "",
+  organizationNftImage: emptyData,
+};
+
+interface Lecture {
+  name: string;
+  description: string;
+  video: File | null;
+}
+
+const InitCourseRegistrationData = {
+  primaryGoal: "",
+  targetAudience: "",
+  courseArea: "",
+  courseIdentifier: "",
+  courseName: "",
+  courseCreator: "",
+  courseDescription: "",
+  courseCategory: "",
+  difficultyLevel: "",
+  studentRequirements: "",
+  learningObjectives: "",
+  targetAudienceDesc: "",
+  courseImage: emptyData,
+  courseCurriculum: [] as Lecture[],
+  coursePricing: "",
+  promoAndDiscount: "",
+  publishWithCertificate: false,
+};
+
 //organization data state
 export const organzationInitState = atom(InitOrganizationRegstrationData);
 //bootcamp data state
-export const createBootcampInitState = atom(InitBootcampData);
+export const createBootcampInitState = atom(InitBootcampNftData);
+
+// course data state
+export const courseInitState = atom(InitCourseRegistrationData);
 
 export const walletStarknetkitNextAtom = atomWithReset<
   StarknetWindowObject | null | undefined
@@ -116,6 +157,10 @@ export const orgowneraddress = atom(null);
 
 export const isRegisteredatom = atom(false);
 export const orgnameatom = atom("none");
+export const mybootcampDescription = atom("");
+
+export const createbootcampupload = atom(false);
+export const universalloadingstatus = atom(false);
 
 export const useWalletAccountChange = () => {
   const wallet = useAtomValue(walletStarknetkitNextAtom);

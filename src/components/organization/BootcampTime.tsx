@@ -31,6 +31,7 @@ const BootcampTime: React.FC<timeProp> = (props) => {
   const handleStartTimeChange = (newValue: any) => {
     setBootcampData((prevData) => ({
       ...prevData,
+      //@ts-ignore
       bootcampLecture: prevData.bootcampLecture.map((lecture) =>
         lecture.day == props.day.toString()
           ? { ...lecture, start: newValue }
@@ -42,6 +43,7 @@ const BootcampTime: React.FC<timeProp> = (props) => {
   const handleEndTimeChange = (newValue: any) => {
     setBootcampData((prevData) => ({
       ...prevData,
+      //@ts-ignore
       bootcampLecture: prevData.bootcampLecture.map((lecture) =>
         lecture.day == props.day.toString()
           ? { ...lecture, end: newValue }

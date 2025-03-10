@@ -54,7 +54,7 @@ const Tab = () => {
   };
 
   return (
-    <div className="h-[55px] w-full border-b-[2px] border-[#D0D0D0] items-end lg:items-center flex justify-start lg:justify-center">
+    <div className="h-[55px] w-full border-b-[2px] border-[#D0D0D0] items-end lg:items-center flex justify-start lg:justify-center mt-5">
       {/* Desktop view */}
       <div className="hidden md:flex justify-center md:w-[85%] lg:w-[60%] clg:w-[65%] lclg:w-[80%] lg:space-x-20 md:space-x-8 h-[40px] mt-5">
         <Button

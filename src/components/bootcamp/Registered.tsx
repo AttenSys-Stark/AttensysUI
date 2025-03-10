@@ -12,7 +12,7 @@ import MobileBootcampCard from "../organization/MobileBootcampCard";
 import { FcSettings } from "react-icons/fc";
 import { ImBooks } from "react-icons/im";
 
-const Registered = () => {
+const Registered = (props: any) => {
   const router = useRouter();
   const responsive = {
     superLargeDesktop: {
@@ -41,6 +41,7 @@ const Registered = () => {
   const handlegotomybootcamp = () => {
     router.push("/Mybootcamps");
   };
+  // console.log("checking reg", props.regbootcamp)
 
   return (
     <div className="h-[448px] w-[90%] mx-auto flex flex-col items-start md:items-center bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl py-8 mt-8">
@@ -49,7 +50,7 @@ const Registered = () => {
           <span>
             <ImBooks className="text-[#9B51E0] text-2xl" />
           </span>
-          Registered Bootcamps
+          Registered Bootcamps ({props?.regbootcamp.length})
         </div>
         <div className="flex space-x-3 items-center">
           <div
@@ -80,34 +81,33 @@ const Registered = () => {
           itemClass=""
           keyBoardControl
           minimumTouchDrag={80}
-          autoPlay={true} // Enables auto-scrolling
+          autoPlay={window.innerWidth >= 464 ? true : false} // Enables auto-scrolling
           autoPlaySpeed={3000}
         >
-          {regcaroselldata.map((data, index) => (
+          {props?.regbootcamp?.map((data: any, index: any) => (
             <Carosellcard
               key={index}
-              name={data.name}
-              time={data.time}
-              flier={data.flier}
-              logo={data.logo}
+              name={data.bootcamp_name}
+              uri={data.bootcamp_ipfs_uri}
               action="Ongoing"
               height="300px"
               width="300px"
+              alldata={data}
             />
           ))}
         </Carousel>
       </div>
       <div className="flex flex-wrap gap-x-3 gap-y-3 justify-start px-3 py-5 items-start sm:hidden">
-        {regcaroselldata.slice(0, 3).map((data, index) => (
+        {props?.regbootcamp?.map((data: any, index: any) => (
           <div key={index} className="flex flex-col items-center gap-2">
             <MobileBootcampCard
-              name={data.name}
-              time={data.time}
-              flier={data.flier}
-              logo={data.logo}
-              action="Ongoing"
+              key={index}
+              name={data.bootcamp_name}
+              uri={data.bootcamp_ipfs_uri}
+              action="Manage"
               height={"150px"}
               width={"150px"}
+              alldata={data}
             />
             {/* <div className='flex items-center justify-center text-black'>
                 <FcSettings />

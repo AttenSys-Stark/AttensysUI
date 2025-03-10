@@ -15,6 +15,7 @@ import { attensysOrgAddress } from "@/deployments/contracts";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { pinata } from "../../../utils/config";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const Tophero = () => {
   const [meetingCreation, setMeetingCreation] = useAtom(createMeeting);
@@ -28,6 +29,7 @@ const Tophero = () => {
   const org = searchParams.get("org");
   const [Imagesource, setImageSource] = useState<string | StaticImport>("");
   const [bootcampDate, setDate] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleCreateMeeting = () => {
     setMeetingCreation(true);
@@ -100,8 +102,27 @@ const Tophero = () => {
   }
 
   useEffect(() => {
-    getBootcampInfo();
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await getBootcampInfo();
+      } catch (error) {
+        console.error("Error loading bootcamp data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [wallet]);
+
+  if (isLoading) {
+    return (
+      <div className="lg:h-[261px] w-full lg:w-[90%] lg:mx-auto flex items-center justify-center">
+        <LoadingSpinner size="lg" colorVariant="primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="lg:h-[261px] w-full lg:w-[90%]  lg:mx-auto flex flex-col lg:flex-row justify-between lg:items-center rounded-xl">

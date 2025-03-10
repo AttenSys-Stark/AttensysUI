@@ -2,6 +2,9 @@ const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    domains: ["ipfs.io", "gateway.pinata.cloud", "cloudflare-ipfs.com"], // Add more IPFS gateways if needed
+  },
   webpack: (config, { isServer, webpack }) => {
     if (!isServer) {
       config.resolve.fallback = {

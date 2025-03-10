@@ -18,6 +18,7 @@ import plus from "../../../public/plus.svg";
 import { specificOrgRoute } from "@/state/connectedWalletStarknetkitNext";
 
 import { FileObject } from "pinata";
+import LoadingSpinner from "../ui/LoadingSpinner";
 const emptyData: FileObject = {
   name: "",
   type: "",
@@ -48,8 +49,6 @@ const Addinstructor = (props: any) => {
   const [specificOrg, setSpecificOrg] = useAtom(specificOrgRoute);
   const [uploading, setUploading] = useState(false);
   // const [cidToContract, setCidToContract] = useState<string>("")
-
-  // console.dir(organizationData, {depth : null})
 
   const handleEmailsChange = (emails: string[]) => {
     setEmailList(emails);
@@ -181,9 +180,16 @@ const Addinstructor = (props: any) => {
         onClick={() => {
           handle_multicall_routing();
         }}
-        className="w-[342px] h-[47px] mt-8 flex justify-center items-center text-[#FFFFFF] text-[14px] font-bold leading-[16px] bg-[#4A90E2] rounded-xl"
+        disabled={uploading}
+        className={`w-[342px] h-[47px] mt-8 flex justify-center items-center text-[#FFFFFF] text-[14px] font-bold leading-[16px]  rounded-xl ${
+          uploading ? "bg-[#357ABD] cursor-not-allowed" : "bg-[#4A90E2]"
+        }`}
       >
-        {uploading ? "Uploading..." : "Create your first bootcamp"}
+        {uploading ? (
+          <LoadingSpinner size="sm" colorVariant="white" />
+        ) : (
+          "Create your first bootcamp"
+        )}
       </Button>
     </div>
   );

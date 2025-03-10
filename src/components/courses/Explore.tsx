@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 import videoHero from "../../assets/video.svg";
 import CarouselComp from "./Carousel";
@@ -9,7 +9,7 @@ import { GiBackwardTime } from "@react-icons/all-files/gi/GiBackwardTime";
 import { FaPlay } from "@react-icons/all-files/fa/FaPlay";
 import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond";
 import { IoMdArrowDropdown } from "@react-icons/all-files/io/IoMdArrowDropdown";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { handleCourse } from "@/utils/helpers";
 import { skills, subLectures } from "@/constants/data";
 import Carousel from "react-multi-carousel";
@@ -17,9 +17,21 @@ import "react-multi-carousel/lib/styles.css";
 import StarRating from "../bootcamp/StarRating";
 import { LuBadgeCheck } from "react-icons/lu";
 import { CardWithLink } from "./Cards";
+import CourseLanding from "./CourseLanding";
 
-const Explore = () => {
+interface ChildComponentProps {
+  wallet: any;
+  courseData: any;
+}
+
+const Explore = ({ wallet, courseData }: ChildComponentProps) => {
   const router = useRouter();
+  const pathname = usePathname();
+
+  // const queryString = new URLSearchParams({
+  //   data: encodeURIComponent(JSON.stringify(courseData)),
+  // }).toString();
+  // console.log("Query what", queryString);
 
   const responsive = {
     superLargeDesktop: {
@@ -96,16 +108,17 @@ const Explore = () => {
                 “Introduction to Web Dev Starknet”
               </span>
             </p>
+            {/* <CourseLanding /> */}
           </div>
 
           {/* cards  */}
-          {/* <div className="mx-12 sm:mx-0"> */}
-          <CarouselComp />
+          <CarouselComp wallet={wallet} />
           <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2 lg:hidden flex-col w-full">
-            <CardWithLink />
-            <CardWithLink />
-            <CardWithLink />
-            <CardWithLink />
+            {/* <CardWithLink wallet={wallet} />
+            <CardWithLink wallet={wallet} />
+            <CardWithLink wallet={wallet} />
+            <CardWithLink wallet={wallet} /> */}
+            <CarouselComp wallet={wallet} />
           </div>
           {/* </div> */}
         </div>
@@ -115,7 +128,7 @@ const Explore = () => {
           <div className="my-4 lg:hidden">
             {/* wording */}
             <h3 className="text-[25px] font-bold text-[#2D3A4B]">
-              Fan favourite
+              Fan favorite
             </h3>
             <p className="font-light text-base lg:text-xl text-[#2D3A4B]">
               Because you viewed{" "}
@@ -128,32 +141,42 @@ const Explore = () => {
           <div className="flex flex-col md:flex-row gap-x-5 space-x-10 sm:flex sm:mx-0 justify-top xl:w-[70%] max-w-full">
             <div className="h-full sm:w-full rounded-xl">
               <Image
-                src={videoHero}
+                src={`https://ipfs.io/ipfs/${courseData[courseData.length - 1]?.data.courseImage}`}
                 alt="video"
+                width={700}
+                height={700}
                 className="object-cover h-full w-full rounded-xl"
               />
             </div>
             <div className="my-4 sm:my-0 !ml-0 lg:!ml-8">
               <div className="">
                 <div
-                  onClick={(e) =>
-                    handleCourse(e, e.currentTarget.textContent, router)
-                  }
+                  onClick={(e) => {
+                    localStorage.setItem(
+                      "courseData",
+                      JSON.stringify(courseData[courseData.length - 1]?.data),
+                    );
+                    handleCourse(e, e.currentTarget.textContent, router);
+                  }}
                 >
                   <button className="bg-[#2D3A4B] hidden lg:block hover:bg-gray-500 text-white text-[11px] font-bold py-2 px-4 rounded cursor-pointer">
                     Get this course
                   </button>
                   <h2 className="font-bold lg:text-[32px] leading-5 tracking-tight lg:leading-[1.1] text-[23px] sm:text-4xl text-[#2D3A4B] lg:tracking-tight my-4 cursor-pointer">
-                    Introduction to Web Development
+                    {courseData[courseData.length - 1]?.data.courseName}
                   </h2>
                 </div>
                 <p className="text-white items-center font-semibold inline gap-2 text-sm bg-[#5801A9] rounded p-2">
-                  Tech Innovators Academy
+                  {courseData[courseData.length - 1]?.data.courseCreator}
                 </p>
                 <button
-                  onClick={(e) =>
-                    handleCourse(e, e.currentTarget.textContent, router)
-                  }
+                  onClick={(e) => {
+                    localStorage.setItem(
+                      "courseData",
+                      JSON.stringify(courseData[courseData.length - 1]?.data),
+                    );
+                    handleCourse(e, e.currentTarget.textContent, router);
+                  }}
                   className="bg-[#9B51E0] ml-3 lg:hidden hover:bg-gray-500 text-white text-[14px] rounded-md font-bold py-[15px] px-[10px] cursor-pointer"
                 >
                   Get this course
@@ -225,9 +248,13 @@ const Explore = () => {
                 <div
                   key={i}
                   className="flex content-center text-sm my-3 cursor-pointer space-x-4"
-                  onClick={(e) =>
-                    handleCourse(e, e.currentTarget.textContent, router)
-                  }
+                  onClick={(e) => {
+                    localStorage.setItem(
+                      "courseData",
+                      JSON.stringify(courseData[courseData.length - 1]?.data),
+                    );
+                    handleCourse(e, e.currentTarget.textContent, router);
+                  }}
                 >
                   <div className="h-full w-[160px] rounded-xl">
                     <Image
@@ -261,7 +288,7 @@ const Explore = () => {
           </div>
         </div>
         <div className="mx-6 lg:mx-auto max-w-screen-2xl">
-          <CarouselComp />
+          <CarouselComp wallet={wallet} />
 
           <div className="mt-24 mx-auto max-w-screen-2xl">
             <div className="my-4 md:mx-6">
@@ -276,7 +303,7 @@ const Explore = () => {
             </div>
 
             {/* cards  */}
-            <CarouselComp />
+            <CarouselComp wallet={wallet} />
           </div>
         </div>
       </div>

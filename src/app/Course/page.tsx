@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
 import { useAtom } from "jotai";
 import {
@@ -7,10 +7,28 @@ import {
   bootcampdropdownstatus,
 } from "@/state/connectedWalletStarknetkitNext";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-
+import { getAllCoursesInfo } from "@/utils/helpers";
+import { pinata } from "../../../utils/config";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import Explore from "@/components/courses/Explore";
 import CourseNews from "@/components/courses/CourseNews";
+import { GetCIDResponse } from "pinata";
+import { provider } from "@/constants";
+
+interface CourseType {
+  data: any;
+  owner: string;
+  course_identifier: number;
+  accessment: boolean;
+  uri: Uri;
+  course_ipfs_uri: string;
+  is_suspended: boolean;
+}
+
+interface Uri {
+  first: string;
+  second: string;
+}
 
 const Index = () => {
   const [status, setstatus] = useAtom(coursestatusAtom);
@@ -20,10 +38,82 @@ const Index = () => {
 
   const [wallet] = useAtom(walletStarknetkit);
 
+  const [courses, setCourses] = useState<CourseType[]>([]);
+  const [courseData, setCourseData] = useState<CourseType[]>([]);
+
+  const getAllCourses = async () => {
+    const res: CourseType[] = await getAllCoursesInfo();
+    setCourses(res);
+  };
+
+  const getPubIpfs = async (CID: string) => {
+    try {
+      //@ts-ignore
+      const data = await pinata.gateways.get(CID);
+
+      // const courseImage: GetCIDResponse = await pinata.gateways.get(
+      //   //@ts-ignore
+      //   data?.data?.courseImage,
+      // );
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching IPFS content:", error);
+    }
+  };
+
+  const getCourse = async () => {
+    // if (courses.length < 1) return; // Prevent running on empty `courses`
+    // console.log("This guy", courses);
+
+    const resolvedCourses = await Promise.all(
+      courses.map(async (course: CourseType) => {
+        if (!course.course_ipfs_uri) {
+          console.warn(`Skipping invalid IPFS URL: ${course.course_ipfs_uri}`);
+          return null; // Skip invalid URLs
+        }
+
+        try {
+          return await getPubIpfs(course.course_ipfs_uri);
+        } catch (error) {
+          console.error("Error fetching from IPFS:", error);
+          return null; // Skip on failure
+        }
+      }),
+    );
+
+    // Filter out null values before updating state
+    const validCourses = resolvedCourses.filter(
+      (course): course is any => course !== null,
+    );
+
+    // Remove duplicates before updating state
+    setCourseData((prevCourses) => {
+      const uniqueCourses = [
+        ...prevCourses,
+        ...validCourses.filter(
+          (newCourse) =>
+            !prevCourses.some(
+              (prev) => prev.data.courseName === newCourse.data.courseName,
+            ),
+        ),
+      ];
+      return uniqueCourses;
+    });
+  };
+
   const handlePageClick = () => {
     setbootcampdropstat(false);
     setstatus(false);
   };
+
+  useEffect(() => {
+    getAllCourses();
+  }, [provider]);
+
+  useEffect(() => {
+    getCourse();
+  }, [courses]);
 
   return (
     <div onClick={handlePageClick}>
@@ -41,7 +131,7 @@ const Index = () => {
       </div>
 
       <CourseNews />
-      <Explore />
+      <Explore wallet={wallet} courseData={courseData} />
     </div>
   );
 };

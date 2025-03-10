@@ -10,6 +10,8 @@ import { attensysEventAbi } from "@/deployments/abi";
 import { attensysEventAddress } from "@/deployments/contracts";
 import { provider } from "@/constants";
 import { decimalToHexAddress } from "@/utils/formatAddress";
+import { useEvents } from "@/hooks/useEvents";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 export interface EventData {
   event_name: string;
@@ -21,47 +23,36 @@ export interface EventData {
     start_time: bigint;
     registeration_open: boolean;
   };
+  event_uri: string;
+  suspension_status: boolean;
 }
 const DiscoverLanding = () => {
-  const [events, setEvents] = useState<EventData[]>([]);
-  const eventContract = useMemo(
-    () => new Contract(attensysEventAbi, attensysEventAddress, provider),
-    [],
-  );
-
-  const getEvents = useCallback(async () => {
-    try {
-      const res = await eventContract.get_all_events();
-      const formatedRes = res.map((data: any) => {
-        return {
-          event_name: data.event_name,
-          event_organizer: decimalToHexAddress(data.event_organizer),
-          registered_attendants: data.registered_attendants,
-          signature_count: data.signature_count,
-          time: {
-            end_time: data.time.end_time,
-            start_time: data.time.start_time,
-            registeration_open: data.time.registeration_open,
-          },
-        };
-      });
-      console.log({ formatedRes });
-      setEvents(formatedRes);
-    } catch (error) {
-      console.error("get_all_events error", error);
-    }
-  }, [eventContract]);
+  const { events, getEvents, loading } = useEvents();
 
   useEffect(() => {
     getEvents();
   }, [getEvents]);
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-screen bg-event-gradient flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <LoadingSpinner size="lg" colorVariant="primary" />
+          <p className="text-white text-lg">Loading events...</p>
+        </div>
+      </div>
+    );
+  }
+
+  console.log("this is all events data", events);
+
   return (
-    <div className=" w-full bg-event-gradient">
+    <div className="w-full bg-event-gradient">
       <TopdiscoverSection />
       <Backgroundsection />
       <Timesection />
-      <Highlight />
-      <Allevents events={events} />
+      <Highlight events={events} />
+      {/* <Allevents events={events} /> */}
     </div>
   );
 };

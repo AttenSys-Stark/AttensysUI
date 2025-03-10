@@ -1,3 +1,32 @@
+import { attensysCourseAddress } from "@/deployments/contracts";
+import { attensysCourseAbi } from "@/deployments/abi";
+import { Contract } from "starknet";
+import { provider } from "@/constants";
+
+const courseContract = new Contract(
+  attensysCourseAbi,
+  attensysCourseAddress,
+  provider,
+);
+
+export const getAllCoursesInfo = async () => {
+  const callCourseContract = await courseContract?.get_all_courses_info();
+  return callCourseContract;
+};
+export const getUserCoursesInfo = async (user: string) => {
+  const callCourseContract =
+    await courseContract?.get_all_creator_courses(user);
+  return callCourseContract;
+};
+
+export function shortHex(input?: any) {
+  if (!input || typeof input !== "string" || input.length < 6) {
+    console.error("Invalid input to shortHex:", input);
+    return "Invalid Address";
+  }
+  return `${input.slice(0, 4)}...${input.slice(-2)}`;
+}
+
 export const handleSubmit = (
   event: React.FormEvent<HTMLFormElement>,
   searchValue: any,

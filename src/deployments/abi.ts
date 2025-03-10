@@ -93,6 +93,10 @@ export const attensysCourseAbi = [
         name: "course_ipfs_uri",
         type: "core::byte_array::ByteArray",
       },
+      {
+        name: "is_suspended",
+        type: "core::bool",
+      },
     ],
   },
   {
@@ -144,7 +148,7 @@ export const attensysCourseAbi = [
     ],
     outputs: [
       {
-        type: "core::starknet::contract_address::ContractAddress",
+        type: "(core::starknet::contract_address::ContractAddress, core::integer::u256)",
       },
     ],
     state_mutability: "external",
@@ -168,6 +172,18 @@ export const attensysCourseAbi = [
       {
         name: "new_course_uri_b",
         type: "core::felt252",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "acquire_a_course",
+    inputs: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
       },
     ],
     outputs: [],
@@ -212,6 +228,22 @@ export const attensysCourseAbi = [
       {
         name: "course_identifiers",
         type: "core::array::Array::<core::integer::u256>",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<attendsys::contracts::AttenSysCourse::AttenSysCourse::Course>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_all_taken_courses",
+    inputs: [
+      {
+        name: "user",
+        type: "core::starknet::contract_address::ContractAddress",
       },
     ],
     outputs: [
@@ -354,6 +386,45 @@ export const attensysCourseAbi = [
     state_mutability: "view",
   },
   {
+    type: "function",
+    name: "ensure_admin",
+    inputs: [],
+    outputs: [],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_suspension_status",
+    inputs: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "toggle_suspension",
+    inputs: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
+      },
+      {
+        name: "suspend",
+        type: "core::bool",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
     type: "constructor",
     name: "constructor",
     inputs: [
@@ -467,6 +538,30 @@ export const attensysCourseAbi = [
   },
   {
     type: "event",
+    name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseSuspended",
+    kind: "struct",
+    members: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseUnsuspended",
+    kind: "struct",
+    members: [
+      {
+        name: "course_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
     name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::Event",
     kind: "enum",
     variants: [
@@ -488,6 +583,16 @@ export const attensysCourseAbi = [
       {
         name: "AdminTransferred",
         type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::AdminTransferred",
+        kind: "nested",
+      },
+      {
+        name: "CourseSuspended",
+        type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseSuspended",
+        kind: "nested",
+      },
+      {
+        name: "CourseUnsuspended",
+        type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::CourseUnsuspended",
         kind: "nested",
       },
     ],
@@ -547,25 +652,11 @@ export const attensysEventAbi = [
   },
   {
     type: "struct",
-    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::UserAttendedEventStruct",
-    members: [
-      {
-        name: "event_name",
-        type: "core::byte_array::ByteArray",
-      },
-      {
-        name: "time",
-        type: "core::integer::u256",
-      },
-    ],
-  },
-  {
-    type: "struct",
     name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Time",
     members: [
       {
         name: "registration_open",
-        type: "core::bool",
+        type: "core::integer::u8",
       },
       {
         name: "start_time",
@@ -574,6 +665,32 @@ export const attensysEventAbi = [
       {
         name: "end_time",
         type: "core::integer::u256",
+      },
+    ],
+  },
+  {
+    type: "struct",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::UserAttendedEventStruct",
+    members: [
+      {
+        name: "event_name",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "time",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Time",
+      },
+      {
+        name: "event_organizer",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "event_id",
+        type: "core::integer::u256",
+      },
+      {
+        name: "event_uri",
+        type: "core::byte_array::ByteArray",
       },
     ],
   },
@@ -604,6 +721,26 @@ export const attensysEventAbi = [
       {
         name: "registered_attendants",
         type: "core::integer::u256",
+      },
+      {
+        name: "event_uri",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "is_suspended",
+        type: "core::bool",
+      },
+      {
+        name: "event_id",
+        type: "core::integer::u256",
+      },
+      {
+        name: "location",
+        type: "core::integer::u8",
+      },
+      {
+        name: "canceled",
+        type: "core::bool",
       },
     ],
   },
@@ -641,7 +778,15 @@ export const attensysEventAbi = [
       },
       {
         name: "reg_status",
-        type: "core::bool",
+        type: "core::integer::u8",
+      },
+      {
+        name: "event_uri",
+        type: "core::byte_array::ByteArray",
+      },
+      {
+        name: "event_location",
+        type: "core::integer::u8",
       },
     ],
     outputs: [
@@ -683,6 +828,10 @@ export const attensysEventAbi = [
         name: "event_identifier",
         type: "core::integer::u256",
       },
+      {
+        name: "attendee_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
     ],
     outputs: [],
     state_mutability: "external",
@@ -697,6 +846,22 @@ export const attensysEventAbi = [
       },
     ],
     outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_registered_users",
+    inputs: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+      },
+    ],
     state_mutability: "external",
   },
   {
@@ -753,11 +918,27 @@ export const attensysEventAbi = [
   },
   {
     type: "function",
+    name: "get_all_created_events",
+    inputs: [
+      {
+        name: "organizer",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<attendsys::contracts::AttenSysEvent::AttenSysEvent::EventStruct>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
     name: "start_end_reg",
     inputs: [
       {
         name: "reg_stat",
-        type: "core::bool",
+        type: "core::integer::u8",
       },
       {
         name: "event_identifier",
@@ -856,8 +1037,8 @@ export const attensysEventAbi = [
     name: "sponsor_event",
     inputs: [
       {
-        name: "event",
-        type: "core::starknet::contract_address::ContractAddress",
+        name: "event_identifier",
+        type: "core::integer::u256",
       },
       {
         name: "amt",
@@ -877,6 +1058,94 @@ export const attensysEventAbi = [
     inputs: [
       {
         name: "amt",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "set_sponsorship_contract",
+    inputs: [
+      {
+        name: "sponsor_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_event_sponsorship_balance",
+    inputs: [
+      {
+        name: "event",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::integer::u256",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "toggle_event_suspended_status",
+    inputs: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+      },
+      {
+        name: "status",
+        type: "core::bool",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_event_suspended_status",
+    inputs: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_all_attendace_marked",
+    inputs: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "cancel_event",
+    inputs: [
+      {
+        name: "event_identifier",
         type: "core::integer::u256",
       },
     ],
@@ -946,6 +1215,142 @@ export const attensysEventAbi = [
   },
   {
     type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::EventCreated",
+    kind: "struct",
+    members: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "event_name",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "event_organizer",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "event_uri",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::EventEnded",
+    kind: "struct",
+    members: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::AttendanceMarked",
+    kind: "struct",
+    members: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "attendee",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::RegisteredForEvent",
+    kind: "struct",
+    members: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "attendee",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::RegistrationStatusChanged",
+    kind: "struct",
+    members: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "registration_open",
+        type: "core::integer::u8",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::AdminTransferred",
+    kind: "struct",
+    members: [
+      {
+        name: "old_admin",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "new_admin",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::AdminOwnershipClaimed",
+    kind: "struct",
+    members: [
+      {
+        name: "new_admin",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::BatchCertificationCompleted",
+    kind: "struct",
+    members: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+        kind: "data",
+      },
+      {
+        name: "certified_attendees",
+        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
     name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Event",
     kind: "enum",
     variants: [
@@ -957,6 +1362,46 @@ export const attensysEventAbi = [
       {
         name: "Withdrawn",
         type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::Withdrawn",
+        kind: "nested",
+      },
+      {
+        name: "EventCreated",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::EventCreated",
+        kind: "nested",
+      },
+      {
+        name: "EventEnded",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::EventEnded",
+        kind: "nested",
+      },
+      {
+        name: "AttendanceMarked",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::AttendanceMarked",
+        kind: "nested",
+      },
+      {
+        name: "RegisteredForEvent",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::RegisteredForEvent",
+        kind: "nested",
+      },
+      {
+        name: "RegistrationStatusChanged",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::RegistrationStatusChanged",
+        kind: "nested",
+      },
+      {
+        name: "AdminTransferred",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::AdminTransferred",
+        kind: "nested",
+      },
+      {
+        name: "AdminOwnershipClaimed",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::AdminOwnershipClaimed",
+        kind: "nested",
+      },
+      {
+        name: "BatchCertificationCompleted",
+        type: "attendsys::contracts::AttenSysEvent::AttenSysEvent::BatchCertificationCompleted",
         kind: "nested",
       },
     ],
@@ -1064,7 +1509,7 @@ export const attensysOrgAbi = [
     members: [
       {
         name: "bootcamp_id",
-        type: "core::integer::u256",
+        type: "core::integer::u64",
       },
       {
         name: "address_of_org",
@@ -1126,7 +1571,7 @@ export const attensysOrgAbi = [
       },
       {
         name: "bootcamp_id",
-        type: "core::integer::u256",
+        type: "core::integer::u64",
       },
     ],
   },
@@ -1165,6 +1610,28 @@ export const attensysOrgAbi = [
       {
         name: "total_sponsorship_fund",
         type: "core::integer::u256",
+      },
+    ],
+  },
+  {
+    type: "struct",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::RegisteredBootcamp",
+    members: [
+      {
+        name: "address_of_org",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "student",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "acceptance_status",
+        type: "core::bool",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
       },
     ],
   },
@@ -1364,6 +1831,10 @@ export const attensysOrgAbi = [
         name: "class_id",
         type: "core::integer::u64",
       },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
     ],
     outputs: [],
     state_mutability: "external",
@@ -1377,12 +1848,28 @@ export const attensysOrgAbi = [
         type: "core::starknet::contract_address::ContractAddress",
       },
       {
-        name: "class_id",
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "single_certify_student",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
         type: "core::integer::u64",
       },
       {
         name: "students",
-        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+        type: "core::starknet::contract_address::ContractAddress",
       },
     ],
     outputs: [],
@@ -1427,6 +1914,42 @@ export const attensysOrgAbi = [
       {
         name: "amt",
         type: "core::integer::u256",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "suspend_organization",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "suspend",
+        type: "core::bool",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "suspend_org_bootcamp",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id_",
+        type: "core::integer::u64",
+      },
+      {
+        name: "suspend",
+        type: "core::bool",
       },
     ],
     outputs: [],
@@ -1674,6 +2197,227 @@ export const attensysOrgAbi = [
     outputs: [
       {
         type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Bootcamp",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "transfer_admin",
+    inputs: [
+      {
+        name: "new_admin",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "claim_admin_ownership",
+    inputs: [],
+    outputs: [],
+    state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_admin",
+    inputs: [],
+    outputs: [
+      {
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_new_admin",
+    inputs: [],
+    outputs: [
+      {
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_org_sponsorship_balance",
+    inputs: [
+      {
+        name: "organization",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::integer::u256",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "is_bootcamp_suspended",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "is_org_suspended",
+    inputs: [
+      {
+        name: "org_",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_registered_bootcamp",
+    inputs: [
+      {
+        name: "student",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<attendsys::contracts::AttenSysOrg::AttenSysOrg::RegisteredBootcamp>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_specific_organization_registered_bootcamp",
+    inputs: [
+      {
+        name: "org",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "student",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<attendsys::contracts::AttenSysOrg::AttenSysOrg::RegisteredBootcamp>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_class_attendance_status",
+    inputs: [
+      {
+        name: "org",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+      {
+        name: "class_id",
+        type: "core::integer::u64",
+      },
+      {
+        name: "student",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_all_bootcamp_classes",
+    inputs: [
+      {
+        name: "org",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<core::integer::u64>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_certified_student_bootcamp_address",
+    inputs: [
+      {
+        name: "org",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_bootcamp_certification_status",
+    inputs: [
+      {
+        name: "org",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+      },
+      {
+        name: "student",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
       },
     ],
     state_mutability: "view",
@@ -2029,6 +2773,55 @@ export const attensysOrgAbi = [
   },
   {
     type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::OrganizationSuspended",
+    kind: "struct",
+    members: [
+      {
+        name: "org_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "org_name",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "suspended",
+        type: "core::bool",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
+    name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::BootCampSuspended",
+    kind: "struct",
+    members: [
+      {
+        name: "org_contract_address",
+        type: "core::starknet::contract_address::ContractAddress",
+        kind: "data",
+      },
+      {
+        name: "bootcamp_id",
+        type: "core::integer::u64",
+        kind: "data",
+      },
+      {
+        name: "bootcamp_name",
+        type: "core::byte_array::ByteArray",
+        kind: "data",
+      },
+      {
+        name: "suspended",
+        type: "core::bool",
+        kind: "data",
+      },
+    ],
+  },
+  {
+    type: "event",
     name: "attendsys::contracts::AttenSysOrg::AttenSysOrg::Event",
     kind: "enum",
     variants: [
@@ -2112,6 +2905,16 @@ export const attensysOrgAbi = [
         type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::SponsorshipFundWithdrawn",
         kind: "nested",
       },
+      {
+        name: "OrganizationSuspended",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::OrganizationSuspended",
+        kind: "nested",
+      },
+      {
+        name: "BootCampSuspended",
+        type: "attendsys::contracts::AttenSysOrg::AttenSysOrg::BootCampSuspended",
+        kind: "nested",
+      },
     ],
   },
 ];
@@ -2139,6 +2942,10 @@ export const attensysSponsorAbi = [
     type: "function",
     name: "deposit",
     inputs: [
+      {
+        name: "sender",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
       {
         name: "token_address",
         type: "core::starknet::contract_address::ContractAddress",

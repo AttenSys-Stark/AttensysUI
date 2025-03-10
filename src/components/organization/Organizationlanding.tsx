@@ -3,7 +3,10 @@ import Heading from "./Heading";
 import Panel from "./Panel";
 import Organizationtabs from "./Organizationtabs";
 import Create from "./Create";
-import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext";
+import {
+  createbootcampoverlay,
+  createbootcampupload,
+} from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
@@ -13,9 +16,11 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { pinata } from "../../../utils/config";
 import axios from "axios";
 import { GetCIDResponse } from "pinata";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const Organizationlanding = (prop: any) => {
   const [createOverlayStat] = useAtom(createbootcampoverlay);
+  const [createbootebootcampstat] = useAtom(createbootcampupload);
   const [orgHeight, setOrgHeight] = useState<number | null>(null); // State to store the height
   const landingRef = useRef<HTMLDivElement>(null); // Ref for OrganizationLanding
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -30,6 +35,9 @@ const Organizationlanding = (prop: any) => {
   const [bootcampNumber, setBootcampNumber] = useState<number | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [bootcampDataInfo, setBootcampdataInfo] = useState([]);
+  const [isLoadingIPFS, setIsLoadingIPFS] = useState(false);
+  const [isLoadingOrgInfo, setIsLoadingOrgInfo] = useState(false);
+  const [isLoadingBootcamps, setIsLoadingBootcamps] = useState(false);
 
   const orgContract = new Contract(
     attensysOrgAbi,
@@ -38,6 +46,7 @@ const Organizationlanding = (prop: any) => {
   );
 
   const getPubIpfs = async (CID: string) => {
+    setIsLoadingIPFS(true);
     try {
       const data = await pinata.gateways.get(CID);
       //@ts-ignore
@@ -73,25 +82,42 @@ const Organizationlanding = (prop: any) => {
     } catch (error) {
       console.error("Error fetching IPFS content:", error);
       throw error;
+    } finally {
+      setIsLoadingIPFS(false);
     }
   };
 
   const getOrgInfo = async () => {
-    const org_info = await orgContract?.get_org_info(wallet?.selectedAddress);
-    setNumberofClasses(Number(org_info.number_of_all_classes));
-    setNumberofTutors(Number(org_info.number_of_instructors));
-    setStudentNumber(Number(org_info.number_of_students));
-    setBootcampNumber(Number(org_info.number_of_all_bootcamps));
-    console.info(org_info);
-    const ipfsdata = getPubIpfs(org_info.org_ipfs_uri);
-    console.info(ipfsdata);
+    setIsLoadingOrgInfo(true);
+
+    try {
+      const org_info = await orgContract?.get_org_info(wallet?.selectedAddress);
+      setNumberofClasses(Number(org_info.number_of_all_classes));
+      setNumberofTutors(Number(org_info.number_of_instructors));
+      setStudentNumber(Number(org_info.number_of_students));
+      setBootcampNumber(Number(org_info.number_of_all_bootcamps));
+      console.info(org_info);
+      const ipfsdata = getPubIpfs(org_info.org_ipfs_uri);
+      console.info(ipfsdata);
+    } catch (error) {
+      console.error("Error fetching org info:", error);
+    } finally {
+      setIsLoadingOrgInfo(false);
+    }
   };
 
   const getAllOrgBootcamp = async () => {
-    const org_boot_camp_info = await orgContract?.get_all_org_bootcamps(
-      wallet?.selectedAddress,
-    );
-    setBootcampdataInfo(org_boot_camp_info);
+    setIsLoadingBootcamps(true);
+    try {
+      const org_boot_camp_info = await orgContract?.get_all_org_bootcamps(
+        wallet?.selectedAddress,
+      );
+      setBootcampdataInfo(org_boot_camp_info);
+    } catch (error) {
+      console.error("Error fetching bootcamps:", error);
+    } finally {
+      setIsLoadingBootcamps(false);
+    }
   };
 
   useEffect(() => {
@@ -120,21 +146,43 @@ const Organizationlanding = (prop: any) => {
 
   return (
     <div ref={landingRef} className="h-auto bg-[#f5f8fa] relative">
-      {createOverlayStat && (
-        <Create organizationName={organizationName} height={orgHeight} />
+      {isLoadingOrgInfo || isLoadingIPFS ? (
+        <div className="flex justify-center items-center min-h-screen">
+          <LoadingSpinner size="lg" colorVariant="primary" />
+        </div>
+      ) : (
+        <>
+          {/* Full screen loading overlay */}
+          {createbootebootcampstat && (
+            <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+              <div className="bg-white p-6 rounded-lg flex flex-col items-center gap-4">
+                <LoadingSpinner size="lg" colorVariant="primary" />
+                <p className="text-gray-700 font-medium">
+                  Publishing bootcamp... Please wait
+                </p>
+              </div>
+            </div>
+          )}
+          {createOverlayStat && (
+            <Create organizationName={organizationName} height={orgHeight} />
+          )}
+          <Heading logo={logoImagesource} banner={bannerImagesource} />
+          <Panel
+            orgname={organizationName}
+            owner={truncateAddress(Owneraddress)}
+            classes={classessNumber}
+            tutors={tutors}
+            creator={creator}
+            studentNumber={studentNumber}
+            bootcampNumber={bootcampNumber}
+            description={description}
+          />
+          <Organizationtabs
+            bootcampinfo={bootcampDataInfo}
+            isLoading={isLoadingBootcamps}
+          />
+        </>
       )}
-      <Heading logo={logoImagesource} banner={bannerImagesource} />
-      <Panel
-        orgname={organizationName}
-        owner={truncateAddress(Owneraddress)}
-        classes={classessNumber}
-        tutors={tutors}
-        creator={creator}
-        studentNumber={studentNumber}
-        bootcampNumber={bootcampNumber}
-        description={description}
-      />
-      <Organizationtabs bootcampinfo={bootcampDataInfo} />
     </div>
   );
 };

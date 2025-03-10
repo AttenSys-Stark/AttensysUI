@@ -11,6 +11,7 @@ import { FaPlus } from "react-icons/fa6";
 import { createbootcampoverlay } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
 import { ImBooks } from "react-icons/im";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const Organizationtabs = (props: any) => {
   const [mybootcampStat, setMyBootcampStat] = useState(true);
@@ -93,7 +94,14 @@ const Organizationtabs = (props: any) => {
               />
             </div>
           </div>
-          {mybootcampStat && <Mybootcamp bootcampInfo={props.bootcampinfo} />}
+          {mybootcampStat &&
+            (props.isLoading ? (
+              <div className="flex justify-center items-center h-[200px] bg-white">
+                <LoadingSpinner size="lg" colorVariant="primary" />
+              </div>
+            ) : (
+              <Mybootcamp bootcampInfo={props.bootcampinfo} />
+            ))}
         </div>
 
         <div className="-ml-5">

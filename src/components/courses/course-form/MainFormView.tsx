@@ -7,11 +7,33 @@ import { handleCreateCourse } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import Stepper from "@/components/Stepper";
 
-const MainFormView = () => {
+interface ChildComponentProps {
+  courseData: any;
+  handleCourseNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleCourseCreatorChange: (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
+  handleCourseDescriptionChange: (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => void;
+  handleCourseCategoryChange: (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => void;
+  handleDifficultyLevelChange: (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => void;
+}
+const MainFormView: React.FC<ChildComponentProps> = ({
+  courseData,
+  handleCourseNameChange,
+  handleCourseCreatorChange,
+  handleCourseDescriptionChange,
+  handleCourseCategoryChange,
+  handleDifficultyLevelChange,
+}) => {
   const router = useRouter();
-  const [courseName, setCourseName] = useState("");
-  const [courseDescription, setCourseDescription] = useState("");
   const [courseNameError, setCourseNameError] = useState("");
+  const [courseCreatorError, setCourseCreatorError] = useState("");
   const [courseDescriptionError, setCourseDescriptionError] = useState("");
   const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
@@ -22,28 +44,33 @@ const MainFormView = () => {
     e.preventDefault();
 
     setCourseNameError("");
+    setCourseCreatorError("");
     setCourseDescriptionError("");
     setSkillError("");
     setLevelError("");
 
     let hasError = false;
 
-    if (!courseName.trim()) {
+    if (!courseData.courseName.trim()) {
       setCourseNameError("Course Name is required.");
       hasError = true;
     }
+    if (!courseData.courseCreator.trim()) {
+      setCourseCreatorError("Course creator is required.");
+      hasError = true;
+    }
 
-    if (!courseDescription.trim()) {
+    if (!courseData.courseDescription.trim()) {
       setCourseDescriptionError("Course Description is required.");
       hasError = true;
     }
 
-    if (!selectedSkill) {
+    if (!courseData.courseCategory) {
       setSkillError("Please select a course category.");
       hasError = true;
     }
 
-    if (!selectedLevel) {
+    if (!courseData.difficultyLevel) {
       setLevelError("Please select a level.");
       hasError = true;
     }
@@ -58,7 +85,7 @@ const MainFormView = () => {
   return (
     <div className="block sm:flex">
       <div className="hidden lg:block">
-        <CourseSideBar />
+        <CourseSideBar courseData={courseData} />
       </div>
 
       <div className="mb-10 flex-1">
@@ -97,7 +124,7 @@ const MainFormView = () => {
                   htmlFor=""
                   className="font-semibold text-[18px] leading-[31px] text-[#333333]"
                 >
-                  Course Name
+                  Course Title
                 </label>
                 <p className="font-normal mt-1 text-xs/[145%] md:text-sm text-[#2D3A4B] md:leading-[21px]">
                   {` If you are unsure of the perfect title now, don't worry—you can
@@ -108,10 +135,12 @@ const MainFormView = () => {
                     type="input"
                     className="w-[100%] h-[55px] sm:w-[80%] px-6 border border-gray-300 rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
                     placeholder="Course name e.g DApp development, Design basics..."
+                    value={courseData.courseName}
                     onChange={(e) => {
-                      setCourseName(e.target.value);
+                      handleCourseNameChange(e);
                       setCourseNameError("");
                     }}
+                    maxLength={100}
                   />
                   <input
                     type="checkbox"
@@ -120,6 +149,41 @@ const MainFormView = () => {
                 </div>
                 {courseNameError && (
                   <p className="text-red-500 text-xs mt-1">{courseNameError}</p>
+                )}
+              </div>
+
+              <div className="my-12">
+                <label
+                  htmlFor=""
+                  className="font-semibold text-[18px] leading-[31px] text-[#333333]"
+                >
+                  Course Creator
+                </label>
+                <p className="font-normal mt-1 text-xs/[145%] md:text-sm text-[#2D3A4B] md:leading-[21px]">
+                  {` If you are unsure of the perfect creator name now, don't worry—you can
+                always update it later.`}
+                </p>
+                <div className="flex items-center my-4 space-x-4">
+                  <input
+                    type="input"
+                    className="w-[100%] h-[55px] sm:w-[80%] px-6 border border-gray-300 rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
+                    placeholder="Course creator e.g Mike Smith, Trident Academy..."
+                    value={courseData.courseCreator}
+                    onChange={(e) => {
+                      handleCourseCreatorChange(e);
+                      setCourseCreatorError("");
+                    }}
+                    maxLength={100}
+                  />
+                  <input
+                    type="checkbox"
+                    className="appearance-none w-[23px] h-[23px] hidden md:block rounded-full border-[1px] border-[#C5D322] checked:bg-[#C5D322] checked:border-[#C5D322] required:border-red-500 checked:before:content-['✔'] checked:before:absolute checked:before:top-[3px] checked:before:left-[6px] checked:before:text-white checked:before:text-[10px] relative"
+                  />
+                </div>
+                {courseCreatorError && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {courseCreatorError}
+                  </p>
                 )}
               </div>
 
@@ -138,10 +202,12 @@ const MainFormView = () => {
                     id="message"
                     className="block px-2.5 pb-64 py-3 w-[100%] sm:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-[6px] border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder="a little bit about your course......"
+                    value={courseData.courseDescription}
                     onChange={(e) => {
-                      setCourseDescription(e.target.value);
+                      handleCourseDescriptionChange(e);
                       setCourseDescriptionError("");
                     }}
+                    maxLength={500}
                   ></textarea>
                   <input
                     type="checkbox"
@@ -165,11 +231,12 @@ const MainFormView = () => {
                 <div className="my-4 flex items-start w-full max-w-[556px] h-[55px]">
                   <Dropdown
                     options={skills}
-                    selectedOption={selectedSkill}
+                    selectedOption={courseData.courseCategory}
                     onSelect={(option: string) => {
                       setSelectedSkill(option);
                       setSkillError("");
                     }}
+                    functionToChange={handleCourseCategoryChange}
                     required
                     errorMessage={skillError}
                   />
@@ -192,6 +259,7 @@ const MainFormView = () => {
                       setSelectedLevel(option);
                       setLevelError("");
                     }}
+                    functionToChange={handleDifficultyLevelChange}
                     required
                     errorMessage={levelError}
                   />

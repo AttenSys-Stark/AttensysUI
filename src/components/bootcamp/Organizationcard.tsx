@@ -15,6 +15,7 @@ import { GetCIDResponse } from "pinata";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useAtom } from "jotai";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 interface OrganizationCardProp {
   name: string;
@@ -45,6 +46,7 @@ const Organizationcard = (props: any) => {
   const [studentNumber, setStudentNumber] = useState<number | null>(null);
   const [bootcampNumber, setBootcampNumber] = useState<number | null>(null);
   const [description, setDescription] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleDetailsRoute = () => {
     router.push(
@@ -111,8 +113,27 @@ const Organizationcard = (props: any) => {
   }
 
   useEffect(() => {
-    getOrgInfo();
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await getOrgInfo();
+      } catch (error) {
+        console.error("Error loading organization data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [wallet]);
+
+  if (isLoading) {
+    return (
+      <div className="h-auto pb-2 w-full rounded-xl border-[1px] border-[#C8C8C8] bg-[#FFFFFF] flex items-center justify-center min-h-[300px]">
+        <LoadingSpinner size="md" colorVariant="primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="h-auto pb-2 w-full rounded-xl border-[1px] border-[#C8C8C8] bg-[#FFFFFF]">

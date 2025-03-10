@@ -5,7 +5,25 @@ import { handleCreateCourse } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import Stepper from "@/components/Stepper";
 
-const MainFormView2 = () => {
+interface ChildComponentProps {
+  courseData: any;
+  setCourseData: any;
+  handleStudentReqChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleLearningObjChange: (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => void;
+  handleTADescriptionChange: (
+    event: React.ChangeEvent<HTMLTextAreaElement>,
+  ) => void;
+}
+
+const MainFormView2: React.FC<ChildComponentProps> = ({
+  courseData,
+  setCourseData,
+  handleStudentReqChange,
+  handleLearningObjChange,
+  handleTADescriptionChange,
+}) => {
   const router = useRouter();
   const [requirements, setRequirements] = useState<string[]>([]);
   const [requirementInput, setRequirementInput] = useState("");
@@ -17,11 +35,33 @@ const MainFormView2 = () => {
 
   const handleAddRequirement = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (requirementInput.trim()) {
-      setRequirements([...requirements, requirementInput.trim()]);
-      setRequirementInput("");
-      setRequirementsError("");
+    // Trim input and check if it's not empty
+    const newRequirement = requirementInput.trim();
+    if (newRequirement === "") {
+      setRequirementsError("Requirement cannot be empty");
+      return;
     }
+
+    // Split current value into items and remove duplicates
+    const currentItems = courseData.studentRequirements
+      .split(",")
+      .map((item: any) => item.trim())
+      .filter((item: any) => item); // Remove empty items
+
+    // Add new item if it doesn't already exist
+    if (!currentItems.includes(newRequirement)) {
+      currentItems.push(newRequirement);
+    }
+
+    // Update state with the updated list
+    setCourseData({
+      ...courseData,
+      studentRequirements: currentItems.join(", "),
+    });
+
+    // Clear input field and error
+    setRequirementInput("");
+    setRequirementsError("");
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,19 +75,19 @@ const MainFormView2 = () => {
     let hasError = false;
 
     // Validate requirements
-    if (requirements.length === 0) {
+    if (courseData.studentRequirements.length === 0) {
       setRequirementsError("At least one student requirement is required");
       hasError = true;
     }
 
     // Validate learning objectives
-    if (!learningObjectives.trim()) {
+    if (!courseData.learningObjectives.trim()) {
       setLearningObjectivesError("Learning objectives are required");
       hasError = true;
     }
 
     // Validate target audience
-    if (!targetAudience.trim()) {
+    if (!courseData.targetAudienceDesc.trim()) {
       setTargetAudienceError("Target audience description is required");
       hasError = true;
     }
@@ -61,7 +101,7 @@ const MainFormView2 = () => {
   return (
     <div className="flex">
       <div className="hidden lg:block">
-        <CourseSideBar />
+        <CourseSideBar courseData={courseData} />
       </div>
 
       <div className="flex-1">
@@ -111,8 +151,15 @@ const MainFormView2 = () => {
                     type="input"
                     className="w-auto sm:w-[70%] h-[55px] py-2 px-6 border border-gray-300 rounded md:rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
                     placeholder="e.g A laptop."
-                    value={requirementInput}
-                    onChange={(e) => {
+                    value={courseData.studentRequirements}
+                    // onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    //   handleStudentReqChange(e);
+                    //   setRequirementInput(e.target.value);
+                    //   setRequirementsError("");
+                    // }}
+
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      handleStudentReqChange(e);
                       setRequirementInput(e.target.value);
                       setRequirementsError("");
                     }}
@@ -151,8 +198,9 @@ const MainFormView2 = () => {
                     id="message"
                     className="block px-6 pb-64 py-3 w-full md:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder={`E.g When this course is done, students will :`}
-                    value={learningObjectives}
-                    onChange={(e) => {
+                    value={courseData.learningObjectives}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                      handleLearningObjChange(e);
                       setLearningObjectives(e.target.value);
                       setLearningObjectivesError("");
                     }}
@@ -177,8 +225,9 @@ const MainFormView2 = () => {
                     id="message"
                     className="block px-6 pb-64 py-3 w-full md:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     placeholder={`Example:`}
-                    value={targetAudience}
-                    onChange={(e) => {
+                    value={courseData.targetAudienceDesc}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                      handleTADescriptionChange(e);
                       setTargetAudience(e.target.value);
                       setTargetAudienceError("");
                     }}

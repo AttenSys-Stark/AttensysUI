@@ -7,6 +7,7 @@ import {
 } from "@/state/connectedWalletStarknetkitNext";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { DEFAULT_NETWORK } from "@/config";
 
 export interface WalletConnectionInfo {
   connected: boolean;
@@ -18,6 +19,9 @@ export const useWallet = () => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const setConnector = useSetAtom(connectorAtom);
+  const [isCorrectNetwork, setIsCorrectNetwork] = useState<boolean | null>(
+    false,
+  );
 
   const connectWallet = async () => {
     if (isConnecting) return;
@@ -40,6 +44,7 @@ export const useWallet = () => {
       const { wallet: connectedWallet, connector } = res;
       //@ts-ignore
       setWallet(connectedWallet);
+      setIsCorrectNetwork(connectedWallet?.chainId === DEFAULT_NETWORK);
       setConnector(connector);
       return connectedWallet;
     } catch (error) {
@@ -82,10 +87,12 @@ export const useWallet = () => {
           icons: [],
         },
       });
+      const isNetworkCorrect = connectedWallet?.chainId === DEFAULT_NETWORK;
       // console.log("res ato", connectedWallet, connector, connectorData);
       //@ts-ignore
       setWallet(connectedWallet);
       setConnector(connector);
+      setIsCorrectNetwork(isNetworkCorrect);
 
       if (!connectedWallet) {
         console.warn("Wallet autoconnection failed");
@@ -102,5 +109,8 @@ export const useWallet = () => {
     autoConnectWallet,
     disconnectWallet,
     clearWalletInfo,
+    isCorrectNetwork,
+    setIsCorrectNetwork,
+    wallet,
   };
 };

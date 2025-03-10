@@ -21,6 +21,7 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
 import { pinata } from "../../../utils/config";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const RegisterLanding = (props: any) => {
   const [regModal, setRegModal] = useAtom(registerModal);
@@ -35,6 +36,8 @@ const RegisterLanding = (props: any) => {
   const [endDate, setEndDate] = useState<string | null>(null);
   const [Imagesource, setImageSource] = useState<string | StaticImport>("");
   const [Description, setBootcampDescription] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRegistering, setIsRegistering] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -123,9 +126,27 @@ const RegisterLanding = (props: any) => {
   }
 
   useEffect(() => {
-    getAllBootcamps();
-    getBootcampInfo();
-  }, [wallet]);
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([getAllBootcamps(), getBootcampInfo()]);
+      } catch (error) {
+        console.error("Error loading bootcamp data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [wallet, id, org]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#f4f7f9] flex items-center justify-center">
+        <LoadingSpinner size="lg" colorVariant="primary" />
+      </div>
+    );
+  }
 
   return (
     <>

@@ -50,6 +50,13 @@ module.exports = withMT({
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {},
+      animation: {
+        "spin-slow": "spin 2s linear infinite",
+        "spin-fast": "spin 0.5s linear infinite",
+      },
+      borderWidth: {
+        3: "3px",
+      },
     },
   },
   plugins: [require("tailwindcss-animate"), require("tailwind-scrollbar-hide")],

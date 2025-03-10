@@ -12,6 +12,8 @@ import { attensysOrgAddress } from "@/deployments/contracts";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { pinata } from "../../../utils/config";
 import { useSearchParams } from "next/navigation";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import Previous from "../courses/course-form/previous";
 
 const Explorebootcampdetails = () => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -26,8 +28,10 @@ const Explorebootcampdetails = () => {
   const [bootcampNumber, setBootcampNumber] = useState<number | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [bootcampDataInfo, setBootcampdataInfo] = useState([]);
+  const [RegbootcampDataInfo, setRegBootcampdataInfo] = useState<any>([]);
   const searchParams = useSearchParams();
   const org = searchParams.get("org");
+  const [isLoading, setIsLoading] = useState(true);
 
   const orgContract = new Contract(
     attensysOrgAbi,
@@ -75,14 +79,42 @@ const Explorebootcampdetails = () => {
   };
 
   const getOrgInfo = async () => {
-    const org_info = await orgContract?.get_org_info(org);
-    setNumberofClasses(Number(org_info.number_of_all_classes));
-    setNumberofTutors(Number(org_info.number_of_instructors));
-    setStudentNumber(Number(org_info.number_of_students));
-    setBootcampNumber(Number(org_info.number_of_all_bootcamps));
-    console.info(org_info);
-    const ipfsdata = getPubIpfs(org_info.org_ipfs_uri);
-    console.info(ipfsdata);
+    try {
+      const org_info = await orgContract?.get_org_info(org);
+      setNumberofClasses(Number(org_info.number_of_all_classes));
+      setNumberofTutors(Number(org_info.number_of_instructors));
+      setStudentNumber(Number(org_info.number_of_students));
+      setBootcampNumber(Number(org_info.number_of_all_bootcamps));
+      await getPubIpfs(org_info.org_ipfs_uri);
+    } catch (error) {
+      console.error("Error fetching org info:", error);
+    }
+  };
+
+  const getSpecificOrgInfo = async () => {
+    try {
+      const specific_org_info =
+        await orgContract?.get_specific_organization_registered_bootcamp(
+          org,
+          wallet?.selectedAddress,
+        );
+
+      const bootcampInfoArray = await Promise.all(
+        specific_org_info.map(async (data: any) => {
+          return orgContract?.get_bootcamp_info(
+            data.address_of_org,
+            Number(data.bootcamp_id),
+          );
+        }),
+      );
+
+      // Update state once with all data
+      setRegBootcampdataInfo(bootcampInfoArray);
+
+      console.log("Bootcamp info fetched:", bootcampInfoArray);
+    } catch (error) {
+      console.error("Error fetching specific org info:", error);
+    }
   };
 
   const getAllOrgBootcamp = async () => {
@@ -91,14 +123,36 @@ const Explorebootcampdetails = () => {
   };
 
   useEffect(() => {
-    getOrgInfo();
-    getAllOrgBootcamp();
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        await Promise.all([
+          getOrgInfo(),
+          getAllOrgBootcamp(),
+          getSpecificOrgInfo(),
+        ]);
+      } catch (error) {
+        console.error("Error loading data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, [wallet]);
 
   function truncateAddress(address: any): string {
     const start = address?.slice(0, 10);
     const end = address?.slice(-10);
     return `${start}...${end}`;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#f5f8fa] flex items-center justify-center">
+        <LoadingSpinner size="lg" colorVariant="primary" />
+      </div>
+    );
   }
 
   return (
@@ -115,7 +169,7 @@ const Explorebootcampdetails = () => {
         description={description}
       />
       <Userbootcamps bootcampinfo={bootcampDataInfo} />
-      <Registered />
+      <Registered regbootcamp={RegbootcampDataInfo} />
     </div>
   );
 };

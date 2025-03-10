@@ -2,16 +2,29 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
-import { FC } from "react";
+import { Dispatch, FC, SetStateAction } from "react";
 import { connect } from "starknetkit";
 import { Button } from "@headlessui/react";
 import World from "@/assets/Vector.svg";
 import { useWallet } from "@/hooks/useWallet";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import { DEFAULT_NETWORK } from "@/config";
 
-const ConnectButton: FC = () => {
+type ConnectButtonProps = {
+  setIsCorrectNetwork: Dispatch<SetStateAction<boolean | null>>;
+};
+
+const ConnectButton = ({ setIsCorrectNetwork }: ConnectButtonProps) => {
   const setWallet = useSetAtom(walletStarknetkit);
   const navigate = useRouter();
   const { connectWallet, isConnecting } = useWallet();
+
+  const handleConnectWallet = async () => {
+    const res = await connectWallet();
+    // @ts-expect-error not recognizing wallet for some reason
+    const { connectedWallet } = res;
+    setIsCorrectNetwork(connectedWallet?.chainId === DEFAULT_NETWORK);
+  };
 
   /*   const connectFn = async () => {
     try {
@@ -37,7 +50,9 @@ const ConnectButton: FC = () => {
   return (
     <div>
       <Button
-        onClick={connectWallet}
+        onClick={() => {
+          handleConnectWallet();
+        }}
         disabled={isConnecting}
         className="flex rounded-md xl:rounded-lg bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] py-2 px-2 xl:px-3 data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
       >
@@ -58,7 +73,15 @@ const ConnectButton: FC = () => {
           </svg>
           <div className="flex flex-row flex-none space-x-1 text-sm font-semibold md:text-md">
             <span className="flex">
-              {isConnecting ? "Connecting" : "Connect"}
+              {isConnecting ? (
+                <LoadingSpinner
+                  variant="button"
+                  size="sm"
+                  colorVariant="white"
+                />
+              ) : (
+                "Connect"
+              )}
             </span>
             <span className="flex lg:hidden xl:flex">Wallet</span>
           </div>
