@@ -92,9 +92,6 @@ const AddLecture: React.FC<LectureProps> = ({
     }));
   };
 
-  // Handler for file upload
-  console.log("new lecture", newLecture);
-
   // Handler to add new lecture to the array
   const handleAddLecture = (event: React.MouseEvent) => {
     event.preventDefault();

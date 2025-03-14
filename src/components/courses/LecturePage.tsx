@@ -21,6 +21,7 @@ import { attensysCourseAddress } from "@/deployments/contracts";
 import { getAllCoursesInfo } from "@/utils/helpers";
 import { provider } from "@/constants";
 import { pinata } from "../../../utils/config";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 interface CourseType {
   data: any;
@@ -74,6 +75,8 @@ const LecturePage = (props: any) => {
   const [courseData, setCourseData] = useState<CourseType[]>([]);
   const [durations, setDurations] = useState<{ [key: number]: number }>({});
   const [courseId, setCourseId] = useState<number>();
+  const [taken, setTaken] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleDuration = (id: number, duration: number) => {
     // Set the duration for the specific video ID
@@ -140,6 +143,8 @@ const LecturePage = (props: any) => {
 
   // handle take a course after the course identifier is known
   const handleTakeCourse = async () => {
+    setIsUploading(true);
+
     const courseContract = new Contract(
       attensysCourseAbi,
       attensysCourseAddress,
@@ -163,16 +168,70 @@ const LecturePage = (props: any) => {
       .catch((e: any) => {
         console.error("Error: ", e);
       })
-      .finally(() => {});
+      .finally(() => {
+        setIsUploading(false);
+      });
+  };
+
+  const handleFinishCourseClaimCertfificate = async () => {
+    setIsUploading(true);
+
+    const courseContract = new Contract(
+      attensysCourseAbi,
+      attensysCourseAddress,
+      props?.wallet?.account,
+    );
+    const course_certificate_calldata = courseContract.populate(
+      "finish_course_claim_certification",
+      [Number(courseId)],
+    );
+
+    const callCourseContract = await props.wallet?.account.execute([
+      {
+        contractAddress: attensysCourseAddress,
+        entrypoint: "finish_course_claim_certification",
+        calldata: course_certificate_calldata.calldata,
+      },
+    ]);
+
+    await props.wallet?.account?.provider
+      .waitForTransaction(callCourseContract.transaction_hash)
+      .then(() => {})
+      .catch((e: any) => {
+        console.error("Error: ", e);
+      })
+      .finally(() => {
+        setIsUploading(false);
+      });
+  };
+
+  // Find and set the course taken, in order to certify
+  const find = async () => {
+    try {
+      const courseContract = new Contract(
+        attensysCourseAbi,
+        attensysCourseAddress,
+        provider,
+      );
+
+      const taken_courses = await courseContract?.is_user_taking_course(
+        props.wallet?.selectedAddress,
+        Number(courseId),
+      );
+
+      if (taken_courses) {
+        setTaken(true);
+      }
+    } catch (err) {
+      console.error("Error in find:", err);
+    }
   };
 
   useEffect(() => {
     getAllCourses();
-  }, [provider]);
 
-  useEffect(() => {
     getCourse();
-  }, [courses]);
+  }, [provider, courses]);
 
   useEffect(() => {
     const foundCourse = courses.find((course, index) => {
@@ -182,32 +241,16 @@ const LecturePage = (props: any) => {
     });
 
     if (foundCourse) {
-      console.log("The needed", foundCourse.course_identifier);
       setCourseId(foundCourse.course_identifier);
     }
   }, [courses, courseData, props?.data?.data?.courseImage]);
 
+  // 🔥 Run `find` when `courseId` updates
   useEffect(() => {
-    const find = async () => {
-      const courseContract = new Contract(
-        attensysCourseAbi,
-        attensysCourseAddress,
-        provider,
-      );
-      const taken_courses = await courseContract?.get_all_taken_courses(
-        props.wallet?.selectedAddress,
-      );
-      return taken_courses;
-    };
-
-    const course_taken = find();
-
-    const foundCourse = courses.find((course, index) => {
-      return (
-        props?.data?.data?.courseImage === courseData[index]?.data?.courseImage
-      );
-    });
-  }, []);
+    if (!Number.isNaN(courseId)) {
+      find();
+    }
+  }, [courseId]);
 
   return (
     <div className="pt-6  pb-36 w-full">
@@ -256,9 +299,10 @@ const LecturePage = (props: any) => {
                 className="flex w-full space-y-1 items-center p-3 space-x-8 justify-center"
               >
                 <p className="font-bold text-[#5801a9]">{i + 1}</p>
-                <div className="w-[150px] h-[84px] rounded-xl">
+                <div className="w-[150px] h-[120px] rounded-xl border-4 border ">
                   <ReactPlayer
                     // url={videos[currentIndex]}
+                    light={true}
                     url={`https://${item.video}`}
                     controls
                     playing={false}
@@ -315,9 +359,20 @@ const LecturePage = (props: any) => {
               <div>
                 <button
                   className="hidden sm:block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold"
-                  onClick={handleTakeCourse}
+                  onClick={
+                    taken
+                      ? handleFinishCourseClaimCertfificate
+                      : handleTakeCourse
+                  }
+                  disabled={isUploading}
                 >
-                  Take course
+                  {isUploading ? (
+                    <LoadingSpinner size="sm" colorVariant="white" />
+                  ) : taken ? (
+                    "Get Certificate"
+                  ) : (
+                    "Take course"
+                  )}
                 </button>
               </div>
             </div>

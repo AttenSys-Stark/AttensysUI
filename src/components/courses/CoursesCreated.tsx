@@ -47,8 +47,6 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
   courseData,
 }) => {
   const [isActivated, setIsActivated] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  console.log("me------", courseData);
 
   const handleSwitch = () => {
     setIsActivated(!isActivated);
@@ -70,7 +68,6 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
 
   const generatePageNumbers = () => {
     const pageNumbers = [];
-    const maxVisiblePages = 10;
 
     // Always show the first page
     if (currentPage > 2) pageNumbers.push(1);
@@ -175,7 +172,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                   key={index}
                   className="px-5 xl:px-12 flex border-top py-4 border-2 gap-12 xl:gap-0 flex-col w-full xl:flex-row xl:space-x-12 items-center"
                 >
-                  <div className="w-full h-auto xl:h-[120px] xl:w-[254px] rounded-xl">
+                  <div className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
                     <Image
                       src={
                         item.data.courseImage
@@ -184,7 +181,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                       }
                       width={200}
                       height={200}
-                      alt="video"
+                      alt={item.data.courseName}
                       className="object-cover h-full w-full rounded-xl"
                     />
                   </div>

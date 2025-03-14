@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import {
   Card,
@@ -29,6 +29,7 @@ import { shortHex } from "@/utils/helpers";
 interface UserSideBarProps {
   wallet: any;
   courseData: any;
+  takenCoursesData: any;
   page: string; // or another type like `number` or a union type
   selected: string; // Replace with appropriate type
   setSelected: (value: string) => void; // Function that sets a value
@@ -40,6 +41,7 @@ interface argprop {
 const UserSideBar = ({
   wallet,
   courseData,
+  takenCoursesData,
   page,
   selected,
   setSelected,
@@ -54,7 +56,8 @@ const UserSideBar = ({
     } else if (arg.title == "Completed courses") {
       return (
         <div className="text-[12px] ">
-          <span>{arg.no}</span> Completed course{arg.no > 1 ? "(s)" : ""}
+          <span>{takenCoursesData.length}</span> Completed course
+          {arg.no > 1 ? "(s)" : ""}
         </div>
       );
     } else if (arg.title == "Ongoing") {
@@ -104,7 +107,16 @@ const UserSideBar = ({
     return `${firstName} ${lastName}`;
   }
 
-  useEffect(() => {}, [wallet]);
+  const dummyName = useMemo(() => {
+    if (
+      wallet?.selectedAddress &&
+      typeof wallet.selectedAddress === "string" &&
+      wallet.selectedAddress.trim() !== ""
+    ) {
+      return generateDummyName();
+    }
+    return "No User";
+  }, [wallet?.selectedAddress]);
 
   return (
     <>
@@ -130,11 +142,7 @@ const UserSideBar = ({
                 </div>
                 <div className="xl:w-[200px]">
                   <p className="text-[13px] text-[#2D3A4B] font-bold leading-[22px]">
-                    {!!wallet?.selectedAddress &&
-                    typeof wallet.selectedAddress === "string" &&
-                    wallet.selectedAddress.trim() !== ""
-                      ? generateDummyName()
-                      : "No User"}
+                    {dummyName}
                   </p>
                   <p className="text-[#A01B9B] text-[12px] font-normal leading-[24px]">
                     {!!wallet?.selectedAddress &&
@@ -247,6 +255,7 @@ const UserSideBar = ({
                         item && item.tag == selected ? (
                           <LearningJourney
                             item={item}
+                            takenCoursesData={takenCoursesData}
                             selected={selected}
                             key={i}
                           />

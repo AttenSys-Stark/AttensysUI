@@ -131,8 +131,6 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
         dataUpload.IpfsHash,
       ]);
 
-      console.log("call data value populate", create_course_calldata);
-
       const callCourseContract = await wallet?.account.execute([
         {
           contractAddress: attensysCourseAddress,

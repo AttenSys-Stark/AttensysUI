@@ -41,13 +41,30 @@ export const useEvents = () => {
       setloading(false);
     } catch (error) {
       console.error("get_all_events error", error);
+      throw error;
+    } finally {
       setloading(false);
     }
   }, [eventContract]);
 
+  const getEventsRegiseredUsers = useCallback(
+    async (eventId: bigint) => {
+      try {
+        const res = await eventContract.get_registered_users(eventId);
+
+        return res;
+      } catch (error) {
+        console.error("get_registered_users error", error);
+        throw error;
+      }
+    },
+    [eventContract],
+  );
+
   return {
     events,
     getEvents,
+    getEventsRegiseredUsers,
     loading,
   };
 };

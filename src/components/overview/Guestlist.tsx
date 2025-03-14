@@ -1,19 +1,74 @@
-import { Button, Input } from "@headlessui/react";
-import React, { useState } from "react";
-import Image from "next/image";
+import check from "@/assets/check.svg";
 import downlaod from "@/assets/download.svg";
 import filter from "@/assets/filter.png";
-import check from "@/assets/check.svg";
-import List from "./List";
 import { guestdata } from "@/constants/data";
+import { useEvents } from "@/hooks/useEvents";
+import {
+  decimalToHexAddress,
+  downloadCSV,
+  formatTruncatedAddress,
+} from "@/utils/formatAddress";
+import { Button, Input } from "@headlessui/react";
+import Image from "next/image";
+import { useParams, useSearchParams } from "next/navigation";
+import Papa from "papaparse";
+import { useEffect, useState } from "react";
+import { pinata } from "../../../utils/config";
+import LoadingSpinner from "../ui/LoadingSpinner";
+import List from "./List";
 
+interface IParticipants {
+  student_name: string;
+  student_email: string;
+  student_address: string;
+}
 const Guestlist = () => {
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setloading] = useState<boolean>(false);
+  const [eventParticipants, setEventParticipants] = useState<IParticipants[]>(
+    [],
+  );
+  const { events, getEventsRegiseredUsers } = useEvents();
+  const searchParams = useSearchParams();
+  const params = useParams();
+  const eventName = decodeURIComponent((params.event as string) ?? "");
+  const id = searchParams.get("id");
   const itemsPerPage = 10;
 
+  const fetchEventParticipants = async (id: bigint) => {
+    setloading(true);
+    try {
+      const eventParticipantsUriData = await getEventsRegiseredUsers(id);
+
+      let eventParticipantsIpfsData = [];
+      for (const participant of eventParticipantsUriData) {
+        const userData = await obtainCIDdata(participant.attendee_uri);
+
+        const participantDetails = {
+          //@ts-ignore
+          ...userData,
+          student_address: decimalToHexAddress(participant.attendee_address),
+        };
+        eventParticipantsIpfsData.push(participantDetails);
+      }
+      setEventParticipants(
+        eventParticipantsIpfsData as unknown as IParticipants[],
+      );
+    } catch (error) {
+      console.error("Error fetching registered users:", error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!id) return;
+    fetchEventParticipants(BigInt(id));
+  }, [id]);
+
   // Calculate total pages
-  const totalPages = Math.ceil(guestdata.length / itemsPerPage);
+  const totalPages = Math.ceil(eventParticipants.length / itemsPerPage);
 
   // Get current page items
   const currentItems = guestdata.slice(
@@ -65,6 +120,27 @@ const Guestlist = () => {
     setSearchValue(event.target.value);
   };
 
+  const obtainCIDdata = async (CID: string) => {
+    try {
+      //@ts-ignore
+      const data = await pinata.gateways.get(CID);
+
+      return data?.data;
+    } catch (error) {
+      console.error("Error fetching IPFS content:", error);
+      throw error;
+    }
+  };
+
+  /**
+   * Exports the list of registered users to a CSV file.
+   *
+   **/
+  const handleExport = () => {
+    if (eventParticipants.length === 0) return;
+    const csv = Papa.unparse(eventParticipants);
+    downloadCSV(csv, `${eventName} participants.csv`);
+  };
   return (
     <div className="h-auto w-full md:w-[90%] max-w-[992px] mx-auto pb-10 px-4 lg:px-0">
       <div className="h-auto bg-[#FFFFFF] rounded-lg flex flex-wrap justify-between items-center px-4 md:px-16 py-8 md:py-0 md:h-[150px]">
@@ -73,7 +149,7 @@ const Guestlist = () => {
             Your Guests
           </p>
           <h1 className="text-[#9B51E0] text-[29.7px] font-bold leading-[68.91px] opacity-40">
-            39
+            {eventParticipants.length}
           </h1>
         </div>
         <div className="hidden md:block w-[1px] h-[80%] bg-[#9696966E]"></div>
@@ -109,12 +185,15 @@ const Guestlist = () => {
         <div className="relative">
           {/* Group 1: Header */}
           <div className="flex justify-between items-center h-12 mb-4">
-            <h1 className="text-[18px] lg:w-1/12 font-medium leading-[22px] text-[#333333]">
+            <h1 className="text-[18px] lg:w-[100px] font-medium leading-[22px] text-[#333333] w-[100px]">
               Guest list
             </h1>
             {/* Group 3: Buttons */}
             <div className="flex justify-between gap-1 md:gap-4 lg:pl-4 lg:w-3/12">
-              <Button className="rounded-lg bg-[#4A90E21F] py-2 px-4 lg:h-[42px] flex space-x-1 md:space-x-4 items-center text-sm text-[#2D3A4B] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
+              <Button
+                onClick={handleExport}
+                className="rounded-lg bg-[#4A90E21F] py-2 px-4 lg:h-[42px] flex space-x-1 md:space-x-4 items-center text-sm text-[#2D3A4B] data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+              >
                 <div className="flex space-x-4 items-center font-semibold text-[16px]">
                   <Image src={downlaod} alt="ticket" className="mr-2" />
                 </div>
@@ -161,35 +240,45 @@ const Guestlist = () => {
           </div>
         </div>
         <div className="mt-6 h-[750px] overflow-y-auto">
-          <table className="w-full border-separate border-spacing-y-3 ">
-            <thead>
-              <tr className="h-[56px] text-[14px] bg-[#9B51E052] font-normal text-[#5801A9] leading-[19.79px]">
-                <th className="w-[50px] px-4 rounded-tl-xl rounded-bl-xl">
-                  <Image src={check} alt="ticket" />
-                </th>
-                <th className=" text-center font-light">Name</th>
-                <th className=" text-center font-light">Address</th>
-                <th className=" text-center font-light">Status</th>
-                <th className=" text-center font-light">Role</th>
-                <th className="text-center font-light">Reg date</th>
-                <th className="text-center font-light rounded-tr-xl rounded-br-xl">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            {currentItems.map((data, index) => {
-              return (
-                <List
-                  key={index}
-                  name={data.name}
-                  address={data.address}
-                  status={data.status}
-                  role={data.role}
-                  regdate={data.date}
-                />
-              );
-            })}
-          </table>
+          {loading && <LoadingSpinner />}
+
+          {!loading && eventParticipants.length > 0 && (
+            <table className="w-full border-separate border-spacing-y-3 ">
+              <thead>
+                <tr className="h-[56px] text-[14px] bg-[#9B51E052] font-normal text-[#5801A9] leading-[19.79px]">
+                  <th className="w-[50px] px-4 rounded-tl-xl rounded-bl-xl">
+                    <Image src={check} alt="ticket" />
+                  </th>
+                  <th className=" text-center font-light">Name</th>
+                  <th className=" text-center font-light">Address</th>
+                  <th className=" text-center font-light">Status</th>
+                  <th className=" text-center font-light">Role</th>
+                  <th className="text-center font-light">Reg date</th>
+                  <th className="text-center font-light rounded-tr-xl rounded-br-xl">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              {eventParticipants.map((data, index) => {
+                return (
+                  <List
+                    key={index}
+                    name={data.student_name}
+                    address={formatTruncatedAddress(data.student_address)}
+                    status="Approved"
+                    role="N/A"
+                    regdate="12/25/2024"
+                  />
+                );
+              })}
+            </table>
+          )}
+
+          {!loading && eventParticipants.length === 0 && (
+            <div className="flex items-center justify-center">
+              No registered users
+            </div>
+          )}
         </div>
 
         {/* Pagination Controls */}

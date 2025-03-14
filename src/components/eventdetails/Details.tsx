@@ -25,6 +25,7 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { pinata } from "../../../utils/config";
 import clsx from "clsx";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 
 const Details = (props: any) => {
   const { connectorDataAccount } = props;
@@ -37,8 +38,13 @@ const Details = (props: any) => {
   const [address, setAddress] = useState("");
   const [fullname, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [eventName, setEventName] = useState("");
   const [nameError, setNameError] = useState(false);
   const [emailError, setEmailError] = useState(false);
+  const [ifsuccess, setifsuccess] = useState(false);
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
+  const [walletAddress, setWalletAddress] = useState<string | undefined>("");
+  const [alluserRegisterevent, setalluserRegisterevent] = useState([]);
 
   const params = useParams();
   const formatedParams = decodeURIComponent(params["details"] as string);
@@ -49,6 +55,25 @@ const Details = (props: any) => {
     () => new Contract(attensysEventAbi, attensysEventAddress, provider),
     [],
   );
+
+  const altfetchUserRegisteredEvent = async () => {
+    const eventContract = new Contract(
+      attensysEventAbi,
+      attensysEventAddress,
+      provider,
+    );
+    const res = await eventContract.get_all_list_registered_events(
+      wallet?.selectedAddress,
+    );
+    // setalluserRegisterevent(res);
+    res.map((data: any, index: any) => {
+      if (Number(data.event_id) == Number(id)) {
+        setifsuccess(true);
+      } else {
+        setifsuccess(false);
+      }
+    });
+  };
 
   const obtainCIDdata = async (CID: string) => {
     try {
@@ -83,6 +108,7 @@ const Details = (props: any) => {
 
       if (res) {
         seteventData(res);
+        setEventName(res?.event_name);
         console.log("reponse here", res);
         obtainCIDdata(res.event_uri);
       }
@@ -94,8 +120,23 @@ const Details = (props: any) => {
   }, [eventContract]);
 
   useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        altfetchUserRegisteredEvent();
+      } catch (error) {
+        console.error("Error fetching events:", error);
+      }
+    };
+    fetchEvents();
+  }, [wallet]);
+
+  useEffect(() => {
     getEventData();
   }, [getEventData, formatedParams]);
+
+  useEffect(() => {
+    setWalletAddress(wallet?.selectedAddress);
+  }, [wallet]);
 
   const handleDialog = () => {
     setModalstatus(!modalstat);
@@ -136,7 +177,31 @@ const Details = (props: any) => {
           await connectorDataAccount?.provider.waitForTransaction(
             result.transaction_hash,
           );
+
+          try {
+            const response = await fetch(
+              "https://attensys-1a184d8bebe7.herokuapp.com/api/register",
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, walletAddress, id, eventName }),
+              },
+            );
+
+            console.log(response);
+            if (response.ok) {
+              setifsuccess(true);
+            } else {
+              alert("Registration failed. Please try again.");
+            }
+          } catch (err) {
+            console.error("Error during registration:", err);
+            alert("An error occurred. Please try again.");
+          }
         } catch (error) {
+          setIsRegistering(false);
           console.error("Error registering for event:", error);
         } finally {
           setIsRegistering(false);
@@ -188,7 +253,7 @@ const Details = (props: any) => {
 
       <div className="h-full w-full  bg-event-gradient flex items-center mx-auto  justify-between md:pt-[5%] md:pb-[10%] py-[15%]">
         <div className="h-full w-[100%] mx-auto justify-between  lg:w-[80%] md:w-[80%] flex  lg:flex-row flex-col gap-28 ">
-          <div className="flex flex-col justify-center">
+          <div className="flex flex-col">
             <div className=" w-[100%]  lg:w-[380px] h-[350.44px] rounded-lg overflow-hidden relative md:mx-0 mx-auto">
               <Image
                 src={logoImagesource}
@@ -197,11 +262,11 @@ const Details = (props: any) => {
                 layout="fill"
               />
             </div>
-            <h1 className="mt-4 text-[30px] font-bold leading-[40.53px] text-[#FFFFFF] ">
+            <h1 className="mt-4 text-[30px] font-bold leading-[40.53px] text-[#FFFFFF] px-4 ">
               {eventData?.event_name ?? "unavailable"}{" "}
             </h1>
             <div className=" w-[351px] mx-auto md:w-auto md:mx-0">
-              <div className="w-full  h-[2px] border border-[#FFFFFF3D]"></div>
+              <div className="w-[90%]  h-[2px] border border-[#FFFFFF3D]"></div>
               <h1 className="mt-8  text-[18px] text-[#FFFFFF] font-semibold leading-[22px]">
                 This event is hosted by :
               </h1>
@@ -259,7 +324,7 @@ const Details = (props: any) => {
             </div>
           </div>
 
-          <div className="space-y-8  pl-14 ">
+          <div className="space-y-8  lg:pl-14 ">
             <div className="md:w-[720px] w-[95%] mx-auto md:mx-0 h-[222px] md:h-[94px] md:flex-row flex-col bg-details-gradient rounded-xl flex  justify-end items-center px-6 lg:mt-0 mt-[10%] gap-4  ">
               <div className="flex gap-4 ">
                 <Image src={key} alt="key" />
@@ -307,81 +372,94 @@ const Details = (props: any) => {
             </div>
 
             <div className="md:w-[720px] w-[95%] mx-auto md:mx-0 h-[628px] md:h-[413px] bg-oneclick-gradient rounded-xl flex flex-col justify-center px-6 space-y-4 border-[#FFFFFF7D] border-[1px]">
-              <div className="space-y-2 flex justify-between">
+              {!ifsuccess ? (
                 <div>
-                  <h1 className="text-[#FFFFFF] text-[16px] font-semibold leading-[22px]">
-                    Register for this event
-                  </h1>
+                  <div className="space-y-2 flex justify-between">
+                    <div>
+                      <h1 className="text-[#FFFFFF] text-[16px] font-semibold leading-[22px]">
+                        Register for this event
+                      </h1>
+                      <p className="text-[#FFFFFF] text-[16px] font-light leading-[22px]">
+                        After registration confirmation email will be sent to
+                        your inbox. Sit tight!!
+                      </p>
+                    </div>
+                    <Image src={top} alt="moon" />
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <h1 className="text-md text-[#FFFFFF] font-light">
+                        Full name
+                      </h1>
+                      <Field>
+                        <Input
+                          placeholder="Enter your name"
+                          name="fullname"
+                          value={fullname}
+                          onChange={handleInputChange}
+                          className={clsx(
+                            "h-[55px] border-[2px] border-[#D0D5DD] block w-full rounded-lg bg-white/5 py-1.5 px-3 text-sm/6 text-white",
+                            "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/100",
+                          )}
+                        />
+                      </Field>
+                      {nameError && (
+                        <h1 className="text-red-700 text-[13px] font-light leading-[22px] ml-4">
+                          Name cannot be empty
+                        </h1>
+                      )}
+                    </div>
+                    <div className="space-y-1.5">
+                      <h1 className="text-md text-[#FFFFFF] font-light">
+                        Email Address
+                      </h1>
+                      <Field>
+                        <Input
+                          placeholder="Enter your email"
+                          type="email"
+                          name="email"
+                          value={email}
+                          onChange={handleInputChange}
+                          className={clsx(
+                            "h-[55px] border-[2px] border-[#D0D5DD] block w-full rounded-lg bg-white/5 py-1.5 px-3 text-sm/6 text-white",
+                            "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/100",
+                          )}
+                        />
+                      </Field>
+                      {emailError && (
+                        <h1 className="text-red-700 text-[13px] font-light leading-[22px] ml-4">
+                          email cannot be empty
+                        </h1>
+                      )}
+                    </div>
+                  </div>
+                  <Button
+                    onClick={!isRegistering ? handleRegisterEvent : undefined}
+                    disabled={isRegistering}
+                    className={`justify-center mt-4 flex rounded-lg py-2 px-4 h-[50px] items-center  md:w-[422px] text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700 ${
+                      isRegistering
+                        ? " bg-[#357ABD] cursor-not-allowed"
+                        : "bg-[#4A90E2]"
+                    }`}
+                  >
+                    {isRegistering ? (
+                      <LoadingSpinner size="sm" colorVariant="white" />
+                    ) : (
+                      "One click to apply"
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3 flex flex-col items-center justify-center">
+                  <h2 className="text-[#FFFFFF] text-[16px] font-semibold leading-[22px]">
+                    Thank you for registering!
+                  </h2>
                   <p className="text-[#FFFFFF] text-[16px] font-light leading-[22px]">
-                    After registration confirmation email will be sent to your
-                    inbox. Sit tight!!
+                    Check your email for the confirmation QR code.
                   </p>
                 </div>
-                <Image src={top} alt="moon" />
-              </div>
-
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <h1 className="text-md text-[#FFFFFF] font-light">
-                    Full name
-                  </h1>
-                  <Field>
-                    <Input
-                      placeholder="Enter your name"
-                      name="fullname"
-                      value={fullname}
-                      onChange={handleInputChange}
-                      className={clsx(
-                        "h-[55px] border-[2px] border-[#D0D5DD] block w-full rounded-lg bg-white/5 py-1.5 px-3 text-sm/6 text-white",
-                        "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/100",
-                      )}
-                    />
-                  </Field>
-                  {nameError && (
-                    <h1 className="text-red-700 text-[13px] font-light leading-[22px] ml-4">
-                      Name cannot be empty
-                    </h1>
-                  )}
-                </div>
-                <div className="space-y-1.5">
-                  <h1 className="text-md text-[#FFFFFF] font-light">
-                    Email Address
-                  </h1>
-                  <Field>
-                    <Input
-                      placeholder="Enter your email"
-                      type="email"
-                      name="email"
-                      value={email}
-                      onChange={handleInputChange}
-                      className={clsx(
-                        "h-[55px] border-[2px] border-[#D0D5DD] block w-full rounded-lg bg-white/5 py-1.5 px-3 text-sm/6 text-white",
-                        "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/100",
-                      )}
-                    />
-                  </Field>
-                  {emailError && (
-                    <h1 className="text-red-700 text-[13px] font-light leading-[22px] ml-4">
-                      email cannot be empty
-                    </h1>
-                  )}
-                </div>
-              </div>
-              <Button
-                onClick={!isRegistering ? handleRegisterEvent : undefined}
-                disabled={isRegistering}
-                className={`justify-center flex rounded-lg py-2 px-4 h-[50px] items-center  md:w-[422px] text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700 ${
-                  isRegistering
-                    ? " bg-[#357ABD] cursor-not-allowed"
-                    : "bg-[#4A90E2]"
-                }`}
-              >
-                {isRegistering ? (
-                  <LoadingSpinner size="sm" colorVariant="white" />
-                ) : (
-                  "One click to apply"
-                )}
-              </Button>
+              )}
             </div>
 
             <div className=" w-[90%] mx-auto md:mx-0">

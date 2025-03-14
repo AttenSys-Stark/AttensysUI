@@ -19,6 +19,7 @@ const MyCertifications = (props: any) => {
         <UserSideBar
           wallet={props.wallet}
           courseData={props.courseData}
+          takenCoursesData={props.takenCoursesData}
           page={page}
           selected={selected}
           setSelected={setSelected}
@@ -98,6 +99,7 @@ const MyCertifications = (props: any) => {
       <UserSideBar
         wallet={props.wallet}
         courseData={props.courseData}
+        takenCoursesData={props.takenCoursesData}
         page={page}
         selected={selected}
         setSelected={setSelected}

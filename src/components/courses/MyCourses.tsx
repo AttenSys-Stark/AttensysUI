@@ -50,25 +50,30 @@ interface Uri {
 const MyCourses = (props: any) => {
   const [selected, setSelected] = useState("");
   const [page, setPage] = useState("");
-  const router = useRouter();
   const [wallet, setWallet] = useAtom(walletStarknetkit);
-  const [isActivated, setIsActivated] = useState(false);
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [courseData, setCourseData] = useState<CourseType[]>([]);
+  const [takenCourses, setTakenCourses] = useState<CourseType[]>([]);
+  const [takenCoursesData, setTakenCoursesData] = useState<CourseType[]>([]);
 
-  console.log("wallet empty", wallet);
   const courseContract = new Contract(
     attensysCourseAbi,
     attensysCourseAddress,
     wallet?.account,
   );
-  console.log("watching wallet change", wallet);
 
   const getAllUserCreatedCourses = async () => {
+    if (wallet == undefined) return;
     const res: CourseType[] = await courseContract?.get_all_creator_courses(
       wallet?.selectedAddress,
     );
+
+    const secondRes: CourseType[] = await courseContract?.get_all_taken_courses(
+      wallet?.selectedAddress,
+    );
+
     setCourses(res);
+    setTakenCourses(secondRes);
   };
 
   const getPubIpfs = async (CID: string) => {
@@ -83,17 +88,29 @@ const MyCourses = (props: any) => {
 
   const getSingleCourse = async () => {
     if (!courses.length) return; // Prevent running on empty `courses`
-    console.log("Fetching courses from IPFS...");
+    if (!takenCourses.length) return; // Prevent running on empty `courses`
 
     const resolvedCourses = await Promise.all(
       courses.map(async (course: CourseType) => {
         if (!course.course_ipfs_uri) {
-          console.warn(`Skipping invalid IPFS URL: ${course.course_ipfs_uri}`);
           return null; // Skip invalid URLs
         }
 
         try {
-          console.log("reaches here:", course.course_ipfs_uri);
+          return await getPubIpfs(course.course_ipfs_uri);
+        } catch (error) {
+          console.error("Error fetching from IPFS:", error);
+          return null; // Skip on failure
+        }
+      }),
+    );
+    const resolvedTakenCourses = await Promise.all(
+      takenCourses.map(async (course: CourseType) => {
+        if (!course.course_ipfs_uri) {
+          return null; // Skip invalid URLs
+        }
+
+        try {
           return await getPubIpfs(course.course_ipfs_uri);
         } catch (error) {
           console.error("Error fetching from IPFS:", error);
@@ -104,6 +121,10 @@ const MyCourses = (props: any) => {
 
     // Filter out null values before updating state
     const validCourses = resolvedCourses.filter(
+      (course): course is any => course !== null,
+    );
+    // Filter out null values before updating state
+    const validTakenCourses = resolvedTakenCourses.filter(
       (course): course is any => course !== null,
     );
 
@@ -120,17 +141,26 @@ const MyCourses = (props: any) => {
       ];
       return uniqueCourses;
     });
-  };
 
-  console.log("courses data", courseData);
+    // Remove duplicates before updating state
+    setTakenCoursesData((prevCourses) => {
+      const uniqueCourses = [
+        ...prevCourses,
+        ...validTakenCourses.filter(
+          (newCourse) =>
+            !prevCourses.some(
+              (prev) => prev.data.courseName === newCourse.data.courseName,
+            ),
+        ),
+      ];
+      return uniqueCourses;
+    });
+  };
 
   useEffect(() => {
     getAllUserCreatedCourses(); // Fetch courses when the wallet address changes
-  }, [wallet]);
-
-  useEffect(() => {
     getSingleCourse();
-  }, [courses]);
+  }, [wallet, courses]);
 
   useEffect(() => {
     setPage("myCourse");
@@ -168,6 +198,7 @@ const MyCourses = (props: any) => {
       <UserSideBar
         wallet={wallet}
         courseData={courseData}
+        takenCoursesData={takenCoursesData}
         page={page}
         selected={selected}
         setSelected={setSelected}
@@ -189,7 +220,12 @@ const MyCourses = (props: any) => {
           {/* Learning journey */}
           {learningDetails.map((item, i) =>
             item && item.tag == selected ? (
-              <LearningJourney item={item} selected={selected} key={i} />
+              <LearningJourney
+                item={item}
+                selected={selected}
+                key={i}
+                takenCoursesData={takenCoursesData}
+              />
             ) : null,
           )}
         </div>

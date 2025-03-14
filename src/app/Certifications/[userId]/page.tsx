@@ -37,6 +37,8 @@ const Index = () => {
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [takenCourses, setTakenCourses] = useState<CourseType[]>([]);
+  const [takenCoursesData, setTakenCoursesData] = useState<CourseType[]>([]);
 
   const userId = null;
   // const userId = searchParams.get('userId');
@@ -102,7 +104,11 @@ const Index = () => {
         <Bootcampdropdown />
       </div>
 
-      <MyCertifications wallet={wallet} courseData={courseData} />
+      <MyCertifications
+        wallet={wallet}
+        courseData={courseData}
+        takenCoursesData={takenCoursesData}
+      />
     </div>
   );
 };

@@ -34,11 +34,12 @@ const Lectures = ({ lectures, courseData, learningObj }: LectureData) => {
         <h2 className="block xl:hidden">Lectures in this course (2)</h2>
         {courseData.courseCurriculum?.map((item: any, id: any) => (
           <div key={id} className="block sm:flex py-3">
-            <div className="flex-3">
+            <div className="flex-3 border-4 border w-48 h-24">
               {item.video && (
                 <ReactPlayer
                   url={`https://${item.video}`}
                   controls
+                  light={true}
                   playing={false} // Auto-play next video
                   // onEnded={handleVideoEnd} // Trigger when video ends
                   width="100%"

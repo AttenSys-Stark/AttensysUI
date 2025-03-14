@@ -139,9 +139,13 @@ const LandingPage: React.FC<ChildComponentProps> = ({
             {/* field */}
             <div className="">
               <button
-                onClick={(e) =>
-                  handleCourse(e, e.currentTarget.textContent, router)
-                }
+                onClick={(e) => {
+                  localStorage.setItem(
+                    "courseData",
+                    JSON.stringify(dataRef.current),
+                  );
+                  handleCourse(e, e.currentTarget.textContent, router);
+                }}
                 className="hidden sm:block bg-[#fff] px-7 py-2 rounded text-[#333333] font-bold"
               >
                 Get course

@@ -1,5 +1,5 @@
 import { Button, Input } from "@headlessui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import scan from "@/assets/scan.svg";
 import Image from "next/image";
 import check from "@/assets/check.svg";
@@ -9,6 +9,7 @@ import EventQRCode from "../eventdetails/EventQRCode";
 
 const Attendance = () => {
   const [searchValue, setSearchValue] = useState("");
+  const [qrurl, setQrurl] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
   // Calculate total pages
@@ -64,6 +65,38 @@ const Attendance = () => {
   const handleChange = (event: { target: { value: any } }) => {
     setSearchValue(event.target.value);
   };
+
+  // Fetch the master QR code from the server
+  // async function fetchMasterQRCode() {
+  //   const response = await fetch(
+  //     "https://attensys-1a184d8bebe7.herokuapp.com/api/generate-master-qr",
+  //   );
+  //   const data = await response.json();
+  //   setQrurl(data.qrCodeDataUrl);
+  //   console.log("check data hrer", data);
+  //   // Connect to the WebSocket server
+  //   const ws = new WebSocket("wss://attensys-1a184d8bebe7.herokuapp.com");
+
+  //   ws.onopen = () => {
+  //     // Register the laptop with the session ID
+  //     ws.send(
+  //       JSON.stringify({ type: "register-laptop", sessionId: data.sessionId }),
+  //     );
+  //   };
+
+  //   ws.onmessage = (event) => {
+  //     const message = JSON.parse(event.data);
+  //     if (message.type === "action") {
+  //       // Trigger action based on scanned data
+  //       console.log("Scanned data:", message.data);
+  //       alert(`Action triggered with data: ${message.data}`);
+  //     }
+  //   };
+  // }
+
+  // useEffect(() => {
+  //   fetchMasterQRCode();
+  // }, []);
 
   return (
     <div className="h-auto w-[90%] max-w-[992px] mx-auto pb-10">
@@ -128,8 +161,8 @@ const Attendance = () => {
 
         <div className="h-[300px] w-full mt-6 flex items-center justify-center">
           <div className="w-[235px] h-[224px] border-[3px] border-[#4A90E2] rounded-xl mx-auto flex justify-center items-center">
-            {/* <Image src={scan} alt="scan" /> */}
-            <EventQRCode eventId="sample-event" />
+            {/* <Image src={qrurl ? qrurl : scan} alt="scan" /> */}
+            <EventQRCode eventId="attendance-scanner" />
           </div>
         </div>
         <h1 className="mt-6 text-[18px] font-medium text-[#333333] leading-[22px] w-[92%] mx-auto">
