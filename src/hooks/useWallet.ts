@@ -44,7 +44,12 @@ export const useWallet = () => {
       const { wallet: connectedWallet, connector } = res;
       //@ts-ignore
       setWallet(connectedWallet);
-      setIsCorrectNetwork(connectedWallet?.chainId === DEFAULT_NETWORK);
+      if (connectedWallet?.id === "braavos") {
+        setIsCorrectNetwork(true);
+      } else {
+        setIsCorrectNetwork(connectedWallet?.chainId === DEFAULT_NETWORK);
+      }
+      console.log(connectedWallet);
       setConnector(connector);
       return connectedWallet;
     } catch (error) {
@@ -87,7 +92,10 @@ export const useWallet = () => {
           icons: [],
         },
       });
-      const isNetworkCorrect = connectedWallet?.chainId === DEFAULT_NETWORK;
+      const isNetworkCorrect =
+        connectedWallet?.id === "braavos"
+          ? true
+          : connectedWallet?.chainId === DEFAULT_NETWORK;
       // console.log("res ato", connectedWallet, connector, connectorData);
       //@ts-ignore
       setWallet(connectedWallet);
