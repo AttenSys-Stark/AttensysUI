@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import story from "@/assets/story.svg";
 import Image from "next/image";
 import { Button } from "@headlessui/react";
@@ -15,12 +15,25 @@ import { useAtom } from "jotai";
 import { connectorAtom } from "@/state/connectedWalletStarknetkitNext";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useSearchParams } from "next/navigation";
+import { provider } from "@/constants";
+import { FormatDateFromUnix } from "@/utils/formatAddress";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import { pinata } from "../../../utils/config";
 
 const Insight = (props: any) => {
   const [emailList, setEmailList] = useState<string[]>([]);
   const [connector] = useAtom(connectorAtom);
   const [isStartingReg, setIsStartingReg] = useState(false);
   const [isEndingReg, setIsEndingReg] = useState(false);
+  const [attendees, setattendees] = useState(0);
+  const [suspension, setsuspensions] = useState(false);
+  const [canceled, setcanceled] = useState(false);
+  const [regOpen, setregOpen] = useState(0);
+  const [starttime, setstarttime] = useState(0n);
+  const [startDate, setstartDate] = useState(0n);
+  const [endDate, setendDate] = useState(0n);
+  const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
+
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
@@ -73,12 +86,60 @@ const Insight = (props: any) => {
     }
   };
 
+  const getEventData = async () => {
+    const eventContract = new Contract(
+      attensysEventAbi,
+      attensysEventAddress,
+      provider,
+    );
+    const res = await eventContract.get_event_details(Number(id));
+    console.log("insight overview", res);
+    setattendees(Number(res?.registered_attendants));
+    setsuspensions(res?.is_suspended);
+    setcanceled(res?.canceled);
+    setregOpen(Number(res?.time.registration_open));
+    setstarttime(res?.time.start_time);
+    setstartDate(res?.time.start_time);
+    setendDate(res?.time.end_time);
+    obtainCIDdata(res?.event_uri);
+  };
+
+  const obtainCIDdata = async (CID: string) => {
+    try {
+      //@ts-ignore
+      const data = await pinata.gateways.get(CID);
+      console.log("fetched CID event details", data);
+      //@ts-ignore
+      const logoData: GetCIDResponse = await pinata.gateways.get(
+        //@ts-ignore
+        data?.data?.eventDesign,
+      );
+      const objectURL = URL.createObjectURL(logoData.data as Blob);
+      setLogoImage(objectURL);
+    } catch (error) {
+      console.error("Error fetching IPFS content:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    getEventData();
+  }, [connectorDataAccount]);
+
   return (
     <div className="h-auto pb-32">
       <div className="w-[90%] max-w-[992px] h-[100%] mx-auto">
-        <div className="w-[196px] h-[184px] rounded-lg overflow-hidden relative">
-          <Image src={story} alt="story" objectFit="cover" layout="fill" />
-        </div>
+        {logoImagesource ? (
+          <div className="w-[196px] h-[184px] rounded-lg overflow-hidden relative">
+            <Image
+              src={logoImagesource}
+              alt="story"
+              objectFit="cover"
+              layout="fill"
+            />
+          </div>
+        ) : null}
+
         <h1 className="mt-4 text-[#ABADBA] text-[29.7px] font-bold leading-[68px]">
           {props.eventname}
         </h1>
@@ -96,9 +157,9 @@ const Insight = (props: any) => {
             </div>
             <div className="lg:basis-5/12 md:basis-1/2 md:w-1/2">
               <div className="flex flex-col gap-4 justify-between items-end md:flex-1 md:basis-1/3">
-                <Button className="bg-[#2D3A4B91] text-[#FFFFFF] font-light text-[14px] rounded-lg h-[39px] w-[155px] items-center flex justify-center">
+                <Button className="bg-[#2D3A4B91] text-[#FFFFFF] font-light text-[14px] rounded-lg h-[39px] w-[110px] items-center flex justify-center">
                   <Image src={drop} alt="drop" className="mr-2" />
-                  Past Week
+                  All time
                 </Button>
 
                 <div className="w-full md:w-full h-[272px] bg-[#2D3A4B] rounded-lg shadow-sm">
@@ -108,15 +169,19 @@ const Insight = (props: any) => {
                         Total Registration
                       </h1>
                       <h1 className="text-[#FFFFFF] font-semibold text-[19.8px] leading-[18.15px]">
-                        36
+                        {attendees}
                       </h1>
                     </div>
                     <div className="space-y-3">
                       <h1 className="text-[#FFFFFF] text-[13.2px] font-light leading-[18.15px]">
-                        Highest Daily Reg
+                        Suspended
                       </h1>
                       <h1 className="text-[#FFFFFF] font-semibold text-[19.8px] leading-[18.15px]">
-                        Saturday
+                        {suspension ? (
+                          <span className="text-red-900">Yes</span>
+                        ) : (
+                          <span className="text-green-800">No</span>
+                        )}
                       </h1>
                     </div>
                   </div>
@@ -124,28 +189,42 @@ const Insight = (props: any) => {
                   <div className="flex justify-between px-14 pb-6">
                     <div className="space-y-3">
                       <h1 className="text-[#FFFFFF] text-[13.2px] font-light leading-[18.15px]">
-                        Event Managers/hosts
+                        Canceled
                       </h1>
                       <h1 className="text-[#FFFFFF] font-semibold text-[19.8px] leading-[18.15px]">
-                        5
+                        {canceled ? (
+                          <span className="text-red-900">Yes</span>
+                        ) : (
+                          <span className="text-green-800">No</span>
+                        )}
                       </h1>
                     </div>
                     <div className="space-y-3">
                       <h1 className="text-[#FFFFFF] text-[13.2px] font-light leading-[18.15px]">
-                        Approvals Granted
+                        Registration
                       </h1>
                       <h1 className="text-[#FFFFFF] font-semibold text-[19.8px] leading-[18.15px]">
-                        31
+                        {regOpen == 0 ? (
+                          <span className="text-red-900">Closed</span>
+                        ) : (
+                          <span className="">Open</span>
+                        )}
                       </h1>
                     </div>
                   </div>
                   <div className="flex justify-between px-14 pb-4">
                     <div className="space-y-3">
                       <h1 className="text-[#FFFFFF] text-[13.2px] font-light leading-[18.15px]">
-                        Disapprovals
+                        Event Date
                       </h1>
-                      <h1 className="text-[#FFFFFF] font-semibold text-[19.8px] leading-[18.15px]">
-                        3
+                      <h1 className="text-[#FFFFFF] font-semibold text-[12.8px] leading-[18.15px]">
+                        {FormatDateFromUnix(starttime ?? 0n).date ??
+                          "unavailable"}
+                        ,{" "}
+                        {FormatDateFromUnix(startDate).time ?? "unavailable AM"}{" "}
+                        -{" "}
+                        {FormatDateFromUnix(endDate ?? 0n).time ??
+                          "unavailable AM"}
                       </h1>
                     </div>
                     <div className="space-y-3"></div>

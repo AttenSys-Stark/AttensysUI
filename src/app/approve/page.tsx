@@ -1,15 +1,15 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import Coursedropdown from "@/components/courses/Coursedropdown";
+import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
 } from "@/state/connectedWalletStarknetkitNext";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import { useAtom } from "jotai";
-import Coursedropdown from "@/components/courses/Coursedropdown";
-import { useParams } from "next/navigation";
-import MyCoursePage from "@/components/courses/mycourse/MyCoursePage";
-import { MoonLoader } from "react-spinners";
+import DashboardLanding from "@/components/orgbootcampdashboard/DashboardLanding";
 
 const Index = () => {
   const [status, setstatus] = useAtom(coursestatusAtom);
@@ -17,21 +17,12 @@ const Index = () => {
     bootcampdropdownstatus,
   );
   const params = useParams();
-  const section = params.section;
-  const [loading, setLoading] = useState(true);
+  const bootcamp = params.bootcampname;
 
   const handlePageClick = () => {
     setbootcampdropstat(false);
     setstatus(false);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000); // 1 seconds fake delay or until data is fetched.
-
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <div onClick={handlePageClick}>
@@ -47,21 +38,6 @@ const Index = () => {
       <div onClick={(e) => e.stopPropagation()}>
         <Bootcampdropdown />
       </div>
-
-      {loading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh", // Full page height
-          }}
-        >
-          <MoonLoader color="#9B51E0" size={60} />
-        </div>
-      ) : (
-        <MyCoursePage section={section} />
-      )}
     </div>
   );
 };

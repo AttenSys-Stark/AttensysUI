@@ -141,6 +141,7 @@ export const detailsEntryStat = atom(true);
 export const detailsEntryLoading = atom(false);
 
 export const registrationsuccess = atom(false);
+export const attendancesuccess = atom(false);
 export const specificOrgRoute = atom("undefined");
 
 const data = {

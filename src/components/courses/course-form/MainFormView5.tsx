@@ -21,6 +21,7 @@ import { Contract } from "starknet";
 import { useRouter } from "next/navigation";
 import { handleCreateCourse } from "@/utils/helpers";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { toast } from "react-toastify";
 
 interface ChildComponentProps {
   courseData: any;
@@ -78,6 +79,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showRetry, setShowRetry] = useState(false);
 
   const router = useRouter();
   const handleSwitch = (
@@ -93,71 +95,84 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
     setIsUploading(true);
     setIsSaving(true);
 
-    const courseImgupload = await pinata.upload.file(courseData.courseImage);
+    try {
+      const courseImgupload = await pinata.upload.file(courseData.courseImage);
 
-    const dataUpload = await pinata.upload.json({
-      primaryGoal: courseData.primaryGoal,
-      targetAudience: courseData.targetAudience,
-      courseArea: courseData.courseArea,
-      courseIdentifier: "",
-      courseCreator: courseData.courseCreator,
-      courseName: courseData.courseName,
-      courseDescription: courseData.courseDescription,
-      courseCategory: courseData.courseCategory,
-      difficultyLevel: courseData.difficultyLevel,
-      studentRequirements: courseData.studentRequirements,
-      learningObjectives: courseData.learningObjectives,
-      targetAudienceDesc: courseData.targetAudienceDesc,
-      courseImage: courseImgupload.IpfsHash,
-      courseCurriculum: courseData.courseCurriculum,
-      coursePricing: courseData.coursePricing,
-      promoAndDiscount: courseData.promoAndDiscount,
-      publishWithCertificate: courseData.publishWithCertificate,
-    });
+      const dataUpload = await pinata.upload.json({
+        primaryGoal: courseData.primaryGoal,
+        targetAudience: courseData.targetAudience,
+        courseArea: courseData.courseArea,
+        courseIdentifier: "",
+        courseCreator: courseData.courseCreator,
+        courseName: courseData.courseName,
+        courseDescription: courseData.courseDescription,
+        courseCategory: courseData.courseCategory,
+        difficultyLevel: courseData.difficultyLevel,
+        studentRequirements: courseData.studentRequirements,
+        learningObjectives: courseData.learningObjectives,
+        targetAudienceDesc: courseData.targetAudienceDesc,
+        courseImage: courseImgupload.IpfsHash,
+        courseCurriculum: courseData.courseCurriculum,
+        coursePricing: courseData.coursePricing,
+        promoAndDiscount: courseData.promoAndDiscount,
+        publishWithCertificate: courseData.publishWithCertificate,
+      });
 
-    if (dataUpload) {
-      const courseContract = new Contract(
-        attensysCourseAbi,
-        attensysCourseAddress,
-        wallet?.account,
-      );
+      if (dataUpload) {
+        try {
+          const courseContract = new Contract(
+            attensysCourseAbi,
+            attensysCourseAddress,
+            wallet?.account,
+          );
 
-      const create_course_calldata = courseContract.populate("create_course", [
-        wallet?.account?.address,
-        false,
-        courseImgupload.IpfsHash,
-        courseData.courseName,
-        "XXX",
-        dataUpload.IpfsHash,
-      ]);
+          const create_course_calldata = courseContract.populate(
+            "create_course",
+            [
+              wallet?.account?.address,
+              false,
+              courseImgupload.IpfsHash,
+              courseData.courseName,
+              "XXX",
+              dataUpload.IpfsHash,
+            ],
+          );
 
-      console.log("call data value populate", create_course_calldata);
+          const callCourseContract = await wallet?.account.execute([
+            {
+              contractAddress: attensysCourseAddress,
+              entrypoint: "create_course",
+              calldata: create_course_calldata.calldata,
+            },
+          ]);
 
-      const callCourseContract = await wallet?.account.execute([
-        {
-          contractAddress: attensysCourseAddress,
-          entrypoint: "create_course",
-          calldata: create_course_calldata.calldata,
-        },
-      ]);
+          const receipt = await wallet?.account?.provider
+            .waitForTransaction(callCourseContract.transaction_hash)
+            .then((res: any) => {
+              console.log("what is ", res);
+              setReceiptData(res);
+            })
+            .catch((e: any) => {
+              setIsUploading(false);
+              setIsSaving(false);
 
-      const receipt = await wallet?.account?.provider
-        .waitForTransaction(callCourseContract.transaction_hash)
-        .then((res: any) => {
-          console.log("what is ", res);
-          setReceiptData(res);
-        })
-        .catch((e: any) => {
-          console.error("Error: ", e);
-        })
-        .finally(() => {
-          setIsUploading(false);
-          setIsSaving(false);
-
-          handleCreateCourse(e, "course-landing-page", router);
-          // setCourseData(ResetCourseRegistrationData);
-        });
+              toast.error("Transaction failed or timed out:", e.message);
+              setShowRetry(true);
+            })
+            .finally(() => {
+              handleCreateCourse(e, "course-landing-page", router);
+            });
+        } catch (error: any) {
+          toast.error(error);
+        }
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  const retryTransaction = (e: any) => {
+    handleCourseUpload(e);
   };
 
   useEffect(() => {
@@ -352,6 +367,15 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                       "Save and Publish Course"
                     )}
                   </button>
+
+                  {showRetry && (
+                    <button
+                      onClick={retryTransaction}
+                      className="ml-4 px-4 py-2 bg-purple-600 text-white rounded"
+                    >
+                      Retry
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

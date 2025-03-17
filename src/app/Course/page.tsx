@@ -14,6 +14,7 @@ import Explore from "@/components/courses/Explore";
 import CourseNews from "@/components/courses/CourseNews";
 import { GetCIDResponse } from "pinata";
 import { provider } from "@/constants";
+import { MoonLoader } from "react-spinners";
 
 interface CourseType {
   data: any;
@@ -35,9 +36,8 @@ const Index = () => {
   const [bootcampdropstat, setbootcampdropstat] = useAtom(
     bootcampdropdownstatus,
   );
-
+  const [loading, setLoading] = useState(true);
   const [wallet] = useAtom(walletStarknetkit);
-
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [courseData, setCourseData] = useState<CourseType[]>([]);
 
@@ -62,6 +62,7 @@ const Index = () => {
     }
   };
 
+
   const getCourse = async () => {
     // if (courses.length < 1) return; // Prevent running on empty `courses`
     // console.log("This guy", courses);
@@ -84,7 +85,7 @@ const Index = () => {
 
     // Filter out null values before updating state
     const validCourses = resolvedCourses.filter(
-      (course): course is any => course !== null,
+      (course: any): course is any => course !== null,
     );
 
     // Remove duplicates before updating state
@@ -92,7 +93,7 @@ const Index = () => {
       const uniqueCourses = [
         ...prevCourses,
         ...validCourses.filter(
-          (newCourse) =>
+          (newCourse: any) =>
             !prevCourses.some(
               (prev) => prev.data.courseName === newCourse.data.courseName,
             ),
@@ -100,6 +101,12 @@ const Index = () => {
       ];
       return uniqueCourses;
     });
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000); // 1 seconds fake delay or until data is fetched.
+
+    return () => clearTimeout(timer);
   };
 
   const handlePageClick = () => {
@@ -131,7 +138,21 @@ const Index = () => {
       </div>
 
       <CourseNews />
-      <Explore wallet={wallet} courseData={courseData} />
+
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh", // Full page height
+          }}
+        >
+          <MoonLoader color="#9B51E0" size={60} />
+        </div>
+      ) : (
+        <Explore wallet={wallet} courseData={courseData} />
+      )}
     </div>
   );
 };

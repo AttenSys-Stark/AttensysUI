@@ -31,7 +31,7 @@ export function CardWithLink({ wallet, data }: ChildComponentProps) {
     <div
       className="mt-6 items-center align-middle justify-center w-[100%] lg:w-[95%] border-2 rounded-xl pb-8"
       onClick={(e) => {
-        localStorage.setItem("courseData", JSON.stringify(data));
+        localStorage.setItem("courseData", JSON.stringify(data?.data));
         handleCourse(e, e.currentTarget.textContent, router);
       }}
     >
@@ -46,7 +46,7 @@ export function CardWithLink({ wallet, data }: ChildComponentProps) {
           />
         </div>
         <div className="flex sm:flex-col h-24 md:flex-row justify-between mt-6 px-5 ">
-          <div className="">
+          <div className="w-52">
             <p className="mb-2 font-bold lg:text-[14px] leading-[22px] text-[#333333]">
               {data?.data.courseName}
             </p>

@@ -1,18 +1,100 @@
 import { Button, Input } from "@headlessui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import scan from "@/assets/scan.svg";
 import Image from "next/image";
 import check from "@/assets/check.svg";
 import { attendanceData } from "@/constants/data";
 import AttendanceList from "./AttendanceList";
 import EventQRCode from "../eventdetails/EventQRCode";
+import { useEvents } from "@/hooks/useEvents";
+import { useParams, useSearchParams } from "next/navigation";
+import {
+  decimalToHexAddress,
+  formatTruncatedAddress,
+} from "@/utils/formatAddress";
+import { pinata } from "../../../utils/config";
+import { provider } from "@/constants";
+import { attensysEventAbi } from "@/deployments/abi";
+import { attensysEventAddress } from "@/deployments/contracts";
+import { Contract } from "starknet";
+
+interface IParticipants {
+  student_name: string;
+  student_email: string;
+  student_address: string;
+}
 
 const Attendance = () => {
   const [searchValue, setSearchValue] = useState("");
+  const [qrurl, setQrurl] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setloading] = useState<boolean>(false);
+  const [eventParticipants, setEventParticipants] = useState<IParticipants[]>(
+    [],
+  );
+  const [marked, setMarked] = useState<any[]>([]);
+  const { events, getEventsRegiseredUsers } = useEvents();
+  const searchParams = useSearchParams();
+  const params = useParams();
   const itemsPerPage = 4;
+  const id = searchParams.get("id");
+
+  const fetchEventParticipants = async (id: bigint) => {
+    setloading(true);
+    try {
+      const eventParticipantsUriData = await getEventsRegiseredUsers(id);
+
+      let eventParticipantsIpfsData = [];
+      for (const participant of eventParticipantsUriData) {
+        const userData = await obtainCIDdata(participant.attendee_uri);
+
+        const participantDetails = {
+          //@ts-ignore
+          ...userData,
+          student_address: decimalToHexAddress(participant.attendee_address),
+        };
+        eventParticipantsIpfsData.push(participantDetails);
+      }
+      setEventParticipants(
+        eventParticipantsIpfsData as unknown as IParticipants[],
+      );
+    } catch (error) {
+      console.error("Error fetching registered users:", error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const fetchMarked = async (id: any) => {
+    const eventContract = new Contract(
+      attensysEventAbi,
+      attensysEventAddress,
+      provider,
+    );
+    const res = await eventContract.get_all_attendace_marked(Number(id));
+    setMarked(res);
+  };
+
+  useEffect(() => {
+    if (!id) return;
+    fetchEventParticipants(BigInt(id));
+    fetchMarked(id);
+  }, [id]);
+
+  const obtainCIDdata = async (CID: string) => {
+    try {
+      //@ts-ignore
+      const data = await pinata.gateways.get(CID);
+
+      return data?.data;
+    } catch (error) {
+      console.error("Error fetching IPFS content:", error);
+      throw error;
+    }
+  };
+
   // Calculate total pages
-  const totalPages = Math.ceil(attendanceData.length / itemsPerPage);
+  const totalPages = Math.ceil(eventParticipants.length / itemsPerPage);
 
   // Get current page items
   const currentItems = attendanceData.slice(
@@ -128,8 +210,8 @@ const Attendance = () => {
 
         <div className="h-[300px] w-full mt-6 flex items-center justify-center">
           <div className="w-[235px] h-[224px] border-[3px] border-[#4A90E2] rounded-xl mx-auto flex justify-center items-center">
-            {/* <Image src={scan} alt="scan" /> */}
-            <EventQRCode eventId="sample-event" />
+            {/* <Image src={qrurl ? qrurl : scan} alt="scan" /> */}
+            <EventQRCode eventId="attendance-scanner" />
           </div>
         </div>
         <h1 className="mt-6 text-[18px] font-medium text-[#333333] leading-[22px] w-[92%] mx-auto">
@@ -151,18 +233,23 @@ const Attendance = () => {
                 </th>
               </tr>
             </thead>
-            {currentItems.map((data, index) => {
-              return (
+            {eventParticipants
+              .filter((data) => {
+                // Check if the student_address matches the condition
+                return marked.some(
+                  (markedData) => markedData == data.student_address,
+                );
+              })
+              .map((data, index) => (
                 <AttendanceList
                   key={index}
-                  name={data.name}
-                  address={data.address}
-                  role={data.role}
-                  regdate={data.date}
-                  checkstat={data.checkstat}
+                  name={data.student_name}
+                  address={formatTruncatedAddress(data.student_address)}
+                  role="N/A"
+                  regdate="12/25/2024"
+                  checkstat={true}
                 />
-              );
-            })}
+              ))}
           </table>
         </div>
         {/* Pagination Controls */}

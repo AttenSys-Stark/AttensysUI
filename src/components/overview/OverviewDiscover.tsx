@@ -15,7 +15,7 @@ const OverviewDiscover = (props: any) => {
   const router = useRouter();
 
   const handlerouting = () => {
-    router.push("/Events/events");
+    router.push("/Events/createdevent");
   };
   const handleEventPage = () => {
     router.push(`/Eventpage/${props.eventsname}/?id=${id}`);

@@ -132,4 +132,5 @@ dist
 
 # DS Store files
 .DS_Store
-**/.DS_Store
+**/.DS_Store.next/
+.next/
