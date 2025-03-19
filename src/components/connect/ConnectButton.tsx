@@ -23,7 +23,11 @@ const ConnectButton = ({ setIsCorrectNetwork }: ConnectButtonProps) => {
     const res = await connectWallet();
     // @ts-expect-error not recognizing wallet for some reason
     const { connectedWallet } = res;
-    setIsCorrectNetwork(connectedWallet?.chainId === DEFAULT_NETWORK);
+    if (connectedWallet?.id === "braavos") {
+      setIsCorrectNetwork(true);
+    } else {
+      setIsCorrectNetwork(connectedWallet?.chainId === DEFAULT_NETWORK);
+    }
   };
 
   /*   const connectFn = async () => {
