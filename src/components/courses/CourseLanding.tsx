@@ -41,6 +41,8 @@ const CourseLanding = (props: any) => {
 
     autoConnect();
   }, [wallet]);
+
+  console.log("lost item:", courseData);
   return (
     <div className="h-auto w-full bg-[#F5F7FA]">
       <LecturePage course={props.course} data={courseData} wallet={wallet} />

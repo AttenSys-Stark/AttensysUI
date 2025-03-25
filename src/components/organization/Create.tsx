@@ -295,7 +295,7 @@ const Create = (props: any) => {
 
       //@ts-ignore
       wallet?.account?.provider
-        .waitForTransaction(callContract.transaction_hash)
+        ?.waitForTransaction(callContract?.transaction_hash)
         .then(() => {})
         .catch((e: any) => {
           console.error("Error: ", e);

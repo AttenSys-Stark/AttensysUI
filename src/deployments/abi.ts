@@ -57,20 +57,6 @@ export const attensysCourseAbi = [
   },
   {
     type: "struct",
-    name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::Uri",
-    members: [
-      {
-        name: "first",
-        type: "core::felt252",
-      },
-      {
-        name: "second",
-        type: "core::felt252",
-      },
-    ],
-  },
-  {
-    type: "struct",
     name: "attendsys::contracts::AttenSysCourse::AttenSysCourse::Course",
     members: [
       {
@@ -87,7 +73,7 @@ export const attensysCourseAbi = [
       },
       {
         name: "uri",
-        type: "attendsys::contracts::AttenSysCourse::AttenSysCourse::Uri",
+        type: "core::byte_array::ByteArray",
       },
       {
         name: "course_ipfs_uri",
@@ -166,12 +152,8 @@ export const attensysCourseAbi = [
         type: "core::starknet::contract_address::ContractAddress",
       },
       {
-        name: "new_course_uri_a",
-        type: "core::felt252",
-      },
-      {
-        name: "new_course_uri_b",
-        type: "core::felt252",
+        name: "new_course_uri",
+        type: "core::byte_array::ByteArray",
       },
     ],
     outputs: [],
@@ -233,6 +215,46 @@ export const attensysCourseAbi = [
     outputs: [
       {
         type: "core::array::Array::<attendsys::contracts::AttenSysCourse::AttenSysCourse::Course>",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "is_user_taking_course",
+    inputs: [
+      {
+        name: "user",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "course_id",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "is_user_certified_for_course",
+    inputs: [
+      {
+        name: "user",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "course_id",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
       },
     ],
     state_mutability: "view",
@@ -496,13 +518,8 @@ export const attensysCourseAbi = [
         kind: "data",
       },
       {
-        name: "new_course_uri_a",
-        type: "core::felt252",
-        kind: "data",
-      },
-      {
-        name: "new_course_uri_b",
-        type: "core::felt252",
+        name: "new_course_uri",
+        type: "core::byte_array::ByteArray",
         kind: "data",
       },
     ],
@@ -633,6 +650,20 @@ export const attensysEventAbi = [
       {
         name: "high",
         type: "core::integer::u128",
+      },
+    ],
+  },
+  {
+    type: "struct",
+    name: "attendsys::contracts::AttenSysEvent::AttenSysEvent::AttendeeInfo",
+    members: [
+      {
+        name: "attendee_address",
+        type: "core::starknet::contract_address::ContractAddress",
+      },
+      {
+        name: "attendee_uri",
+        type: "core::byte_array::ByteArray",
       },
     ],
   },
@@ -844,6 +875,10 @@ export const attensysEventAbi = [
         name: "event_identifier",
         type: "core::integer::u256",
       },
+      {
+        name: "user_uri",
+        type: "core::byte_array::ByteArray",
+      },
     ],
     outputs: [],
     state_mutability: "external",
@@ -859,10 +894,10 @@ export const attensysEventAbi = [
     ],
     outputs: [
       {
-        type: "core::array::Array::<core::starknet::contract_address::ContractAddress>",
+        type: "core::array::Array::<attendsys::contracts::AttenSysEvent::AttenSysEvent::AttendeeInfo>",
       },
     ],
-    state_mutability: "external",
+    state_mutability: "view",
   },
   {
     type: "function",
@@ -1151,6 +1186,38 @@ export const attensysEventAbi = [
     ],
     outputs: [],
     state_mutability: "external",
+  },
+  {
+    type: "function",
+    name: "get_cancelation_status",
+    inputs: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::bool",
+      },
+    ],
+    state_mutability: "view",
+  },
+  {
+    type: "function",
+    name: "get_if_registration_is_open",
+    inputs: [
+      {
+        name: "event_identifier",
+        type: "core::integer::u256",
+      },
+    ],
+    outputs: [
+      {
+        type: "core::integer::u8",
+      },
+    ],
+    state_mutability: "view",
   },
   {
     type: "constructor",

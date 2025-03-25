@@ -47,6 +47,9 @@ import { courseQuestions } from "@/constants/data";
 import { useWallet } from "@/hooks/useWallet";
 import { NetworkSwitchButton } from "./connect/NetworkSwitchButton";
 import { connectWallet } from "@/utils/connectWallet";
+import { ArgentInvisibleButton } from "./connect/ArgentInvisibleButton";
+import { useArgentInvisible } from "@/hooks/useArgentInvisible";
+import { SessionKeyManager } from "./session/SessionKeyManager";
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
@@ -74,6 +77,7 @@ const Header = () => {
     wallet: hookWallet,
     isConnecting,
   } = useWallet();
+  const { account: argentAccount } = useArgentInvisible();
   // const [networkCorrect, setNetworkCorrect] = useState(isCorrectNetwork)
   const [isBootcampsOpen, setIsBootcampsOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -231,16 +235,27 @@ const Header = () => {
                       </>
                     ) : (
                       <>
-                        <DisconnectButton
-                          disconnectFn={disconnect}
-                          resetFn={() => {
-                            disconnectWallet();
-                          }}
-                        />
+                        <div className="flex items-center space-x-3">
+                          <SessionKeyManager compact={true} />
+                          <DisconnectButton
+                            disconnectFn={disconnect}
+                            resetFn={() => {
+                              disconnectWallet();
+                            }}
+                          />
+                        </div>
                       </>
                     )
+                  ) : argentAccount ? (
+                    <div className="flex items-center space-x-3">
+                      <SessionKeyManager compact={true} />
+                      <ArgentInvisibleButton />
+                    </div>
                   ) : (
-                    <ConnectButton setIsCorrectNetwork={setIsCorrectNetwork} />
+                    <div className="flex items-center space-x-3">
+                      <ConnectButton setIsCorrectNetwork={setIsCorrectNetwork} />
+                      <ArgentInvisibleButton />
+                    </div>
                   )}
                 </div>
               </div>
@@ -333,6 +348,57 @@ const Header = () => {
                         </p>
                       </div>
                     </>
+                  ) : argentAccount ? (
+                    <>
+                      {/* Argent Profile */}
+                      <div className="flex items-center space-x-3 w-full">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] flex items-center justify-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="white"
+                            className="w-6 h-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M21 12a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3"
+                            />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">
+                            Argent Web Wallet
+                          </p>
+                          <a
+                            href="https://web.argent.xyz"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#9B51E0] text-sm flex items-center hover:underline"
+                          >
+                            {argentAccount.address
+                              ? `${argentAccount.address.slice(0, 6)}...${argentAccount.address.slice(-4)}`
+                              : "Unknown"}
+                            <svg 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              fill="none" 
+                              viewBox="0 0 24 24" 
+                              strokeWidth="1.5" 
+                              stroke="currentColor" 
+                              className="w-3 h-3 ml-1"
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" 
+                              />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                    </>
                   ) : (
                     <div className="w-full py-2 text-center">
                       <p className="text-sm text-gray-500">Not connected</p>
@@ -390,7 +456,7 @@ const Header = () => {
                         </Link>
 
                         <Link
-                          href={`/mycoursepage/${"sample-profile"}`}
+                          href={`/mycoursepage/${wallet?.selectedAddress}`}
                           className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                           onClick={() => close()}
                         >
@@ -405,7 +471,7 @@ const Header = () => {
                         </Link>
 
                         <Link
-                          href={`/Certifications/${"sample-profile"}`}
+                          href={`/Certifications/${wallet?.selectedAddress}`}
                           className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                           onClick={() => close()}
                         >
@@ -548,8 +614,47 @@ const Header = () => {
                         <span>Disconnect Wallet</span>
                       </button>
                     )
+                  ) : argentAccount ? (
+                    <div className="space-y-3">
+                      <a
+                        href="https://web.argent.xyz"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] text-white py-2 rounded-md flex items-center justify-center space-x-2 mb-2"
+                      >
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          fill="none" 
+                          viewBox="0 0 24 24" 
+                          strokeWidth="1.5" 
+                          stroke="currentColor" 
+                          className="w-5 h-5"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" 
+                          />
+                        </svg>
+                        <span>Dashboard</span>
+                      </a>
+                      <ArgentInvisibleButton className="w-full" />
+                      {wallet && (
+                        <div className="mt-3">
+                          <SessionKeyManager containerClassName="w-full" />
+                        </div>
+                      )}
+                    </div>
                   ) : (
-                    <ConnectButton setIsCorrectNetwork={setIsCorrectNetwork} />
+                    <div className="space-y-3">
+                      <ConnectButton setIsCorrectNetwork={setIsCorrectNetwork} />
+                      <ArgentInvisibleButton className="w-full" />
+                      {wallet && (
+                        <div className="mt-3">
+                          <SessionKeyManager containerClassName="w-full" />
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>

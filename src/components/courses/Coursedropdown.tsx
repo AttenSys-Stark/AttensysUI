@@ -4,11 +4,12 @@ import { useAtom } from "jotai";
 import { VscNewFile } from "react-icons/vsc";
 import { courseQuestions } from "@/constants/data";
 import { useRouter } from "next/navigation";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 
 const Coursedropdown = () => {
   const [status, setcourseStatus] = useAtom(coursestatusAtom);
   const router = useRouter();
-
+  const [wallet] = useAtom(walletStarknetkit);
   const handleNavigation = (path: string) => {
     setcourseStatus(false);
     router.push(path);
@@ -62,9 +63,15 @@ const Coursedropdown = () => {
               </a>
               <a
                 //@todo replace sample profile with user profile id
-                onClick={() =>
-                  handleNavigation(`/mycoursepage/${"sample-profile"}`)
-                }
+                onClick={() => {
+                  if (wallet?.selectedAddress == undefined) {
+                    alert("connect wallet");
+                  } else {
+                    handleNavigation(
+                      `/mycoursepage/${wallet?.selectedAddress}`,
+                    );
+                  }
+                }}
                 className=" cursor-pointer"
               >
                 <div className="flex space-x-3">
@@ -89,7 +96,7 @@ const Coursedropdown = () => {
             <div className="space-y-2 w-[337px]">
               <a
                 onClick={() =>
-                  handleNavigation(`/Certifications/${"sample-profile"}`)
+                  handleNavigation(`/Certifications/${wallet?.selectedAddress}`)
                 }
                 className="cursor-pointer"
               >

@@ -47,8 +47,6 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
   courseData,
 }) => {
   const [isActivated, setIsActivated] = useState(false);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  console.log("me------", courseData);
 
   const handleSwitch = () => {
     setIsActivated(!isActivated);
@@ -63,14 +61,13 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
   const totalPages = Math.ceil(courseData.length / itemsPerPage);
 
   // Get current page items
-  const currentItems = courseData.slice(
+  const currentItems = courseData?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
 
   const generatePageNumbers = () => {
     const pageNumbers = [];
-    const maxVisiblePages = 10;
 
     // Always show the first page
     if (currentPage > 2) pageNumbers.push(1);
@@ -175,16 +172,16 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                   key={index}
                   className="px-5 xl:px-12 flex border-top py-4 border-2 gap-12 xl:gap-0 flex-col w-full xl:flex-row xl:space-x-12 items-center"
                 >
-                  <div className="w-full h-auto xl:h-[120px] xl:w-[254px] rounded-xl">
+                  <div className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
                     <Image
                       src={
                         item.data.courseImage
-                          ? `https://ipfs.io/ipfs/${item.data.courseImage}`
+                          ? `https://ipfs.io/ipfs/${item?.data.courseImage}`
                           : tdesign_video
                       }
                       width={200}
                       height={200}
-                      alt="video"
+                      alt={item.data.courseName}
                       className="object-cover h-full w-full rounded-xl"
                     />
                   </div>
@@ -235,7 +232,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                         <div className="flex items-center gap-x-2">
                           <Image src={diamond} alt="" height={18} width={18} />
                           <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                            Difficulty level: {item.level}
+                            Difficulty level: {item.data.difficultyLevel}
                           </p>
                         </div>
                       </div>

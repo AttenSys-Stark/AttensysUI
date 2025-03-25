@@ -1,12 +1,4 @@
-import React, { useEffect } from "react";
-
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  Typography,
-  Button,
-} from "@material-tailwind/react";
+import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import profilePic from "../../assets/profile_pic.png";
 import { IoMdArrowDropdown } from "@react-icons/all-files/io/IoMdArrowDropdown";
@@ -25,10 +17,15 @@ import LearningJourney from "./LearningJourney";
 import Notification from "./Notification";
 import CreateACourse from "./CreateACourse";
 import { shortHex } from "@/utils/helpers";
+import filled from "@/assets/filled.svg";
+import free_books from "@/assets/free_books.svg";
+import notifications from "@/assets/notifications.svg";
+import createIcon from "@/assets/create.svg";
 
 interface UserSideBarProps {
   wallet: any;
   courseData: any;
+  takenCoursesData: any;
   page: string; // or another type like `number` or a union type
   selected: string; // Replace with appropriate type
   setSelected: (value: string) => void; // Function that sets a value
@@ -40,21 +37,47 @@ interface argprop {
 const UserSideBar = ({
   wallet,
   courseData,
+  takenCoursesData,
   page,
   selected,
   setSelected,
 }: UserSideBarProps) => {
+  const [sideProperties, setSideProperties] = useState([
+    {
+      no: 0,
+      title: "Courses created",
+      url: filled,
+    },
+    {
+      no: 0,
+      title: "My Learning Journey",
+      url: free_books,
+    },
+    {
+      no: 0,
+      title: "Create a course",
+      url: createIcon,
+    },
+    {
+      no: 0,
+      title: "Notification",
+      url: notifications,
+    },
+  ]);
+
   const renderItem = (arg: argprop) => {
     if (arg.title == "Courses") {
       return (
         <div className="text-[12px] ">
-          <span>{arg.no}</span> Course{arg.no > 1 ? "(s)" : ""}
+          <span>{takenCoursesData.length + courseData.length}</span> Course
+          {arg.no > 1 ? "(s)" : ""}
         </div>
       );
     } else if (arg.title == "Completed courses") {
       return (
         <div className="text-[12px] ">
-          <span>{arg.no}</span> Completed course{arg.no > 1 ? "(s)" : ""}
+          <span>{takenCoursesData.length}</span> Completed course
+          {arg.no > 1 ? "(s)" : ""}
         </div>
       );
     } else if (arg.title == "Ongoing") {
@@ -104,7 +127,34 @@ const UserSideBar = ({
     return `${firstName} ${lastName}`;
   }
 
-  useEffect(() => {}, [wallet]);
+  const dummyName = useMemo(() => {
+    if (
+      wallet?.selectedAddress &&
+      typeof wallet.selectedAddress === "string" &&
+      wallet.selectedAddress.trim() !== ""
+    ) {
+      return generateDummyName();
+    }
+    return "No User";
+  }, [wallet?.selectedAddress]);
+
+  useEffect(() => {
+    if (wallet?.selectedAddress != undefined) {
+      setSideProperties((prev) =>
+        prev.map((item) => {
+          if (item.title === "Notification") {
+            return { ...item, no: 0 };
+          } else if (item.title === "My Learning Journey") {
+            return { ...item, no: takenCoursesData?.length };
+          } else if (item.title === "Courses created") {
+            return { ...item, no: courseData?.length };
+          } else {
+            return { ...item, no: 0 };
+          }
+        }),
+      );
+    }
+  }, [wallet?.selectedAddress, courseData, takenCoursesData]);
 
   return (
     <>
@@ -130,11 +180,7 @@ const UserSideBar = ({
                 </div>
                 <div className="xl:w-[200px]">
                   <p className="text-[13px] text-[#2D3A4B] font-bold leading-[22px]">
-                    {!!wallet?.selectedAddress &&
-                    typeof wallet.selectedAddress === "string" &&
-                    wallet.selectedAddress.trim() !== ""
-                      ? generateDummyName()
-                      : "No User"}
+                    {dummyName}
                   </p>
                   <p className="text-[#A01B9B] text-[12px] font-normal leading-[24px]">
                     {!!wallet?.selectedAddress &&
@@ -247,6 +293,7 @@ const UserSideBar = ({
                         item && item.tag == selected ? (
                           <LearningJourney
                             item={item}
+                            takenCoursesData={takenCoursesData}
                             selected={selected}
                             key={i}
                           />

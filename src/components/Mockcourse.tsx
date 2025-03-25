@@ -14,7 +14,7 @@ import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
 import { provider } from "@/constants";
-export default function Mockevent() {
+export default function MockCourse() {
   const [wallet] = useAtom(walletStarknetkit);
 
   const eventContract = new Contract(
@@ -26,12 +26,14 @@ export default function Mockevent() {
   const handleCreateCourse = async () => {
     eventContract.connect(wallet?.account);
     const myCall = eventContract.populate("create_course", [
-      "0x05a679d1e0d9f67370d8c3250388afec2da1deaf895b51841e017a3eb7bfd154",
+      "0x05Bf9E38B116B37A8249a4cd041D402903a5E8a67C1a99d2D336ac7bd8B4034e",
       1,
       "QmXGUbN7ccNtieggpCMTEQfnTqSP6Fb858sucaN2hjRsyv",
       "kennynft",
       "knt",
+      "QmXGUbN7ccNtieggpCMTEQfnTqSP6Fb858sucaN2hjRsyv",
     ]);
+
     const res = await eventContract.create_course(myCall.calldata);
     await provider.waitForTransaction(res.transaction_hash);
     console.info("Course created, transaction hash:", res.transaction_hash);

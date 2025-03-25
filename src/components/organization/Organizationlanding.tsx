@@ -136,7 +136,7 @@ const Organizationlanding = (prop: any) => {
   useEffect(() => {
     getOrgInfo();
     getAllOrgBootcamp();
-  }, [wallet]);
+  }, [wallet, createbootebootcampstat]);
 
   function truncateAddress(address: any): string {
     const start = address?.slice(0, 10);

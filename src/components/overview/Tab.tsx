@@ -7,9 +7,9 @@ import {
   sponsorshipclick,
 } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-const Tab = () => {
+const Tab = (props: any) => {
   const [insightClickstat, setinsightClickstat] = useAtom(insightClick);
   const [guestlistclickstat, setguestlistclickstat] = useAtom(guestlistclick);
   const [attendanceclickstat, setattendanceclickstat] =
@@ -17,6 +17,8 @@ const Tab = () => {
   const [sponsorshipclickstat, setsponsorshipclickstat] =
     useAtom(sponsorshipclick);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
   const handleinsightclick = () => {
     setinsightClickstat(true);
@@ -24,7 +26,7 @@ const Tab = () => {
     setattendanceclickstat(false);
     setsponsorshipclickstat(false);
     //@todo replace sample event with event name
-    router.push("/Overview/sample-event/insight");
+    router.push(`/Overview/${props.eventname}/insight/?id=${id}`);
   };
 
   const handlegueslistclick = () => {
@@ -33,7 +35,7 @@ const Tab = () => {
     setattendanceclickstat(false);
     setsponsorshipclickstat(false);
     //@todo replace sample event with event name
-    router.push("/Overview/sample-event/guestlist");
+    router.push(`/Overview/${props.eventname}/guestlist/?id=${id}`);
   };
   const handleAttendanceclick = () => {
     setinsightClickstat(false);
@@ -41,7 +43,7 @@ const Tab = () => {
     setattendanceclickstat(true);
     setsponsorshipclickstat(false);
     //@todo replace sample event with event name
-    router.push("/Overview/sample-event/attendance");
+    router.push(`/Overview/${props.eventname}/attendance/?id=${id}`);
   };
 
   const handleSponsorshipclick = () => {
@@ -50,7 +52,7 @@ const Tab = () => {
     setattendanceclickstat(false);
     setsponsorshipclickstat(true);
     //@todo replace sample event with event name
-    router.push("/Overview/sample-event/sponsorship");
+    router.push(`/Overview/${props.eventname}/sponsorship/?id=${id}`);
   };
 
   return (
