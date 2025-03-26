@@ -54,7 +54,7 @@ const Experience = () => {
         {/* 📌 Text and Button for `sm` and below (Below the images) */}
         <div className="flex flex-col items-center text-center w-[90%] mx-auto pt-1">
           {/* 📝 Responsive Text */}
-          <p className="text-[18px] sm:text-[18px] font-bold text-[#2D3A4B] w-[90%]">
+          <p className="text-[18px] sm:text-[18px] font-bold text-[#2D3A4B] w-[65%]">
             Our <span className="text-[#4A90E2]">bootcamps</span> are designed
             for learners seeking high-impact, career-advancing courses hosted by
             Industry Leaders.
@@ -119,7 +119,7 @@ const Experience = () => {
           className="absolute right-[42%] top-[30%] "
         />
 
-        <div className="w-[60%] flex justify-center mt-24">
+        <div className="w-[55%] flex justify-center mt-24">
           <p className="w-[353px] h-[156px] text-[24px] font-bold text-[#2D3A4B]">
             Experience a new standard of professional growth and skill
             development with
@@ -127,8 +127,8 @@ const Experience = () => {
           </p>
         </div>
 
-        <div className="w-[40%] mt-48">
-          <p className="w-[490px] h-[156px] text-[24px] font-bold text-[#2D3A4B] sm1275:w-[400px]">
+        <div className="w-[45%] mt-48">
+          <p className="w-[490px] h-[156px] text-[24px] font-bold text-[#2D3A4B] sm1275:w-[400px] ">
             Our <span className="text-[#4A90E2]">bootcamps</span> are designed
             for learners seeking high-impact, career-advancing courses hosted by
             Industry Leaders

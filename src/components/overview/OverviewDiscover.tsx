@@ -28,7 +28,7 @@ const OverviewDiscover = (props: any) => {
   return (
     <div className="h-[120px] pt-3 clg:h-[80px] lg:h-[70px] lclg:h-[60px] flex flex-col lg:flex-row justify-around w-[90%] mx-auto items-start lg:items-center lg:pt-10">
       <div className="lg:w-full sm:w[90%]">
-        <div className="flex min-w-max lg:space-x-4 space-x-3 items-center lg:px-4">
+        <div className="flex flex-wrap w-full lg:space-x-4 space-x-4 items-center lg:px-4">
           <div
             onClick={handleDiscover}
             className="flex space-x-3 items-center cursor-pointer"

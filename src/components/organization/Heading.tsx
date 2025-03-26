@@ -12,17 +12,17 @@ const Heading = (props: any) => {
           <Image
             src={props.banner}
             alt="shake"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover z-0"
             layout="fill"
           />
         ) : (
           <Image
             src={placeholder}
             alt="shake"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover z-0"
           />
         )}
-        <div className="h-[189px] w-[189px] rounded-full absolute z-20 bottom-[-25%] left-12">
+        <div className="h-[189px] w-[189px] rounded-full absolute z-1 bottom-[-25%] left-12">
           {props.logo ? (
             <Image
               src={props.logo}

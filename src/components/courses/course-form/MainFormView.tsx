@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IoMdArrowBack } from "@react-icons/all-files/io/IoMdArrowBack";
 import Dropdown from "../Dropdown";
 import { skills, levelOptions } from "@/constants/data";
@@ -6,6 +6,13 @@ import CourseSideBar from "./SideBar";
 import { handleCreateCourse } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import Stepper from "@/components/Stepper";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAtom } from "jotai";
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { connect } from "starknetkit";
+import { toast } from "react-toastify";
+import WalletisConnected from "@/components/createorganization/WalletisConnected";
+import TrueFocus from "@/components/createorganization/TrueFocus";
 
 interface ChildComponentProps {
   courseData: any;
@@ -39,6 +46,7 @@ const MainFormView: React.FC<ChildComponentProps> = ({
   const [selectedLevel, setSelectedLevel] = useState<string | null>(null);
   const [skillError, setSkillError] = useState("");
   const [levelError, setLevelError] = useState("");
+  const [wallet, setWallet] = useAtom(walletStarknetkit);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -82,13 +90,58 @@ const MainFormView: React.FC<ChildComponentProps> = ({
     handleCreateCourse(e, "courseSetup2", router);
   };
 
+  useEffect(() => {
+    const autoConnect = async () => {
+      if (!wallet) {
+        try {
+          const { wallet: connectedWallet } = await connect({
+            //@ts-ignore
+            provider,
+            modalMode: "neverAsk",
+            webWalletUrl: ARGENT_WEBWALLET_URL,
+            argentMobileOptions: {
+              dappName: "Attensys",
+              url: window.location.hostname,
+              chainId: CHAIN_ID,
+              icons: [],
+            },
+          });
+          setWallet(connectedWallet);
+        } catch (e) {
+          console.error(e);
+        } finally {
+          console.log("show");
+        }
+      }
+    };
+
+    autoConnect();
+  }, [wallet]);
+
+  if (wallet == undefined) {
+    return (
+      <div className="w-screen h-screen z-50 flex justify-center items-center">
+        {/* <WalletisConnected /> */}
+        <TrueFocus
+          sentence="Connect Wallet"
+          manualMode={false}
+          blurAmount={9}
+          borderColor="#9B51E0"
+          animationDuration={1}
+          pauseBetweenAnimations={1}
+        />
+      </div>
+    );
+    // toast.error("Wallet not connetced");
+  }
+
   return (
     <div className="block sm:flex">
       <div className="hidden lg:block">
         <CourseSideBar courseData={courseData} />
       </div>
 
-      <div className="mb-10 flex-1">
+      <div className="mb-10 flex-1 w-full">
         <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
           <p className="text-xs sm:text-sm text-white text-center py-2">
             Your course creation progress saves automatically, but feel free to
@@ -265,9 +318,9 @@ const MainFormView: React.FC<ChildComponentProps> = ({
                   />
                 </div>
 
-                <div className="mt-12 mb-5 w-full">
+                <div className="mt-12 mb-5 w-full mx-auto flex justify-center md:justify-start">
                   <button
-                    className="bg-[#4A90E2] px-48 rounded-lg py-[15px] text-white w-full max-w-[350px]"
+                    className="bg-[#4A90E2] rounded-lg py-[15px] text-white w-[190px] md:w-[350px]"
                     type="submit"
                   >
                     Next
@@ -275,7 +328,10 @@ const MainFormView: React.FC<ChildComponentProps> = ({
                 </div>
 
                 <div className="w-full flex justify-center pb-[74px]">
-                  <button className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black">
+                  <button
+                    type="button"
+                    className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black"
+                  >
                     Save progress
                   </button>
                 </div>

@@ -105,7 +105,7 @@ const LandingPage: React.FC<ChildComponentProps> = ({
         URL.revokeObjectURL(imageUrl);
       };
     }
-  }, [courseData]);
+  }, []);
 
   return (
     <div className="pb-14 bg-[#F5F8FA]">
@@ -169,7 +169,16 @@ const LandingPage: React.FC<ChildComponentProps> = ({
               </div>
 
               <div className="">
-                <button className="sm:hidden block bg-[#9b51e0] px-7 py-2 rounded text-[#333333] font-bold">
+                <button
+                  onClick={(e) => {
+                    localStorage.setItem(
+                      "courseData",
+                      JSON.stringify(dataRef.current),
+                    );
+                    handleCourse(e, e.currentTarget.textContent, router);
+                  }}
+                  className="sm:hidden block bg-[#9b51e0] px-7 py-2 rounded text-[#333333] font-bold"
+                >
                   Get course
                 </button>
               </div>
@@ -242,9 +251,13 @@ const LandingPage: React.FC<ChildComponentProps> = ({
         {/* field */}
         <div className="">
           <button
-            onClick={(e) =>
-              handleCourse(e, e.currentTarget.textContent, router)
-            }
+            onClick={(e) => {
+              localStorage.setItem(
+                "courseData",
+                JSON.stringify(dataRef.current),
+              );
+              handleCourse(e, e.currentTarget.textContent, router);
+            }}
             className="hidden xl:block bg-[#fff] px-7 py-2 rounded text-[#333333] font-bold"
           >
             Get course
@@ -266,7 +279,16 @@ const LandingPage: React.FC<ChildComponentProps> = ({
           </div>
 
           <div className="ml-4 xl:ml-0 ">
-            <button className="sm:hidden block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold">
+            <button
+              onClick={(e) => {
+                localStorage.setItem(
+                  "courseData",
+                  JSON.stringify(dataRef.current),
+                );
+                handleCourse(e, e.currentTarget.textContent, router);
+              }}
+              className="sm:hidden block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold"
+            >
               Get course
             </button>
           </div>
@@ -343,11 +365,11 @@ const LandingPage: React.FC<ChildComponentProps> = ({
             Student Requirements
           </h4>
 
-          {/* <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
+          <ul className="list-disc mx-6 mt-4 text-[#333333] text-[14px] font-light leading-[22px]">
             <li>A computer with internet access</li>
             <li>Basic computer skills</li>
             <li>Willingness to learn and experiment</li>
-          </ul> */}
+          </ul>
           <div>
             <p>{dataRef.current.studentRequirements}</p>
           </div>
@@ -368,8 +390,8 @@ const LandingPage: React.FC<ChildComponentProps> = ({
       <div className="px-6 lg:mx-48 sm:mt-4 xl:mt-32 mb-10">
         <Lectures
           lectures={lectures}
-          courseData={courseData}
-          learningObj={courseData.learningObjectives}
+          courseData={dataRef.current}
+          learningObj={dataRef.current.learningObjectives}
         />
       </div>
 

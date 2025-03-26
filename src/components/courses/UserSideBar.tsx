@@ -1,12 +1,4 @@
-import React, { useEffect, useMemo } from "react";
-
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  Typography,
-  Button,
-} from "@material-tailwind/react";
+import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import profilePic from "../../assets/profile_pic.png";
 import { IoMdArrowDropdown } from "@react-icons/all-files/io/IoMdArrowDropdown";
@@ -25,6 +17,10 @@ import LearningJourney from "./LearningJourney";
 import Notification from "./Notification";
 import CreateACourse from "./CreateACourse";
 import { shortHex } from "@/utils/helpers";
+import filled from "@/assets/filled.svg";
+import free_books from "@/assets/free_books.svg";
+import notifications from "@/assets/notifications.svg";
+import createIcon from "@/assets/create.svg";
 
 interface UserSideBarProps {
   wallet: any;
@@ -46,11 +42,37 @@ const UserSideBar = ({
   selected,
   setSelected,
 }: UserSideBarProps) => {
+  const [sideProperties, setSideProperties] = useState([
+    {
+      no: 0,
+      title: "Courses created",
+      url: filled,
+    },
+    {
+      no: 0,
+      title: "My Learning Journey",
+      url: free_books,
+    },
+    {
+      no: 0,
+      title: "Create a course",
+      url: createIcon,
+    },
+    {
+      no: 0,
+      title: "Notification",
+      url: notifications,
+    },
+  ]);
+
+  const [isFilterModalOpen, setFilterModalOpen] = useState(false); // State for filter modal
+
   const renderItem = (arg: argprop) => {
     if (arg.title == "Courses") {
       return (
         <div className="text-[12px] ">
-          <span>{arg.no}</span> Course{arg.no > 1 ? "(s)" : ""}
+          <span>{takenCoursesData.length + courseData.length}</span> Course
+          {arg.no > 1 ? "(s)" : ""}
         </div>
       );
     } else if (arg.title == "Completed courses") {
@@ -117,6 +139,30 @@ const UserSideBar = ({
     }
     return "No User";
   }, [wallet?.selectedAddress]);
+
+  useEffect(() => {
+    if (wallet?.selectedAddress != undefined) {
+      setSideProperties((prev) =>
+        prev.map((item) => {
+          if (item.title === "Notification") {
+            return { ...item, no: 0 };
+          } else if (item.title === "My Learning Journey") {
+            return { ...item, no: takenCoursesData?.length };
+          } else if (item.title === "Courses created") {
+            return { ...item, no: courseData?.length };
+          } else {
+            return { ...item, no: 0 };
+          }
+        }),
+      );
+    }
+  }, [wallet?.selectedAddress, courseData, takenCoursesData]);
+
+  // Function to handle filter selection
+  const handleFilterSelection = (filter: string) => {
+    setSelected(filter);
+    setFilterModalOpen(false); // Close the modal after selection
+  };
 
   return (
     <>
@@ -271,31 +317,80 @@ const UserSideBar = ({
             </div>
           ))}
 
-        {/* Mobile */}
-        {page == "myCourse" ? null : (
-          <div className="flex sm:hidden justify-between mt-10 border-b-2 p-3">
-            <div>
-              <p>All NFts</p>
-            </div>
+        {/* Mobile Filter Section */}
+        {page == "myCertificate" && (
+          <div className="sm:hidden">
+            <div className="flex justify-between mt-10 border-b-2 p-3">
+              <div>
+                <p>All NFTs</p>
+              </div>
 
-            <div className="flex">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-6"
+              <div
+                className="flex cursor-pointer"
+                onClick={() => setFilterModalOpen(true)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 13.5V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 9.75V10.5"
-                />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 13.5V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 9.75V10.5"
+                  />
+                </svg>
 
-              <h4 className="underline font-bold">Filter</h4>
+                <h4 className="underline font-bold">Filter</h4>
+              </div>
             </div>
+
+            {/* Filter Modal */}
+            {isFilterModalOpen && (
+              <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
+                <div className="bg-white p-6 rounded-lg w-[90%] max-w-full">
+                  <h2 className="text-lg font-bold mb-4">
+                    Filter Certificates
+                  </h2>
+                  {certSideProperties.map((item, i) => (
+                    <div
+                      className={`border-[1px] border-[#BCBCBC] bg-[#FFFFFF] rounded-xl my-3 h-[62px] xl:w-[400px] px-6 flex items-center cursor-pointer hover:bg-violet-600 active:bg-violet-700 ${selected == item.title ? "focus:outline-none focus:ring focus:ring-violet-300" : ""} `}
+                      key={i}
+                      onClick={() => setFilterModalOpen(false)}
+                    >
+                      <div
+                        className="flex justify-between text-sm items-center w-full"
+                        onClick={() => {
+                          setSelected(item.title);
+                        }}
+                      >
+                        <div className="flex items-center">
+                          <Image src={item.url} alt={item.title} />
+                          <p className="ml-3 font-bold text-[14px] leading-[19px] text-[#2D3A4B]">
+                            {item.title}{" "}
+                          </p>
+                        </div>
+
+                        <div>
+                          {selected == item.title ? (
+                            <IoMdCheckmark color="green" size={20} />
+                          ) : null}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    className="mt-4 w-full bg-violet-600 text-gray-900 py-2 rounded-lg"
+                    onClick={() => setFilterModalOpen(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

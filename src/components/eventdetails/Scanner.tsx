@@ -47,7 +47,7 @@ const Scanner = ({ eventId }: QrScannerComponentProps) => {
       (scannedData: string) => {
         // Send scanned data to the server
         ws.send(JSON.stringify({ type: "scan", sessionId, scannedData }));
-        alert(`Scanned data: ${scannedData}`);
+        // alert(`Scanned data: ${scannedData}`);
       },
       (error: string) => {
         console.error("QR code scan error:", error);

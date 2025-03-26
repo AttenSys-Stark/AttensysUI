@@ -170,7 +170,7 @@ const Basicinfo = () => {
         )}
       </div>
 
-      <div className="block space-x-4 lg:flex">
+      <div className="block lg:space-x-4 lg:flex">
         <div className="lg:w-[60%] w-full lg:space-y-16 space-y-8">
           <div className="w-full space-y-3">
             <h1 className="text-[16px] text-[#2D3A4B] font-semibold leading-[23px]">
@@ -189,7 +189,7 @@ const Basicinfo = () => {
             {orgnameinputError && (
               <p className="text-red-400 text-[13px]">* Required</p>
             )}
-            <p className="text-[14px] w-full text-[#2D3A4B] font-light leading-[23px]">
+            <p className="text-[14px] w-full text-[#2D3A4B] font-light leading-[23px] max-w-[90%]">
               Once chosen Organization name will be unchangeable for the next 3
               months{" "}
             </p>
@@ -225,7 +225,7 @@ const Basicinfo = () => {
           </div>
         </div>
 
-        <div className="lg:w-[40%] w-full mt-8 lg:mt-0 flex flex-col  lg:justify-center lg:items-center space-y-8">
+        <div className="lg:w-[40%] w-full mt-8 lg:mt-0 flex flex-col px-0 lg:px-4 lg:justify-center lg:items-center space-y-8">
           <div className="w-full m-0 space-y-5 lg:w-auto">
             <h1 className="text-[16px] text-[#2D3A4B] font-semibold leading-[23px]">
               Organization Logo

@@ -35,7 +35,7 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
   const totalPages = Math.ceil(takenCoursesData.length / itemsPerPage);
 
   // Get current page items
-  const currentItems = takenCoursesData.slice(
+  const currentItems = takenCoursesData?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
@@ -82,15 +82,9 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
   if (takenCoursesData.length === 0) {
     return <div className="text-[#A01B9B] text-center mt-12">No Courses</div>;
   }
-  // console.log(takenCoursesData);
-  // console.log("current", currentItems);
+
   return (
-    <div
-      className="bg-white my-0 sm:my-12 rounded-xl  border-[1px] border-[#BCBCBC] h-auto pb-8"
-      // onClick={(e) =>
-      //   handleMyCourseSubComp(e, "sample-profile", router, item.title)
-      // }
-    >
+    <div className="bg-white my-0 sm:my-12 rounded-xl  border-[1px] border-[#BCBCBC] h-auto pb-8">
       <div>
         <div>
           {item.no == 1 ? (
@@ -130,7 +124,7 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
                     <Image
                       src={
                         item.data.courseImage
-                          ? `https://ipfs.io/ipfs/${item.data.courseImage}`
+                          ? `https://ipfs.io/ipfs/${item?.data.courseImage}`
                           : tdesign_video
                       }
                       width={200}
@@ -186,6 +180,39 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
               );
             })}
           </div>
+        </div>
+        {/* Pagination Controls */}
+        <div className="flex justify-center space-x-2 pb-4 pt-10">
+          <button
+            onClick={goToPreviousPage}
+            disabled={currentPage === 1}
+            className="px-4 py-1.5 border-[#D0D5DD] border-[1px] rounded disabled:opacity-50"
+          >
+            {"<"}
+          </button>
+          {generatePageNumbers().map((page, index) =>
+            page == "..." ? (
+              <span key={index} className="px-2 text-base mt-2">
+                ...
+              </span>
+            ) : (
+              <button
+                key={index}
+                onClick={() => goToPage(page)}
+                className={`px-4 py-1.5 rounded text-[14px] ${currentPage == page ? "bg-none text-[#000000] border-[#9B51E0] border-[1px]" : "bg-none text-[#000000]"}`}
+              >
+                {page}
+              </button>
+            ),
+          )}
+
+          <button
+            onClick={goToNextPage}
+            disabled={currentPage === totalPages}
+            className="px-4 py-1.5 border-[#D0D5DD] border-[1px] text-sm rounded disabled:opacity-50"
+          >
+            {">"}
+          </button>
         </div>
       </div>
     </div>

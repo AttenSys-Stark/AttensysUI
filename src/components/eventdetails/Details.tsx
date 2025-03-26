@@ -251,10 +251,10 @@ const Details = (props: any) => {
     <>
       {modalstat && <Modal status={modalstat} />}
 
-      <div className="h-full w-full  bg-event-gradient flex items-center mx-auto  justify-between md:pt-[5%] md:pb-[10%] py-[15%]">
-        <div className="h-full w-[100%] mx-auto justify-between  lg:w-[80%] md:w-[80%] flex  lg:flex-row flex-col gap-28 ">
-          <div className="flex flex-col">
-            <div className=" w-[100%]  lg:w-[380px] h-[350.44px] rounded-lg overflow-hidden relative md:mx-0 mx-auto">
+      <div className="h-full w-full  bg-event-gradient flex items-center mx-auto px-8 justify-between md:pt-[5%] md:pb-[10%] py-[15%]">
+        <div className="h-full w-full md:max-w-[95%] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-x-8 items-start">
+          <div className="w-full col-span-1 flex flex-col space-y-8">
+            <div className="w-full min-h-[320px] lg:w-[380px] h-auto rounded-lg overflow-hidden relative mx-auto">
               <Image
                 src={logoImagesource}
                 alt="story"
@@ -265,13 +265,12 @@ const Details = (props: any) => {
             <h1 className="mt-4 text-[30px] font-bold leading-[40.53px] text-[#FFFFFF] px-4 ">
               {eventData?.event_name ?? "unavailable"}{" "}
             </h1>
-            <div className=" w-[351px] mx-auto md:w-auto md:mx-0">
-              <div className="w-[90%]  h-[2px] border border-[#FFFFFF3D]"></div>
-              <h1 className="mt-8  text-[18px] text-[#FFFFFF] font-semibold leading-[22px]">
+            <div className="w-full">
+              <div className="w-full h-[2px] border border-[#FFFFFF3D]"></div>
+              <h1 className="w-full mt-8 text-[18px] text-[#FFFFFF] font-semibold leading-[22px]">
                 This event is hosted by :
               </h1>
-
-              <div className="mt-4 flex space-x-5 items-center">
+              <div className="w-full mt-4 flex px-4 space-x-4 items-center">
                 <div className="w-[49px] h-[49px] rounded-[100%]">
                   <Image src={live} alt="story" objectFit="cover" />
                 </div>
@@ -281,7 +280,7 @@ const Details = (props: any) => {
                       decimalToHexAddress(eventData?.event_organizer ?? 0n),
                     )}
                   </span>
-                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-3 py-1 text-xs text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <span className="w-[90%] break-all absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 text-xs text-white bg-gray-900 rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     {decimalToHexAddress(eventData?.event_organizer ?? 0n)}
                   </span>
                 </div>
@@ -309,7 +308,7 @@ const Details = (props: any) => {
               <h1 className="text-[18px] text-[#FFFFFF] font-semibold leading-[22px] mt-8">
                 Sponsor this event{" "}
               </h1>
-              <p className="md:w-[401px] w-[90%] text-justify mt-2 text-[#FFFFFF] text-[16px] font-light leading-[22px]">
+              <p className="w-full text-justify mt-2 text-[#FFFFFF] text-[16px] font-light leading-[22px]">
                 Showcase your brand and connect with a community eager to learn
                 and grow. Sponsor this event on AttenSys to elevate your reach
                 and inspire lifelong learners
@@ -317,16 +316,16 @@ const Details = (props: any) => {
 
               <Button
                 onClick={handleDialog}
-                className=" justify-center lg:flex rounded-lg bg-[#9B51E0] py-2 px-4 lg:h-[50px] items-center lg:w-[241px] mt-8 text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+                className="w-auto justify-center lg:flex rounded-lg bg-[#9B51E0] py-2 px-8 lg:h-[50px] items-center lg:w-[240px] mt-8 text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
               >
                 <div>Sponsor this event</div>
               </Button>
             </div>
           </div>
 
-          <div className="space-y-8  lg:pl-14 ">
-            <div className="md:w-[720px] w-[95%] mx-auto md:mx-0 h-[222px] md:h-[94px] md:flex-row flex-col bg-details-gradient rounded-xl flex  justify-end items-center px-6 lg:mt-0 mt-[10%] gap-4  ">
-              <div className="flex gap-4 ">
+          <div className="w-full col-span-1 flex flex-col space-y-8">
+            <div className="w-full mx-auto md:mx-0 h-auto py-6 md:flex-row flex-col bg-details-gradient rounded-xl flex justify-center items-center px-6 lg:mt-0 mt-[10%] gap-4">
+              <div className="flex justify-center lg:justify-start gap-4 w-full">
                 <Image src={key} alt="key" />
                 <div>
                   <h1 className="text-[#FFFFFF] text-[16px] font-semibold leading-[22px]">
@@ -337,7 +336,7 @@ const Details = (props: any) => {
                   </h1>
                 </div>
               </div>
-              <Button className=" justify-center lg:flex rounded-lg bg-[#9B51E0] px-4 h-[50px] items-center w-[241px] text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
+              <Button className="justify-end flex-none lg:flex rounded-lg bg-[#9B51E0] px-4 h-[50px] items-center w-auto text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700">
                 <div>Manage this event</div>
               </Button>
             </div>
@@ -371,7 +370,7 @@ const Details = (props: any) => {
               </div>
             </div>
 
-            <div className="md:w-[720px] w-[95%] mx-auto md:mx-0 h-[628px] md:h-[413px] bg-oneclick-gradient rounded-xl flex flex-col justify-center px-6 space-y-4 border-[#FFFFFF7D] border-[1px]">
+            <div className="w-full py-12 h-auto bg-oneclick-gradient rounded-xl flex flex-col justify-center px-6 space-y-4 border-[#FFFFFF7D] border-[1px]">
               {!ifsuccess ? (
                 <div>
                   <div className="space-y-2 flex justify-between">
@@ -437,7 +436,7 @@ const Details = (props: any) => {
                   <Button
                     onClick={!isRegistering ? handleRegisterEvent : undefined}
                     disabled={isRegistering}
-                    className={`justify-center mt-4 flex rounded-lg py-2 px-4 h-[50px] items-center  md:w-[422px] text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700 ${
+                    className={`justify-center mt-4 flex rounded-lg py-2 px-8 h-[50px] items-center w-auto md:w-[320px] text-sm text-[#FFFFFF] data-[hover]:bg-sky-500 data-[active]:bg-sky-700 ${
                       isRegistering
                         ? " bg-[#357ABD] cursor-not-allowed"
                         : "bg-[#4A90E2]"
@@ -462,7 +461,7 @@ const Details = (props: any) => {
               )}
             </div>
 
-            <div className=" w-[90%] mx-auto md:mx-0">
+            <div className="w-full">
               <h1 className="text-[#FFFFFF] text-[16px] font-semibold leading-[22px]">
                 About this Event
               </h1>
@@ -471,9 +470,9 @@ const Details = (props: any) => {
               </p>
             </div>
 
-            <div className="md:w-full w-[95%] mx-auto md:mx-0 h-[2px] border border-[#FFFFFF3D] mt-16"></div>
+            <div className="w-full h-[2px] border border-[#FFFFFF3D] mt-16"></div>
 
-            <div className="md:w-full w-[95%] mx-auto md:mx-0">
+            <div className="w-full">
               <h1 className="text-[#FFFFFF] text-[16px] font-semibold leading-[22px]">
                 {splitAddress(address).mainAddress}
               </h1>
@@ -482,7 +481,7 @@ const Details = (props: any) => {
               </p>
             </div>
 
-            <div className="md:h-[213px] h-auto md:w-[100%] rounded-xl w-[95%] mx-auto md:mx-0">
+            <div className="h-auto w-full rounded-xl mx-auto md:mx-0">
               {/* <Locator /> */}
               <Image src={citymap} alt="moon" />
             </div>

@@ -7,14 +7,14 @@ import { CiCircleInfo } from "react-icons/ci";
 
 const Panel = (props: any) => {
   return (
-    <div className="h-auto w-[90%] mx-auto mt-24">
+    <div className="h-auto w-full mx-auto mt-24">
       <div className="flex justify-between w-[320px] items-center">
         <h1 className="text-[22px] leading-[22px] text-[#333333] font-bold">
           {props?.orgname}
         </h1>
         <Image src={drop} alt="dropdown" />
       </div>
-      <div className="flex w-[380px] items-center space-x-1 mt-1">
+      <div className="flex w-full sm:w-[380px] items-center space-x-1 mt-1">
         <IoIosInformationCircleOutline />
         <h1 className="text-[13px] text-[#2D3A4B] leading-[20px] font-light">
           Toggle to switch between multiple organizations

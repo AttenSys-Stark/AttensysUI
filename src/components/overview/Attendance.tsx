@@ -6,14 +6,95 @@ import check from "@/assets/check.svg";
 import { attendanceData } from "@/constants/data";
 import AttendanceList from "./AttendanceList";
 import EventQRCode from "../eventdetails/EventQRCode";
+import { useEvents } from "@/hooks/useEvents";
+import { useParams, useSearchParams } from "next/navigation";
+import {
+  decimalToHexAddress,
+  formatTruncatedAddress,
+} from "@/utils/formatAddress";
+import { pinata } from "../../../utils/config";
+import { provider } from "@/constants";
+import { attensysEventAbi } from "@/deployments/abi";
+import { attensysEventAddress } from "@/deployments/contracts";
+import { Contract } from "starknet";
+
+interface IParticipants {
+  student_name: string;
+  student_email: string;
+  student_address: string;
+}
 
 const Attendance = () => {
   const [searchValue, setSearchValue] = useState("");
   const [qrurl, setQrurl] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setloading] = useState<boolean>(false);
+  const [eventParticipants, setEventParticipants] = useState<IParticipants[]>(
+    [],
+  );
+  const [marked, setMarked] = useState<any[]>([]);
+  const { events, getEventsRegiseredUsers } = useEvents();
+  const searchParams = useSearchParams();
+  const params = useParams();
   const itemsPerPage = 4;
+  const id = searchParams.get("id");
+
+  const fetchEventParticipants = async (id: bigint) => {
+    setloading(true);
+    try {
+      const eventParticipantsUriData = await getEventsRegiseredUsers(id);
+
+      let eventParticipantsIpfsData = [];
+      for (const participant of eventParticipantsUriData) {
+        const userData = await obtainCIDdata(participant.attendee_uri);
+
+        const participantDetails = {
+          //@ts-ignore
+          ...userData,
+          student_address: decimalToHexAddress(participant.attendee_address),
+        };
+        eventParticipantsIpfsData.push(participantDetails);
+      }
+      setEventParticipants(
+        eventParticipantsIpfsData as unknown as IParticipants[],
+      );
+    } catch (error) {
+      console.error("Error fetching registered users:", error);
+    } finally {
+      setloading(false);
+    }
+  };
+
+  const fetchMarked = async (id: any) => {
+    const eventContract = new Contract(
+      attensysEventAbi,
+      attensysEventAddress,
+      provider,
+    );
+    const res = await eventContract.get_all_attendace_marked(Number(id));
+    setMarked(res);
+  };
+
+  useEffect(() => {
+    if (!id) return;
+    fetchEventParticipants(BigInt(id));
+    fetchMarked(id);
+  }, [id]);
+
+  const obtainCIDdata = async (CID: string) => {
+    try {
+      //@ts-ignore
+      const data = await pinata.gateways.get(CID);
+
+      return data?.data;
+    } catch (error) {
+      console.error("Error fetching IPFS content:", error);
+      throw error;
+    }
+  };
+
   // Calculate total pages
-  const totalPages = Math.ceil(attendanceData.length / itemsPerPage);
+  const totalPages = Math.ceil(eventParticipants.length / itemsPerPage);
 
   // Get current page items
   const currentItems = attendanceData.slice(
@@ -65,38 +146,6 @@ const Attendance = () => {
   const handleChange = (event: { target: { value: any } }) => {
     setSearchValue(event.target.value);
   };
-
-  // Fetch the master QR code from the server
-  // async function fetchMasterQRCode() {
-  //   const response = await fetch(
-  //     "https://attensys-1a184d8bebe7.herokuapp.com/api/generate-master-qr",
-  //   );
-  //   const data = await response.json();
-  //   setQrurl(data.qrCodeDataUrl);
-  //   console.log("check data hrer", data);
-  //   // Connect to the WebSocket server
-  //   const ws = new WebSocket("wss://attensys-1a184d8bebe7.herokuapp.com");
-
-  //   ws.onopen = () => {
-  //     // Register the laptop with the session ID
-  //     ws.send(
-  //       JSON.stringify({ type: "register-laptop", sessionId: data.sessionId }),
-  //     );
-  //   };
-
-  //   ws.onmessage = (event) => {
-  //     const message = JSON.parse(event.data);
-  //     if (message.type === "action") {
-  //       // Trigger action based on scanned data
-  //       console.log("Scanned data:", message.data);
-  //       alert(`Action triggered with data: ${message.data}`);
-  //     }
-  //   };
-  // }
-
-  // useEffect(() => {
-  //   fetchMasterQRCode();
-  // }, []);
 
   return (
     <div className="h-auto w-[90%] max-w-[992px] mx-auto pb-10">
@@ -184,18 +233,23 @@ const Attendance = () => {
                 </th>
               </tr>
             </thead>
-            {currentItems.map((data, index) => {
-              return (
+            {eventParticipants
+              .filter((data) => {
+                // Check if the student_address matches the condition
+                return marked.some(
+                  (markedData) => markedData == data.student_address,
+                );
+              })
+              .map((data, index) => (
                 <AttendanceList
                   key={index}
-                  name={data.name}
-                  address={data.address}
-                  role={data.role}
-                  regdate={data.date}
-                  checkstat={data.checkstat}
+                  name={data.student_name}
+                  address={formatTruncatedAddress(data.student_address)}
+                  role="N/A"
+                  regdate="12/25/2024"
+                  checkstat={true}
                 />
-              );
-            })}
+              ))}
           </table>
         </div>
         {/* Pagination Controls */}

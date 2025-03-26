@@ -1,25 +1,7 @@
 import { useEffect, useState } from "react";
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  Typography,
-  Button,
-} from "@material-tailwind/react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { FaUserGraduate } from "@react-icons/all-files/fa/FaUserGraduate";
-import Switch from "react-switch";
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
-import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck";
-import { FaPlay } from "@react-icons/all-files/fa/FaPlay";
-import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond";
-
-import ProgressBar from "@ramonak/react-progress-bar";
 import Notification from "./Notification";
 import CreateACourse from "./CreateACourse";
 import UserSideBar from "./UserSideBar";
-import { handleMyCourseSubComp } from "@/utils/helpers";
 import { coursesDetails, learningDetails } from "@/constants/data";
 import LearningJourney from "./LearningJourney";
 import CoursesCreated from "./CoursesCreated";
@@ -180,12 +162,9 @@ const MyCourses = (props: any) => {
           },
         });
 
-        // console.log(connector.wallet.account )
-        // setConnectorDataAccount(connector.wallet.account);
         setWallet(connectedWallet);
       } catch (e) {
         console.error(e);
-        // alert((e as any).message)
       }
     };
     if (!wallet) {

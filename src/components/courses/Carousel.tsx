@@ -131,7 +131,7 @@ const CarouselComp: React.FC<ChildComponentProps> = ({ wallet }) => {
     getCourse();
   }, [courses]);
   return (
-    <div className=" w-full h-full mx-auto lg:flex flex-col justify-center items-center ">
+    <div className="w-full h-full mx-auto lg:flex flex-col justify-center items-center">
       <Carousel
         className="course-carousel"
         responsive={responsive}

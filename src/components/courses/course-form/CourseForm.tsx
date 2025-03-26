@@ -55,7 +55,7 @@ const CourseForm = ({
       <form onSubmit={handleSubmit} noValidate>
         <div className="bg-white px-5 md:px-12 py-9 md:py-16 rounded-2xl flex flex-col gap-5 md:gap-6 justify-center w-full max-w-[524px] mx-auto">
           {options.map((option) => (
-            <div key={option.id} className="flex items-center">
+            <div key={option.id} className="flex">
               <input
                 type="radio"
                 id={option.id}
@@ -68,7 +68,7 @@ const CourseForm = ({
 
               <label
                 htmlFor={option.id}
-                className="block ml-3 text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]"
+                className="block my-2 ml-3 text-[#333333] text-xs md:text-[18px] font-medium md:leading-[22px]"
               >
                 {option.label}
               </label>
@@ -77,16 +77,16 @@ const CourseForm = ({
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
 
-        <div className="text-center w-full">
+        <div className="text-center">
           <button
-            className="bg-[#4A90E2] w-full max-w-[350px] rounded-xl py-3 mt-12 mb-44 text-white"
+            className="bg-[#4A90E2] rounded-xl py-3 mt-12 mb-44 text-white w-[190px] md:w-[350px]"
             type="submit"
           >
             Next
           </button>
         </div>
       </form>
-      <div className="block absolute left-[35%] bottom-36 lg:hidden">
+      <div className="block absolute left-[37.5%]  md:left-[42%] bottom-36 lg:hidden">
         <Previous />
       </div>
     </div>

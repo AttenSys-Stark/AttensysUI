@@ -263,9 +263,9 @@ You want to make sure your creative is very catchy.`}
                 handleCourseCurriculumChange={handleCourseCurriculumChange}
               />
 
-              <div className="w-full mt-12 mb-4">
+              <div className="mt-12 mb-5 w-full mx-auto flex justify-center md:justify-start">
                 <button
-                  className="rounded-lg bg-[#4A90E2] px-8 py-[15px] text-white w-full md:max-w-[350px]"
+                  className="bg-[#4A90E2] rounded-lg py-[15px] text-white w-[190px] md:w-[350px]"
                   type="submit"
                 >
                   Almost there!
@@ -273,7 +273,10 @@ You want to make sure your creative is very catchy.`}
               </div>
 
               <div className="w-full flex justify-center pb-[74px]">
-                <button className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black">
+                <button
+                  type="button"
+                  className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black"
+                >
                   Save progress
                 </button>
               </div>

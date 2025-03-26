@@ -152,13 +152,13 @@ const Addinstructor = (props: any) => {
   };
 
   return (
-    <div className="lg:h-[500px] w-full flex flex-col items-center space-y-8 py-3">
-      <div className="mx-auto w-full lg:w-auto pt-12">
+    <div className="lg:h-auto w-full flex flex-col mx-auto items-center space-y-8 py-3">
+      <div className="mx-auto pt-12">
         <h1 className="text-[16px] text-[#2D3A4B] font-light leading-[23px]">
           Use commas (,) to seperate instructor emails
         </h1>
-        <div className="flex flex-col w-full lg:flex-row justify-center  space-x-3 items-center">
-          <div className="lg:w-[590px] lg:h-[60px] w-full border-[2px] rounded-2xl mt-5">
+        <div className="flex flex-col w-full lg:flex-row justify-center space-x-3 items-center">
+          <div className="w-full md:w-[600px] h-[60px] border-[2px] rounded-2xl mt-5">
             <Emailinput onEmailsChange={handleEmailsChange} />
           </div>
         </div>
@@ -168,7 +168,7 @@ const Addinstructor = (props: any) => {
           Use commas (,) to seperate wallet addresses
         </h1>
         <div className="flex space-x-3 items-center">
-          <div className="w-[590px] h-[60px] border-[2px] rounded-2xl mt-5">
+          <div className="w-full md:w-[600px] h-[60px] border-[2px] rounded-2xl mt-5">
             <Addressinput onAddressChange={handleAddresssChange} />
           </div>
           {/* <Button className='bg-[#4A90E21F] text-[#5801A9] font-normal text-[14px] rounded-lg h-[48px] w-[155px] items-center flex justify-center mt-5'>
@@ -181,7 +181,7 @@ const Addinstructor = (props: any) => {
           handle_multicall_routing();
         }}
         disabled={uploading}
-        className={`w-[342px] h-[47px] mt-8 flex justify-center items-center text-[#FFFFFF] text-[14px] font-bold leading-[16px]  rounded-xl ${
+        className={`mx-auto w-auto px-16 md:w-[600px] h-[60px] mt-8 flex justify-center items-center text-[#FFFFFF] text-[14px] font-bold leading-[16px] rounded-xl ${
           uploading ? "bg-[#357ABD] cursor-not-allowed" : "bg-[#4A90E2]"
         }`}
       >

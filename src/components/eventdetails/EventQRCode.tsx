@@ -1,9 +1,28 @@
 import { QRCodeCanvas } from "qrcode.react";
 import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import {
+  attendancesuccess,
+  connectorAtom,
+} from "@/state/connectedWalletStarknetkitNext";
+import { attensysEventAbi } from "@/deployments/abi";
+import { attensysEventAddress } from "@/deployments/contracts";
+import { Contract } from "starknet";
+import { walletStarknetkitNextAtom } from "@/state/connectedWalletStarknetkitNext";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 
 const EventQRCode = ({ eventId }: { eventId: string }) => {
   const [scannerUrl, setScannerUrl] = useState("");
   const [qrUrl, setQrUrl] = useState("");
+  const [attendanceOverlayStat, setattendanceOverlayStat] =
+    useAtom(attendancesuccess);
+  const [connector] = useAtom(connectorAtom);
+
+  const [wallet] = useAtom(walletStarknetkit);
+
+  const [connectorDataAccount] = useState<null | any>(
+    connector?.wallet.account,
+  );
 
   // Fetch the master QR code and establish WebSocket connection
   const fetchMasterQRCode = async () => {
@@ -28,13 +47,42 @@ const EventQRCode = ({ eventId }: { eventId: string }) => {
         );
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = async (event) => {
         const message = JSON.parse(event.data);
         if (message.type === "action") {
           // Trigger action based on scanned data
           console.log("Scanned data:", message.data);
-          // alert(`Action triggered with data: ${message.data}`);
+          const data = JSON.parse(message.data);
+          console.log(Number(data.eventId));
+          console.log(data.attendeeaddress);
+          setattendanceOverlayStat(true);
+          const eventContract = new Contract(
+            attensysEventAbi,
+            attensysEventAddress,
+            //@ts-ignore
+            wallet?.account,
+          );
+          const createEventCall = eventContract.populate("mark_attendance", [
+            Number(data.eventId),
+            data.attendeeaddress,
+          ]);
+          const result = await eventContract.mark_attendance(
+            createEventCall.calldata,
+          );
+          //@ts-ignore
+          wallet?.account?.provider
+            .waitForTransaction(result.transaction_hash)
+            .then(() => {})
+            .catch((e: any) => {
+              console.log("Error: ", e);
+              setattendanceOverlayStat(false);
+            })
+            .finally(() => {
+              setattendanceOverlayStat(false);
+            });
+          //   // alert(`Action triggered with data: ${message.data}`);
         }
+        setattendanceOverlayStat(false);
       };
 
       // Generate the scanner URL with session ID and WebSocket URL

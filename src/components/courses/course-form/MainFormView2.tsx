@@ -104,7 +104,7 @@ const MainFormView2: React.FC<ChildComponentProps> = ({
         <CourseSideBar courseData={courseData} />
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
           <p className="text-sm text-white text-center py-2">
             Your course creation progress saves automatically, but feel free to
@@ -146,10 +146,10 @@ const MainFormView2: React.FC<ChildComponentProps> = ({
                 <p className="font-normal text-xs md:text-[14px] mt-2 text-[#2D3A4B] leading-[21px]">
                   {` What will users taking this course need to get the best out of it.`}
                 </p>
-                <div className="flex items-center md:items-start my-4">
+                <div className="flex items-stretch justify-between w-full md:w-[80%] flex-row space-x-2 my-4">
                   <input
                     type="input"
-                    className="w-auto sm:w-[70%] h-[55px] py-2 px-6 border border-gray-300 rounded md:rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
+                    className="w-full h-[55px] py-2 px-6 border border-gray-300 rounded md:rounded-[6px] shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm text-gray-700 placeholder-gray-400"
                     placeholder="e.g A laptop."
                     value={courseData.studentRequirements}
                     // onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,7 +166,7 @@ const MainFormView2: React.FC<ChildComponentProps> = ({
                   />
                   <button
                     onClick={handleAddRequirement}
-                    className="rounded md:rounded-[6px] py-2 px-4 h-[41px] md:h-[55px] min-w-max font-normal min-w-[119px] md:min-w-fit text-[#2D3A4B] leading-[21px] border-2 p-1 ml-2 md:ml-5 text-[13px] sm:text-base bg-white"
+                    className="rounded md:rounded-[6px] py-2 px-4 flex-none h-[55px] w-auto font-normal text-[#2D3A4B] leading-[21px] border-2 p-1 ml-2 md:ml-5 text-[13px] sm:text-base bg-white"
                   >
                     <span className="text-xl leading-none">+</span> Add Item
                   </button>
@@ -241,9 +241,9 @@ const MainFormView2: React.FC<ChildComponentProps> = ({
               </div>
 
               <div className="my-12 w-full">
-                <div className="mt-12 mb-5 flex justify-stretch w-full">
+                <div className="mt-12 mb-5 w-full mx-auto flex justify-center md:justify-start">
                   <button
-                    className="bg-[#4A90E2] px-28 sm:px-48 py-3 rounded-xl text-white w-full md:max-w-[350px]"
+                    className="bg-[#4A90E2] rounded-lg py-[15px] text-white w-[190px] md:w-[350px]"
                     type="submit"
                   >
                     Next
@@ -251,7 +251,10 @@ const MainFormView2: React.FC<ChildComponentProps> = ({
                 </div>
 
                 <div className="w-full flex justify-center pb-[74px]">
-                  <button className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black">
+                  <button
+                    type="button"
+                    className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black"
+                  >
                     Save progress
                   </button>
                 </div>

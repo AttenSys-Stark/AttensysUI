@@ -21,7 +21,7 @@ const Timesection = () => {
           You can also explore fantastic community-curated calendars.
         </p>
       </div>
-      <div className="flex space-x-1 mt-12">
+      <div className="flex flex-none overflow-hidden space-x-1 mt-12">
         <Image src={dot1} alt="group" />
         <Image src={dot2} alt="group" />
         <Image src={dot3} alt="group" />

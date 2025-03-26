@@ -29,7 +29,7 @@ const Eventsection = () => {
         {/* Description and Button */}
         <div className="space-y-5 w-full lg:w-[400px] text-center lg:text-left">
           {/* Text visible only on lg screens or larger */}
-          <div className="hidden lg:block">
+          <div className="block">
             <h1 className="text-[14px] sm:text-[16px] md:text-[17px] lg:text-[17px] text-[#2D3A4B] font-light leading-[20px] sm:leading-[22px] lg:leading-[22px] mx-auto lg:mx-0 w-full lg:w-[485px] sm1275:w-[300px] ">
               The central hub where event organizers can manage all their
               events, access key statistics, and perform quick actions.
@@ -37,7 +37,7 @@ const Eventsection = () => {
           </div>
 
           {/* Button always visible */}
-          <Button className="flex justify-center lg:justify-start rounded-lg bg-gradient-to-r from-[#9B51E0] to-[#4A90E2] py-2 px-4 lg:h-[50px] items-center lg:w-[170px] text-sm text-white hover:bg-sky-500 active:bg-sky-700">
+          <Button className="flex justify-center lg:justify-start rounded-lg bg-gradient-to-r from-[#9B51E0] to-[#4A90E2] py-2 px-4 mx-auto lg:mx-0 lg:h-[50px] items-center lg:w-[170px] text-sm text-white hover:bg-sky-500 active:bg-sky-700">
             <div className="flex space-x-2 items-center font-semibold text-[14px] sm:text-[16px]">
               <Image src={ticket} alt="ticket" className="mr-2" />
             </div>

@@ -260,11 +260,16 @@ export const certSideProperties = [
     title: "Event NFTs",
     url: f7_tickets,
   },
+  {
+    no: 0,
+    title: "Bootcamp NFTs",
+    url: f7_tickets,
+  },
 ];
 
 export const certContent = [
   {
-    heading: "My Certification",
+    heading: "My Courses Certifications",
     no: 2,
     type: "Course NFTs",
     certificates: [
@@ -311,9 +316,48 @@ export const certContent = [
     ],
   },
   {
-    heading: "My Events",
+    heading: "My Events Certifications",
     no: 3,
     type: "Event NFTs",
+    certificates: [
+      {
+        img: Swisstaler,
+        cert_name: "Blockchain Africa ‘24",
+        recipient: "0x3C4kB...J29",
+        author: "Blockchain Africa ‘24",
+        nft_description:
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+      },
+      {
+        img: topNotch,
+        cert_name: "Blockchain Africa ‘24",
+        recipient: "0x3C4kB...J29",
+        author: "Blockchain Africa ‘24",
+        nft_description:
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+      },
+      {
+        img: liveNft,
+        cert_name: "Blockchain Africa ‘24",
+        recipient: "0x3C4kB...J29",
+        author: "Blockchain Africa ‘24",
+        nft_description:
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+      },
+      {
+        img: liveNft,
+        cert_name: "Blockchain Africa ‘24",
+        recipient: "0x3C4kB...J29",
+        author: "Blockchain Africa ‘24",
+        nft_description:
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+      },
+    ],
+  },
+  {
+    heading: "My Bootcamps Certifications",
+    no: 3,
+    type: "Bootcamp NFTs",
     certificates: [
       {
         img: Swisstaler,

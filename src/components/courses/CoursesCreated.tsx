@@ -61,7 +61,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
   const totalPages = Math.ceil(courseData.length / itemsPerPage);
 
   // Get current page items
-  const currentItems = courseData.slice(
+  const currentItems = courseData?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
@@ -176,7 +176,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                     <Image
                       src={
                         item.data.courseImage
-                          ? `https://ipfs.io/ipfs/${item.data.courseImage}`
+                          ? `https://ipfs.io/ipfs/${item?.data.courseImage}`
                           : tdesign_video
                       }
                       width={200}
@@ -232,7 +232,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                         <div className="flex items-center gap-x-2">
                           <Image src={diamond} alt="" height={18} width={18} />
                           <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                            Difficulty level: {item.level}
+                            Difficulty level: {item.data.difficultyLevel}
                           </p>
                         </div>
                       </div>

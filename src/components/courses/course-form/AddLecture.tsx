@@ -65,6 +65,9 @@ const AddLecture: React.FC<LectureProps> = ({
       progress: 0,
     } as UploadStatus,
   });
+
+  const [lectureType, setLectureType] = useState("video"); // "video" or "text"
+
   const [formData, setFormData] = useState<FormData>({
     topic: "",
     description: "",
@@ -192,7 +195,6 @@ const AddLecture: React.FC<LectureProps> = ({
         setUploadHash(ipfsHash);
       }
     } catch (error: any) {
-      console.error("Upload error:", error);
       setUploadStatus((prev) => ({
         ...prev,
         [type]: {
@@ -241,18 +243,6 @@ const AddLecture: React.FC<LectureProps> = ({
   return (
     <div>
       <div className="my-12">
-        <Button
-          className="rounded-xl bg-[#9b51e052] px-12 py-4  text-[#2d3a4b]"
-          onClick={handleAddLecture}
-          disabled={
-            uploadStatus.video.progress > 0 && uploadStatus.video.progress < 100
-          }
-        >
-          {uploadStatus.video.progress > 0 && uploadStatus.video.progress < 100
-            ? `Uploading (${uploadStatus.video.progress}%)`
-            : " + Add New Lecture"}
-        </Button>
-
         <div>
           {uploadStatus.video.progress > 0 &&
             uploadStatus.video.progress < 100 && (
@@ -267,9 +257,32 @@ const AddLecture: React.FC<LectureProps> = ({
             )}
         </div>
 
-        {/* Render new lecture forms dynamically */}
-        {/* {lectures.map((lecture, index) => ( */}
         <div className="my-4 bg-[#9b51e01a] p-12 border rounded-xl">
+          <div className="flex justify-end mb-4">
+            <button
+              className={`px-6 py-2 rounded-l-lg ${
+                lectureType === "video"
+                  ? "bg-[#9b51e0] text-white"
+                  : "bg-gray-200"
+              }`}
+              onClick={() => setLectureType("video")}
+              type="button"
+            >
+              Video
+            </button>
+            <button
+              className={`px-6 py-2 rounded-r-lg ${
+                lectureType === "text"
+                  ? "bg-[#9b51e0] text-white"
+                  : "bg-gray-200"
+              }`}
+              onClick={() => setLectureType("text")}
+              type="button"
+            >
+              Text
+            </button>
+          </div>
+
           <div className="flex bg-white p-5 rounded-xl my-3">
             <p className="font-medium mr-3 text-[16px]">Lecture Title:</p>
             <input
@@ -281,7 +294,69 @@ const AddLecture: React.FC<LectureProps> = ({
               maxLength={70}
             />
           </div>
-          <div className="flex bg-white p-5 rounded-xl my-3">
+
+          {lectureType === "video" ? (
+            <div>
+              <div className="flex bg-white p-5 rounded-xl my-3">
+                <p className="font-medium mr-3 text-[16px]">Description:</p>
+                <textarea
+                  name="description"
+                  placeholder="Class description (optional)"
+                  value={newLecture.description}
+                  onChange={handleChange}
+                  className="w-[100%]"
+                  maxLength={200}
+                ></textarea>
+              </div>
+
+              <div className="bg-white p-5 rounded-xl my-3 text-center content-center w-[100%] flex flex-col justify-center">
+                <div className="w-[15%] mx-auto flex justify-center">
+                  <Image src={upload_other} alt="upload" />
+                </div>
+                <p className="text-[14px] font-normal text-[#353535] leading-[22px]">
+                  <span
+                    className="text-[#A020F0] cursor-pointer"
+                    onClick={handleBrowsefiles}
+                    onDrop={(e) => handleDrop(e, "video")}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
+                    Click to upload
+                  </span>{" "}
+                  or drag and drop
+                </p>
+                <p className="text-[14px] font-normal text-[#353535] leading-[22px]">
+                  SVG, PNG, JPG or GIF (max. 500MB)
+                </p>
+
+                <div>
+                  <input
+                    type="file"
+                    accept="video/*"
+                    ref={fileInputRef}
+                    onChange={(e) => handleFileSelect(e, "video")}
+                    className="mt-3"
+                    style={{ display: "none" }}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            // ✅ TEXT CONTENT UI
+            <div className="flex bg-white p-5 rounded-xl my-3">
+              <p className="font-medium mr-3 text-[16px]">Lecture Content:</p>
+              <textarea
+                name="description"
+                placeholder="Enter full lecture text here..."
+                value={newLecture.description}
+                onChange={handleChange}
+                className="w-[100%]"
+                rows={10}
+                maxLength={3000} // <- Example limit
+              ></textarea>
+            </div>
+          )}
+
+          {/* <div className="flex bg-white p-5 rounded-xl my-3">
             <p className="font-medium mr-3 text-[16px]">Description:</p>
             <textarea
               name="description"
@@ -291,8 +366,9 @@ const AddLecture: React.FC<LectureProps> = ({
               className="w-[100%]"
               maxLength={200}
             ></textarea>
-          </div>
-          <div className="bg-white p-5 rounded-xl my-3 text-center content-center w-[100%] flex flex-col justify-center">
+          </div> */}
+
+          {/* <div className="bg-white p-5 rounded-xl my-3 text-center content-center w-[100%] flex flex-col justify-center">
             <div className="w-[15%] mx-auto flex justify-center">
               <Image src={upload_other} alt="upload" />
             </div>
@@ -321,9 +397,24 @@ const AddLecture: React.FC<LectureProps> = ({
                 style={{ display: "none" }}
               />
             </div>
+          </div> */}
+
+          <div className="flex justify-end mt-10">
+            <Button
+              className="rounded-xl bg-[#9b51e052] px-12 py-4  text-[#2d3a4b]"
+              onClick={handleAddLecture}
+              disabled={
+                uploadStatus.video.progress > 0 &&
+                uploadStatus.video.progress < 100
+              }
+            >
+              {uploadStatus.video.progress > 0 &&
+              uploadStatus.video.progress < 100
+                ? `Uploading (${uploadStatus.video.progress}%)`
+                : " Click to Add New Lecture"}
+            </Button>
           </div>
         </div>
-        {/* ))} */}
       </div>
 
       {/* Lectures List */}

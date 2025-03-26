@@ -86,15 +86,27 @@ const RegistrationDetails = (props: any) => {
           },
         ]);
 
-        await wallet?.account?.provider.waitForTransaction(
-          callContract.transaction_hash,
-        );
+        setIsRegistering(false);
+        setregistrationsuccessstatus(true);
+        setDetailsEntryLoadingStatus(false);
+
+        wallet?.account?.provider
+          .waitForTransaction(callContract.transaction_hash)
+          .then(() => {})
+          .catch((e: any) => {
+            console.error("Error: ", e);
+            // setIsRegistering(false);
+            // setregistrationsuccessstatus(true);
+          })
+          .finally(() => {
+            setDetailsEntryLoadingStatus(false);
+            setIsRegistering(false);
+            setregistrationsuccessstatus(true);
+            console.log("registration done");
+          });
       }
     } catch (error) {
       console.error("Registration failed:", error);
-    } finally {
-      setIsRegistering(false);
-      setregistrationsuccessstatus(true);
     }
   };
 

@@ -27,7 +27,7 @@ const CreateACourse = () => {
             </div>
             <div className="my-4 sm:my-0">
               <button
-                className="bg-[#4A90E2] px-24 py-3 text-white text-sm rounded-xl"
+                className="bg-[#4A90E2] px-8 py-3 text-white w-auto text-sm rounded-xl"
                 type="submit"
                 onClick={(e) =>
                   handleCreateCourse(e, courseQuestions[0], router)
@@ -55,7 +55,7 @@ const CreateACourse = () => {
 
         <div className="p-10 block sm:flex items-center justify-between text-sm">
           <div className="flex-1">
-            <div className="w-[254px] h-[164px] sm:w-[80%] rounded-xl  bg-[#d5d5d5] flex text-center justify-center">
+            <div className="w-auto h-[164px] sm:w-[80%] rounded-xl  bg-[#d5d5d5] flex text-center justify-center">
               <Image
                 src={tdesign_video}
                 alt="tdesign_video"

@@ -7,9 +7,9 @@ import Image from "next/image";
 
 const World = () => {
   return (
-    <div className="w-[90%] mx-auto my-4 lg:flex lg:justify-between lg:items-center sm:h-[450px]">
+    <div className="w-[90%] mx-auto my-4 pt-10 lg:flex lg:justify-between lg:items-center sm:h-[450px]">
       {/* 📌 Text Section */}
-      <div className="sm:w-[100%] flex items-center">
+      <div className="z-[0] sm:w-[100%] flex items-center">
         <div className="w-[90%] sm:w-[80%] mx-auto">
           {/* 📌 Title */}
           <h1 className="text-[24px] sm:text-[30px] lg:text-[36px] font-bold text-[#2D3A4B] mb-5">
@@ -48,20 +48,20 @@ const World = () => {
       </div>
 
       {/* Responsive Images */}
-      <div className="w-full sm:w-[40%] relative">
+      <div className="z-[-1] w-full sm:w-[40%] relative pb-12 px-4">
         {/* 📌 Images for small screens */}
         <div className="sm:hidden relative mb-[350px]">
           {/* Planet Image */}
           <Image
             alt="planet"
             src={plane}
-            className="absolute top-[-320px] left-[50px] w-[280px] h-[280px]"
+            className="absolute top-[-300px] left-[20px] w-[240px] h-[200px]"
           />
           {/* Speech Bubble Image */}
           <Image
             alt="speech"
             src={thoughts}
-            className="absolute top-[-370px] left-[-10px] w-[233px] h-[150px]"
+            className="absolute top-[-370px] left-[-20px] w-[233px] h-[150px]"
           />
         </div>
 
@@ -71,13 +71,13 @@ const World = () => {
           <Image
             alt="planet"
             src={plane}
-            className="absolute top-[-300px] left-[450px] w-[320px] h-[320px]"
+            className="absolute top-[-300px] left-[400px] w-[300px] h-[300px]"
           />
           {/* Speech Bubble Image */}
           <Image
             alt="speech"
             src={thoughts}
-            className="absolute top-[-350px] left-[370px] w-[240px] h-[140px]"
+            className="absolute top-[-360px] left-[380px] w-[240px] h-[140px]"
           />
         </div>
 
@@ -87,13 +87,13 @@ const World = () => {
           <Image
             alt="planet"
             src={plane}
-            className="absolute top-[-80px] left-[40px] w-[380px] h-[380px]"
+            className="absolute top-[-50px] left-[0px] w-[360px] h-[360px]"
           />
           {/* 💬 Speech Bubble */}
           <Image
             alt="speech"
             src={thoughts}
-            className="absolute top-[-180px] left-[-90px] w-[290px] h-[190px]"
+            className="absolute top-[-120px] left-[-160px] w-[290px] h-[190px]"
           />
         </div>
       </div>

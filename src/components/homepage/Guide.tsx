@@ -16,7 +16,11 @@ const Guide = () => {
             <Image alt="steps" src={steps} className="w-[35px] h-[200px]" />
 
             {/* Main Image */}
-            <Image alt="thumbs" src={thumbs} className="w-[260px] h-[230px]" />
+            <Image
+              alt="thumbs"
+              src={thumbs}
+              className="min-w-[240px] max-w-auto h-[230px]"
+            />
           </div>
 
           {/* 🔹 🔹 🔹 Medium Screens */}
@@ -38,7 +42,7 @@ const Guide = () => {
             <Image
               alt="thumbs"
               src={thumbs}
-              className="w-[480px] h-[250px] ml-2"
+              className="w-[480px] h-[250px] mr-5"
             />
             <Image alt="steps" src={steps} className="w-[40px] h-[230px]" />
           </div>

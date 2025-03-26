@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   coursestatusAtom,
   bootcampdropdownstatus,
@@ -9,6 +9,7 @@ import { useAtom } from "jotai";
 import Coursedropdown from "@/components/courses/Coursedropdown";
 import { useParams } from "next/navigation";
 import MyCoursePage from "@/components/courses/mycourse/MyCoursePage";
+import { MoonLoader } from "react-spinners";
 
 const Index = () => {
   const [status, setstatus] = useAtom(coursestatusAtom);
@@ -17,11 +18,20 @@ const Index = () => {
   );
   const params = useParams();
   const section = params.section;
+  const [loading, setLoading] = useState(true);
 
   const handlePageClick = () => {
     setbootcampdropstat(false);
     setstatus(false);
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000); // 1 seconds fake delay or until data is fetched.
+
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div onClick={handlePageClick}>
@@ -38,7 +48,20 @@ const Index = () => {
         <Bootcampdropdown />
       </div>
 
-      <MyCoursePage section={section} />
+      {loading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh", // Full page height
+          }}
+        >
+          <MoonLoader color="#9B51E0" size={60} />
+        </div>
+      ) : (
+        <MyCoursePage section={section} />
+      )}
     </div>
   );
 };

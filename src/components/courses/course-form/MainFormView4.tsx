@@ -75,7 +75,7 @@ const MainFormView4: React.FC<ChildComponentProps> = ({
         <div className="lg:hidden w-full flex justify-center mt-[58px] mb-[79px]">
           <Stepper currentStep={4} />
         </div>
-        <div className="">
+        <div className="w-full">
           <div className="block sm:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] px-5 items-center">
             <div className="flex items-center">
               <div className="px-4 sm:px-8 border-r border-blue-100">
@@ -94,29 +94,34 @@ const MainFormView4: React.FC<ChildComponentProps> = ({
             </button>
           </div>
 
-          <div className="mx-4 sm:ml-24 lg:mr-96 mt-12">
+          <div className="mx-5 mt-12 md:mx-10">
             <form onSubmit={handleSubmit}>
-              <div className="my-12">
+              <div className="my-12 w-full md:w-[80%]">
                 <label className="font-semibold text-[18px] leading-[31px] text-[#333333]">
                   Course Pricing
                 </label>
                 {pricingError && (
                   <p className="text-red-500 text-sm mt-1">{pricingError}</p>
                 )}
-                <div className="sm:flex my-12">
+                <div className="w-full sm:flex sm:flex-row sm:space-x-4 sm:items-stretch my-12">
                   {pricing.map((item, id: number) => (
                     <div
                       key={id}
-                      className={`relative border mr-12 px-5 py-5 rounded-xl sm:my-0 my-8 cursor-pointer ${
+                      className={`w-full relative border px-5 py-5 rounded-xl sm:my-0 my-8 cursor-pointer ${
                         courseData.coursePricing === item.cost
                           ? "border-2 border-[#4A90E2]"
                           : "border-[#00000033]"
                       }`}
                       onClick={() => handleCoursePricing(item.cost)}
                     >
-                      <div className="flex content-start">
+                      <div className="w-full flex content-start">
                         <div>
-                          <Image src={item.sym} alt={item.cost} width={30} />
+                          <Image
+                            src={item.sym}
+                            className="flex-none"
+                            alt={item.cost}
+                            width={30}
+                          />
                         </div>
                         <div className="mx-4">
                           <p className="font-semibold text-base leading-[31px] text-[#333333]">
@@ -143,41 +148,47 @@ const MainFormView4: React.FC<ChildComponentProps> = ({
                 </div>
               </div>
 
-              <div className="mt-[71px]">
+              <div className="mt-[71px] w-full md:w-[80%]">
                 <label
                   htmlFor=""
                   className="font-semibold text-[18px] leading-[31px] text-[#333333]"
                 >
                   Promo and Discount
                 </label>
-                <p className="font-normal text-[13px]/[145%] md:text-[14px] mt-5 text-[#2D3A4B] leading-[21px]">
+                <p className="w-full font-normal text-[13px]/[145%] md:text-[14px] mt-5 text-[#2D3A4B] leading-[21px]">
                   Promotional pricing is a great way to create urgency and
                   increase the visibility of your course, helping you reach a
                   wider audience while rewarding early sign-ups.
                 </p>
-                <div className="block sm:flex py-4">
+                <div className="w-full block sm:flex sm:items-center sm:flex-row sm:space-x-2 sm:justify-between py-4">
                   <input
                     type="text"
                     placeholder="Create Promo Code"
-                    className="rounded-[5px] flex-1 h-[52px] mr-4 bg-white text-[#2d3a4b] border-[#c0c0c0] border-[1px] py-2 pl-10 w-full md:w-auto"
+                    className="rounded-[5px] h-[55px] w-full bg-white text-[#2d3a4b] border-[#c0c0c0] border-[1px] py-2 pl-10 mb-4 sm:mb-0"
                     value={courseData.promoAndDiscount}
                     onChange={handleCoursePromoCode}
                   />
-                  <button className="rounded-[5px] bg-white font-normal h-[55px] text-[13px] text-[#2D3A4B] leading-[21px] border-[#d0d5dd] mt-5 sm:mt-0 border-[1px]  py-3 px-6">
+                  <button className="rounded-[5px] w-auto flex-none bg-white font-normal h-[55px] py-2 text-[13px] text-[#2D3A4B] leading-[21px] border-[#d0d5dd] border-[1px] px-6">
                     + Add Promo Code
                   </button>
                 </div>
               </div>
 
-              <div className="my-12">
-                <div className="mt-12 mb-24">
-                  <button
-                    className="rounded-lg bg-[#4A90E2] px-12 py-3 text-white w-full md:max-w-[350px]"
-                    type="submit"
-                  >
-                    Save and Proceed
-                  </button>
-                </div>
+              <div className="mt-12 mb-5 w-full mx-auto flex justify-center md:justify-start">
+                <button
+                  className="bg-[#4A90E2] rounded-lg py-[15px] text-white w-[190px] md:w-[350px]"
+                  type="submit"
+                >
+                  Save and Proceed
+                </button>
+              </div>
+              <div className="w-full flex justify-center pb-[74px]">
+                <button
+                  type="button"
+                  className="block sm:hidden bg-[#c5d322] text-sm px-12 py-[15px] rounded-lg text-black"
+                >
+                  Save progress
+                </button>
               </div>
             </form>
           </div>

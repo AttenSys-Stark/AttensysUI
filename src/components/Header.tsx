@@ -390,7 +390,7 @@ const Header = () => {
                         </Link>
 
                         <Link
-                          href={`/mycoursepage/${"sample-profile"}`}
+                          href={`/mycoursepage/${wallet?.selectedAddress}`}
                           className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                           onClick={() => close()}
                         >
@@ -405,7 +405,7 @@ const Header = () => {
                         </Link>
 
                         <Link
-                          href={`/Certifications/${"sample-profile"}`}
+                          href={`/Certifications/${wallet?.selectedAddress}`}
                           className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                           onClick={() => close()}
                         >

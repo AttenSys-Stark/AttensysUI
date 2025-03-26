@@ -93,13 +93,13 @@ const Index = () => {
               {[1, 2, 3, 4, 5].map((step, index) => (
                 <React.Fragment key={step}>
                   <div
-                    className={`flex items-center justify-center h-6 w-6 md:h-[38px] md:w-[38px] rounded-full border border-[#9B51E0] text-sm
+                    className={`flex flex-none items-center justify-center h-6 w-6 md:h-[38px] md:w-[38px] rounded-full border border-[#9B51E0] text-sm
          ${step === 1 ? "bg-[#9B51E0] text-white" : ""}`}
                   >
                     {step}
                   </div>
                   {index < 4 && (
-                    <div className="h-[1px] w-8 md:w-[54px] border-t border-[#5801A9]" />
+                    <div className="h-[1px] w-[24px] sm:w-[32px] md:w-[48px] border-t border-[#5801A9]" />
                   )}
                 </React.Fragment>
               ))}
@@ -140,23 +140,23 @@ const Index = () => {
 
               {/* Mobile Progress Stepper - Hidden on desktop */}
               <div className="flex sm:hidden space-x-2 justify-center items-center w-full max-w-[300px]">
-                <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   1
                 </div>
                 <div className="h-[1px] w-[20px] border-[1px] border-[#5801A9]"></div>
-                <div className="border-[1px] rounded-full border-[#9B51E0] h-[30px] w-[30px] bg-[#9B51E0] text-[#FFFFFF] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] h-[30px] w-[30px] bg-[#9B51E0] text-[#FFFFFF] flex items-center justify-center text-sm">
                   2
                 </div>
                 <div className="h-[1px] w-[20px] border-[1px] border-[#5801A9]"></div>
-                <div className="border-[1px] rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   3
                 </div>
                 <div className="h-[1px] w-[20px] border-[1px] border-[#5801A9]"></div>
-                <div className="border-[1px] rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   4
                 </div>
                 <div className="h-[1px] w-[20px] border-[1px] border-[#5801A9]"></div>
-                <div className="border-[1px] rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   5
                 </div>
               </div>
@@ -199,23 +199,23 @@ const Index = () => {
 
               {/* Mobile Progress Stepper - Hidden on desktop */}
               <div className="flex sm:hidden space-x-2 justify-center items-center w-full max-w-[300px]">
-                <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   1
                 </div>
                 <div className="h-[1px] w-[20px] border-[1px] border-[#5801A9]"></div>
-                <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   2
                 </div>
                 <div className="h-[1px] w-[20px] border-[1px] border-[#5801A9]"></div>
-                <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   3
                 </div>
                 <div className="h-[1px] w-[20px] border-[1px] border-[#5801A9]"></div>
-                <div className="border-[1px] rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   4
                 </div>
                 <div className="h-[1px] w-[20px] border-[1px] border-[#5801A9]"></div>
-                <div className="border-[1px] rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
+                <div className="border-[1px] flex-none rounded-full border-[#9B51E0] h-[30px] w-[30px] flex items-center justify-center text-sm">
                   5
                 </div>
               </div>
@@ -248,24 +248,24 @@ const Index = () => {
             </h1>
 
             {/* Progress Steps - Adjusts size on mobile */}
-            <div className="flex items-center justify-center px-4 space-x-2 sm:space-x-4 sm:px-0">
-              <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
+            <div className="flex items-center justify-center px-4 space-x-1 sm:space-x-2 sm:px-0">
+              <div className="border-[1px] flex-none rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
                 1
               </div>
-              <div className="h-[1px] w-[20px] sm:w-[54px] border-[1px] border-[#5801A9]"></div>
-              <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
+              <div className="h-[1px] w-[12px] sm:w-[32px] border-[1px] border-[#5801A9]"></div>
+              <div className="border-[1px] flex-none rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
                 2
               </div>
-              <div className="h-[1px] w-[20px] sm:w-[54px] border-[1px] border-[#5801A9]"></div>
-              <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
+              <div className="h-[1px] w-[12px] sm:w-[32px] border-[1px] border-[#5801A9]"></div>
+              <div className="border-[1px] flex-none rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
                 3
               </div>
-              <div className="h-[1px] w-[20px] sm:w-[54px] border-[1px] border-[#5801A9]"></div>
-              <div className="border-[1px] rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
+              <div className="h-[1px] w-[12px] sm:w-[32px] border-[1px] border-[#5801A9]"></div>
+              <div className="border-[1px] flex-none rounded-full border-[#9B51E0] bg-[#9B51E0] text-[#FFFFFF] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
                 4
               </div>
-              <div className="h-[1px] w-[20px] sm:w-[54px] border-[1px] border-[#5801A9]"></div>
-              <div className="border-[1px] rounded-full border-[#9B51E0] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
+              <div className="h-[1px] w-[12px] sm:w-[32px] border-[1px] border-[#5801A9]"></div>
+              <div className="border-[1px] flex-none rounded-full border-[#9B51E0] h-[30px] w-[30px] sm:h-[38px] sm:w-[38px] flex items-center justify-center text-sm sm:text-base">
                 5
               </div>
             </div>
@@ -308,7 +308,7 @@ const Index = () => {
       </div>
 
       <div className="flex justify-center w-full lg:justify-start ">
-        <div className="w-[20%] bg-create-gradient lg:flex hidden justify-end">
+        <div className="w-[30%] xl:w-[20%] bg-create-gradient lg:flex hidden justify-end">
           <div className="mt-20 bg-[#F5F8FA]0 space-y-2 md:space-y-5">
             <div
               className={`cursor-pointer h-[67px] w-[278px] text-[16px]  rounded-tl-xl rounded-bl-xl py-5 pl-10 ${section == "basic-info" ? "bg-[#F5F8FA] text-[#5801A9]" : "bg-none text-[#FFFFFF]"} leading-[22px] font-bold`}
@@ -354,7 +354,7 @@ const Index = () => {
           </div>
         </div>
 
-        <div className="lg:w-[80%] w-full bg-[#f5f8fa] px-6 pb-12 lg:px-16 lg:pb-32">
+        <div className="lg:w-[70%] xl:w-[80%] w-full bg-[#f5f8fa] px-6 pb-12 lg:px-16 lg:pb-32">
           <div className="flex flex-col items-center justify-center w-full h-auto pt-24 pb-8 space-y-5">
             {renderHeader()}
           </div>

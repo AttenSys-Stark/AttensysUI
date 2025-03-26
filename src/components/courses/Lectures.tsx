@@ -17,7 +17,6 @@ interface LectureData {
 }
 
 const Lectures = ({ lectures, courseData, learningObj }: LectureData) => {
-  console.log("courseData", courseData?.courseCurriculum);
   const [durations, setDurations] = useState<{ [key: number]: number }>({});
 
   const handleDuration = (id: number, duration: number) => {

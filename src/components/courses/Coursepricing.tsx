@@ -83,7 +83,7 @@ const Coursepricing = () => {
 
               <div className="mt-12 mb-24">
                 <button
-                  className="rounded bg-[#4A90E2] px-48 py-3 text-white"
+                  className="rounded bg-[#4A90E2] px-24py-3 text-white"
                   type="submit"
                 >
                   Next

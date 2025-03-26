@@ -66,7 +66,7 @@ const Highlight = ({ events }: { events: EventData[] }) => {
 
   return (
     <>
-      <div className="mt-24 min-:h-[400px] sm:w-[87%] mx-auto justify-items-center flex flex-wrap items-center mb-20 gap-28">
+      <div className="mt-32 sm:mt-24 w-full p-4 sm:p-8 mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:w-[90%] items-center mb-20 gap-8">
         {currentItems.map((data, index) => {
           return (
             <Highlightcard

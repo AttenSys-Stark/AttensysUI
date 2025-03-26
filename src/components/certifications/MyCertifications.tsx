@@ -9,9 +9,11 @@ const MyCertifications = (props: any) => {
   const [selected, setSelected] = useState("");
   const [page, setPage] = useState("");
 
+  console.log("Here", props.takenCoursesData);
+
   useEffect(() => {
     setPage("myCertificate");
-  }, [page]);
+  }, []);
 
   if (selected == "" || selected == "All NFTs") {
     return (
@@ -95,7 +97,7 @@ const MyCertifications = (props: any) => {
   }
 
   return (
-    <div className="flex flex-row mx-20 my-8">
+    <div className="lg:flex max-w-screen-2xl xl:mx-auto">
       <UserSideBar
         wallet={props.wallet}
         courseData={props.courseData}
@@ -105,19 +107,19 @@ const MyCertifications = (props: any) => {
         setSelected={setSelected}
       />
 
-      <div className="mx-20 my-12">
+      <div className="w-full sm:mx-auto px-4 my-12 ">
         {certContent.map((item, i) =>
           item.type == selected ? (
-            <div key={i}>
+            <div key={i} className="w-[100%]">
               <h1 className="text-[#A01B9B] font-bold text-2xl">
                 {item.heading} ({item.no})
               </h1>
 
-              <div className="grid lg:grid-cols-3 md:grid-cols-4 lclg:grid-cols-2 gap-8 my-6">
+              <div className="grid sm:grid-cols-2 xl:grid-cols-3 md:gap-y-8 md:gap-x-3 my-6 ">
                 {item.certificates.map((cert, j) => (
                   <div
                     key={j}
-                    className="bg-[#FFFFFF] rounded-xl shadow-lg my-20 sm:my-0 w-[300px]"
+                    className="bg-[#FFFFFF] rounded-xl shadow-lg my-4 sm:my-0 w-full "
                   >
                     <div className="relative">
                       <Image

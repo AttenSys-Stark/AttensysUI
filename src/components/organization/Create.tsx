@@ -292,7 +292,7 @@ const Create = (props: any) => {
           calldata: create_bootcamp_calldata.calldata,
         },
       ]);
-
+      setcreatebootcampStat(false);
       //@ts-ignore
       wallet?.account?.provider
         ?.waitForTransaction(callContract?.transaction_hash)

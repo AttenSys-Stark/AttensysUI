@@ -31,7 +31,7 @@ export function CardWithLink({ wallet, data }: ChildComponentProps) {
     <div
       className="mt-6 items-center align-middle justify-center w-[100%] lg:w-[95%] border-2 rounded-xl pb-8"
       onClick={(e) => {
-        localStorage.setItem("courseData", JSON.stringify(data));
+        localStorage.setItem("courseData", JSON.stringify(data?.data));
         handleCourse(e, e.currentTarget.textContent, router);
       }}
     >

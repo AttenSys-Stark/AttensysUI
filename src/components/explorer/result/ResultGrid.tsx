@@ -44,12 +44,14 @@ const ResultGrid: React.FC<ResultGridProps> = ({
         return (
           <p className="text-[12px] font-medium leading-[16px] text-[#817676]">
             Address{" "}
-            <span className="text-[#5801A9]">(0x5c956e61...de5232dc11)</span>
+            <span className="text-[#5801A9] text-[10px]">
+              (0x5c956e61...de5232dc11)
+            </span>
           </p>
         );
       case "Status":
         return (
-          <div className="h-[30px] w-[64px] bg-[#C4FFA2] rounded-xl flex items-center justify-center">
+          <div className="h-[30px] w-auto px-4 bg-[#C4FFA2] rounded-xl flex items-center justify-center">
             <h1 className="text-[#115E2C] font-light text-[12px] leading-[19px]">
               Verified
             </h1>
@@ -63,7 +65,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
         );
       case "Marked attendance":
         return (
-          <div className="flex space-x-3">
+          <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-4">
             <h1 className="text-[12px] font-medium leading-[16px] text-[#817676]">
               <span className="text-[#9B51E0]">14</span> marked
             </h1>
@@ -89,7 +91,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
         {/* Left Column - Overview Section */}
         <div className="row-span-2 bg-white rounded-lg mb-6 py-5 border border-[#b9b9ba]">
           <div className="border-b-2 border-[#b9b9ba]">
-            <div className="flex gap-2 w-60 rounded-xl mx-12 items-center border-[1px] border-[#6B6D6E] p-3 mb-3">
+            <div className="flex gap-2 w-auto rounded-xl mx-12 items-center border-[1px] border-[#6B6D6E] p-3 mb-3">
               <h1>{item.name} Overview</h1>
             </div>
           </div>
@@ -182,15 +184,15 @@ const ResultGrid: React.FC<ResultGridProps> = ({
               </div>
 
               <div
-                className={`${item.eventsData.length > 0 ? "" : "h-[308px]"}`}
+                className={`${item.eventsData.length > 0 ? "" : "h-[308px]"} w-full overflow-auto`}
               >
                 <table className="w-full border-separate border-spacing-y-3">
                   <thead>
-                    <tr className="h-[42px] border-b-2 border-black font-normal text-[#2d3a4b] leading-[19.79px] rounded">
+                    <tr className="w-full h-[42px] border-b-2 border-black font-normal text-[#2d3a4b] leading-[19.79px] rounded">
                       {item.heading.map((item, i) => (
                         <td
                           key={i}
-                          className="py-3 pl-3 border-b-2 border-[#b9b9ba] text-[14px]"
+                          className="py-3 pl-3 flex-none border-b-2 border-[#b9b9ba] text-[12px]"
                         >
                           {item}
                         </td>
@@ -201,12 +203,12 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                     item.eventsData.map((data, index) => (
                       <tbody key={index}>
                         <tr>
-                          <td className="py-3 pl-10 border-b-2 border-[#b9b9ba]">
+                          <td className="py-3 pl-10 border-b-2 border-[#b9b9ba] flex-none">
                             {data.eventName}
                           </td>
                           <td className="p-3 mb-3 border-b-2 border-[#b9b9ba] font-normal text-xs leading-[19.79px]">
                             <div
-                              className={`flex p-2 rounded-lg text-xs items-center justify-around ${
+                              className={`flex p-2 rounded-lg text-xs items-center justify-around flex-none ${
                                 data.status === "Course Complete"
                                   ? "bg-[#C4FFA2] text-[#115E2C]"
                                   : "bg-[#F6A61C2B] text-[#8#730404]"

@@ -93,12 +93,15 @@ const CourseForm3 = ({
           )}
         </div>
         <div className="text-center">
-          <button className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] w-full max-w-[350px] rounded-xl py-3 text-xs md:text-base mt-12 mb-44 text-white">
+          <button
+            type="submit"
+            className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] w-[190px] md:w-[350px rounded-xl py-3 text-xs md:text-base mt-12 mb-44 text-white"
+          >
             Setup my course
           </button>
         </div>
       </form>
-      <div className="block absolute left-[35%] bottom-36 lg:hidden">
+      <div className="block absolute left-[37.5%]  md:left-[42%] bottom-36 lg:hidden">
         <Previous />
       </div>
     </div>

@@ -21,6 +21,7 @@ import { Contract } from "starknet";
 import { useRouter } from "next/navigation";
 import { handleCreateCourse } from "@/utils/helpers";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { toast } from "react-toastify";
 
 interface ChildComponentProps {
   courseData: any;
@@ -78,6 +79,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showRetry, setShowRetry] = useState(false);
 
   const router = useRouter();
   const handleSwitch = (
@@ -93,69 +95,84 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
     setIsUploading(true);
     setIsSaving(true);
 
-    const courseImgupload = await pinata.upload.file(courseData.courseImage);
+    try {
+      const courseImgupload = await pinata.upload.file(courseData.courseImage);
 
-    const dataUpload = await pinata.upload.json({
-      primaryGoal: courseData.primaryGoal,
-      targetAudience: courseData.targetAudience,
-      courseArea: courseData.courseArea,
-      courseIdentifier: "",
-      courseCreator: courseData.courseCreator,
-      courseName: courseData.courseName,
-      courseDescription: courseData.courseDescription,
-      courseCategory: courseData.courseCategory,
-      difficultyLevel: courseData.difficultyLevel,
-      studentRequirements: courseData.studentRequirements,
-      learningObjectives: courseData.learningObjectives,
-      targetAudienceDesc: courseData.targetAudienceDesc,
-      courseImage: courseImgupload.IpfsHash,
-      courseCurriculum: courseData.courseCurriculum,
-      coursePricing: courseData.coursePricing,
-      promoAndDiscount: courseData.promoAndDiscount,
-      publishWithCertificate: courseData.publishWithCertificate,
-    });
+      const dataUpload = await pinata.upload.json({
+        primaryGoal: courseData.primaryGoal,
+        targetAudience: courseData.targetAudience,
+        courseArea: courseData.courseArea,
+        courseIdentifier: "",
+        courseCreator: courseData.courseCreator,
+        courseName: courseData.courseName,
+        courseDescription: courseData.courseDescription,
+        courseCategory: courseData.courseCategory,
+        difficultyLevel: courseData.difficultyLevel,
+        studentRequirements: courseData.studentRequirements,
+        learningObjectives: courseData.learningObjectives,
+        targetAudienceDesc: courseData.targetAudienceDesc,
+        courseImage: courseImgupload.IpfsHash,
+        courseCurriculum: courseData.courseCurriculum,
+        coursePricing: courseData.coursePricing,
+        promoAndDiscount: courseData.promoAndDiscount,
+        publishWithCertificate: courseData.publishWithCertificate,
+      });
 
-    if (dataUpload) {
-      const courseContract = new Contract(
-        attensysCourseAbi,
-        attensysCourseAddress,
-        wallet?.account,
-      );
+      if (dataUpload) {
+        try {
+          const courseContract = new Contract(
+            attensysCourseAbi,
+            attensysCourseAddress,
+            wallet?.account,
+          );
 
-      const create_course_calldata = courseContract.populate("create_course", [
-        wallet?.account?.address,
-        false,
-        courseImgupload.IpfsHash,
-        courseData.courseName,
-        "XXX",
-        dataUpload.IpfsHash,
-      ]);
+          const create_course_calldata = courseContract.populate(
+            "create_course",
+            [
+              wallet?.account?.address,
+              false,
+              courseImgupload.IpfsHash,
+              courseData.courseName,
+              "XXX",
+              dataUpload.IpfsHash,
+            ],
+          );
 
-      const callCourseContract = await wallet?.account.execute([
-        {
-          contractAddress: attensysCourseAddress,
-          entrypoint: "create_course",
-          calldata: create_course_calldata.calldata,
-        },
-      ]);
+          const callCourseContract = await wallet?.account.execute([
+            {
+              contractAddress: attensysCourseAddress,
+              entrypoint: "create_course",
+              calldata: create_course_calldata.calldata,
+            },
+          ]);
 
-      const receipt = await wallet?.account?.provider
-        .waitForTransaction(callCourseContract.transaction_hash)
-        .then((res: any) => {
-          console.log("what is ", res);
-          setReceiptData(res);
-        })
-        .catch((e: any) => {
-          console.error("Error: ", e);
-        })
-        .finally(() => {
-          setIsUploading(false);
-          setIsSaving(false);
+          const receipt = await wallet?.account?.provider
+            .waitForTransaction(callCourseContract.transaction_hash)
+            .then((res: any) => {
+              console.log("what is ", res);
+              setReceiptData(res);
+            })
+            .catch((e: any) => {
+              setIsUploading(false);
+              setIsSaving(false);
 
-          handleCreateCourse(e, "course-landing-page", router);
-          // setCourseData(ResetCourseRegistrationData);
-        });
+              toast.error("Transaction failed or timed out:", e.message);
+              setShowRetry(true);
+            })
+            .finally(() => {
+              handleCreateCourse(e, "course-landing-page", router);
+            });
+        } catch (error: any) {
+          toast.error(error);
+        }
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  const retryTransaction = (e: any) => {
+    handleCourseUpload(e);
   };
 
   useEffect(() => {
@@ -180,7 +197,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
         <CourseSideBar courseData={courseData} />
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 w-full">
         <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
           <p className="text-sm text-white text-center py-2">
             Your course creation progress saves automatically, but feel free to
@@ -223,7 +240,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
             </div>
             <div className="block lg:grid lg:grid-cols-2 gap-4">
               {/* Course Image */}
-              <div className="relative h-[350px]  w-[500px]">
+              <div className="relative h-[350px] w-auto max-w-[500px]">
                 {imageSrc ? (
                   <Image
                     src={(imageSrc as string) || "/placeholder.svg"}
@@ -350,6 +367,15 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                       "Save and Publish Course"
                     )}
                   </button>
+
+                  {showRetry && (
+                    <button
+                      onClick={retryTransaction}
+                      className="ml-4 px-4 py-2 bg-purple-600 text-white rounded"
+                    >
+                      Retry
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

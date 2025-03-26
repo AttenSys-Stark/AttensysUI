@@ -77,6 +77,13 @@ const LecturePage = (props: any) => {
   const [courseId, setCourseId] = useState<number>();
   const [taken, setTaken] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isCertified, setIsCertified] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // console.log("uploading:", isUploading);
+  // console.log("taken:", taken);
+  // console.log("Certified:", isCertified);
 
   const handleDuration = (id: number, duration: number) => {
     // Set the duration for the specific video ID
@@ -150,9 +157,10 @@ const LecturePage = (props: any) => {
       attensysCourseAddress,
       props?.wallet?.account,
     );
-    const take_course_calldata = courseContract.populate("acquire_a_course", [
-      Number(courseId),
-    ]);
+    const take_course_calldata = await courseContract.populate(
+      "acquire_a_course",
+      [Number(courseId)],
+    );
 
     const callCourseContract = await props.wallet?.account.execute([
       {
@@ -169,6 +177,7 @@ const LecturePage = (props: any) => {
         console.error("Error: ", e);
       })
       .finally(() => {
+        setTaken(true);
         setIsUploading(false);
       });
   };
@@ -181,7 +190,7 @@ const LecturePage = (props: any) => {
       attensysCourseAddress,
       props?.wallet?.account,
     );
-    const course_certificate_calldata = courseContract.populate(
+    const course_certificate_calldata = await courseContract.populate(
       "finish_course_claim_certification",
       [Number(courseId)],
     );
@@ -201,8 +210,25 @@ const LecturePage = (props: any) => {
         console.error("Error: ", e);
       })
       .finally(() => {
+        setIsCertified(true);
         setIsUploading(false);
       });
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex < props?.data.courseCurriculum.length - 1 ? prevIndex + 1 : 0,
+    );
+  };
+
+  const handlePrevious = () => {
+    setCurrentIndex((prevIndex) =>
+      prevIndex > 0 ? prevIndex - 1 : props?.data.courseCurriculum.length - 1,
+    );
+  };
+
+  const handleVideoClick = (item: any) => {
+    setSelectedVideo(`https://${item.video}`);
   };
 
   // Find and set the course taken, in order to certify
@@ -218,9 +244,22 @@ const LecturePage = (props: any) => {
         props.wallet?.selectedAddress,
         Number(courseId),
       );
+      console.log("taken_courses result:", taken_courses);
 
       if (taken_courses) {
         setTaken(true);
+      }
+
+      const certfified_courses =
+        await courseContract?.is_user_certified_for_course(
+          props.wallet?.selectedAddress,
+          Number(courseId),
+        );
+
+      console.log("certfified_courses result:", certfified_courses);
+
+      if (certfified_courses) {
+        setIsCertified(true);
       }
     } catch (err) {
       console.error("Error in find:", err);
@@ -228,60 +267,88 @@ const LecturePage = (props: any) => {
   };
 
   useEffect(() => {
+    if (!provider) return;
+
     getAllCourses();
+  }, [provider]);
+  useEffect(() => {
+    if (courses.length === 0) return;
 
     getCourse();
-  }, [provider, courses]);
-
+  }, [courses]);
   useEffect(() => {
+    console.log("here as props", props?.data);
+    if (!props?.data?.courseImage) return;
+
     const foundCourse = courses.find((course, index) => {
-      return (
-        props?.data?.data?.courseImage === courseData[index]?.data?.courseImage
-      );
+      return props?.data?.courseImage === courseData[index]?.data?.courseImage;
     });
 
-    if (foundCourse) {
+    if (foundCourse && foundCourse.course_identifier !== courseId) {
       setCourseId(foundCourse.course_identifier);
     }
-  }, [courses, courseData, props?.data?.data?.courseImage]);
-
-  // 🔥 Run `find` when `courseId` updates
+  }, [courses, courseData, props?.data?.courseImage, courseId]);
   useEffect(() => {
-    if (!Number.isNaN(courseId)) {
+    if (!Number.isNaN(courseId) && courseId !== undefined) {
       find();
     }
   }, [courseId]);
 
+  // ⛳ Set the first video on page load
+  useEffect(() => {
+    if (props?.data.courseCurriculum?.length > 0) {
+      setSelectedVideo(`https://${props?.data.courseCurriculum[0].video}`);
+    }
+  }, [props.data]);
+
   return (
     <div className="pt-6  pb-36 w-full">
       {/* Video and Title */}
-      <div className="flex text-sm space-x-3 items-center px-12">
-        <div className="flex space-x-2 items-center">
+      <div className="flex flex-none w-full text-sm space-x-3 items-center px-12">
+        <div className="flex flex-none space-x-2 items-center">
           <Image
             src={graduate}
             className="h-[25px] w-[25px]"
             alt="stream_video"
           />
-          <p className="text-[16px] text-[#2D3A4B] leading-[19px] font-semibold">
-            My Courses
-          </p>
+          <p className="text-[16px] text-[#2D3A4B] font-semibold">My Courses</p>
         </div>
-        <p className="text-[16px] text-[#2D3A4B] leading-[19px] font-semibold">
-          <span className="mr-2 text-[#9B51E0]">|</span>{" "}
-          {props?.data?.data?.courseName}
+        <span className="text-[#9B51E0]">|</span>{" "}
+        <p className="w-full truncate text-[16px] text-[#2D3A4B] font-semibold">
+          {props?.data?.courseName}
         </p>
       </div>
 
       {/* ReactPlayer & lecture*/}
       <div className="w-[100%] mx-auto flex justify-between items-center px-12 mt-5">
         <div className="w-full xl:w-[67%] xl:h-[543px] h-auto aspect-video sm:aspect-[16/9] md:aspect-[16/8] lg:aspect-[16/7] rounded-xl overflow-hidden">
-          <ReactPlayer
-            url="https://www.youtube.com/watch?v=lEF4ccMlQB8"
-            width="100%"
-            height="100%"
-            className="rounded-xl"
-          />
+          {selectedVideo && (
+            <ReactPlayer
+              url={selectedVideo}
+              width="100%"
+              height="100%"
+              className="rounded-xl"
+              controls
+              playing
+            />
+          )}
         </div>
+
+        {/* Next & Previous Buttons */}
+        {/* <div className="flex justify-between mt-4">
+          <button
+            onClick={handlePrevious}
+            className="px-4 py-2 bg-purple-600 text-white rounded"
+          >
+            Previous
+          </button>
+          <button
+            onClick={handleNext}
+            className="px-4 py-2 bg-purple-600 text-white rounded"
+          >
+            Next
+          </button>
+        </div> */}
 
         <div className="hidden xl:block w-[30%] h-[543px] space-y-4">
           <div className="flex space-x-2  justify-center bg-gradient-to-r from-[#5801a9] to-[#4a90e2] text-white items-center text-sm py-3 px-7 rounded-xl">
@@ -289,44 +356,45 @@ const LecturePage = (props: any) => {
             <p>Attensys Certified Course</p>
           </div>
           <h1 className="text-[16px] text-[#2D3A4B] leading-[22px] font-semibold">
-            Lecture ({props.data?.data?.courseCurriculum.length})
+            Lecture ({props?.data?.courseCurriculum.length})
           </h1>
 
           <div className="h-[440px] w-[100%] bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide">
-            {props.data?.data?.courseCurriculum.map((item: any, i: any) => (
-              <div
-                key={i}
-                className="flex w-full space-y-1 items-center p-3 space-x-8 justify-center"
-              >
-                <p className="font-bold text-[#5801a9]">{i + 1}</p>
-                <div className="w-[150px] h-[120px] rounded-xl border-4 border ">
-                  <ReactPlayer
-                    // url={videos[currentIndex]}
-                    light={true}
-                    url={`https://${item.video}`}
-                    controls
-                    playing={false}
-                    // onEnded={handleVideoEnd} // Trigger when video ends
-                    width="100%"
-                    height="100px"
-                    onDuration={(duration) => handleDuration(i, duration)}
-                  />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
-                    {item.name}
-                  </p>
-                  <h1 className="text-[8px] text-[#333333] leading-[14px] font-medium">
-                    Creator address
-                  </h1>
-                  <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
-                    <p className="text-xs px-7 py-1">
-                      {durations[i]?.toFixed(2)}
+            {props?.data?.courseCurriculum.map((item: any, i: any) => {
+              return (
+                <div
+                  key={i}
+                  className="flex w-full space-y-1 items-center p-3 space-x-8 justify-center"
+                  onClick={() => handleVideoClick(item)}
+                >
+                  <p className="font-bold text-[#5801a9]">{i + 1}</p>
+                  <div className="w-[150px] h-[120px] rounded-xl border-4 border ">
+                    <ReactPlayer
+                      light={true}
+                      url={`https://${item.video}`}
+                      controls
+                      playing={false}
+                      width="100%"
+                      height="100px"
+                      onDuration={(duration) => handleDuration(i, duration)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
+                      {item.name}
                     </p>
+                    <h1 className="text-[8px] text-[#333333] leading-[14px] font-medium">
+                      Creator address
+                    </h1>
+                    <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
+                      <p className="text-xs px-7 py-1">
+                        {durations[i]?.toFixed(2)}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
@@ -338,42 +406,48 @@ const LecturePage = (props: any) => {
         >
           <div className="flex space-x-14 justify-between">
             <h1 className="font-bold text-[24px] text-[#2D3A4B] leading-[31px]">
-              {props?.data?.data?.courseName}
+              {props?.data?.courseName}
             </h1>
             <div className="hidden xl:flex sm:ml-5 space-x-2 items-center">
               <GrDiamond color="#2D3A4B" className="h-[20px] w-[20px]" />
               <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-                Difficulty level: {props?.data?.data?.difficultyLevel}
+                Difficulty level: {props?.data?.difficultyLevel}
               </p>
             </div>
+
             <div className="hidden xl:flex space-x-2 items-center">
               <div>
-                <LuBadgeCheck className="h-[20px] w-[20px] text-[#5801A9]" />
-              </div>
-              <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-                Certificate of Completion
-              </p>
-            </div>
-            <div className="hidden xl:flex space-x-2 items-center">
-              <div></div>
-              <div>
-                <button
-                  className="hidden sm:block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold"
-                  onClick={
-                    taken
-                      ? handleFinishCourseClaimCertfificate
-                      : handleTakeCourse
-                  }
-                  disabled={isUploading}
-                >
-                  {isUploading ? (
-                    <LoadingSpinner size="sm" colorVariant="white" />
-                  ) : taken ? (
-                    "Get Certificate"
-                  ) : (
-                    "Take course"
-                  )}
-                </button>
+                {isCertified ? (
+                  <div className="hidden xl:flex space-x-2 items-center">
+                    <div>
+                      <LuBadgeCheck className="h-[20px] w-[20px] text-[#5801A9]" />
+                    </div>
+                    <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
+                      Certificate of Completion
+                    </p>
+                  </div>
+                ) : (
+                  <button
+                    className={`hidden sm:block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold`}
+                    onClick={
+                      taken
+                        ? handleFinishCourseClaimCertfificate
+                        : handleTakeCourse
+                    }
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <div className="flex items-center gap-2">
+                        <LoadingSpinner size="sm" colorVariant="white" />
+                        {taken ? "Claiming Certificate..." : "Taking Course..."}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        {taken ? "Get Certificate" : "Take Course"}
+                      </div>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -381,7 +455,7 @@ const LecturePage = (props: any) => {
             <p className="text-[14px] text-[#2D3A4B] leading-[18px] font-medium">
               Created by{" "}
               <span className="underline text-[#5801A9]">
-                {props?.data?.data?.courseCreator}
+                {props?.data?.courseCreator}
               </span>
             </p>
           </div>
@@ -400,7 +474,7 @@ const LecturePage = (props: any) => {
                 About this course
               </p>
               <p className="text-[14px] text-[#333333] leading-[22px] font-light">
-                {props?.data?.data?.courseDescription}
+                {props?.data?.courseDescription}
               </p>
             </div>
             <div className="py-4">
@@ -412,7 +486,7 @@ const LecturePage = (props: any) => {
                 {/* <li>A computer with internet access</li>
                 <li>Basic computer skills</li>
                 <li>Willingness to learn and experiment</li> */}
-                {props?.data?.data?.studentRequirements}
+                {props?.data?.studentRequirements}
               </ul>
             </div>
             <div className="py-6">
@@ -422,9 +496,9 @@ const LecturePage = (props: any) => {
               </p>
 
               <div>
-                <p>{props?.data?.data?.targetAudience}</p>
+                <p>{props?.data?.targetAudience}</p>
 
-                <p>{props?.data?.data?.targetAudienceDesc}</p>
+                <p>{props?.data?.targetAudienceDesc}</p>
               </div>
             </div>
           </div>

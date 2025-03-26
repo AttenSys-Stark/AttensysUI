@@ -3,21 +3,17 @@ import React, { useState } from "react";
 import videoHero from "../../assets/video.svg";
 import CarouselComp from "./Carousel";
 import Image from "next/image";
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
-import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck";
 import { GiBackwardTime } from "@react-icons/all-files/gi/GiBackwardTime";
 import { FaPlay } from "@react-icons/all-files/fa/FaPlay";
 import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond";
 import { IoMdArrowDropdown } from "@react-icons/all-files/io/IoMdArrowDropdown";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { handleCourse } from "@/utils/helpers";
 import { skills, subLectures } from "@/constants/data";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 import StarRating from "../bootcamp/StarRating";
 import { LuBadgeCheck } from "react-icons/lu";
-import { CardWithLink } from "./Cards";
-import CourseLanding from "./CourseLanding";
 
 interface ChildComponentProps {
   wallet: any;
@@ -26,12 +22,6 @@ interface ChildComponentProps {
 
 const Explore = ({ wallet, courseData }: ChildComponentProps) => {
   const router = useRouter();
-  const pathname = usePathname();
-
-  // const queryString = new URLSearchParams({
-  //   data: encodeURIComponent(JSON.stringify(courseData)),
-  // }).toString();
-  // console.log("Query what", queryString);
 
   const responsive = {
     superLargeDesktop: {
@@ -72,9 +62,12 @@ const Explore = ({ wallet, courseData }: ChildComponentProps) => {
       </div>
 
       {/* skills  */}
-      <div className="ml-6 lg:mx-12 overflow-x-scroll xl:overflow-auto my-16 hidden xl:flex flex-row lg:justify-center">
+      <div className="ml-6 lg:mx-12 overflow-x-scroll xl:overflow-auto my-16 hidden xl:flex flex-row space-x-4 lg:justify-center">
         {skills.map((item, index) => (
-          <p className="bg-[#2D3A4B] p-6 text-white" key={index}>
+          <p
+            className="bg-[#2D3A4B] px-6 py-3.5 rounded-lg text-white flex flex-none items-center justify-center"
+            key={index}
+          >
             {item}
           </p>
         ))}
@@ -84,7 +77,7 @@ const Explore = ({ wallet, courseData }: ChildComponentProps) => {
         <Carousel responsive={responsive}>
           {skills.map((item, index) => (
             <p
-              className="bg-[#2D3A4B] rounded-[8px] xl:rounded-none p-6 text-white"
+              className="bg-[#2D3A4B] rounded-[8px] xl:rounded-none py-3.5 text-white mr-4"
               key={index}
             >
               {item}
@@ -108,7 +101,6 @@ const Explore = ({ wallet, courseData }: ChildComponentProps) => {
                 “Introduction to Web Dev Starknet”
               </span>
             </p>
-            {/* <CourseLanding /> */}
           </div>
 
           {/* cards  */}
@@ -141,7 +133,7 @@ const Explore = ({ wallet, courseData }: ChildComponentProps) => {
           <div className="flex flex-col md:flex-row gap-x-5 space-x-10 sm:flex sm:mx-0 justify-top xl:w-[70%] max-w-full">
             <div className="h-full sm:w-full rounded-xl">
               <Image
-                src={`https://ipfs.io/ipfs/${courseData[courseData.length - 1]?.data.courseImage}`}
+                src={`https://ipfs.io/ipfs/${courseData[courseData.length - 1]?.data?.courseImage}`}
                 alt="video"
                 width={700}
                 height={700}

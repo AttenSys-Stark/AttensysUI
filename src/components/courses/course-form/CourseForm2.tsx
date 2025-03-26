@@ -72,18 +72,16 @@ const CourseForm2 = ({
           ))}
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </div>
-
         <div className="text-center">
           <button
+            className="bg-[#4A90E2] rounded-xl py-3 mt-12 mb-44 text-white w-[190px] md:w-[350px]"
             type="submit"
-            className="w-full max-w-[350px] rounded-xl bg-[#4A90E2] py-3 mt-12 mb-44 text-white"
           >
             Next
           </button>
         </div>
       </form>
-
-      <div className="block absolute left-[35%] bottom-36 lg:hidden">
+      <div className="block absolute left-[37.5%] md:left-[42%] bottom-36 lg:hidden">
         <Previous />
       </div>
     </div>

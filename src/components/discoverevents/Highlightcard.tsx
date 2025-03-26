@@ -55,7 +55,7 @@ const Highlightcard = (props: any) => {
   return (
     <div
       onClick={props.onClick}
-      className="cursor-pointer relative h-[380px] w-[75%] mx-auto sm:mx-0 my-12 sm:my-0 sm:w-[278px] rounded-2xl "
+      className="cursor-pointer relative h-[380px] w-full rounded-2xl "
     >
       <Image
         src={logoImagesource}
@@ -63,7 +63,7 @@ const Highlightcard = (props: any) => {
         className="h-full w-full object-cover rounded-2xl"
         layout="fill"
       />
-      <div className="absolute bottom-6 z-20 w-full text-center bg-[#1A1A1A99] py-3">
+      <div className="absolute bottom-0 rounded-b-2xl z-20 w-full text-center bg-[#1A1A1A99] py-3">
         <h1 className="text-[#FFFFFF] text-[13px] font-normal leading-[21px]">
           HIGHLIGHTED EVENT
         </h1>
