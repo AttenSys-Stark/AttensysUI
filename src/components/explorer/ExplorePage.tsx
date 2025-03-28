@@ -7,6 +7,23 @@ import TableList from "./TableList";
 import { useRouter } from "next/navigation";
 import { handleSubmit } from "@/utils/helpers";
 import { RiArrowDropDownLine } from "react-icons/ri";
+import { useQuery } from "@tanstack/react-query";
+import { gql, request } from "graphql-request";
+const query = gql`
+  {
+    myEntities(first: 5) {
+      id
+    }
+    organizationProfiles(first: 5) {
+      id
+      org_name
+      org_ipfs_uri
+    }
+  }
+`;
+const url =
+  "https://api.studio.thegraph.com/query/107628/orgsubgraph/version/latest";
+const headers = { Authorization: "Bearer {api-key}" };
 
 const ExplorePage = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -14,6 +31,13 @@ const ExplorePage = () => {
   const [maxVisiblePages, setMaxVisiblePages] = useState(10);
   const itemsPerPage = 10;
   const router = useRouter();
+
+  const { data } = useQuery({
+    queryKey: ["data"],
+    async queryFn() {
+      return await request(url, query, {}, headers);
+    },
+  });
 
   useEffect(() => {
     const handleResize = () => {
@@ -216,6 +240,7 @@ const ExplorePage = () => {
           </button>
         </div>
       </div>
+      <div>{JSON.stringify(data ?? {})}</div>
     </div>
   );
 };
