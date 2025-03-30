@@ -1,18 +1,14 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import blucecirle from "@/assets/bluecircle.svg";
-import { Calendar } from "@nextui-org/react";
-import type { DateValue } from "@react-types/calendar";
-import { today, getLocalTimeZone } from "@internationalized/date";
 import eventlog from "@/assets/eventlogo.svg";
-import fire from "@/assets/fire.svg";
-import { CiLocationOn } from "react-icons/ci";
-import { pinata } from "../../../utils/config";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import { useAtom } from "jotai";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { decimalToHexAddress, FormatDateFromUnix } from "@/utils/formatAddress";
+import { decimalToHexAddress } from "@/utils/formatAddress";
+import { getLocalTimeZone, today } from "@internationalized/date";
+import { useAtom } from "jotai";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { CiLocationOn } from "react-icons/ci";
 
 interface MyeventCardProp {
   todaydate: string;
@@ -26,7 +22,11 @@ const Eventcard = (props: any) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [location, setLocation] = useState("");
   const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
-
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
   let defaultDate = today(getLocalTimeZone());
   const router = useRouter();
 
@@ -34,11 +34,11 @@ const Eventcard = (props: any) => {
 
   const obtainCIDdata = async (CID: string) => {
     try {
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
       //@ts-ignore
       console.info("event_uri here", data?.data);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.eventDesign,
       );

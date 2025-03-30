@@ -1,20 +1,20 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import OutlineCard from "./OutlineCard";
-import { FaPlus } from "react-icons/fa6";
+import { provider } from "@/constants";
+import { attensysOrgAbi } from "@/deployments/abi";
+import { attensysOrgAddress } from "@/deployments/contracts";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import {
   addclassmodal,
   currentID,
   orgowneraddress,
 } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
-import { attensysOrgAbi } from "@/deployments/abi";
-import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { pinata } from "../../../utils/config";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FaPlus } from "react-icons/fa6";
+import { Contract } from "starknet";
+import OutlineCard from "./OutlineCard";
 
 const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
 
@@ -26,6 +26,11 @@ const Outline = () => {
   const [ownerAddress, setowneraddress] = useAtom(orgowneraddress);
   const [videoarray, setVideoArray] = useState<any[]>([]);
   const searchParams = useSearchParams();
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
   const id = searchParams.get("id");
   const org = searchParams.get("org");
 
@@ -62,7 +67,7 @@ const Outline = () => {
   };
 
   const getIPfsVideodata = async (CID: string) => {
-    const data = await pinata.gateways.get(CID);
+    const data = await fetchCIDContent(CID);
     console.log(data);
     //@ts-ignore
     console.log("url", data?.data?.courseData?.videoUrl);

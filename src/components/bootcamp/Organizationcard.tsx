@@ -1,21 +1,18 @@
-import React, { useEffect, useState } from "react";
-import handshake from "@/assets/handshake.svg";
-import Image from "next/image";
-import testlogo from "@/assets/testlogo.svg";
-import StarRating from "./StarRating";
-import { Button } from "@headlessui/react";
-import { useRouter } from "next/navigation";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { provider } from "@/constants";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { pinata } from "../../../utils/config";
-import axios from "axios";
-import { GetCIDResponse } from "pinata";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { Button } from "@headlessui/react";
 import { useAtom } from "jotai";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { GetCIDResponse } from "pinata";
+import { useEffect, useState } from "react";
+import { Contract } from "starknet";
+import StarRating from "./StarRating";
 
 interface OrganizationCardProp {
   name: string;
@@ -47,6 +44,11 @@ const Organizationcard = (props: any) => {
   const [bootcampNumber, setBootcampNumber] = useState<number | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const handleDetailsRoute = () => {
     router.push(
@@ -57,15 +59,15 @@ const Organizationcard = (props: any) => {
   const getPubIpfs = async (CID: string) => {
     try {
       //@ts-ignore
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
       console.info(data?.data);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.OrganizationLogoCID,
       );
       //@ts-ignore
-      const bannerData: GetCIDResponse = await pinata.gateways.get(
+      const bannerData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.OrganizationBannerCID,
       );

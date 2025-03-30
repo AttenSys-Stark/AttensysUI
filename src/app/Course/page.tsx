@@ -1,19 +1,18 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import Coursedropdown from "@/components/courses/Coursedropdown";
-import { useAtom } from "jotai";
-import {
-  coursestatusAtom,
-  bootcampdropdownstatus,
-} from "@/state/connectedWalletStarknetkitNext";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { getAllCoursesInfo } from "@/utils/helpers";
-import { pinata } from "../../../utils/config";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
-import Explore from "@/components/courses/Explore";
+import Coursedropdown from "@/components/courses/Coursedropdown";
 import CourseNews from "@/components/courses/CourseNews";
-import { GetCIDResponse } from "pinata";
+import Explore from "@/components/courses/Explore";
 import { provider } from "@/constants";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import {
+  bootcampdropdownstatus,
+  coursestatusAtom,
+} from "@/state/connectedWalletStarknetkitNext";
+import { getAllCoursesInfo } from "@/utils/helpers";
+import { useAtom } from "jotai";
+import { useEffect, useState } from "react";
 import { MoonLoader } from "react-spinners";
 
 interface CourseType {
@@ -40,26 +39,11 @@ const Index = () => {
   const [wallet] = useAtom(walletStarknetkit);
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [courseData, setCourseData] = useState<CourseType[]>([]);
+  const { fetchCIDContent } = useFetchCID();
 
   const getAllCourses = async () => {
     const res: CourseType[] = await getAllCoursesInfo();
     setCourses(res);
-  };
-
-  const getPubIpfs = async (CID: string) => {
-    try {
-      //@ts-ignore
-      const data = await pinata.gateways.get(CID);
-
-      // const courseImage: GetCIDResponse = await pinata.gateways.get(
-      //   //@ts-ignore
-      //   data?.data?.courseImage,
-      // );
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching IPFS content:", error);
-    }
   };
 
   const getCourse = async () => {
@@ -73,12 +57,7 @@ const Index = () => {
           return null; // Skip invalid URLs
         }
 
-        try {
-          return await getPubIpfs(course.course_ipfs_uri);
-        } catch (error) {
-          console.error("Error fetching from IPFS:", error);
-          return null; // Skip on failure
-        }
+        return await fetchCIDContent(course.course_ipfs_uri);
       }),
     );
 

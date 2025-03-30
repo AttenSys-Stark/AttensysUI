@@ -1,22 +1,27 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { pinata } from "../../../utils/config";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import { FormatDateFromUnix } from "@/utils/formatAddress";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const Highlightcard = (props: any) => {
   const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
   const [isLoading, setIsLoading] = useState(true);
   const [eventName, setEventName] = useState("");
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const obtainCIDdata = async (CID: string) => {
     try {
       //@ts-ignore
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
       console.log("fetched CID event", data);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.eventDesign,
       );

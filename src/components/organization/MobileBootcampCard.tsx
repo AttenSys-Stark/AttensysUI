@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import { Button } from "@headlessui/react";
-import { IoSettingsSharp } from "react-icons/io5";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { Button } from "@headlessui/react";
 import { useAtom } from "jotai";
-import { pinata } from "../../../utils/config";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import Image from "next/image";
 import { GetCIDResponse } from "pinata";
+import { useEffect, useState } from "react";
+import { IoSettingsSharp } from "react-icons/io5";
 
 // interface CarousellCardProp {
 //   name : string,
@@ -25,21 +25,26 @@ const MobileBootcampCard = (props: any) => {
   const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
   const [NFTImagesource, setNFTLogoImage] = useState<string | StaticImport>("");
   const [date, setDate] = useState<string | null>(null);
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const obtainCIDdata = async (CID: string) => {
     try {
-      const data = await pinata.gateways.get(CID);
+      const data = await CID;
       //@ts-ignore
       console.info("bootcamp uri here", data?.data);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.BootcampLogo,
       );
       const objectURL = URL.createObjectURL(logoData.data as Blob);
 
       //@ts-ignore
-      const nftData: GetCIDResponse = await pinata.gateways.get(
+      const nftData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.BootcampNftImage,
       );

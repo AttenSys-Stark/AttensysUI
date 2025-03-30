@@ -226,14 +226,10 @@ export default function UploadModal(prop: any) {
           },
         ]);
 
-        try {
-          //@ts-ignore
-          await wallet?.account?.provider.waitForTransaction(
-            callContract.transaction_hash,
-          );
-        } catch (error) {
-          console.error("Transaction confirmation failed:", error);
-        }
+        //@ts-ignore
+        await wallet?.account?.provider.waitForTransaction(
+          callContract.transaction_hash,
+        );
       }
     } catch (error) {
       console.error("Error during save:", error);

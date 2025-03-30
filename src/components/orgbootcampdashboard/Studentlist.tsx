@@ -1,17 +1,22 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useAtom } from "jotai";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { pinata } from "../../../utils/config";
+import { useAtom } from "jotai";
+import { useEffect, useState } from "react";
 
 const Studentlist = (props: any) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const getIpfsData = async () => {
     try {
-      const data = await pinata.gateways.get(props?.info?.student_details_uri);
+      const data = await fetchCIDContent(props?.info?.student_details_uri);
       console.log("student data", data);
       //@ts-ignore
       setEmail(data?.data?.student_email);

@@ -1,19 +1,24 @@
 "use client";
-import Image from "next/image";
-import React, { useEffect, useState } from "react";
-import { useAtom } from "jotai";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { pinata } from "../../../utils/config";
 import book from "@/assets/book.svg";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAtom } from "jotai";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 const MobileStudentRegisteredCard = (props: any) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const getIpfsData = async () => {
     try {
-      const data = await pinata.gateways.get(props?.info?.student_details_uri);
+      const data = await fetchCIDContent(props?.info?.student_details_uri);
       console.log("student data", data);
       //@ts-ignore
       setEmail(data?.data?.student_email);

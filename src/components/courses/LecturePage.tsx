@@ -1,27 +1,25 @@
-import React, { useState, useEffect } from "react";
-import ReactPlayer from "react-player/lazy";
-import { CardWithLink } from "./Cards";
-import { Button } from "@material-tailwind/react";
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
-import Image from "next/image";
-import stream_video from "@/assets/stream_video.svg";
-import graduate from "@/assets/grad.svg";
-import profile_pic from "@/assets/profile_pic.png";
-import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck";
-import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond";
-import youtube from "@/assets/youtube.svg";
 import podcast from "@/assets/Podcast.svg";
 import rich from "@/assets/Richin2024.svg";
 import attensys_logo from "@/assets/attensys_logo.svg";
-import { LuBadgeCheck } from "react-icons/lu";
-import StarRating from "../bootcamp/StarRating";
-import { Contract, wallet } from "starknet";
+import graduate from "@/assets/grad.svg";
+import profile_pic from "@/assets/profile_pic.png";
+import youtube from "@/assets/youtube.svg";
+import { provider } from "@/constants";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import { getAllCoursesInfo } from "@/utils/helpers";
-import { provider } from "@/constants";
-import { pinata } from "../../../utils/config";
+import { GrDiamond } from "@react-icons/all-files/gr/GrDiamond";
+import { HiBadgeCheck } from "@react-icons/all-files/hi/HiBadgeCheck";
+import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { LuBadgeCheck } from "react-icons/lu";
+import ReactPlayer from "react-player/lazy";
+import { Contract } from "starknet";
+import StarRating from "../bootcamp/StarRating";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import { CardWithLink } from "./Cards";
 
 interface CourseType {
   data: any;
@@ -80,6 +78,11 @@ const LecturePage = (props: any) => {
   const [isCertified, setIsCertified] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   // console.log("uploading:", isUploading);
   // console.log("taken:", taken);
@@ -99,17 +102,6 @@ const LecturePage = (props: any) => {
     setCourses(res);
   };
 
-  const getPubIpfs = async (CID: string) => {
-    try {
-      //@ts-ignore
-      const data = await pinata.gateways.get(CID);
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching IPFS content:", error);
-    }
-  };
-
   // Extract courses and informmation
   const getCourse = async () => {
     const resolvedCourses = await Promise.all(
@@ -120,7 +112,7 @@ const LecturePage = (props: any) => {
         }
 
         try {
-          return await getPubIpfs(course.course_ipfs_uri);
+          return await fetchCIDContent(course.course_ipfs_uri);
         } catch (error) {
           console.error("Error fetching from IPFS:", error);
           return null; // Skip on failure

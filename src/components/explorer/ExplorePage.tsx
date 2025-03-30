@@ -9,21 +9,92 @@ import { handleSubmit } from "@/utils/helpers";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { useQuery } from "@tanstack/react-query";
 import { gql, request } from "graphql-request";
-const query = gql`
+import EventFeed from "./EventFeed";
+
+const orgquery = gql`
   {
-    myEntities(first: 5) {
-      id
-    }
-    organizationProfiles(first: 5) {
-      id
+    organizationProfiles {
       org_name
-      org_ipfs_uri
+    }
+    bootCampCreateds {
+      bootcamp_name
+      org_name
+    }
+    bootcampRegistrations {
+      bootcamp_id
+      org_address
+    }
+    instructorAddedToOrgs {
+      instructors
+      org_name
+    }
+    instructorRemovedFromOrgs {
+      instructor_addr
+      org_owner
+    }
+    registrationApproveds {
+      bootcamp_id
+      student_address
+    }
+    registrationDeclineds {
+      bootcamp_id
+      student_address
     }
   }
 `;
-const url =
+
+const coursequery = gql`
+  {
+    adminTransferreds {
+      new_admin
+    }
+    courseCertClaimeds {
+      candidate
+    }
+    courseCreateds {
+      owner_
+      course_ipfs_uri
+    }
+    courseReplaceds {
+      owner_
+      new_course_uri
+    }
+  }
+`;
+
+const eventquery = gql`
+  {
+    eventCreateds {
+      event_name
+      event_organizer
+    }
+    adminOwnershipClaimeds {
+      new_admin
+    }
+    adminTransferreds {
+      new_admin
+    }
+    attendanceMarkeds {
+      attendee
+    }
+    registeredForEvents {
+      attendee
+    }
+    registrationStatusChangeds {
+      registration_open
+    }
+  }
+`;
+
+const orgurl =
   "https://api.studio.thegraph.com/query/107628/orgsubgraph/version/latest";
 const headers = { Authorization: "Bearer {api-key}" };
+
+const courseurl =
+  "https://api.studio.thegraph.com/query/107628/coursesubgraph/version/latest";
+
+const eventurl =
+  "https://api.studio.thegraph.com/query/107628/eventsubgraph/version/latest";
 
 const ExplorePage = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -35,9 +106,35 @@ const ExplorePage = () => {
   const { data } = useQuery({
     queryKey: ["data"],
     async queryFn() {
-      return await request(url, query, {}, headers);
+      return await request(orgurl, orgquery, {}, headers);
     },
+    refetchInterval: 10000,
   });
+
+  const { data: coursedata } = useQuery({
+    queryKey: ["coursedata"],
+    async queryFn() {
+      return await request(courseurl, coursequery, {}, headers);
+    },
+    refetchInterval: 10000,
+  });
+
+  const { data: eventdata } = useQuery({
+    queryKey: ["eventdata"],
+    async queryFn() {
+      return await request(eventurl, eventquery, {}, headers);
+    },
+    refetchInterval: 10000,
+  });
+
+  const eventData = React.useMemo(
+    () => ({
+      organizations: data ?? {},
+      courses: coursedata ?? {},
+      events: eventdata ?? {},
+    }),
+    [data, coursedata],
+  );
 
   useEffect(() => {
     const handleResize = () => {
@@ -55,26 +152,6 @@ const ExplorePage = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
-
-  const generatePageNumbers = () => {
-    const pageNumbers = [];
-
-    if (currentPage > 2) pageNumbers.push(1);
-    if (currentPage > 3) pageNumbers.push("...");
-
-    for (
-      let i = Math.max(1, currentPage - 1);
-      i <= Math.min(currentPage + 1, totalPages);
-      i++
-    ) {
-      pageNumbers.push(i);
-    }
-
-    if (currentPage < totalPages - 2) pageNumbers.push("...");
-    if (currentPage < totalPages - 1) pageNumbers.push(totalPages);
-
-    return pageNumbers;
-  };
 
   const handleChange = (event: { target: { value: any } }) => {
     setSearchValue(event.target.value);
@@ -142,9 +219,9 @@ const ExplorePage = () => {
       {/* Table Section */}
       <div className="min-h-[930px] mx-auto bg-white mt-4 rounded-lg mb-24 p-4 md:p-6">
         <div className="flex bg-[#9B51E052] bg-opacity-[35%] md:bg-[#9B51E052] xl:bg-transparent h-[80px] rounded-xl xl:max-h-20 justify-between align-middle items-center px-5 md:px-5 xl:px-12 mt-10 max-w-[92%] mx-auto">
-          <h1 className="text-[18px] font-medium leading-[22px] text-[#333333]">
-            Recent activity
-          </h1>
+          <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+            Recent Activity
+          </h2>
           <div className="flex justify-end">
             <Button className="flex rounded-lg bg-[#4A90E21F] py-2 px-4 h-[42px] items-center w-[90px] text-sm text-[#5801A9]">
               <Image src={filter} alt="filter" className="mr-2" />
@@ -152,95 +229,8 @@ const ExplorePage = () => {
             </Button>
           </div>
         </div>
-
-        <div className="w-full md:w-[92%] mx-auto mt-6">
-          {/* Mobile, Tablet, and Small Desktop View */}
-          <div className="block xl:hidden space-y-4 px-4">
-            {currentItems.map((data, index) => (
-              <TableList
-                key={index}
-                timestamp={data.timestamp}
-                address={data.address}
-                status={data.status}
-                category={data.category}
-              />
-            ))}
-          </div>
-
-          {/* Large Desktop View */}
-          <div className="hidden xl:block overflow-x-auto">
-            <table className="w-full border-separate border-spacing-y-3 min-w-[800px]">
-              <thead>
-                <tr className="h-[56px] text-[14px] bg-[#9B51E052] font-normal text-[#5801A9] leading-[19.79px]">
-                  <th className="text-center font-light rounded-tl-xl rounded-bl-xl whitespace-nowrap px-4">
-                    Timestamp
-                  </th>
-                  <th className="text-center font-light whitespace-nowrap px-4">
-                    Wallet Address
-                  </th>
-                  <th className="text-center font-light whitespace-nowrap px-4">
-                    Activity Status
-                  </th>
-                  <th className="text-center font-light rounded-tr-xl rounded-br-xl whitespace-nowrap px-4">
-                    Course/Event/Bootcamp
-                  </th>
-                </tr>
-              </thead>
-              {currentItems.map((data, index) => (
-                <TableList
-                  key={index}
-                  timestamp={data.timestamp}
-                  address={data.address}
-                  status={data.status}
-                  category={data.category}
-                />
-              ))}
-            </table>
-          </div>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex justify-center space-x-2 mt-8 overflow-x-auto py-4">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-3 md:px-4 py-2 border border-[#D0D5DD] rounded disabled:opacity-50"
-          >
-            {"<"}
-          </button>
-
-          {generatePageNumbers().map((page, index) =>
-            page === "..." ? (
-              <span key={index} className="px-2 text-base mt-2">
-                ...
-              </span>
-            ) : (
-              <button
-                key={index}
-                onClick={() => setCurrentPage(Number(page))}
-                className={`px-3 md:px-4 py-2 rounded text-[14px] ${
-                  currentPage === page
-                    ? "border border-[#F56630] text-black"
-                    : "text-black"
-                }`}
-              >
-                {page}
-              </button>
-            ),
-          )}
-
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className="px-3 md:px-4 py-2 border border-[#D0D5DD] rounded disabled:opacity-50"
-          >
-            {">"}
-          </button>
-        </div>
+        <EventFeed data={eventData} />
       </div>
-      <div>{JSON.stringify(data ?? {})}</div>
     </div>
   );
 };

@@ -70,85 +70,84 @@ const Addinstructor = (props: any) => {
   // function to handle multicall of create_org and add_instructor functions from contract
   const handle_multicall_routing = async () => {
     setUploading(true);
-    const OrgBannerupload = await pinata.upload.file(
-      organizationData.organizationBanner,
-    );
-    const OrgLogoUpload = await pinata.upload.file(
-      organizationData.organizationLogo,
-    );
-    console.log("org data here", organizationData);
-    const Dataupload = await pinata.upload.json({
-      OrganizationName: organizationData.organizationName,
-      OrganizationDescription: organizationData.organizationDescription,
-      OrganizationBannerCID: OrgBannerupload.IpfsHash,
-      OrganizationLogoCID: OrgLogoUpload.IpfsHash,
-      OrganizationCategory: organizationData.organizationCategory,
-      OrganizationAdminName: organizationData.organizationAdminfullname,
-      OrganizationAdminEmail: organizationData.organizationAminEmail,
-      OrganizationAminWalletAddress: organizationData.organizationAdminWallet,
-      OrganizationInstructorEmails:
-        organizationData.organizationInstructorEmails,
-      OrganizationInstructorWalletAddresses:
-        organizationData.organizationInstructorsWalletAddresses,
-    });
-    //@todo reset all data field after pinata data upload is successful
-    if (Dataupload) {
-      console.log("Data upload here", Dataupload);
-      console.log("Cid to send to contract", Dataupload.IpfsHash);
-      //initialize provider with a Sepolia Testnet node
-      const organizationContract = new Contract(
-        attensysOrgAbi,
-        attensysOrgAddress,
-        connectorDataAccount,
+    try {
+      const OrgBannerupload = await pinata.upload.file(
+        organizationData.organizationBanner,
       );
-
-      const create_org_calldata = organizationContract.populate(
-        "create_org_profile",
-        [
-          organizationData.organizationName,
-          // @ts-ignore
-          Dataupload.IpfsHash,
-        ],
+      const OrgLogoUpload = await pinata.upload.file(
+        organizationData.organizationLogo,
       );
-
-      const add_instructor_calldata = organizationContract.populate(
-        "add_instructor_to_org",
-        [
+      console.log("org data here", organizationData);
+      const Dataupload = await pinata.upload.json({
+        OrganizationName: organizationData.organizationName,
+        OrganizationDescription: organizationData.organizationDescription,
+        OrganizationBannerCID: OrgBannerupload.IpfsHash,
+        OrganizationLogoCID: OrgLogoUpload.IpfsHash,
+        OrganizationCategory: organizationData.organizationCategory,
+        OrganizationAdminName: organizationData.organizationAdminfullname,
+        OrganizationAdminEmail: organizationData.organizationAminEmail,
+        OrganizationAminWalletAddress: organizationData.organizationAdminWallet,
+        OrganizationInstructorEmails:
+          organizationData.organizationInstructorEmails,
+        OrganizationInstructorWalletAddresses:
           organizationData.organizationInstructorsWalletAddresses,
-          organizationData.organizationName,
-        ],
-      );
+      });
+      //@todo reset all data field after pinata data upload is successful
+      if (Dataupload) {
+        console.log("Data upload here", Dataupload);
+        console.log("Cid to send to contract", Dataupload.IpfsHash);
+        //initialize provider with a Sepolia Testnet node
+        const organizationContract = new Contract(
+          attensysOrgAbi,
+          attensysOrgAddress,
+          connectorDataAccount,
+        );
 
-      //@ts-ignore
-      const multiCall = await connectorDataAccount.execute([
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "create_org_profile",
-          calldata: create_org_calldata.calldata,
-        },
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "add_instructor_to_org",
-          calldata: add_instructor_calldata.calldata,
-        },
-      ]);
+        const create_org_calldata = organizationContract.populate(
+          "create_org_profile",
+          [
+            organizationData.organizationName,
+            // @ts-ignore
+            Dataupload.IpfsHash,
+          ],
+        );
 
-      //@ts-ignore
-      connectorDataAccount?.provider
-        .waitForTransaction(multiCall.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.log("Error: ", e);
-        })
-        .finally(() => {
-          setSpecificOrg(organizationData.organizationName);
-          //Resets all org data input
-          setOrganizationData(ResetOrgRegData);
-          router.push(`/Createorganization/create-a-bootcamp`);
-        });
+        const add_instructor_calldata = organizationContract.populate(
+          "add_instructor_to_org",
+          [
+            organizationData.organizationInstructorsWalletAddresses,
+            organizationData.organizationName,
+          ],
+        );
+
+        //@ts-ignore
+        const multiCall = await connectorDataAccount.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "create_org_profile",
+            calldata: create_org_calldata.calldata,
+          },
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "add_instructor_to_org",
+            calldata: add_instructor_calldata.calldata,
+          },
+        ]);
+
+        //@ts-ignore
+        await connectorDataAccount?.provider.waitForTransaction(
+          multiCall.transaction_hash,
+        );
+        console.log("Done Submitting");
+        setUploading(false);
+        setOrganizationData(ResetOrgRegData);
+        setSpecificOrg(organizationData.organizationName);
+        router.push(`/Createorganization/create-a-bootcamp`);
+      }
+    } catch (error) {
       setUploading(false);
+      console.error("An error occured: ", error);
     }
-    setUploading(false);
   };
 
   return (

@@ -14,6 +14,7 @@ import { pinata } from "../../../utils/config";
 import { useSearchParams } from "next/navigation";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Previous from "../courses/course-form/previous";
+import { useFetchCID } from "@/hooks/useFetchCID";
 
 const Explorebootcampdetails = () => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -32,6 +33,7 @@ const Explorebootcampdetails = () => {
   const searchParams = useSearchParams();
   const org = searchParams.get("org");
   const [isLoading, setIsLoading] = useState(true);
+  const { fetchCIDContent, getError } = useFetchCID();
 
   const orgContract = new Contract(
     attensysOrgAbi,
@@ -41,16 +43,16 @@ const Explorebootcampdetails = () => {
 
   const getPubIpfs = async (CID: string) => {
     try {
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
       //@ts-ignore
       console.info(data?.data);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.OrganizationLogoCID,
       );
       //@ts-ignore
-      const bannerData: GetCIDResponse = await pinata.gateways.get(
+      const bannerData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.OrganizationBannerCID,
       );

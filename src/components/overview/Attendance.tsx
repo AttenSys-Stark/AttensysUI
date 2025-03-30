@@ -1,22 +1,21 @@
-import { Button, Input } from "@headlessui/react";
-import React, { useEffect, useState } from "react";
-import scan from "@/assets/scan.svg";
-import Image from "next/image";
 import check from "@/assets/check.svg";
+import { provider } from "@/constants";
 import { attendanceData } from "@/constants/data";
-import AttendanceList from "./AttendanceList";
-import EventQRCode from "../eventdetails/EventQRCode";
+import { attensysEventAbi } from "@/deployments/abi";
+import { attensysEventAddress } from "@/deployments/contracts";
 import { useEvents } from "@/hooks/useEvents";
-import { useParams, useSearchParams } from "next/navigation";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import {
   decimalToHexAddress,
   formatTruncatedAddress,
 } from "@/utils/formatAddress";
-import { pinata } from "../../../utils/config";
-import { provider } from "@/constants";
-import { attensysEventAbi } from "@/deployments/abi";
-import { attensysEventAddress } from "@/deployments/contracts";
+import { Button, Input } from "@headlessui/react";
+import Image from "next/image";
+import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Contract } from "starknet";
+import EventQRCode from "../eventdetails/EventQRCode";
+import AttendanceList from "./AttendanceList";
 
 interface IParticipants {
   student_name: string;
@@ -36,6 +35,11 @@ const Attendance = () => {
   const { events, getEventsRegiseredUsers } = useEvents();
   const searchParams = useSearchParams();
   const params = useParams();
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
   const itemsPerPage = 4;
   const id = searchParams.get("id");
 
@@ -84,7 +88,7 @@ const Attendance = () => {
   const obtainCIDdata = async (CID: string) => {
     try {
       //@ts-ignore
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
 
       return data?.data;
     } catch (error) {

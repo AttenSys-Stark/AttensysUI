@@ -1,27 +1,23 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import largeflier from "@/assets/largeflier.svg";
-import { FaTags } from "react-icons/fa";
-import { CiCalendarDate } from "react-icons/ci";
-import { IoTimeSharp } from "react-icons/io5";
-import { IoPeopleSharp } from "react-icons/io5";
-import { FaRegHourglass } from "react-icons/fa";
-import Sponsors from "./Sponsors";
-import Descriptionsupport from "./Descriptionsupport";
-import Ongoingcarousell from "./Ongoingcarousell";
-import { useRouter } from "next/navigation";
-import RegisterModal from "./RegisterModal";
-import { registerModal } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom } from "jotai";
-import { useSearchParams } from "next/navigation";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { provider } from "@/constants";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
-import { pinata } from "../../../utils/config";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { registerModal } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { CiCalendarDate } from "react-icons/ci";
+import { FaRegHourglass, FaTags } from "react-icons/fa";
+import { IoPeopleSharp, IoTimeSharp } from "react-icons/io5";
+import { Contract } from "starknet";
+import Descriptionsupport from "./Descriptionsupport";
+import Ongoingcarousell from "./Ongoingcarousell";
+import RegisterModal from "./RegisterModal";
+import Sponsors from "./Sponsors";
 
 const RegisterLanding = (props: any) => {
   const [regModal, setRegModal] = useAtom(registerModal);
@@ -38,14 +34,19 @@ const RegisterLanding = (props: any) => {
   const [Description, setBootcampDescription] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const org = searchParams.get("org");
 
-  console.log("this is register landing ID", id);
-  console.log("this is registerlanding org", org);
+  // console.log("this is register landing ID", id);
+  // console.log("this is registerlanding org", org);
 
   const handleExplore = () => {
     router.push("/Bootcamps");
@@ -77,30 +78,24 @@ const RegisterLanding = (props: any) => {
 
   const obtainCIDdata = async (CID: string) => {
     try {
-      //@ts-ignore
-      const data = await pinata.gateways.get(CID);
-      //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
-        //@ts-ignore
-        data?.data?.BootcampLogo,
-      );
+      // Fetch main bootcamp data
+      const bootcampData = await fetchCIDContent(CID);
+
+      // Fetch logo data
+      const logoData = await fetchCIDContent(bootcampData.data.BootcampLogo);
+
       const objectURL = URL.createObjectURL(logoData.data as Blob);
 
-      //@ts-ignore
-      const nftData: GetCIDResponse = await pinata.gateways.get(
-        //@ts-ignore
-        data?.data?.BootcampNftImage,
-      );
+      // Fetch NFT image data
+      const nftData = await fetchCIDContent(bootcampData.data.BootcampNftImage);
 
-      console.log("ip data here", data);
-      //@ts-ignore
-      setBootcampDescription(data?.data?.BootcampDescription);
-      let formatedDate = formatBootcampDates(data?.data);
-      //@ts-ignore
+      // Update state with fetched data
+      setBootcampDescription(bootcampData.data.BootcampDescription);
+      const formatedDate = formatBootcampDates(bootcampData.data);
       setDate(formatedDate);
       setImageSource(objectURL);
     } catch (error) {
-      console.error("Error fetching IPFS content:", error);
+      console.error("Error obtaining IPFS content:", error);
       throw error;
     }
   };
@@ -279,6 +274,7 @@ const RegisterLanding = (props: any) => {
 
         <Sponsors />
         <Descriptionsupport bootcampDescription={Description} />
+
         <Ongoingcarousell allbootcampInfo={bootcampDataInfo} />
       </div>
     </>

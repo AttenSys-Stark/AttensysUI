@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
-import Notification from "./Notification";
-import CreateACourse from "./CreateACourse";
-import UserSideBar from "./UserSideBar";
-import { coursesDetails, learningDetails } from "@/constants/data";
-import LearningJourney from "./LearningJourney";
-import CoursesCreated from "./CoursesCreated";
-import { useAtom } from "jotai";
-import { connect } from "starknetkit";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { pinata } from "../../../utils/config";
-import { attensysCourseAddress } from "@/deployments/contracts";
+import { coursesDetails, learningDetails } from "@/constants/data";
 import { attensysCourseAbi } from "@/deployments/abi";
+import { attensysCourseAddress } from "@/deployments/contracts";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAtom } from "jotai";
+import { useEffect, useState } from "react";
 import { Contract } from "starknet";
+import { connect } from "starknetkit";
+import CoursesCreated from "./CoursesCreated";
+import CreateACourse from "./CreateACourse";
+import LearningJourney from "./LearningJourney";
+import Notification from "./Notification";
+import UserSideBar from "./UserSideBar";
 
 interface CourseType {
   data: any;
@@ -37,6 +37,11 @@ const MyCourses = (props: any) => {
   const [courseData, setCourseData] = useState<CourseType[]>([]);
   const [takenCourses, setTakenCourses] = useState<CourseType[]>([]);
   const [takenCoursesData, setTakenCoursesData] = useState<CourseType[]>([]);
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const courseContract = new Contract(
     attensysCourseAbi,
@@ -58,16 +63,6 @@ const MyCourses = (props: any) => {
     setTakenCourses(secondRes);
   };
 
-  const getPubIpfs = async (CID: string) => {
-    try {
-      //@ts-ignore
-      const data = await pinata.gateways.get(CID);
-      return data;
-    } catch (error) {
-      console.error("Error fetching IPFS content:", error);
-    }
-  };
-
   const getSingleCourse = async () => {
     if (!courses.length) return; // Prevent running on empty `courses`
     if (!takenCourses.length) return; // Prevent running on empty `courses`
@@ -79,7 +74,7 @@ const MyCourses = (props: any) => {
         }
 
         try {
-          return await getPubIpfs(course.course_ipfs_uri);
+          return await fetchCIDContent(course.course_ipfs_uri);
         } catch (error) {
           console.error("Error fetching from IPFS:", error);
           return null; // Skip on failure
@@ -93,7 +88,7 @@ const MyCourses = (props: any) => {
         }
 
         try {
-          return await getPubIpfs(course.course_ipfs_uri);
+          return await fetchCIDContent(course.course_ipfs_uri);
         } catch (error) {
           console.error("Error fetching from IPFS:", error);
           return null; // Skip on failure
@@ -213,7 +208,7 @@ const MyCourses = (props: any) => {
 
         <div>
           {selected == "" || selected == "Notification" ? (
-            <Notification />
+            <Notification wallet={wallet} />
           ) : null}
         </div>
       </div>

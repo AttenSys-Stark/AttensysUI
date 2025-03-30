@@ -1,21 +1,19 @@
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import flier from "@/assets/flierd.svg";
-import { Button } from "@headlessui/react";
-import { LuCalendarDays } from "react-icons/lu";
-import { RiEditFill } from "react-icons/ri";
-import { FiLink } from "react-icons/fi";
-import { useRouter } from "next/navigation";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useSearchParams } from "next/navigation";
-import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import { atom, useAtom } from "jotai";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import { provider } from "@/constants";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { pinata } from "../../../utils/config";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { mybootcampDescription } from "@/state/connectedWalletStarknetkitNext";
+import { Button } from "@headlessui/react";
+import { useAtom } from "jotai";
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FiLink } from "react-icons/fi";
+import { LuCalendarDays } from "react-icons/lu";
+import { RiEditFill } from "react-icons/ri";
+import { Contract } from "starknet";
 
 const MybootcampTophero = (props: any) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -29,7 +27,7 @@ const MybootcampTophero = (props: any) => {
   const [Imagesource, setImageSource] = useState<string | StaticImport>("");
   const [bootcampDate, setDate] = useState<string | null>(null);
   const [Description, setBootcampDescription] = useAtom(mybootcampDescription);
-
+  const { fetchCIDContent } = useFetchCID();
   const router = useRouter();
 
   const handleroute = () => {
@@ -55,16 +53,16 @@ const MybootcampTophero = (props: any) => {
   const obtainCIDdata = async (CID: string) => {
     try {
       //@ts-ignore
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.BootcampLogo,
       );
       const objectURL = URL.createObjectURL(logoData.data as Blob);
 
       //@ts-ignore
-      const nftData: GetCIDResponse = await pinata.gateways.get(
+      const nftData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.BootcampNftImage,
       );

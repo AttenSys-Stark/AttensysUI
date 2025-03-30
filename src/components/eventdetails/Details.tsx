@@ -1,31 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import story from "@/assets/story.svg";
-import live from "@/assets/live.svg";
-import { approvedsponsors } from "@/constants/data";
-import { Button, Field, Input } from "@headlessui/react";
-import key from "@/assets/key.svg";
-import location from "@/assets/locationn.svg";
 import calendar from "@/assets/calendarr.svg";
-import top from "@/assets/top.svg";
-import Locator from "./Locator";
 import citymap from "@/assets/citymap.svg";
-import Modal from "./Modal";
-import { modalstatus } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom } from "jotai";
-import { Contract } from "starknet";
+import key from "@/assets/key.svg";
+import live from "@/assets/live.svg";
+import location from "@/assets/locationn.svg";
+import top from "@/assets/top.svg";
+import { provider } from "@/constants";
+import { approvedsponsors } from "@/constants/data";
 import { attensysEventAbi } from "@/deployments/abi";
 import { attensysEventAddress } from "@/deployments/contracts";
-import { provider } from "@/constants";
+import { modalstatus } from "@/state/connectedWalletStarknetkitNext";
+import { Button, Field, Input } from "@headlessui/react";
+import { useAtom } from "jotai";
+import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Contract } from "starknet";
+import Modal from "./Modal";
 
-import { EventData } from "../discoverevents/DiscoverLanding";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { decimalToHexAddress, FormatDateFromUnix } from "@/utils/formatAddress";
-import LoadingSpinner from "../ui/LoadingSpinner";
+import clsx from "clsx";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
 import { pinata } from "../../../utils/config";
-import clsx from "clsx";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import LoadingSpinner from "../ui/LoadingSpinner";
 
 const Details = (props: any) => {
   const { connectorDataAccount } = props;
@@ -45,7 +43,11 @@ const Details = (props: any) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [walletAddress, setWalletAddress] = useState<string | undefined>("");
   const [alluserRegisterevent, setalluserRegisterevent] = useState([]);
-
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
   const params = useParams();
   const formatedParams = decodeURIComponent(params["details"] as string);
   const searchParams = useSearchParams();
@@ -78,10 +80,10 @@ const Details = (props: any) => {
   const obtainCIDdata = async (CID: string) => {
     try {
       //@ts-ignore
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
       console.log("fetched CID event details", data);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.eventDesign,
       );

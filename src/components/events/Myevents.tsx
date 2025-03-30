@@ -228,6 +228,7 @@ const Myevents = (props: any) => {
           console.log("Error: ", e);
         })
         .finally(() => {
+          console.log("FINALYY BLOCK RUNNING");
           //Resets all event data input
           setEventName("");
           setStartDate(null);

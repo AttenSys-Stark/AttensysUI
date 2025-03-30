@@ -438,7 +438,7 @@ const Header = () => {
                   </div>
                   {/* 📌 Events - Enlace directo */}
                   <Link
-                    href="/Events/events"
+                    href="/Discoverevent"
                     className="block px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                     onClick={() => close()}
                   >

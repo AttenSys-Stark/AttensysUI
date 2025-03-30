@@ -1,22 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import Heading from "./Heading";
-import Panel from "./Panel";
-import Organizationtabs from "./Organizationtabs";
-import Create from "./Create";
+import { provider } from "@/constants";
+import { attensysOrgAbi } from "@/deployments/abi";
+import { attensysOrgAddress } from "@/deployments/contracts";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import {
   createbootcampoverlay,
   createbootcampupload,
 } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
-import { attensysOrgAbi } from "@/deployments/abi";
-import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
-import { pinata } from "../../../utils/config";
-import axios from "axios";
 import { GetCIDResponse } from "pinata";
+import { useEffect, useRef, useState } from "react";
+import { Contract } from "starknet";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import Create from "./Create";
+import Heading from "./Heading";
+import Organizationtabs from "./Organizationtabs";
+import Panel from "./Panel";
 
 const Organizationlanding = (prop: any) => {
   const [createOverlayStat] = useAtom(createbootcampoverlay);
@@ -38,7 +37,11 @@ const Organizationlanding = (prop: any) => {
   const [isLoadingIPFS, setIsLoadingIPFS] = useState(false);
   const [isLoadingOrgInfo, setIsLoadingOrgInfo] = useState(false);
   const [isLoadingBootcamps, setIsLoadingBootcamps] = useState(false);
-
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
   const orgContract = new Contract(
     attensysOrgAbi,
     attensysOrgAddress,
@@ -48,16 +51,16 @@ const Organizationlanding = (prop: any) => {
   const getPubIpfs = async (CID: string) => {
     setIsLoadingIPFS(true);
     try {
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
       //@ts-ignore
       console.info(data?.data);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.OrganizationLogoCID,
       );
       //@ts-ignore
-      const bannerData: GetCIDResponse = await pinata.gateways.get(
+      const bannerData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.OrganizationBannerCID,
       );
@@ -97,7 +100,7 @@ const Organizationlanding = (prop: any) => {
       setStudentNumber(Number(org_info.number_of_students));
       setBootcampNumber(Number(org_info.number_of_all_bootcamps));
       console.info(org_info);
-      const ipfsdata = getPubIpfs(org_info.org_ipfs_uri);
+      const ipfsdata = await getPubIpfs(org_info.org_ipfs_uri);
       console.info(ipfsdata);
     } catch (error) {
       console.error("Error fetching org info:", error);

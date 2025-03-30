@@ -1,24 +1,12 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
-import robotImg from "../../assets/robot.svg";
-import Image from "next/image";
-import { IoIosStar } from "@react-icons/all-files/io/IoIosStar";
-import {
-  getAllCoursesInfo,
-  handleCourse,
-  handleCoursehome,
-} from "@/utils/helpers";
-import { useRouter } from "next/navigation";
-import StarRating from "../bootcamp/StarRating";
-import { attensysCourseAddress } from "@/deployments/contracts";
-import { attensysCourseAbi } from "@/deployments/abi";
-import { Contract } from "starknet";
 import { provider } from "@/constants";
-import { pinata } from "../../../utils/config";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { getAllCoursesInfo } from "@/utils/helpers";
+import { useRouter } from "next/navigation";
 import "react-multi-carousel/lib/styles.css";
-import { GetCIDResponse } from "pinata";
 import { CardWithLink } from "./Cards";
 
 interface ChildComponentProps {
@@ -64,26 +52,14 @@ const CarouselComp: React.FC<ChildComponentProps> = ({ wallet }) => {
   const router = useRouter();
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [courseData, setCourseData] = useState<CourseType[]>([]);
-
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
   const getAllCourses = async () => {
     const res: CourseType[] = await getAllCoursesInfo();
     setCourses(res);
-  };
-
-  const getPubIpfs = async (CID: string) => {
-    try {
-      //@ts-ignore
-      const data = await pinata.gateways.get(CID);
-
-      // const courseImage: GetCIDResponse = await pinata.gateways.get(
-      //   //@ts-ignore
-      //   data?.data?.courseImage,
-      // );
-
-      return data;
-    } catch (error) {
-      console.error("Error fetching IPFS content:", error);
-    }
   };
 
   const getCourse = async () => {
@@ -95,7 +71,7 @@ const CarouselComp: React.FC<ChildComponentProps> = ({ wallet }) => {
         }
 
         try {
-          return await getPubIpfs(course.course_ipfs_uri);
+          return await fetchCIDContent(course.course_ipfs_uri);
         } catch (error) {
           console.error("Error fetching from IPFS:", error);
           return null; // Skip on failure

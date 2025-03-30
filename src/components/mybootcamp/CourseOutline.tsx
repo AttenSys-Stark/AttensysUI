@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import CourseOutlinecard from "./CourseOutlinecard";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { pinata } from "../../../utils/config";
-import { useAtom } from "jotai";
-import { useSearchParams } from "next/navigation";
-import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
+import { provider } from "@/constants";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAtom } from "jotai";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Contract } from "starknet";
+import CourseOutlinecard from "./CourseOutlinecard";
 
 const CourseOutline = () => {
   const [dataStat, setDataStat] = useState(false);
@@ -17,6 +17,11 @@ const CourseOutline = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const org = searchParams.get("org");
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const orgContract = new Contract(
     attensysOrgAbi,
@@ -52,7 +57,7 @@ const CourseOutline = () => {
   };
 
   const getIPfsVideodata = async (CID: string) => {
-    const data = await pinata.gateways.get(CID);
+    const data = await fetchCIDContent(CID);
     console.log(data);
     //@ts-ignore
     console.log("url", data?.data?.courseData?.videoUrl);

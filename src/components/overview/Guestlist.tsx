@@ -3,6 +3,7 @@ import downlaod from "@/assets/download.svg";
 import filter from "@/assets/filter.png";
 import { guestdata } from "@/constants/data";
 import { useEvents } from "@/hooks/useEvents";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import {
   decimalToHexAddress,
   downloadCSV,
@@ -13,14 +14,13 @@ import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
 import Papa from "papaparse";
 import { useEffect, useState } from "react";
-import { pinata } from "../../../utils/config";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import List from "./List";
 
 interface IParticipants {
-  student_name: string;
-  student_email: string;
-  student_address: string;
+  guest_name: string;
+  guest_email: string;
+  guest_address: string;
 }
 const Guestlist = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -32,6 +32,11 @@ const Guestlist = () => {
   const { events, getEventsRegiseredUsers } = useEvents();
   const searchParams = useSearchParams();
   const params = useParams();
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
   const eventName = decodeURIComponent((params.event as string) ?? "");
   const id = searchParams.get("id");
   const itemsPerPage = 10;
@@ -53,7 +58,13 @@ const Guestlist = () => {
         eventParticipantsIpfsData.push(participantDetails);
       }
       setEventParticipants(
-        eventParticipantsIpfsData as unknown as IParticipants[],
+        eventParticipantsIpfsData.map((participant) => {
+          return {
+            guest_name: participant.student_name,
+            guest_email: participant.student_email,
+            guest_address: formatTruncatedAddress(participant.student_address),
+          };
+        }),
       );
     } catch (error) {
       console.error("Error fetching registered users:", error);
@@ -123,7 +134,7 @@ const Guestlist = () => {
   const obtainCIDdata = async (CID: string) => {
     try {
       //@ts-ignore
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
 
       return data?.data;
     } catch (error) {
@@ -263,8 +274,8 @@ const Guestlist = () => {
                 return (
                   <List
                     key={index}
-                    name={data.student_name}
-                    address={formatTruncatedAddress(data.student_address)}
+                    name={data.guest_name}
+                    address={data.guest_address}
                     status="Approved"
                     role="N/A"
                     regdate="12/25/2024"

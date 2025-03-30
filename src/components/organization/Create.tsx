@@ -221,93 +221,95 @@ const Create = (props: any) => {
   const handlePublishButton = async () => {
     setCreateOverlayStat(false);
     setcreatebootcampStat(true);
-    //@ts-ignore
-    const bootcamplogo = await pinata.upload.file(bootcampData.BootcampLogo);
-    //@ts-ignore
-    const Nftimage = await pinata.upload.file(bootcampData.bootcampNftImage);
-    const Dataupload = await pinata.upload.json({
+    try {
       //@ts-ignore
-      BootcampName: bootcampData.bootcampName,
-      BootcampLogo: bootcamplogo.IpfsHash,
+      const bootcamplogo = await pinata.upload.file(bootcampData.BootcampLogo);
       //@ts-ignore
-      BootcampDescription: bootcampData.bootcampDescription,
-      //@ts-ignore
-      Bootcamplecturedata: bootcampData.bootcampLecture,
-      //@ts-ignore
-      BootcampStartDate: bootcampData.bootcampStartdate,
-      //@ts-ignore
-      BootEndDate: bootcampData.bootcampEndDate,
-      //@ts-ignore
-      BootcampNFTname: bootcampData.bootcampNftName,
-      //@ts-ignore
-      BootcampNFTsymbol: bootcampData.bootCampNftSymbol,
-      BootcampNftImage: Nftimage.IpfsHash,
-      //@ts-ignore
-      Organizer: bootcampData.bootcampOrganization,
-      //@ts-ignore
-      PriceStaus: bootcampData.price,
-      //@ts-ignore
-      BootcampPrice: bootcampData.bootcampPrice,
-      //@ts-ignore
-      targetAudience: bootcampData.targetAudience,
-    });
+      const Nftimage = await pinata.upload.file(bootcampData.bootcampNftImage);
+      const Dataupload = await pinata.upload.json({
+        //@ts-ignore
+        BootcampName: bootcampData.bootcampName,
+        BootcampLogo: bootcamplogo.IpfsHash,
+        //@ts-ignore
+        BootcampDescription: bootcampData.bootcampDescription,
+        //@ts-ignore
+        Bootcamplecturedata: bootcampData.bootcampLecture,
+        //@ts-ignore
+        BootcampStartDate: bootcampData.bootcampStartdate,
+        //@ts-ignore
+        BootEndDate: bootcampData.bootcampEndDate,
+        //@ts-ignore
+        BootcampNFTname: bootcampData.bootcampNftName,
+        //@ts-ignore
+        BootcampNFTsymbol: bootcampData.bootCampNftSymbol,
+        BootcampNftImage: Nftimage.IpfsHash,
+        //@ts-ignore
+        Organizer: bootcampData.bootcampOrganization,
+        //@ts-ignore
+        PriceStaus: bootcampData.price,
+        //@ts-ignore
+        BootcampPrice: bootcampData.bootcampPrice,
+        //@ts-ignore
+        targetAudience: bootcampData.targetAudience,
+      });
 
-    if (Dataupload) {
-      console.info("Data upload here", Dataupload);
-      console.info(
-        "Create bootcamp Cid to send to contract ",
-        Dataupload.IpfsHash,
-      );
-      // setUploading(false);
-      // router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`)
-      // setCreateOverlayStat(false);
-      // setBootcampData(ResetBootcampData)
-
-      const organizationContract = new Contract(
-        attensysOrgAbi,
-        attensysOrgAddress,
-        wallet?.account,
-      );
-
-      const create_bootcamp_calldata = organizationContract.populate(
-        "create_bootcamp",
-        [
-          organizationName,
-          //@ts-ignore
-          bootcampData.bootcampName,
+      if (Dataupload) {
+        console.info("Data upload here", Dataupload);
+        console.info(
+          "Create bootcamp Cid to send to contract ",
           Dataupload.IpfsHash,
-          //@ts-ignore
-          bootcampData.bootcampNftName,
-          //@ts-ignore
-          bootcampData.bootCampNftSymbol,
-          numOfClassesToCreate,
-          Dataupload.IpfsHash,
-        ],
-      );
+        );
+        // setUploading(false);
+        // router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`)
+        // setCreateOverlayStat(false);
+        // setBootcampData(ResetBootcampData)
 
-      const callContract = await wallet?.account.execute([
-        {
-          contractAddress: attensysOrgAddress,
-          entrypoint: "create_bootcamp",
-          calldata: create_bootcamp_calldata.calldata,
-        },
-      ]);
+        const organizationContract = new Contract(
+          attensysOrgAbi,
+          attensysOrgAddress,
+          wallet?.account,
+        );
+
+        const create_bootcamp_calldata = organizationContract.populate(
+          "create_bootcamp",
+          [
+            organizationName,
+            //@ts-ignore
+            bootcampData.bootcampName,
+            Dataupload.IpfsHash,
+            //@ts-ignore
+            bootcampData.bootcampNftName,
+            //@ts-ignore
+            bootcampData.bootCampNftSymbol,
+            numOfClassesToCreate,
+            Dataupload.IpfsHash,
+          ],
+        );
+
+        const callContract = await wallet?.account.execute([
+          {
+            contractAddress: attensysOrgAddress,
+            entrypoint: "create_bootcamp",
+            calldata: create_bootcamp_calldata.calldata,
+          },
+        ]);
+
+        //@ts-ignore
+        await wallet?.account?.provider?.waitForTransaction(
+          callContract?.transaction_hash,
+        );
+        console.log("Submitted successfully");
+
+        //@ts-ignore
+        // router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`);
+      }
+    } catch (e: any) {
+      console.error("Error: ", e);
+    } finally {
+      console.log("Finally block running");
+      //@ts-ignore
+      setBootcampData(ResetBootcampData);
       setcreatebootcampStat(false);
-      //@ts-ignore
-      wallet?.account?.provider
-        ?.waitForTransaction(callContract?.transaction_hash)
-        .then(() => {})
-        .catch((e: any) => {
-          console.error("Error: ", e);
-          setcreatebootcampStat(false);
-        })
-        .finally(() => {
-          setcreatebootcampStat(false);
-          //@ts-ignore
-          // router.push(`/Bootcamp/${bootcampData.bootcampName}/Outline`);
-          //@ts-ignore
-          setBootcampData(ResetBootcampData);
-        });
     }
   };
 

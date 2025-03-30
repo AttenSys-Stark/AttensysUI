@@ -97,3 +97,22 @@ export const handleCreateCourse = (
     router.push(`/Course/CreateACourse/${section}`);
   }
 };
+
+export function base64ToBlob(base64: string): Blob {
+  const [metadata, data] = base64.split(",");
+  const mimeType = metadata.match(/:(.*?);/)?.[1] || "application/octet-stream"; // Extract MIME type
+  const binary = atob(data); // Decode Base64
+  const array = new Uint8Array(binary.length);
+
+  for (let i = 0; i < binary.length; i++) {
+    array[i] = binary.charCodeAt(i);
+  }
+
+  return new Blob([array], { type: mimeType });
+}
+
+export async function blobToBase64(blob: Blob): Promise<string> {
+  const arrayBuffer = await blob.arrayBuffer(); // Convert Blob to ArrayBuffer
+  const buffer = Buffer.from(arrayBuffer); // Convert ArrayBuffer to Buffer
+  return `data:${blob.type};base64,` + buffer.toString("base64"); // Return Base64 with MIME type
+}

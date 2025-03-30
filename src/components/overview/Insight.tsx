@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from "react";
-import story from "@/assets/story.svg";
-import Image from "next/image";
-import { Button } from "@headlessui/react";
-import drop from "@/assets/drop.svg";
-import Emailinput from "./Emailinput";
 import cross from "@/assets/cross.svg";
-import share from "@/assets/share.svg";
 import del from "@/assets/delete.svg";
-import ChartData from "./ChartData";
-import { Contract } from "starknet";
+import drop from "@/assets/drop.svg";
+import share from "@/assets/share.svg";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { provider } from "@/constants";
 import { attensysEventAbi } from "@/deployments/abi";
 import { attensysEventAddress } from "@/deployments/contracts";
-import { useAtom } from "jotai";
+import { useFetchCID } from "@/hooks/useFetchCID";
 import { connectorAtom } from "@/state/connectedWalletStarknetkitNext";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { useSearchParams } from "next/navigation";
-import { provider } from "@/constants";
 import { FormatDateFromUnix } from "@/utils/formatAddress";
+import { Button } from "@headlessui/react";
+import { useAtom } from "jotai";
 import { StaticImport } from "next/dist/shared/lib/get-img-props";
-import { pinata } from "../../../utils/config";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Contract } from "starknet";
+import ChartData from "./ChartData";
+import Emailinput from "./Emailinput";
 
 const Insight = (props: any) => {
   const [emailList, setEmailList] = useState<string[]>([]);
@@ -33,6 +32,11 @@ const Insight = (props: any) => {
   const [startDate, setstartDate] = useState(0n);
   const [endDate, setendDate] = useState(0n);
   const [logoImagesource, setLogoImage] = useState<string | StaticImport>("");
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
@@ -107,10 +111,10 @@ const Insight = (props: any) => {
   const obtainCIDdata = async (CID: string) => {
     try {
       //@ts-ignore
-      const data = await pinata.gateways.get(CID);
+      const data = await fetchCIDContent(CID);
       console.log("fetched CID event details", data);
       //@ts-ignore
-      const logoData: GetCIDResponse = await pinata.gateways.get(
+      const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
         data?.data?.eventDesign,
       );

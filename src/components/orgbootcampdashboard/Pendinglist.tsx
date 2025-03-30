@@ -1,17 +1,16 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import ex from "@/assets/ex.svg";
 import correct from "@/assets/correct.png";
-import Image from "next/image";
-import { pinata } from "../../../utils/config";
-import { useAtom } from "jotai";
-import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useSearchParams } from "next/navigation";
+import ex from "@/assets/ex.svg";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAtom } from "jotai";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Contract } from "starknet";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const Pendinglist = (props: any) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -21,6 +20,11 @@ const Pendinglist = (props: any) => {
   const id = searchParams.get("id");
   const [isApproving, setIsApproving] = useState(false);
   const [isDeclining, setIsDeclining] = useState(false);
+  const {
+    fetchCIDContent,
+    getError,
+    isLoading: isCIDFetchLoading,
+  } = useFetchCID();
 
   const organizationContract = new Contract(
     attensysOrgAbi,
@@ -30,7 +34,7 @@ const Pendinglist = (props: any) => {
 
   const getIpfsData = async () => {
     try {
-      const data = await pinata.gateways.get(props?.info?.student_details_uri);
+      const data = await fetchCIDContent(props?.info?.student_details_uri);
       console.log("student data", data);
       //@ts-ignore
       setEmail(data?.data?.student_email);

@@ -1,24 +1,24 @@
 "use client";
-import React, { useState, useEffect } from "react";
 import Coursedropdown from "@/components/courses/Coursedropdown";
-import { useAtom } from "jotai";
-import {
-  coursestatusAtom,
-  bootcampdropdownstatus,
-} from "@/state/connectedWalletStarknetkitNext";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import {
+  bootcampdropdownstatus,
+  coursestatusAtom,
+} from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
+import { useEffect, useState } from "react";
 
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import MyCertifications from "@/components/certifications/MyCertifications";
-import { useRouter, useSearchParams } from "next/navigation";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { MoonLoader } from "react-spinners";
+import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
+import { useFetchCID } from "@/hooks/useFetchCID";
+import { useRouter, useSearchParams } from "next/navigation";
+import { MoonLoader } from "react-spinners";
 import { Contract } from "starknet";
-import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { connect } from "starknetkit";
-import { pinata } from "../../../../utils/config";
 
 interface CourseType {
   data: any;
@@ -46,7 +46,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [takenCourses, setTakenCourses] = useState<CourseType[]>([]);
   const [takenCoursesData, setTakenCoursesData] = useState<CourseType[]>([]);
-
+  const { fetchCIDContent } = useFetchCID();
   const userId = null;
   // const userId = searchParams.get('userId');
   const search = searchParams.get("userId");
@@ -58,15 +58,6 @@ const Index = () => {
   const handlePageClick = () => {
     setbootcampdropstat(false);
     setstatus(false);
-  };
-  const getPubIpfs = async (CID: string) => {
-    try {
-      //@ts-ignore
-      const data = await pinata.gateways.get(CID);
-      return data;
-    } catch (error) {
-      console.error("Error fetching IPFS content:", error);
-    }
   };
 
   const courseContract = new Contract(
@@ -98,13 +89,7 @@ const Index = () => {
         if (!course.course_ipfs_uri) {
           return null; // Skip invalid URLs
         }
-
-        try {
-          return await getPubIpfs(course.course_ipfs_uri);
-        } catch (error) {
-          console.error("Error fetching from IPFS:", error);
-          return null; // Skip on failure
-        }
+        return await fetchCIDContent(course.course_ipfs_uri);
       }),
     );
     const resolvedTakenCourses = await Promise.all(
@@ -112,13 +97,7 @@ const Index = () => {
         if (!course.course_ipfs_uri) {
           return null; // Skip invalid URLs
         }
-
-        try {
-          return await getPubIpfs(course.course_ipfs_uri);
-        } catch (error) {
-          console.error("Error fetching from IPFS:", error);
-          return null; // Skip on failure
-        }
+        return await fetchCIDContent(course.course_ipfs_uri);
       }),
     );
 

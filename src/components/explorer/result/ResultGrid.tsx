@@ -15,16 +15,23 @@ interface Events {
   date: string;
 }
 
-interface Item {
+// First define the interfaces for the grid item structure
+interface GridItem {
   name: string;
   subProp: string[];
   viewPartName: string;
   heading: string[];
-  eventsData: Events[];
+  eventsData: Array<{
+    eventName: string;
+    status: string;
+    certification: string;
+    nftImg: string;
+    date: string;
+  }>;
 }
 
 interface ResultGridProps {
-  item: Item;
+  item: GridItem;
   eventsData: Events[];
   generatePageNumbers: () => (string | number)[];
   goToPage: (page: any) => void;

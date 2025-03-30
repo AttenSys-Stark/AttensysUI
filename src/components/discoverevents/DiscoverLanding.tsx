@@ -4,12 +4,10 @@ import TopdiscoverSection from "./TopdiscoverSection";
 import Backgroundsection from "./Backgroundsection";
 import Timesection from "./Timesection";
 import Highlight from "./Highlight";
-import Allevents from "./Allevents";
 import { Contract } from "starknet";
 import { attensysEventAbi } from "@/deployments/abi";
 import { attensysEventAddress } from "@/deployments/contracts";
 import { provider } from "@/constants";
-import { decimalToHexAddress } from "@/utils/formatAddress";
 import { useEvents } from "@/hooks/useEvents";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
@@ -26,12 +24,39 @@ export interface EventData {
   event_uri: string;
   suspension_status: boolean;
 }
+
 const DiscoverLanding = () => {
   const { events, getEvents, loading } = useEvents();
 
-  useEffect(() => {
-    getEvents();
+  // BigInt serialization helper
+  const serializeBigInt = (data: any): any => {
+    if (data === null || data === undefined) return data;
+    if (typeof data === "bigint") return data.toString();
+    if (Array.isArray(data)) return data.map(serializeBigInt);
+    if (typeof data === "object") {
+      return Object.fromEntries(
+        Object.entries(data).map(([key, value]) => [
+          key,
+          serializeBigInt(value),
+        ]),
+      );
+    }
+    return data;
+  };
+
+  const fetchEvents = useCallback(async () => {
+    try {
+      const rawEvents = await getEvents();
+      return serializeBigInt(rawEvents);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      return [];
+    }
   }, [getEvents]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
 
   if (loading) {
     return (
@@ -44,15 +69,12 @@ const DiscoverLanding = () => {
     );
   }
 
-  console.log("this is all events data", events);
-
   return (
     <div className="w-full bg-event-gradient">
       <TopdiscoverSection />
       <Backgroundsection />
       <Timesection />
       <Highlight events={events} />
-      {/* <Allevents events={events} /> */}
     </div>
   );
 };
