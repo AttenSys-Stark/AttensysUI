@@ -41,7 +41,10 @@ const NetworkSwitchButton = ({
 
   useEffect(() => {
     if (connectedWallet) {
-      const currentNetwork = connectedWallet.chainId === DEFAULT_NETWORK;
+      const currentNetwork =
+        connectedWallet?.id === "braavos"
+          ? true
+          : connectedWallet?.chainId === DEFAULT_NETWORK;
       setIsCorrectNetwork(currentNetwork);
     }
   }, [connectedWallet, setIsCorrectNetwork]);
