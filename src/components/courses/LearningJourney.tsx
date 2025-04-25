@@ -80,7 +80,22 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
   };
 
   if (takenCoursesData.length == 0) {
-    return <div className="text-[#A01B9B] text-center mt-12">No Courses</div>;
+    return (
+      <div className="flex flex-col items-center justify-center bg-white rounded-xl border-[1px] border-[#BCBCBC] h-auto py-20 my-12">
+        <Image
+          src="/not-found.svg"
+          alt="No courses taken yet"
+          width={220}
+          height={166}
+        />
+        <p className="text-[#2D3A4B] text-lg font-medium mt-6 mb-4">
+          No Courses taken yet
+        </p>
+        <button className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] text-white font-semibold py-3 px-10 rounded-lg shadow-md hover:opacity-90 transition-opacity">
+          Browse courses
+        </button>
+      </div>
+    );
   }
 
   return (
