@@ -80,7 +80,29 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
   };
 
   if (takenCoursesData.length == 0) {
-    return <div className="text-[#A01B9B] text-center mt-12">No Courses</div>;
+    return (
+      <div className="bg-white my-0 sm:my-12 rounded-xl border-[1px] border-[#BCBCBC] h-auto pb-8">
+        <div className="flex justify-between border-b-[1px] border-b-[#CACBCB] my-3 px-10">
+          <div className="flex items-center my-5">
+            <h4 className="font-bold text-lg text-[#A01B9B]">{selected} (0)</h4>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center h-auto py-10 sm:py-20">
+          <Image
+            src="/not-found.svg"
+            alt="No courses taken yet"
+            width={220}
+            height={166}
+          />
+          <p className="text-[#2D3A4B] text-lg font-medium mt-6 mb-4">
+            No Courses taken yet
+          </p>
+          <button className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] text-white font-semibold py-3 px-10 rounded-lg shadow-md hover:opacity-90 transition-opacity">
+            Browse courses
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -90,7 +112,9 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
           {item.no == 1 ? (
             <div className="flex justify-between  border-b-[1px] border-b-[#CACBCB] my-3 px-10">
               <div className="flex text-gradient-to-r from-purple-400 via-purple-30 mx-8 my-5">
-                <h4 className="font-bold text-lg text-[#A01B9B]">{selected}</h4>
+                <h4 className="font-bold text-lg text-[#A01B9B]">
+                  {selected} ({takenCoursesData.length})
+                </h4>
               </div>
               <div className="hidden sm:flex mx-8 my-5">
                 <svg

@@ -106,16 +106,41 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
   };
 
   if (courseData.length === 0) {
-    return <div className="text-[#A01B9B] text-center mt-12">No Courses</div>;
+    return (
+      <div className="bg-white sm:my-12 rounded-xl border-[1px] border-[#BCBCBC] h-auto pb-8">
+        {/* Header specific to CoursesCreated when empty */}
+        <div className="flex justify-between border-b-[1px] border-b-[#CACBCB] my-3 px-10 sm:px-16">
+          <div className="flex items-center text-[#A01B9B] my-5 space-x-3">
+            {/* Use selected prop for the title, or fallback if needed */}
+            <h4 className="font-bold text-lg text-[#A01B9B]">{selected} (0)</h4>
+            <FaUserGraduate color="#A01B9B" />
+          </div>
+          {/* Optionally include the Activate/Deactivate switch if needed in empty state */}
+        </div>
+        {/* Using the previously created EmptyState component structure directly */}
+        <div className="flex flex-col items-center justify-center h-auto py-10 sm:py-20">
+          <Image
+            src="/not-found.svg"
+            alt="No courses found"
+            width={220}
+            height={166}
+          />
+        </div>
+      </div>
+    );
   }
   return (
     <div className="bg-white  sm:my-12 rounded-xl border-[1px] border-[#BCBCBC] h-auto pb-8">
       {/* courses created */}
       <div>
-        <div className="flex justify-between border-b-[1px] border-b-[#CACBCB] my-3 px-16">
+        {/* Header for non-empty state */}
+        <div className="flex justify-between border-b-[1px] border-b-[#CACBCB] my-3 px-10 sm:px-16">
           {/* activate */}
           <div className="flex items-center text-[#A01B9B]  my-5 space-x-3">
-            <h4 className="font-bold text-lg text-[#A01B9B]">{selected}</h4>
+            {/* Display count dynamically when not empty */}
+            <h4 className="font-bold text-lg text-[#A01B9B]">
+              {selected} ({courseData.length})
+            </h4>
             <FaUserGraduate color="#A01B9B" />
           </div>
           <div className="hidden sm:flex items-center  my-5">
