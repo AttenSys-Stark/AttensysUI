@@ -37,6 +37,7 @@ import { ReviewForm } from "@/components/ReviewForm";
 import { auth } from "@/lib/firebase/client";
 import { getCurrentUser, signInUser } from "@/lib/services/authService";
 import ControllerConnector from "@cartridge/connector/controller";
+import { useArgentInvisible } from "@/hooks/useArgentInvisible";
 
 interface CourseType {
   data: any;
@@ -96,6 +97,8 @@ const LecturePage = (props: any) => {
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
   const [username, setUsername] = useState<string>();
+  const { account: argentAccount } = useArgentInvisible();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Fetch reviews and average rating in parallel, sends empty string if undefined
   const fetchReviewsAndRating = async () => {
@@ -240,65 +243,138 @@ const LecturePage = (props: any) => {
 
   // handle take a course after the course identifier is known
   const handleTakeCourse = async () => {
-    if (!address) {
-      console.log("No address available");
+    if (!address && !argentAccount) {
+      console.log("No wallet connected");
       return;
     }
 
     setIsUploading(true);
 
-    const courseContract = new Contract(
-      attensysCourseAbi,
-      attensysCourseAddress,
-      account,
-    );
-    const take_course_calldata = await courseContract.populate(
-      "acquire_a_course",
-      [Number(courseId)],
-    );
+    try {
+      if (argentAccount) {
+        // Handle Argent transaction
+        const call = {
+          contractAddress: attensysCourseAddress,
+          entrypoint: "acquire_a_course",
+          calldata: [Number(courseId).toString()],
+        };
 
-    const callCourseContract = await account?.execute([
-      {
-        contractAddress: attensysCourseAddress,
-        entrypoint: "acquire_a_course",
-        calldata: take_course_calldata.calldata,
-      },
-    ]);
-    setTxnHash(callCourseContract?.transaction_hash);
-    localStorage.setItem(`course_${courseId}_taken`, "true");
-    setIsTakingCourse(true);
-    setShowOverlay(false);
-    setIsUploading(false);
+        const { resourceBounds: estimatedResourceBounds } = await argentAccount.estimateInvokeFee(call, {
+          version: "0x3",
+        });
+
+        const resourceBounds = {
+          ...estimatedResourceBounds,
+          l1_gas: {
+            ...estimatedResourceBounds.l1_gas,
+            max_amount: "0x28",
+          },
+        };
+
+        const { transaction_hash } = await argentAccount.execute(call, {
+          version: "0x3",
+          resourceBounds,
+        });
+
+        setTxnHash(transaction_hash);
+        await argentAccount.waitForTransaction(transaction_hash);
+      } else {
+        // Handle Cartridge transaction
+        const courseContract = new Contract(
+          attensysCourseAbi,
+          attensysCourseAddress,
+          account,
+        );
+        const take_course_calldata = await courseContract.populate(
+          "acquire_a_course",
+          [Number(courseId)],
+        );
+
+        const callCourseContract = await account?.execute([
+          {
+            contractAddress: attensysCourseAddress,
+            entrypoint: "acquire_a_course",
+            calldata: take_course_calldata.calldata,
+          },
+        ]);
+        setTxnHash(callCourseContract?.transaction_hash);
+        localStorage.setItem(`course_${courseId}_taken`, "true");
+        setIsTakingCourse(true);
+        setShowOverlay(false);
+      }
+    } catch (error) {
+      console.error("Error taking course:", error);
+      // Handle error appropriately
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleFinishCourseClaimCertfificate = async () => {
-    if (!address) {
-      console.log("No address available");
+    if (!address && !argentAccount) {
+      console.log("No wallet connected");
       return;
     }
 
     setIsUploading(true);
 
-    const courseContract = new Contract(
-      attensysCourseAbi,
-      attensysCourseAddress,
-      account,
-    );
-    const course_certificate_calldata = await courseContract.populate(
-      "finish_course_claim_certification",
-      [Number(courseId)],
-    );
+    try {
+      if (argentAccount) {
+        // Handle Argent transaction
+        const call = {
+          contractAddress: attensysCourseAddress,
+          entrypoint: "finish_course_claim_certification",
+          calldata: [Number(courseId).toString()],
+        };
 
-    const callCourseContract = await account?.execute([
-      {
-        contractAddress: attensysCourseAddress,
-        entrypoint: "finish_course_claim_certification",
-        calldata: course_certificate_calldata.calldata,
-      },
-    ]);
-    setTxnHash(callCourseContract?.transaction_hash);
-    setIsCertified(true);
-    setIsUploading(false);
+        const { resourceBounds: estimatedResourceBounds } = await argentAccount.estimateInvokeFee(call, {
+          version: "0x3",
+        });
+
+        const resourceBounds = {
+          ...estimatedResourceBounds,
+          l1_gas: {
+            ...estimatedResourceBounds.l1_gas,
+            max_amount: "0x28",
+          },
+        };
+
+        const { transaction_hash } = await argentAccount.execute(call, {
+          version: "0x3",
+          resourceBounds,
+        });
+
+        setTxnHash(transaction_hash);
+        await argentAccount.waitForTransaction(transaction_hash);
+      } else {
+        // Handle Cartridge transaction
+        const courseContract = new Contract(
+          attensysCourseAbi,
+          attensysCourseAddress,
+          account,
+        );
+        const course_certificate_calldata = await courseContract.populate(
+          "finish_course_claim_certification",
+          [Number(courseId)],
+        );
+
+        const callCourseContract = await account?.execute([
+          {
+            contractAddress: attensysCourseAddress,
+            entrypoint: "finish_course_claim_certification",
+            calldata: course_certificate_calldata.calldata,
+          },
+        ]);
+        setTxnHash(callCourseContract?.transaction_hash);
+      }
+
+      setIsCertified(true);
+    } catch (error) {
+      console.error("Error claiming certificate:", error);
+      // Handle error appropriately
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleNext = () => {

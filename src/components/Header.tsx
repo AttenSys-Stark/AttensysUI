@@ -50,6 +50,9 @@ import { connectWallet } from "@/utils/connectWallet";
 import { CatridgeConnect } from "./connect/CatridgeConnect";
 import { useAccount, useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
+import { ArgentInvisibleButton } from "./connect/ArgentInvisibleButton";
+import { useArgentInvisible } from "@/hooks/useArgentInvisible";
+import { ProviderSelector } from "./auth/ProviderSelector";
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
@@ -86,6 +89,10 @@ const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   const [error, setError] = useState("");
+
+  const [showProviderSelector, setShowProviderSelector] = useState(false);
+
+  const { account: argentAccount, isLoading } = useArgentInvisible();
 
   const handleChange = (event: { target: { value: any } }) => {
     setSearchValue(event.target.value);
@@ -254,7 +261,40 @@ const Header = () => {
                   </div>
                 </div>
                 <div className="absolute inset-y-0 right-0 items-center hidden md:hidden lg:flex sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                  <CatridgeConnect />
+                  <div className="flex items-center space-x-4">
+                    {!address && !argentAccount ? (
+                      <button
+                        onClick={() => setShowProviderSelector(true)}
+                        className="flex rounded-md xl:rounded-lg bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] py-2 px-2 xl:px-3 data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+                      >
+                        <div className="flex items-center space-x-2 text-white">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03 4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
+                            />
+                          </svg>
+                          <span className="text-sm font-semibold">LOGIN</span>
+                        </div>
+                      </button>
+                    ) : (
+                      <div className="flex items-center space-x-4">
+                        {argentAccount || isLoading ? (
+                          <ArgentInvisibleButton />
+                        ) : (
+                          <CatridgeConnect />
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -527,13 +567,50 @@ const Header = () => {
                 {/* 🔹 Connect/Disconnect Wallet button */}
 
                 <div className="px-4 py-3">
-                  <CatridgeConnect />
+                  <div className="flex items-center space-x-4">
+                    {!address && !argentAccount ? (
+                      <button
+                        onClick={() => setShowProviderSelector(true)}
+                        className="flex rounded-md xl:rounded-lg bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] py-2 px-2 xl:px-3 data-[hover]:bg-sky-500 data-[active]:bg-sky-700"
+                      >
+                        <div className="flex items-center space-x-2 text-white">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="size-5"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03 4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
+                            />
+                          </svg>
+                          <span className="text-sm font-semibold">Connect Wallet</span>
+                        </div>
+                      </button>
+                    ) : (
+                      <div className="flex items-center space-x-4">
+                        {argentAccount ? (
+                          <ArgentInvisibleButton />
+                        ) : (
+                          <CatridgeConnect />
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </DisclosurePanel>
           </>
         )}
       </Disclosure>
+
+      {showProviderSelector && (
+        <ProviderSelector onClose={() => setShowProviderSelector(false)} />
+      )}
     </>
   );
 };
