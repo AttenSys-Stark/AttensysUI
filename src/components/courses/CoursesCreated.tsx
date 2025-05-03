@@ -106,7 +106,16 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
   };
 
   if (courseData.length === 0) {
-    return <div className="text-[#A01B9B] text-center mt-12">No Courses</div>;
+    return (
+      <div className="flex flex-col items-center justify-center bg-white rounded-xl border-[1px] border-[#BCBCBC] h-auto py-20 my-12">
+        <Image
+          src="/not-found.svg"
+          alt="No courses found"
+          width={220}
+          height={166}
+        />
+      </div>
+    );
   }
   return (
     <div className="bg-white  sm:my-12 rounded-xl border-[1px] border-[#BCBCBC] h-auto pb-8">
