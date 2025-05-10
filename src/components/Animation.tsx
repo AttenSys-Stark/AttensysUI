@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import Lottie, { LottieRefCurrentProps } from "lottie-react";
-import animationData from "./../assets/meet.json";
+import animationData from "../assets/meet.json";
 
 export default function Animation() {
   const meetRef = useRef<LottieRefCurrentProps>(null);

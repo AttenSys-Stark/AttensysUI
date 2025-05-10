@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Button, Input } from "@headlessui/react";
 import Image from "next/image";
 import filter from "@/assets/filter.png";
@@ -10,6 +10,7 @@ import { RiArrowDropDownLine } from "react-icons/ri";
 import { useQuery } from "@tanstack/react-query";
 import { gql, request } from "graphql-request";
 import EventFeed from "./EventFeed";
+import { createPortal } from "react-dom";
 import {
   getRecentEvents,
   orgquery,
@@ -27,9 +28,13 @@ const ExplorePage = () => {
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [maxVisiblePages, setMaxVisiblePages] = useState(10);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("All");
+  const filterRef = useRef<HTMLDivElement>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const itemsPerPage = 10;
   const router = useRouter();
-  // const { createAccessLink, url, loading, error } = usePinataAccess();
 
   const { data } = useQuery({
     queryKey: ["data"],
@@ -90,36 +95,38 @@ const ExplorePage = () => {
     setSearchValue(event.target.value);
   };
 
-  // const handleUpload = async () => {
-  //   try {
-  //     const jsonData = { school: "web3", name: "taiwo" };
-  //     const blob = new Blob([JSON.stringify(jsonData)], {
-  //       type: "application/json",
-  //     });
-  //     const file = new File([blob], `my-private-data-${Date.now()}.json`);
+  const handleSubmit = (
+    e: React.FormEvent,
+    searchValue: string,
+    router: any,
+  ) => {
+    e.preventDefault();
+    if (searchValue) {
+      router.push(`/Explorer/${searchValue}`);
+    }
+  };
 
-  //     const formData = new FormData();
-  //     formData.append("file", file);
+  const updateDropdownPosition = () => {
+    if (filterButtonRef.current) {
+      const rect = filterButtonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.right - 120,
+      });
+    }
+  };
 
-  //     const res = await fetch("/api/pinata/upload", {
-  //       method: "POST",
-  //       body: formData,
-  //     });
-
-  //     const data = await res.json();
-  //     if (!res.ok) throw new Error(data.error || "Upload failed");
-
-  //     console.log("Private file uploaded:", data.cid.data.cid);
-  //   } catch (error) {
-  //     console.error("Upload error:", error);
-  //   }
-  // };
-
-  // const handleRead = async () => {
-  //   const cid ="bafkreifk7x3mvjqv6zts53hptbfndranwf3rtsw5tjg25a62jqq7ulzvyq";
-  // const accessUrl = await createAccessLink(cid);
-  //   console.log("Access link:", accessUrl);
-  // }
+  useEffect(() => {
+    if (isFilterOpen) {
+      updateDropdownPosition();
+      window.addEventListener("scroll", updateDropdownPosition);
+      window.addEventListener("resize", updateDropdownPosition);
+    }
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPosition);
+      window.removeEventListener("resize", updateDropdownPosition);
+    };
+  }, [isFilterOpen]);
 
   return (
     <div className="mx-4 md:mx-8 lg:mx-24 pb-10">
@@ -130,12 +137,12 @@ const ExplorePage = () => {
         {/* Search Form */}
         <div className="relative w-full md:w-[80%] my-5">
           <form onSubmit={(e) => handleSubmit(e, searchValue, router)}>
-            <div className="h-[61px] sm:w-full md:w-[627px] bg-white rounded-xl md:px-6 flex items-center justify-between">
-              <div className="w-full md:w-[75%] relative">
+            <div className="h-[61px] w-full bg-white rounded-xl px-4 md:px-6 flex flex-col md:flex-row items-center justify-between gap-2 md:gap-0">
+              <div className="w-full relative">
                 <Input
                   name="search by address"
                   type="text"
-                  placeholder="Search an address | organization | Course"
+                  placeholder="Search an address | organization | course"
                   value={searchValue}
                   onChange={handleChange}
                   className="w-full h-[61px] pl-[50px] rounded-xl text-[13px] md:text-[16px] md:font-medium text-[#817676] placeholder-[#817676] focus:outline-none"
@@ -158,11 +165,50 @@ const ExplorePage = () => {
                 )}
               </div>
 
-              <div className="h-[42px] w-[25%] hidden md:flex rounded-lg items-center justify-center border border-[#6B6D6E] bg-[#e8e9ea] space-x-2">
-                <h1 className="text-[#2D3A4B] text-[14px] leading-[21px] font-medium">
-                  All Filters
-                </h1>
-                <RiArrowDropDownLine className="h-[20px] w-[20px] text-[#2D3A4B]" />
+              <div className="w-full md:w-[25%] h-[42px] flex rounded-lg items-center justify-center border border-[#6B6D6E] bg-[#e8e9ea] space-x-2 hidden md:flex">
+                <button
+                  ref={filterButtonRef}
+                  type="button"
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  className="flex items-center justify-center space-x-2 w-full h-full"
+                >
+                  <h1 className="text-[#2D3A4B] text-[14px] leading-[21px] font-medium">
+                    {selectedFilter}
+                  </h1>
+                  <RiArrowDropDownLine className="h-[20px] w-[20px] text-[#2D3A4B]" />
+                </button>
+
+                {isFilterOpen &&
+                  typeof window !== "undefined" &&
+                  createPortal(
+                    <div
+                      className="fixed w-[120px] bg-[#F5F7FA] rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.1)] z-[9999] border border-[#e8e9ea] hidden md:block"
+                      style={{
+                        top: `${dropdownPosition.top}px`,
+                        left: `${dropdownPosition.left}px`,
+                      }}
+                    >
+                      {["All", "Courses", "Events", "Organizations"].map(
+                        (filter) => (
+                          <button
+                            key={filter}
+                            onClick={() => {
+                              setSelectedFilter(filter);
+                              setIsFilterOpen(false);
+                            }}
+                            className={`w-full px-4 py-2.5 text-left text-sm transition-colors duration-200 ${
+                              selectedFilter === filter
+                                ? "bg-[#4A90E2] text-white"
+                                : "text-[#2D3A4B] hover:bg-[#4A90E21F]"
+                            }`}
+                          >
+                            {filter}
+                          </button>
+                        ),
+                      )}
+                    </div>,
+                    document.body,
+                  )}
               </div>
             </div>
           </form>
@@ -193,7 +239,6 @@ const ExplorePage = () => {
             </Button>
           </div>
         </div>
-        {/* <Button onClick={handleUpload}>TRIAL</Button> */}
         <EventFeed data={eventData} />
       </div>
     </div>
