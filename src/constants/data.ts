@@ -44,6 +44,9 @@ import videoHero from "@/assets/video.svg";
 import videoClip from "@/assets/video_clip.svg";
 import certIcon from "@/assets/certificate-outline.svg";
 import rich from "@/assets/Richin2024.svg";
+import graduate from "@/assets/game-icons_graduate-cap.svg";
+import certificate from "@/assets/bx_certification.svg";
+import event from "@/assets/Vector.svg";
 
 export const courseSetup = [
   {
@@ -1470,6 +1473,7 @@ export const eventsData = [
 
 export const gridsData = [
   {
+    img: event,
     name: "Events",
     subProp: [
       "Key",
@@ -1488,6 +1492,7 @@ export const gridsData = [
     eventsData: [],
   },
   {
+    img: graduate,
     name: "Courses",
     subProp: ["Key", "Status", "Courses"],
     viewPartName: "All Courses",
@@ -1495,6 +1500,7 @@ export const gridsData = [
     eventsData: [],
   },
   {
+    img: certificate,
     name: "Certifications",
     subProp: [
       "Key",
@@ -1504,7 +1510,12 @@ export const gridsData = [
       "Total",
     ],
     viewPartName: "All Certifications",
-    heading: ["Activity type", "Completion status", "Certifications", "Date"],
+    heading: [
+      "Activity type",
+      "Completion status",
+      "Certifications",
+      "Date certified",
+    ],
     eventsData: [],
   },
 ];

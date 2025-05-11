@@ -18,6 +18,7 @@ interface Events {
 }
 
 interface GridItem {
+  img: string;
   name: string;
   subProp: string[];
   viewPartName: string;
@@ -63,7 +64,8 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     e.stopPropagation();
     setSelectedImage(null);
   };
-
+  console.log("the result:", item.eventsData);
+  // console.log("the result:", item);
   const renderContent = (arg: string) => {
     const eventCount = item.eventsData.filter(
       (event) => event.type === "COURSE_TAKEN",
@@ -77,15 +79,15 @@ const ResultGrid: React.FC<ResultGridProps> = ({
         event.type === "COURSE_TAKEN" && event.status !== "Course Complete",
     ).length;
     const certCount = item.eventsData.filter(
-      (event) => event.type === "CERT_CLAIMED",
+      (event) => event.type === "COURSE",
     ).length;
     const completedCourses = item.eventsData.filter(
-      (event) => event.status === "Course Complete",
+      (event) => event.type === "COURSE",
     ).length;
     const ongoingCourses = item.eventsData.filter(
-      (event) => event.status === "Course Taken",
+      (event) => event.type === "CERT_CLAIMED",
     ).length;
-    const createdCourses = item.eventsData.filter(
+    const eventCerts = item.eventsData.filter(
       (event) => event.type === "COURSE_CREATED",
     ).length;
 
@@ -130,22 +132,24 @@ const ResultGrid: React.FC<ResultGridProps> = ({
             <span className="text-[#9B51E0]">{certCount}</span> Certifications
           </h1>
         );
-      case "Completed courses":
+      case "Courses":
         return (
           <h1 className="text-[12px] font-medium leading-[16px] text-[#817676]">
-            <span className="text-[#9B51E0]">{completedCourses}</span> completed
+            <span className="text-[#9B51E0]">{completedCourses}</span> courses
           </h1>
         );
-      case "Ongoing":
+      case "Course Certification":
         return (
           <h1 className="text-[12px] font-medium leading-[16px] text-[#817676]">
-            <span className="text-[#9B51E0]">{ongoingCourses}</span> in progress
+            <span className="text-[#9B51E0]">{ongoingCourses}</span> Course
+            Certification
           </h1>
         );
-      case "Created courses":
+      case "Event Certification":
         return (
           <h1 className="text-[12px] font-medium leading-[16px] text-[#817676]">
-            <span className="text-[#9B51E0]">{createdCourses}</span> created
+            <span className="text-[#9B51E0]">{eventCerts}</span> Event
+            Certification
           </h1>
         );
       default:
@@ -160,7 +164,8 @@ const ResultGrid: React.FC<ResultGridProps> = ({
         <div className="row-span-2 bg-white rounded-lg mb-6 py-5 border border-[#b9b9ba]">
           <div className="border-b-2 border-[#b9b9ba]">
             <div className="flex gap-2 w-auto rounded-xl mx-12 items-center border-[1px] border-[#6B6D6E] p-3 mb-3">
-              <h1>{item.name} Overview</h1>
+              <Image src={item.img} alt="img" className="mr-2" />
+              <h1 className="text-[14px]">{item.name} Overview</h1>
             </div>
           </div>
 
@@ -182,8 +187,8 @@ const ResultGrid: React.FC<ResultGridProps> = ({
         {/* Right Column - Events Table */}
         <div className="row-span-2 bg-white rounded-lg mb-6 py-5 border border-[#b9b9ba]">
           <div className="border-b-2 border-[#b9b9ba]">
-            <div className="flex justify-between items-center px-8 pt-5">
-              <div className="border-[1px] border-[#6B6D6E] p-3 mb-3 rounded-xl">
+            <div className="flex justify-between items-center content-center px-8 py-3">
+              <div className="border-[1px] border-[#6B6D6E] px-4 mb-3 rounded-xl">
                 <h1 className="text-[14px]">{item.viewPartName}</h1>
               </div>
               {item.eventsData.length === 0 ? (
@@ -194,7 +199,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
             </div>
           </div>
 
-          <div className="h-[308px] w-full overflow-auto">
+          <div className="h-[308px] w-full over">
             {item.eventsData.length > 0 ? (
               <>
                 {/* Desktop Table */}
@@ -224,7 +229,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                             key={index}
                             className="hover:bg-gray-50 h-[60px] border-b-2 border-[#b9b9ba]"
                           >
-                            <td className="py-3 px-6 max-w-[200px] truncate h-[60px]">
+                            <td className="py-3 px-6  truncate h-[60px]">
                               <span className="text-[14px] text-[#333333]">
                                 {data.eventName}
                               </span>
@@ -261,7 +266,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                 </div>
                               </div>
                             </td>
-                            <td className="py-3 px-6 text-center whitespace-nowrap h-[60px]">
+                            <td className="py-3 px-6 text-center truncate h-[60px]">
                               <span className="text-[14px] text-[#333333]">
                                 {data.date}
                               </span>
