@@ -489,9 +489,9 @@ const LandingPage: React.FC<ChildComponentProps> = ({
           <p className="text-sm text-white py-2 px-48">Students also bought</p>
         </div>
 
-        <div className="mx-24 sm:mx-48 my-6">
+        {/* <div className="mx-24 sm:mx-48 my-6">
           <CarouselComp wallet={wallet} />
-        </div>
+        </div> */}
       </div>
     </div>
   );
