@@ -3,13 +3,15 @@ import { handleCourse } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import StarRating from "../bootcamp/StarRating";
 import "react-multi-carousel/lib/styles.css";
+import { RatingDisplay } from "../RatingDisplay";
 interface ChildComponentProps {
   wallet: any;
   data: any;
+  rating: any;
 }
 
 // get_all_courses_info
-export function CardWithLink({ wallet, data }: ChildComponentProps) {
+export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
   const router = useRouter();
 
   return (
@@ -38,7 +40,8 @@ export function CardWithLink({ wallet, data }: ChildComponentProps) {
         <div className="flex sm:flex-col h-16 md:flex-row justify-between mt-6 px-5 ">
           <div className="w-[70%]">
             <p className="mb-2 font-bold lg:text-[14px] leading-[22px] text-[#333333]">
-              {data?.data.courseName}
+              {data?.data.courseName.slice(0, 23) +
+                (data?.data.courseName.length > 23 ? "..." : "")}
             </p>
             <p className="text-white text-[12px] font-extrabold items-center gap-2 w-fit  bg-[#5801A9] my-2 rounded p-1">
               {data?.data.courseCreator}
@@ -59,11 +62,13 @@ export function CardWithLink({ wallet, data }: ChildComponentProps) {
       <div className="px-5 mt-2">
         <div className="flex items-center space-x-3">
           {/* rating */}
-          <StarRating totalStars={5} starnumber={4} />
-          <p className="text-[14px] text-[#2D3A4B] font-medium leading-[16px]">
+          {/* <StarRating totalStars={5} starnumber={4} /> */}
+          <RatingDisplay rating={rating[data?.course_identifier]} size="xs" />
+
+          {/* <p className="text-[14px] text-[#2D3A4B] font-medium leading-[16px]">
             {" "}
             <span className="text-[#5801A9]">1220</span> students
-          </p>
+          </p> */}
         </div>
         <div></div>
         <p className="mt-2 text-[14px] text-[#2D3A4B] leading-[19px] font-light">

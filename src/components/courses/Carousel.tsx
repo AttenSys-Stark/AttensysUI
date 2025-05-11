@@ -9,6 +9,7 @@ import { CardWithLink } from "./Cards";
 
 interface ChildComponentProps {
   wallet: any;
+  averagereviewrating: any;
 }
 
 interface CourseType {
@@ -46,7 +47,10 @@ const responsive = {
   },
 };
 
-const CarouselComp: React.FC<ChildComponentProps> = ({ wallet }) => {
+const CarouselComp: React.FC<ChildComponentProps> = ({
+  wallet,
+  averagereviewrating,
+}) => {
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [courseData, setCourseData] = useState<CourseType[]>([]);
   const [randomIndices, setRandomIndices] = useState<number[]>([]);
@@ -159,7 +163,11 @@ const CarouselComp: React.FC<ChildComponentProps> = ({ wallet }) => {
       >
         {randomIndices.map((index) => (
           <div key={index}>
-            <CardWithLink data={courseData[index]} wallet={wallet} />
+            <CardWithLink
+              data={courseData[index]}
+              wallet={wallet}
+              rating={averagereviewrating}
+            />
           </div>
         ))}
       </Carousel>
@@ -185,7 +193,11 @@ const CarouselComp: React.FC<ChildComponentProps> = ({ wallet }) => {
       >
         {randomIndices.map((index) => (
           <div key={index}>
-            <CardWithLink data={courseData[index]} wallet={wallet} />
+            <CardWithLink
+              data={courseData[index]}
+              wallet={wallet}
+              rating={averagereviewrating}
+            />
           </div>
         ))}
       </Carousel>
