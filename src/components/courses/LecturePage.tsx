@@ -548,7 +548,7 @@ const LecturePage = (props: any) => {
     const checkReview = async () => {
       if (auth.currentUser!?.uid) {
         const exists = await hasUserReviewed(
-          `${props?.data?.courseName?.toString() ?? ""}${props?.data?.courseIdentifier ?? ""}`,
+          `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
           auth.currentUser!.uid,
         );
         setHasReviewed(exists);
@@ -557,7 +557,7 @@ const LecturePage = (props: any) => {
     checkReview();
   }, [
     auth?.currentUser!?.uid,
-    `${props?.data?.courseName?.toString() ?? ""}${props?.data?.courseIdentifier ?? ""}`,
+    `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
   ]);
 
   useEffect(() => {
