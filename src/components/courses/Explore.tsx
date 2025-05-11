@@ -16,6 +16,8 @@ import { LuBadgeCheck } from "react-icons/lu";
 import ReactPlayer from "react-player";
 import { PinataSDK } from "pinata";
 import { split } from "lodash-es";
+import { getAverageRatingForVideo } from "@/lib/services/reviewService";
+import { RatingDisplay } from "@/components/RatingDisplay";
 
 interface ChildComponentProps {
   wallet: any;
@@ -130,73 +132,106 @@ const Explore = ({
     }
   };
 
-  const renderCourseCard = (course: any, index: any) => (
-    <div
-      key={index}
-      className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
-    >
-      <div className="h-48 relative">
-        <Image
-          src={`https://ipfs.io/ipfs/${course?.data?.courseImage}`}
-          alt={course?.data?.courseName || "Course image"}
-          layout="fill"
-          objectFit="cover"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="p-4 flex-grow">
-        <div className="flex items-center justify-between mb-2">
-          <p className="bg-[#5801A9] text-white text-xs px-2 py-1 rounded">
-            {course?.data?.difficultyLevel || "Beginner"}
+  // Store average ratings for each course by identifier
+  const [averageRatings, setAverageRatings] = useState<{ [key: string]: any }>(
+    {},
+  );
+
+  useEffect(() => {
+    // Fetch average ratings for all currentItems when courseData or currentPage changes
+    const fetchAllRatings = async () => {
+      const ratings: { [key: string]: any } = {};
+      if (Array.isArray(courseData)) {
+        await Promise.all(
+          courseData.map(async (course: any) => {
+            const identifier = course?.course_identifier;
+            if (identifier && !(identifier in ratings)) {
+              const avg = await getAverageRatingForVideo(
+                (course?.data?.courseName?.toString() ?? "") + identifier,
+              );
+              ratings[identifier] = avg;
+            }
+          }),
+        );
+      }
+      setAverageRatings(ratings);
+    };
+    fetchAllRatings();
+  }, [courseData, currentPage]);
+  // console.log("Average Ratings:", averageRatings);
+
+  const renderCourseCard = (course: any, index: any) => {
+    const averageRating = averageRatings[course?.course_identifier];
+    return (
+      <div
+        key={index}
+        className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
+      >
+        <div className="h-48 relative">
+          <Image
+            src={`https://ipfs.io/ipfs/${course?.data?.courseImage}`}
+            alt={course?.data?.courseName || "Course image"}
+            layout="fill"
+            objectFit="cover"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="p-4 flex-grow">
+          <div className="flex items-center justify-between mb-2">
+            <p className="bg-[#5801A9] text-white text-[10px] px-2 py-1 rounded">
+              {course?.data?.difficultyLevel || "Beginner"}
+            </p>
+            <div className="flex items-center">
+              {/* <StarRating totalStars={5} starnumber={4} /> */}
+              <RatingDisplay rating={averageRating} size="xs" />
+            </div>
+          </div>
+
+          <h3
+            className="font-bold text-lg mb-2 cursor-pointer hover:text-[#5801A9]"
+            onClick={(e) => {
+              localStorage.setItem("courseData", JSON.stringify(course?.data));
+              handleCourse(
+                e,
+                e.currentTarget.textContent,
+                router,
+                course?.course_identifier,
+              );
+            }}
+          >
+            {course?.data.courseName.slice(0, 23) +
+              (course?.data.courseName.length > 23 ? "..." : "") ||
+              "Course Title"}
+          </h3>
+
+          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+            {course?.data?.courseDescription || "No description available"}
           </p>
-          <div className="flex items-center">
-            <StarRating totalStars={5} starnumber={4} />
-            <span className="text-xs text-gray-600 ml-1">(200+)</span>
+
+          <div className="flex items-center text-xs text-gray-500">
+            <GrDiamond className="mr-1" />
+            <span>By {course?.data?.courseCreator || "Unknown Creator"}</span>
           </div>
         </div>
-
-        <h3
-          className="font-bold text-lg mb-2 cursor-pointer hover:text-[#5801A9]"
-          onClick={(e) => {
-            localStorage.setItem("courseData", JSON.stringify(course?.data));
-            handleCourse(
-              e,
-              e.currentTarget.textContent,
-              router,
-              course?.course_identifier,
-            );
-          }}
-        >
-          {course?.data?.courseName || "Course Title"}
-        </h3>
-
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {course?.data?.courseDescription || "No description available"}
-        </p>
-
-        <div className="flex items-center text-xs text-gray-500">
-          <GrDiamond className="mr-1" />
-          <span>By {course?.data?.courseCreator || "Unknown Creator"}</span>
+        <div className="p-4 border-t">
+          <button
+            onClick={(e) => {
+              localStorage.setItem("courseData", JSON.stringify(course?.data));
+              handleCourse(
+                e,
+                e.currentTarget.textContent,
+                router,
+                course?.course_identifier,
+              );
+            }}
+            className="w-full bg-[#5801A9] hover:bg-[#4a0189] text-white py-2 rounded text-sm font-medium"
+          >
+            View Course
+          </button>
         </div>
       </div>
-      <div className="p-4 border-t">
-        <button
-          onClick={(e) => {
-            localStorage.setItem("courseData", JSON.stringify(course?.data));
-            handleCourse(
-              e,
-              e.currentTarget.textContent,
-              router,
-              course?.course_identifier,
-            );
-          }}
-          className="w-full bg-[#5801A9] hover:bg-[#4a0189] text-white py-2 rounded text-sm font-medium"
-        >
-          View Course
-        </button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   useEffect(() => {
     // Pre-fetch all video URLs when component mounts or courseData changes
@@ -369,7 +404,7 @@ const Explore = ({
             </p>
           </div>
 
-          <CarouselComp wallet={wallet} />
+          <CarouselComp wallet={wallet} averagereviewrating={averageRatings} />
         </div>
 
         {/* Featured section */}
@@ -452,17 +487,26 @@ const Explore = ({
 
                 <div className="flex flex-col sm:flex-row space-x-28 sm:gap-x-4 items-start justify-start my-4">
                   <div className="flex items-center space-x-4">
-                    <StarRating totalStars={5} starnumber={4} />
+                    {/* <StarRating totalStars={5} starnumber={4} />
                     <p className="font-bold text-[13px] text-[#2D3A4B]">
                       (281)
-                    </p>
+                    </p> */}
+                    <RatingDisplay
+                      rating={
+                        averageRatings[
+                          unfilteredData[unfilteredData.length - 1]
+                            ?.course_identifier
+                        ]
+                      }
+                      size="sm"
+                    />
                   </div>
-                  <div className="flex items-center mt-3 sm:mt-0">
+                  {/* <div className="flex items-center mt-3 sm:mt-0">
                     <LuBadgeCheck color="#2D3A4B" />
                     <p className="font-bold text-[13px] text-[#2D3A4B] ml-1">
                       291 certification
                     </p>
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-y-3 gap-x-4 lg:gap-x-6">
@@ -593,7 +637,7 @@ const Explore = ({
         </div>
 
         <div className="mx-6 lg:mx-auto max-w-screen-2xl">
-          <CarouselComp wallet={wallet} />
+          <CarouselComp wallet={wallet} averagereviewrating={averageRatings} />
           <div className="mt-8 sm:mt-24">
             <div className="my-4">
               <h3 className="text-2xl font-bold">You will love this</h3>
@@ -604,7 +648,10 @@ const Explore = ({
                 </span>
               </p>
             </div>
-            <CarouselComp wallet={wallet} />
+            <CarouselComp
+              wallet={wallet}
+              averagereviewrating={averageRatings}
+            />
           </div>
         </div>
       </div>

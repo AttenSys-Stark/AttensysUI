@@ -24,6 +24,8 @@ import { FaSpinner } from "react-icons/fa";
 import card from "@/assets/card.svg";
 import EditCoursePanel from "./EditCoursePanel";
 import { pinata } from "../../../utils/config";
+import { getAverageRatingForVideo } from "@/lib/services/reviewService";
+import { RatingDisplay } from "../RatingDisplay";
 
 interface ItemProps {
   courses: Course[];
@@ -70,8 +72,8 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
   const [localCourseData, setLocalCourseData] = useState(courseData);
   const { account } = useAccount();
 
-  console.log("courseData:", courseData);
-  console.log("item.courses:", item.courses);
+  // console.log("courseData:", courseData);
+  // console.log("item.courses:", item.courses);
 
   // pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -86,6 +88,33 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
+
+  // Store average ratings for each course by identifier
+  const [averageRatings, setAverageRatings] = useState<{ [key: string]: any }>(
+    {},
+  );
+
+  useEffect(() => {
+    // Fetch average ratings for all currentItems when courseData or currentPage changes
+    const fetchAllRatings = async () => {
+      const ratings: { [key: string]: any } = {};
+      if (Array.isArray(courseData)) {
+        await Promise.all(
+          courseData.map(async (course: any) => {
+            const identifier = course?.course_identifier;
+            if (identifier && !(identifier in ratings)) {
+              const avg = await getAverageRatingForVideo(
+                (course?.data?.courseName?.toString() ?? "") + identifier,
+              );
+              ratings[identifier] = avg;
+            }
+          }),
+        );
+      }
+      setAverageRatings(ratings);
+    };
+    fetchAllRatings();
+  }, [courseData, currentPage]);
 
   const generatePageNumbers = () => {
     const pageNumbers = [];
@@ -278,6 +307,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
       </div>
     );
   }
+
   return (
     <>
       <div className="bg-white  sm:my-12 rounded-xl border-[1px] border-[#BCBCBC] h-auto pb-8">
@@ -396,12 +426,16 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                           {/* Third row of metadata */}
                           <div className="flex flex-wrap items-center gap-3 my-2">
                             <div className="flex items-center gap-x-2">
-                              <StarRating totalStars={5} starnumber={4} />
+                              {/* <StarRating totalStars={5} starnumber={4} />
                               <p className="font-medium text-[13px] text-[#2D3A4B] leading-[16px]">
                                 {item.stars} students
-                              </p>
+                              </p> */}
+                              <RatingDisplay
+                                rating={averageRatings[item?.course_identifier]}
+                                size="xs"
+                              />
                             </div>
-                            <div className="flex items-center gap-x-2">
+                            {/* <div className="flex items-center gap-x-2">
                               <p className="hidden sm:block text-gray-300">|</p>
                               <Image
                                 src={certificationBadge}
@@ -415,7 +449,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                                   {item.certificate}
                                 </span>
                               </p>
-                            </div>
+                            </div> */}
                           </div>
                         </div>
 

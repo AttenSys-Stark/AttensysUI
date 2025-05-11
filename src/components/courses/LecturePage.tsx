@@ -115,12 +115,10 @@ const LecturePage = (props: any) => {
   const fetchReviewsAndRating = async () => {
     const [reviews, averageRating] = await Promise.all([
       getReviewsForVideo(
-        props?.data?.courseName?.toString() + props?.data.courseIdentifier ||
-          "",
+        props?.data?.courseName?.toString() + ultimate_id || "",
       ),
       getAverageRatingForVideo(
-        props?.data?.courseName?.toString() + props?.data.courseIdentifier ||
-          "",
+        props?.data?.courseName?.toString() + ultimate_id || "",
       ),
     ]);
     setcourseaveragerate(averageRating);
@@ -591,6 +589,33 @@ const LecturePage = (props: any) => {
     console.log(address, "address");
   }, [address, controller]);
 
+  // Store average ratings for each course by identifier
+  const [averageRatings, setAverageRatings] = useState<{ [key: string]: any }>(
+    {},
+  );
+
+  useEffect(() => {
+    // Fetch average ratings for all currentItems when courseData or currentPage changes
+    const fetchAllRatings = async () => {
+      const ratings: { [key: string]: any } = {};
+      if (Array.isArray(courseData)) {
+        await Promise.all(
+          courseData.map(async (course: any) => {
+            const identifier = course?.course_identifier;
+            if (identifier && !(identifier in ratings)) {
+              const avg = await getAverageRatingForVideo(
+                (course?.data?.courseName?.toString() ?? "") + identifier,
+              );
+              ratings[identifier] = avg;
+            }
+          }),
+        );
+      }
+      setAverageRatings(ratings);
+    };
+    fetchAllRatings();
+  }, [courseData]);
+
   return (
     <div className="pt-6  pb-36 w-full">
       <ToastContainer
@@ -1035,10 +1060,7 @@ const LecturePage = (props: any) => {
               <div>
                 {!hasReviewed && isTakingCourse && (
                   <ReviewForm
-                    videoId={
-                      props?.data?.courseName?.toString() +
-                      props?.data.courseIdentifier
-                    }
+                    videoId={props?.data?.courseName?.toString() + ultimate_id}
                     userId={address?.toString() || ""}
                     onSubmit={async (review) => {
                       let user = getCurrentUser();
@@ -1048,7 +1070,7 @@ const LecturePage = (props: any) => {
                       await submitReview({
                         ...review,
                         userId: auth.currentUser!.uid,
-                        videoId: `${props?.data?.courseName?.toString() ?? ""}${props?.data?.courseIdentifier ?? ""}`,
+                        videoId: `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
                       });
                       fetchReviewsAndRating();
                       setHasReviewed(true);
@@ -1135,7 +1157,11 @@ const LecturePage = (props: any) => {
                 .slice(0, 2)
                 .map((item: any, id: any) => (
                   <div key={id}>
-                    <CardWithLink wallet={props.wallet} data={item} />
+                    <CardWithLink
+                      wallet={props.wallet}
+                      data={item}
+                      rating={averageRatings}
+                    />
                   </div>
                 ))}
             </div>
@@ -1179,8 +1205,7 @@ const LecturePage = (props: any) => {
                   <div>
                     <ReviewForm
                       videoId={
-                        props?.data?.courseName?.toString() +
-                        props?.data.courseIdentifier
+                        props?.data?.courseName?.toString() + ultimate_id
                       }
                       userId={address?.toString() || ""}
                       onSubmit={async (review) => {
@@ -1191,7 +1216,7 @@ const LecturePage = (props: any) => {
                         await submitReview({
                           ...review,
                           userId: auth.currentUser!.uid,
-                          videoId: `${props?.data?.courseName?.toString() ?? ""}${props?.data?.courseIdentifier ?? ""}`,
+                          videoId: `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
                         });
                         fetchReviewsAndRating();
                         setHasReviewed(true);
@@ -1210,7 +1235,11 @@ const LecturePage = (props: any) => {
           <div className="space-y-10 overflow-x-auto max-h-[1020px] overflow-y-auto">
             {courseData.map((item: any, id: any) => (
               <div key={id}>
-                <CardWithLink wallet={props.wallet} data={item} />
+                <CardWithLink
+                  wallet={props.wallet}
+                  data={item}
+                  rating={averageRatings}
+                />
               </div>
             ))}
           </div>
