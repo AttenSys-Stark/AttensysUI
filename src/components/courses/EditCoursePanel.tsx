@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Contract } from "starknet";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
@@ -54,9 +54,11 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
   const [videoUrls, setVideoUrls] = useState<{ [key: string]: string }>({});
   const [showAddlecture, setShowAddLecture] = useState(false);
   const [savingstate, setsavingstate] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   const { account, address } = useAccount();
   const { createAccessLink } = usePinataAccess();
   const explorer = useExplorer();
+  const playerRef = useRef<ReactPlayer | null>(null);
 
   const pinata = new PinataSDK({
     pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
@@ -109,6 +111,23 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
         ...formData,
       },
     });
+
+    const handlePlay = () => {
+      // Trigger fullscreen when play starts
+      const playerElement =
+        playerRef.current?.getInternalPlayer() as HTMLElement | null;
+      if (playerElement) {
+        if (playerElement.requestFullscreen) {
+          playerElement.requestFullscreen();
+        } else if ((playerElement as any).webkitRequestFullscreen) {
+          // Safari
+          (playerElement as any).webkitRequestFullscreen();
+        } else if ((playerElement as any).msRequestFullscreen) {
+          // IE/Edge
+          (playerElement as any).msRequestFullscreen();
+        }
+      }
+    };
 
     console.log("this is the form data", formData);
     const dataUpload = await pinataclone.upload.json({
@@ -621,18 +640,21 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
                             </div>
                           ) : (
                             <div className="space-y-4">
-                              <div className="flex space-x-10 items-center">
-                                <div className="w-[150px] h-[150px] border-[1px] rounded-lg flex items-center text-center justify-center">
+                              <div className="flex space-x-10 items-center cursor-pointer">
+                                <div className="w-[150px] h-[97px] border-[1px] overflow-hidden rounded-lg flex items-center text-center justify-center  ">
                                   {videoUrls[lecture.video] ? (
-                                    <ReactPlayer
-                                      url={videoUrls[lecture.video]}
-                                      width="100%"
-                                      height="100%"
-                                      className="rounded-xl"
-                                      controls
-                                      // playing={!showOverlay}
-                                      playIcon={<></>}
-                                    />
+                                    <div>
+                                      <ReactPlayer
+                                        url={videoUrls[lecture.video]}
+                                        width="100%"
+                                        height="100%"
+                                        className="rounded-xl"
+                                        // playing={isPlaying}
+                                        controls
+                                        // playing={!showOverlay}
+                                        playIcon={<></>}
+                                      />
+                                    </div>
                                   ) : (
                                     <h1 className="text-sm italic px-3">
                                       Preview unavailable
@@ -670,7 +692,7 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
                       className="px-4 py-2 w-full text-white bg-gradient-to-r from-[#4A90E2] to-[#9B51E0] rounded-md hover:from-[#4A90E2] hover:to-[#9B51E0] transition-all duration-300 transform hover:scale-105 shadow-md"
                     >
                       {showAddlecture
-                        ? "Cancel"
+                        ? "Collapse"
                         : "Upload Additional lecture +"}
                     </button>
                   </div>

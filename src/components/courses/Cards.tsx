@@ -44,7 +44,9 @@ export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
                 (data?.data.courseName.length > 23 ? "..." : "")}
             </p>
             <p className="text-white text-[12px] font-extrabold items-center gap-2 w-fit  bg-[#5801A9] my-2 rounded p-1">
-              {data?.data.courseCreator}
+              {data?.data.courseCreator?.length > 7
+                ? `${data.data.courseCreator.slice(0, 7)}...`
+                : data?.data.courseCreator}
             </p>
           </div>
 

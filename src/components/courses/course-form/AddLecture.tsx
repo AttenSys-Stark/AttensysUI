@@ -396,7 +396,7 @@ const AddLecture: React.FC<LectureProps> = ({
         {courseData.courseCurriculum.map((lecture: any, index: number) => (
           <div
             key={index}
-            className="my-4 bg-[#9b51e01a] p-12 border rounded-xl relative"
+            className="my-4 bg-[#9b51e01a] py-12 px-4 border rounded-xl relative"
           >
             {editingIndex === index ? (
               <div className="space-y-4">

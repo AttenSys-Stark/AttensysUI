@@ -41,6 +41,7 @@ import ControllerConnector from "@cartridge/connector/controller";
 import { Erc20Abi } from "@/deployments/erc20abi";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 import { ToastContainer, toast, Bounce } from "react-toastify";
+import { Dialog, DialogBackdrop, DialogPanel, Button } from "@headlessui/react";
 
 interface CourseType {
   data: any;
@@ -102,6 +103,8 @@ const LecturePage = (props: any) => {
   const [username, setUsername] = useState<string>();
   const [coursePrice, setCoursePrice] = useState<number>(0);
   const [paymentValue, setPaymentValue] = useState<number>(0);
+  const [isConfirmModalOpen, setisConfirmModalOpen] = useState(false);
+
   const searchParams = useSearchParams();
   const ultimate_id = searchParams.get("id");
 
@@ -137,6 +140,23 @@ const LecturePage = (props: any) => {
     }));
   };
 
+  const handleRatingSubmit = async () => {
+    const courseContract = new Contract(
+      attensysCourseAbi,
+      attensysCourseAddress,
+      account,
+    );
+    const course_review_calldata = await courseContract.populate("review", [
+      Number(ultimate_id),
+    ]);
+    const callCourseContract = await account?.execute([
+      {
+        contractAddress: attensysCourseAddress,
+        entrypoint: "review",
+        calldata: course_review_calldata.calldata,
+      },
+    ]);
+  };
   // Get all courses with CourseType from contract
   const getAllCourses = async () => {
     const res: CourseType[] = await getAllCoursesInfo();
@@ -237,8 +257,16 @@ const LecturePage = (props: any) => {
     }
   };
 
+  const handleconfirmation = () => {
+    setisConfirmModalOpen(true);
+  };
+  const handleconfirmationcancel = () => {
+    setisConfirmModalOpen(false);
+  };
+
   // handle take a course after the course identifier is known
   const handleTakeCourse = async () => {
+    setisConfirmModalOpen(false);
     if (!address) {
       toast.error("Login to proceed", {
         position: "top-right",
@@ -283,77 +311,55 @@ const LecturePage = (props: any) => {
         attensysCourseAddress,
         paymentValue,
       ]);
-      const callErc20Contract = await account?.execute([
+
+      const courseContract = new Contract(
+        attensysCourseAbi,
+        attensysCourseAddress,
+        account,
+      );
+
+      const take_course_calldata = await courseContract.populate(
+        "acquire_a_course",
+        [Number(ultimate_id)],
+      );
+      const callCourseContract = await account?.execute([
         {
           contractAddress: STRK_ADDRESS,
           entrypoint: "approve",
           calldata: approve_calldata.calldata,
         },
+        {
+          contractAddress: attensysCourseAddress,
+          entrypoint: "acquire_a_course",
+          calldata: take_course_calldata.calldata,
+        },
       ]);
 
-      if (callErc20Contract?.transaction_hash) {
+      console.log("call returns", callCourseContract);
+      setTxnHash(callCourseContract?.transaction_hash);
+      //@ts-ignore
+      if (callCourseContract?.code == "SUCCESS") {
         await new Promise((resolve) => setTimeout(resolve, 3000));
-
-        const courseContract = new Contract(
-          attensysCourseAbi,
-          attensysCourseAddress,
-          account,
-        );
-
-        const take_course_calldata = await courseContract.populate(
-          "acquire_a_course",
-          [Number(ultimate_id)],
-        );
-
-        const callCourseContract = await account?.execute([
+        setIsTakingCourse(true);
+        setShowOverlay(false);
+        setIsUploading(false);
+        toast.success(
+          <div>
+            Purchase sucessful!
+            <br />
+            Transaction hash:{" "}
+            <a
+              href={`${explorer.transaction(callCourseContract?.transaction_hash)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "blue", textDecoration: "underline" }}
+            >
+              {callCourseContract?.transaction_hash
+                ? `${callCourseContract.transaction_hash.slice(0, 6)}...${callCourseContract.transaction_hash.slice(-4)}`
+                : ""}
+            </a>
+          </div>,
           {
-            contractAddress: attensysCourseAddress,
-            entrypoint: "acquire_a_course",
-            calldata: take_course_calldata.calldata,
-          },
-        ]);
-        console.log("call returns", callCourseContract);
-        setTxnHash(callCourseContract?.transaction_hash);
-        //@ts-ignore
-        if (callCourseContract?.code == "SUCCESS") {
-          await new Promise((resolve) => setTimeout(resolve, 3000));
-          setIsTakingCourse(true);
-          setShowOverlay(false);
-          setIsUploading(false);
-          toast.success(
-            <div>
-              Purchase sucessful!
-              <br />
-              Transaction hash:{" "}
-              <a
-                href={`${explorer.transaction(callCourseContract?.transaction_hash)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "blue", textDecoration: "underline" }}
-              >
-                {callCourseContract?.transaction_hash
-                  ? `${callCourseContract.transaction_hash.slice(0, 6)}...${callCourseContract.transaction_hash.slice(-4)}`
-                  : ""}
-              </a>
-            </div>,
-            {
-              position: "top-right",
-              autoClose: 5000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-              theme: "light",
-              transition: Bounce,
-            },
-          );
-          return;
-        } else {
-          setIsTakingCourse(false);
-          setShowOverlay(true);
-          setIsUploading(false);
-          toast.error("purchase failed", {
             position: "top-right",
             autoClose: 5000,
             hideProgressBar: false,
@@ -363,9 +369,26 @@ const LecturePage = (props: any) => {
             progress: undefined,
             theme: "light",
             transition: Bounce,
-          });
-        }
+          },
+        );
+        return;
+      } else {
+        setIsTakingCourse(false);
+        setShowOverlay(true);
+        setIsUploading(false);
+        toast.error("purchase failed", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
+      // }
     } catch (error) {
       toast.error("purchase failed, reload & try again", {
         position: "top-right",
@@ -546,17 +569,17 @@ const LecturePage = (props: any) => {
 
   useEffect(() => {
     const checkReview = async () => {
-      if (auth.currentUser!?.uid) {
-        const exists = await hasUserReviewed(
-          `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
-          auth.currentUser!.uid,
+      if (address) {
+        const exists = await courseContract?.get_review_status(
+          ultimate_id,
+          address,
         );
         setHasReviewed(exists);
       }
     };
     checkReview();
   }, [
-    auth?.currentUser!?.uid,
+    address,
     `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
   ]);
 
@@ -649,17 +672,26 @@ const LecturePage = (props: any) => {
 
       {/* ReactPlayer & lecture*/}
       <div className="w-[100%]  mx-auto flex justify-between items-center px-6 sm:px-12 mt-5">
-        <div className="w-full xl:w-[67%] h-[33vh] xl:h-[543px] h-auto aspect-video sm:aspect-[16/9] md:aspect-[16/8] lg:aspect-[16/7] rounded-xl overflow-hidden relative">
+        <div className="w-full xl:w-[67%] h-[33vh] xl:h-[543px] rounded-xl overflow-hidden relative">
           {selectedVideo && (
             <>
-              <ReactPlayer
-                url={selectedVideo}
-                width="100%"
-                height="100%"
-                className="rounded-xl"
-                controls
-                playing={!showOverlay}
-              />
+              <div className="absolute inset-0 overflow-hidden">
+                <ReactPlayer
+                  url={selectedVideo}
+                  width="100%"
+                  height="100%"
+                  className="rounded-xl"
+                  controls
+                  playing={!showOverlay}
+                  config={{
+                    file: {
+                      attributes: {
+                        controlsList: "nodownload",
+                      },
+                    },
+                  }}
+                />
+              </div>
               {showOverlay && !isTakingCourse && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-xl">
                   <div className="text-white text-center p-6">
@@ -667,7 +699,7 @@ const LecturePage = (props: any) => {
                     <p className="mb-6">Take this course to start learning</p>
                     <button
                       className={`bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold`}
-                      onClick={handleTakeCourse}
+                      onClick={handleconfirmation}
                       disabled={isUploading}
                     >
                       {isUploading ? (
@@ -675,6 +707,8 @@ const LecturePage = (props: any) => {
                           <LoadingSpinner size="sm" colorVariant="white" />
                           Processing...
                         </div>
+                      ) : isConfirmModalOpen ? (
+                        "Waiting for confirmation"
                       ) : (
                         `Buy Course ${coursePrice === 0 ? "(Free)" : `($${coursePrice})`}`
                       )}
@@ -725,7 +759,7 @@ const LecturePage = (props: any) => {
                     <div className="w-8 flex-shrink-0">
                       <p className="font-bold text-[#5801a9]">{i + 1}</p>
                     </div>
-                    <div className="w-[150px] h-[120px] rounded-xl border-4 border flex-shrink-0">
+                    <div className="w-[145px] h-[94px] rounded-xl border-4 border flex-shrink-0 overflow-hidden">
                       {accessUrl ? (
                         <ReactPlayer
                           url={accessUrl}
@@ -976,7 +1010,7 @@ const LecturePage = (props: any) => {
                       <div className="w-8 flex-shrink-0">
                         <p className="font-bold text-[#5801a9]">{i + 1}</p>
                       </div>
-                      <div className="w-[150px] h-[120px] rounded-xl border-4 border flex-shrink-0">
+                      <div className="w-[150px] h-[97px] rounded-xl border-4 border flex-shrink-0">
                         {accessUrl ? (
                           <ReactPlayer
                             url={accessUrl}
@@ -1072,6 +1106,7 @@ const LecturePage = (props: any) => {
                         userId: auth.currentUser!.uid,
                         videoId: `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
                       });
+                      handleRatingSubmit();
                       fetchReviewsAndRating();
                       setHasReviewed(true);
                     }}
@@ -1218,6 +1253,7 @@ const LecturePage = (props: any) => {
                           userId: auth.currentUser!.uid,
                           videoId: `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
                         });
+                        handleRatingSubmit();
                         fetchReviewsAndRating();
                         setHasReviewed(true);
                       }}
@@ -1245,6 +1281,55 @@ const LecturePage = (props: any) => {
           </div>
         </div>
       </div>
+      <Dialog
+        open={isConfirmModalOpen}
+        onClose={() => {
+          setisConfirmModalOpen(false);
+        }}
+        className="relative z-50"
+      >
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-[#0F0E0E82] transition-opacity"
+        />
+
+        <div className="fixed inset-0 z-10 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <DialogPanel className="relative transform overflow-hidden rounded-lg bg-white py-8 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+              <div className="bg-white px-6 py-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <h3 className="text-lg font-medium leading-6 text-gray-900">
+                      Confirm Purchase
+                    </h3>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        {`Are you sure you want to purchase this course for ${coursePrice === 0 ? "free" : `$${coursePrice}`}`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                  <Button
+                    onClick={handleTakeCourse}
+                    // type="button"
+                    className=" cursor-pointer inline-flex w-full justify-center rounded-md border border-transparent bg-[#9B51E0] px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-150"
+                  >
+                    Proceed
+                  </Button>
+                  <Button
+                    // type="button"
+                    onClick={handleconfirmationcancel}
+                    className="cursor-pointer mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors duration-150"
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 };

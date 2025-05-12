@@ -60,10 +60,10 @@ const Index = () => {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
-              height: "100vh", // Full page height
+              height: "90vh", // Full page height
             }}
           >
-            <MoonLoader color="#9B51E0" size={60} />
+            <MoonLoader color="#9B51E0" size={30} />
           </div>
         ) : (
           <CourseLanding course={details} />

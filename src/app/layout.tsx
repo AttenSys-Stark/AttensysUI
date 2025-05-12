@@ -72,46 +72,51 @@ const policies: SessionPolicies = {
     [attensysCourseAddress]: {
       methods: [
         {
-          name: "get_certified",
+          name: "get certified",
           entrypoint: "finish_course_claim_certification",
           description: "get certified",
         },
         {
-          name: "create_a_course",
+          name: "create course",
           entrypoint: "create_course",
           description: "create_a_course",
         },
         {
-          name: "remove_course",
+          name: "remove course",
           entrypoint: "remove_course",
-          description: "remove_course",
+          description: "remove a course",
         },
         {
-          name: "creator_withdraw",
+          name: "creator withdraw",
           entrypoint: "creator_withdraw",
           description: "claim Earnings",
         },
         {
-          name: "add_replace_course_content",
+          name: "edit content",
           entrypoint: "add_replace_course_content",
           description: "update course",
         },
-        // {
-        //   name: "add_replace_course_content",
-        //   entrypoint: "add_replace_course_content",
-        //   description: "edit course content",
-        // },
-      ],
-    },
-    [STRK_ADDRESS]: {
-      methods: [
         {
-          name: "approve",
-          entrypoint: "approve",
-          description: "approve STRK",
+          name: "review",
+          entrypoint: "review",
+          description: "review course",
+        },
+        {
+          name: "purchase course",
+          entrypoint: "acquire_a_course",
+          description: "purchase a course",
         },
       ],
     },
+    // [STRK_ADDRESS]: {
+    //   methods: [
+    //     {
+    //       name: "approve",
+    //       entrypoint: "approve",
+    //       description: "approve STRK",
+    //     },
+    //   ],
+    // },
   },
 };
 

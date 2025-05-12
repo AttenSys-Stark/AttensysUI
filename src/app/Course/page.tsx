@@ -170,8 +170,8 @@ const Index = () => {
         <CourseNews />
 
         {loading ? (
-          <div className="flex items-center justify-center h-[70vh]">
-            <MoonLoader color="#9B51E0" size={60} />
+          <div className="flex items-center justify-center h-[90vh]">
+            <MoonLoader color="#9B51E0" size={30} />
           </div>
         ) : mounted ? (
           <>
