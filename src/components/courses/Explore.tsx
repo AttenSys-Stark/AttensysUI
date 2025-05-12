@@ -509,7 +509,7 @@ const Explore = ({
                   </div> */}
                 </div>
 
-                <div className="flex flex-col sm:flex-row sm:flex-wrap gap-y-3 gap-x-4 lg:gap-x-6">
+                <div className="flex flex-row flex-wrap sm:flex-row sm:flex-wrap gap-y-3 gap-x-4 lg:gap-x-6">
                   <p className="text-[11px] text-[#2D3A4B] font-medium">
                     Created by:{" "}
                     <span className="underline inline">
@@ -590,7 +590,7 @@ const Explore = ({
                         );
                       }}
                     >
-                      <div className="w-[150px] h-[120px] rounded-xl border-4 border flex-shrink-0">
+                      <div className="w-[150px] h-[90px] rounded-xl border-4 border flex-shrink-0 overflow-hidden">
                         {videoUrls[item.video] && (
                           <ReactPlayer
                             url={videoUrls[item.video]}

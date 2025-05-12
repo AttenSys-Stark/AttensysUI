@@ -172,7 +172,7 @@ const MyCourses = (props: any) => {
                 height: "100vh", // Full page height
               }}
             >
-              <MoonLoader color="#9B51E0" size={60} />
+              <MoonLoader color="#9B51E0" size={40} />
             </div>
           ) : (
             <CoursesCreated

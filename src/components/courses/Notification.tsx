@@ -136,30 +136,83 @@ const Notification = (props: any) => {
       </div>
 
       {/* content */}
-      <div className="border-t-[1px] border-t-[#BCBCBC] text-sm h-[1014px] overflow-y-scroll scrollbar-hide">
-        {notifications.map((item, i) => (
-          <div key={i}>
-            <div
-              className={`py-3 px-4 lg:px-12 min-h-[75px] border flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ${
-                i % 2 === 0 ? "bg-gray-50" : "bg-white"
-              }`}
-            >
-              <p className="flex-1 truncate">
-                {`You have ${item.type === "COURSE_CREATED" ? "created a course" : item.type === "CERT_CLAIMED" ? "claimed a certificate" : item.type === "INSTRUCTOR_ADDED" ? "added an instructor" : item.type === "INSTRUCTOR_REMOVED" ? "removed an instructor" : item.type === "BOOTCAMP_REGISTRATION" ? "registered for a bootcamp" : item.type === "EVENT_REGISTRATION" ? "registered for an event" : item.type === "ATTENDANCE_MARKED" ? "marked attendance" : item.type === "ORGANIZATION_PROFILE_CREATED" ? "created an organization profile" : item.type === "ORGANIZATION_APPROVED" ? "approved an organization" : item.type === "ORGANIZATION_DECLINED" ? "declined an organization" : ""}`}
-              </p>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-                <p className="text-sm sm:text-base">
-                  {formatTimestamp(item.timestamp)}
-                </p>
-                <p>
-                  <span className="text-xs bg-gray-200 dark:bg-gray-600 px-2 py-1 rounded">
-                    Block #{item.blockNumber}
-                  </span>
-                </p>
+      <div className="border border-gray-200 rounded-lg shadow-sm bg-white overflow-hidden">
+        <div className="text-sm h-[1014px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+          {notifications.map(
+            (
+              item: { type: string; timestamp: number; blockNumber: number },
+              i: number,
+            ) => (
+              <div
+                key={`notification-${i}-${item.blockNumber}`}
+                className="group transition-all duration-200 ease-in-out"
+              >
+                <div
+                  className={`py-4 px-6 lg:px-8 min-h-[80px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 ${
+                    i % 2 === 0 ? "bg-gray-50" : "bg-white"
+                  } group-hover:bg-blue-50 border-b border-gray-100 last:border-b-0`}
+                >
+                  <div className="flex items-start space-x-3">
+                    <div
+                      className={`mt-1 flex-shrink-0 h-3 w-3 rounded-full ${
+                        (
+                          {
+                            COURSE_CREATED: "bg-emerald-500",
+                            CERT_CLAIMED: "bg-indigo-500",
+                            INSTRUCTOR_ADDED: "bg-amber-500",
+                            INSTRUCTOR_REMOVED: "bg-rose-500",
+                            BOOTCAMP_REGISTRATION: "bg-blue-500",
+                            EVENT_REGISTRATION: "bg-purple-500",
+                            ATTENDANCE_MARKED: "bg-teal-500",
+                            ORGANIZATION_PROFILE_CREATED: "bg-cyan-500",
+                            ORGANIZATION_APPROVED: "bg-green-500",
+                            ORGANIZATION_DECLINED: "bg-red-500",
+                          } as Record<string, string>
+                        )[item.type] || "bg-gray-400"
+                      }`}
+                    ></div>
+
+                    <p className="text-gray-800 font-medium leading-snug">
+                      <span className="font-semibold text-gray-900">
+                        You have{" "}
+                      </span>
+                      {(
+                        {
+                          COURSE_CREATED: "created a new course",
+                          CERT_CLAIMED: "successfully claimed a certificate",
+                          INSTRUCTOR_ADDED: "added a new instructor",
+                          INSTRUCTOR_REMOVED: "removed an instructor",
+                          BOOTCAMP_REGISTRATION: "registered for a bootcamp",
+                          EVENT_REGISTRATION:
+                            "registered for an upcoming event",
+                          ATTENDANCE_MARKED: "marked attendance",
+                          ORGANIZATION_PROFILE_CREATED:
+                            "created an organization profile",
+                          ORGANIZATION_APPROVED:
+                            "approved an organization request",
+                          ORGANIZATION_DECLINED:
+                            "declined an organization application",
+                        } as Record<string, string>
+                      )[item.type] || "performed an action"}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6 pl-5 sm:pl-0">
+                    <p className="text-sm text-gray-500 font-medium whitespace-nowrap">
+                      {formatTimestamp(item.timestamp)}
+                    </p>
+                    <p className="hidden sm:block text-gray-300">|</p>
+                    {/* <p>
+              <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium tracking-wide">
+                Block #{item.blockNumber}
+              </span>
+            </p> */}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            ),
+          )}
+        </div>
       </div>
     </div>
   );

@@ -139,7 +139,7 @@ const Lectures = ({
         </div>
       </div>
 
-      <div className="mt-12 hidden xl:block">
+      <div className="mt-2 hidden xl:block">
         <h4 className="font-semibold text-[14px] text-[#333333] leading-[22px]">
           Learning Objective
         </h4>

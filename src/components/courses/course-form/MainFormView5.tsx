@@ -282,7 +282,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
             {/* field */}
             <div className="mb-3 order-first block lg:hidden">
               <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">
-                {courseData.courseCategory} | Web Development
+                Category: {courseData.courseCategory}
               </p>
             </div>
             <div className="block lg:grid lg:grid-cols-2 gap-8">
@@ -326,7 +326,11 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                   </div>
                 </div>
                 <div className="  text-[#333333] text-[14px] font-light leading-[22px] my-3 text-justify sm:w-[95%]">
-                  <p>{courseData.targetAudienceDesc}</p>
+                  <p>
+                    {courseData.targetAudienceDesc?.length > 200
+                      ? `${courseData.targetAudienceDesc.slice(0, 200)}...`
+                      : courseData.targetAudienceDesc}
+                  </p>
                 </div>
               </div>
 
@@ -336,7 +340,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                   {/* field */}
                   <div className="mb-3 order-first hidden lg:block">
                     <p className="text-[#5801A9] text-[16px] font-medium leading-[22px]">
-                      {courseData.courseCategory} | Web Development
+                      Category: {courseData.courseCategory}
                     </p>
                   </div>
 
@@ -345,30 +349,30 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                   </h4>
                   <div className="my-3">
                     <p className="text-[#333333] text-[14px] font-light leading-[22px]">
-                      {courseData.courseDescription}
+                      {courseData.courseDescription?.length > 300
+                        ? `${courseData.courseDescription.slice(0, 300)}...`
+                        : courseData.courseDescription}
                     </p>
+                    <div className="bg-[#5801A9] py-2 text-white text-center mt-4 mb-3 sm:w-[95%] lg:w-[50%] rounded-lg">
+                      <p className="text-[14px] font-extrabold leading-[22px]">
+                        {courseData.courseCreator}
+                      </p>
+                    </div>
+                    <div className="flex space-x-3 items-center">
+                      <MdOutlineDiamond color="#333333" />
+                      <p className="text-[#333333] text-[14px] leading-[22px]">
+                        <span className="font-medium">Difficulty level :</span>
+                        {courseData.difficultyLevel}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <div className="bg-[#5801A9] py-2 text-white text-center mt-6 mb-3 sm:w-[95%] lg:w-[50%] rounded-lg">
-                    <p className="text-[14px] font-extrabold leading-[22px]">
-                      {courseData.courseCreator}
-                    </p>
-                  </div>
-
-                  <div className="flex space-x-3 items-center">
-                    <MdOutlineDiamond color="#333333" />
-                    <p className="text-[#333333] text-[14px] leading-[22px]">
-                      <span className="font-medium">Difficulty level :</span>
-                      {courseData.difficultyLevel}
-                    </p>
-                  </div>
-                </div>
+                <div></div>
               </div>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-3">
               {/* Student Requirements */}
 
               <div className="mb-6 block lg:hidden">
@@ -376,7 +380,11 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                   Student Requirements
                 </h4>
                 <div className="text-[#333333] text-[14px] font-light leading-[22px]">
-                  <p>{courseData?.studentRequirements}</p>
+                  <p>
+                    {courseData.studentRequirements?.length > 200
+                      ? `${courseData.studentRequirements.slice(0, 200)}...`
+                      : courseData.studentRequirements}
+                  </p>
                 </div>
               </div>
 
@@ -386,11 +394,16 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                   Target Audience
                 </h2>
                 <div className="text-[#333333] text-[14px] font-light leading-[22px]">
-                  <p> {courseData.targetAudience}</p>
+                  <p>
+                    {" "}
+                    {courseData.targetAudience?.length > 200
+                      ? `${courseData.targetAudience.slice(0, 200)}...`
+                      : courseData.targetAudience}
+                  </p>
                 </div>
               </div>
 
-              <div className=" sm:mt-4 xl:mt-32 mb-10">
+              <div className=" sm:mt-2 xl:mt-3 mb-10">
                 {/* lectures in course */}
 
                 <Lectures
@@ -407,7 +420,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                 />
 
                 <div>
-                  <div className="flex flex-col lg:w-[60%] mt-5">
+                  <div className="flex flex-col lg:w-[60%] mt-2">
                     <h4 className="font-semibold text-[18px] leading-[31px] text-[#333333] mb-4">
                       Do you want to issue certification for this course?
                     </h4>
