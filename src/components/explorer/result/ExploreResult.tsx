@@ -1,54 +1,69 @@
 // ExploreResult.tsx
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Button, Input } from "@headlessui/react";
 import Image from "next/image";
 import filter from "@/assets/filter.png";
+import organization from "@/assets/octicon_organization-24.svg";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { eventsData, gridsData } from "@/constants/data";
 import ResultGrid from "./ResultGrid";
 import { handleSubmit } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { gql, request } from "graphql-request";
 import { format } from "date-fns";
-import {
-  orgquery,
-  coursequery,
-  eventquery,
-  orgurl,
-  courseurl,
-  eventurl,
-  headers,
-} from "@/utils/helpers";
+import { createPortal } from "react-dom";
+import { Contract } from "starknet";
+import { attensysCourseAbi } from "@/deployments/abi";
+import { attensysCourseAddress } from "@/deployments/contracts";
+import { provider } from "@/constants";
+import { useFetchCID } from "@/hooks/useFetchCID";
+
 type Params = {
   address?: string;
 };
 
-// Add interface for the event data structure
-interface EventData {
-  organizations: {
-    bootcampRegistrations?: any[];
-    instructorAddedToOrgs?: any[];
-    instructorRemovedFromOrgs?: any[];
-  };
-  courses: {
-    courseCreateds?: any[];
-    courseCertClaimeds?: any[];
-  };
-  events: {
-    attendanceMarkeds?: any[];
-    eventCreateds?: any[];
-    registeredForEvents?: any[];
-  };
+interface CourseType {
+  accessment: boolean;
+  course_identifier: number;
+  course_ipfs_uri: string;
+  is_approved: boolean;
+  is_suspended: boolean;
+  owner: string;
+  price: number;
+  uri: string;
+  block_timestamp?: number;
 }
 
-const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
+interface ResultDataItem {
+  type: string;
+  courseData?: {
+    courseName?: string;
+    courseCreator?: string;
+    courseDescription?: string;
+    courseImage?: string;
+    courseCurriculum?: any[];
+    difficultyLevel?: string;
+    playTime?: string;
+    stars?: number;
+    certificate?: string;
+  };
+  course_identifier?: number;
+}
+
+const ExploreResult: React.FC<{ params: Params }> = ({
+  params,
+}): JSX.Element => {
   const [searchValue, setSearchValue] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const router = useRouter();
   const { address } = params;
-  const [resultData, setResultData] = useState<any[]>([]);
+  const [resultData, setResultData] = useState<ResultDataItem[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>("All");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+  const { fetchCIDContent } = useFetchCID();
+  const [coursesData, setCoursesData] = useState<CourseType[]>([]);
+  const [processedCoursesData, setProcessedCoursesData] = useState<any[]>([]);
 
   const itemsPerPage = 10;
 
@@ -82,337 +97,190 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
     return address.slice(0, 10) + "..." + address.slice(-10);
   };
 
-  const { data } = useQuery({
-    queryKey: ["data"],
-    async queryFn() {
-      return await request(orgurl, orgquery, {}, headers);
-    },
-    refetchInterval: 10000,
-  });
-
-  const { data: coursedata } = useQuery({
-    queryKey: ["coursedata"],
-    async queryFn() {
-      return await request(courseurl, coursequery, {}, headers);
-    },
-    refetchInterval: 10000,
-  });
-
-  const { data: eventdata } = useQuery({
-    queryKey: ["eventdata"],
-    async queryFn() {
-      return await request(eventurl, eventquery, {}, headers);
-    },
-    refetchInterval: 10000,
-  });
-
-  const eventData: EventData = React.useMemo(
-    () => ({
-      organizations: data ?? {},
-      courses: coursedata ?? {},
-      events: eventdata ?? {},
-    }),
-    [data, coursedata],
+  const courseContract = new Contract(
+    attensysCourseAbi,
+    attensysCourseAddress,
+    provider,
   );
 
   React.useEffect(() => {
     if (!address) return;
-    // Add this function after the queries and before the return statement
-    const filterNotificationsByAddress = (address: string) => {
-      if (!address) return [];
 
-      const notifications: any = [];
-      // Filter org-related notifications
-      if (Object.keys(eventData.organizations).length != 0) {
-        // Check bootcamp created
-        // eventData.organizations?.bootcampCreateds.forEach((event: any) => {
-        //   if (
-        //     formatAddress(event.org_address.toLowerCase()) ===
-        //     address.toLowerCase()
-        //   ) {
-        //     notifications.push({
-        //       type: "BOOTCAMP_CREATED",
-        //       bootcampId: event.bootcamp_id,
-        //       timestamp: event.block_timestamp,
-        //       blockNumber: event.block_number,
-        //     });
-        //   }
-        // });
+    const fetchUserData = async () => {
+      try {
+        // Get created courses
+        const createdCourses: CourseType[] =
+          await courseContract?.get_all_creator_courses(address);
 
-        // Check bootcamp registrations
-        eventData.organizations?.bootcampRegistrations?.forEach(
-          (event: any) => {
-            if (
-              formatAddress(event.org_address.toLowerCase()) ===
-              address.toLowerCase()
-            ) {
-              notifications.push({
-                type: "BOOTCAMP_REGISTRATION",
-                bootcampId: event.bootcamp_id,
-                timestamp: event.block_timestamp,
-                blockNumber: event.block_number,
-              });
+        // Get taken courses
+        const takenCourses: CourseType[] =
+          await courseContract?.get_all_taken_courses(address);
+
+        console.log("createdCourses", createdCourses);
+        console.log("takenCourses", takenCourses);
+
+        // Combine created and taken courses
+        const allCourses = [...createdCourses, ...takenCourses];
+        setCoursesData(allCourses);
+
+        // Process courses with IPFS data
+        const processedCourses = await Promise.all(
+          allCourses.map(async (course) => {
+            try {
+              const courseData = await fetchCIDContent(course.course_ipfs_uri);
+              if (!courseData || !courseData.data) return null;
+
+              // Check if user is certified for this course
+              const isCertified =
+                await courseContract?.is_user_certified_for_course(
+                  address,
+                  course.course_identifier,
+                );
+
+              return {
+                type: "COURSE",
+                eventName: courseData.data.courseName || "Unnamed Course",
+                status: course.is_approved ? "Approved" : "Pending",
+                date: formatTimestamp(
+                  course.block_timestamp || Date.now() / 1000,
+                ),
+                certification: isCertified
+                  ? "Certificate Available"
+                  : "No Certificate",
+                nftImg: courseData.data.courseImage
+                  ? `https://ipfs.io/ipfs/${courseData.data.courseImage}`
+                  : "",
+                data: {
+                  ...courseData.data,
+                  course_identifier: course.course_identifier,
+                  is_approved: course.is_approved,
+                  is_suspended: course.is_suspended,
+                  price: course.price,
+                  owner: course.owner,
+                  isCertified,
+                },
+              };
+            } catch (error) {
+              console.error("Error processing course:", error);
+              return null;
             }
-          },
+          }),
         );
 
-        // Check instructor additions
-        eventData.organizations?.instructorAddedToOrgs?.forEach(
-          (event: any) => {
-            for (let i = 0; i < event.instructors.length; i++) {
-              if (
-                formatAddress(event.instructors[i].toLowerCase()) ===
-                address.toLowerCase()
-              ) {
-                notifications.push({
-                  type: "INSTRUCTOR_ADDED",
-                  orgName: event.org_name,
-                  timestamp: event.block_timestamp,
-                  blockNumber: event.block_number,
-                });
+        // Filter out any null values and set the processed data
+        const validProcessedCourses = processedCourses.filter(Boolean);
+        setProcessedCoursesData(validProcessedCourses);
+
+        // Get course identifiers for taken courses
+        const courseIdentifiers = takenCourses.map((data) =>
+          Number(data.course_identifier),
+        );
+
+        // Process created courses
+        const createdCoursesData = await Promise.all(
+          createdCourses.map(async (course: CourseType) => {
+            try {
+              const courseData = await fetchCIDContent(course.course_ipfs_uri);
+              if (!courseData || !courseData.data) return null;
+
+              return {
+                type: "COURSE_CREATED",
+                eventName: courseData.data.courseName || "New Course",
+                status: "Course Created",
+                date: formatTimestamp(
+                  course.block_timestamp || Date.now() / 1000,
+                ),
+                certification: "View certifications",
+                nftImg: courseData.data.courseImage
+                  ? `https://ipfs.io/ipfs/${courseData.data.courseImage}`
+                  : "",
+                data: courseData.data,
+              };
+            } catch (error) {
+              console.error("Error processing created course:", error);
+              return null;
+            }
+          }),
+        );
+
+        // Process taken courses
+        const takenCoursesData = await Promise.all(
+          takenCourses.map(async (course: CourseType) => {
+            try {
+              const courseData = await fetchCIDContent(course.course_ipfs_uri);
+              if (!courseData || !courseData.data) return null;
+
+              // Check if user is certified for this course
+              const isCertified =
+                await courseContract?.is_user_certified_for_course(
+                  address,
+                  course.course_identifier,
+                );
+
+              if (isCertified) {
+                return {
+                  type: "CERT_CLAIMED",
+                  eventName: "Certificate Claimed",
+                  status: "Certificate Claimed",
+                  date: formatTimestamp(
+                    course.block_timestamp || Date.now() / 1000,
+                  ),
+                  certification: "View certifications",
+                  nftImg: courseData.data.courseImage
+                    ? `https://ipfs.io/ipfs/${courseData.data.courseImage}`
+                    : "",
+                  data: courseData.data,
+                };
               }
+
+              return {
+                type: "COURSE_TAKEN",
+                eventName: courseData.data.courseName || "Course Taken",
+                status: "Course Taken",
+                date: formatTimestamp(
+                  course.block_timestamp || Date.now() / 1000,
+                ),
+                certification: "View certifications",
+                nftImg: courseData.data.courseImage
+                  ? `https://ipfs.io/ipfs/${courseData.data.courseImage}`
+                  : "",
+                data: courseData.data,
+              };
+            } catch (error) {
+              console.error("Error processing taken course:", error);
+              return null;
             }
-          },
+          }),
         );
 
-        // Check instructor removed
-        eventData.organizations?.instructorRemovedFromOrgs?.forEach(
-          (event: any) => {
-            if (
-              formatAddress(event.org_address.toLowerCase()) ===
-              address.toLowerCase()
-            ) {
-              notifications.push({
-                type: "INSTRUCTOR_REMOVED",
-                bootcampId: event.bootcamp_id,
-                timestamp: event.block_timestamp,
-                blockNumber: event.block_number,
-              });
-            }
-          },
+        // Combine and filter out null values
+        const allData = [...createdCoursesData, ...takenCoursesData].filter(
+          Boolean,
         );
-
-        // Check organization profile created
-        // eventData.organizations?.organizationProfiles.forEach((event: any) => {
-        //   if (
-        //     formatAddress(event.org_address.toLowerCase()) ===
-        //     address.toLowerCase()
-        //   ) {
-        //     notifications.push({
-        //       type: "ORGANIZATION_PROFILE_CREATED",
-        //       bootcampId: event.bootcamp_id,
-        //       timestamp: event.block_timestamp,
-        //       blockNumber: event.block_number,
-        //     });
-        //   }
-        // });
-
-        // Check organization approved
-        // eventData.organizations?.organizationApproveds.forEach((event: any) => {
-        //   if (
-        //     formatAddress(event.student_address.toLowerCase()) ===
-        //     address.toLowerCase()
-        //   ) {
-        //     notifications.push({
-        //       type: "ORGANIZATION_APPROVED",
-        //       bootcampId: event.bootcamp_id,
-        //       timestamp: event.block_timestamp,
-        //       blockNumber: event.block_number,
-        //     });
-        //   }
-        // });
-
-        // Check organization declined
-        // eventData.organizations?.organizationDeclineds.forEach((event: any) => {
-        //   if (
-        //     formatAddress(event.student_address.toLowerCase()) ===
-        //     address.toLowerCase()
-        //   ) {
-        //     notifications.push({
-        //       type: "ORGANIZATION_APPROVED",
-        //       bootcampId: event.bootcamp_id,
-        //       timestamp: event.block_timestamp,
-        //       blockNumber: event.block_number,
-        //     });
-        //   }
-        // });
+        console.log("allData", allData);
+        setResultData(allData as ResultDataItem[]);
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setResultData([]);
       }
-
-      // Filter course-related notifications
-      if (Object.keys(eventData.courses).length != 0) {
-        // Check course creations
-        eventData.courses?.courseCreateds?.forEach((event: any) => {
-          if (
-            formatAddress(event.owner_.toLowerCase()) === address.toLowerCase()
-          ) {
-            notifications.push({
-              type: "COURSE_CREATED",
-              owner: event.owner_,
-              uri: event.course_ipfs_uri,
-              timestamp: event.block_timestamp,
-              blockNumber: event.block_number,
-            });
-          }
-        });
-
-        // Check certificate claims
-        eventData.courses?.courseCertClaimeds?.forEach((event: any) => {
-          if (
-            formatAddress(event.candidate.toLowerCase()) ===
-            address.toLowerCase()
-          ) {
-            notifications.push({
-              type: "CERT_CLAIMED",
-              candidate: event.candidate,
-              timestamp: event.block_timestamp,
-              blockNumber: event.block_number,
-            });
-          }
-        });
-
-        //TODO: check for course replaced
-        //TODO: check for admin transfer
-      }
-
-      // Filter event-related notifications
-      if (Object.keys(eventData.events).length != 0) {
-        //TODO: check for admin ownership claimed
-        //TODO: check for admin transfer
-
-        // Check attendance marks
-        eventData.events?.attendanceMarkeds?.forEach((event: any) => {
-          if (
-            formatAddress(event.attendee.toLowerCase()) ===
-            address.toLowerCase()
-          ) {
-            notifications.push({
-              type: "ATTENDANCE_MARKED",
-              attendee: event.attendee,
-              timestamp: event.block_timestamp,
-              blockNumber: event.block_number,
-            });
-          }
-        });
-
-        // Check event created
-        eventData.events?.eventCreateds?.forEach((event: any) => {
-          if (
-            formatAddress(event.event_organizer.toLowerCase()) ===
-            address.toLowerCase()
-          ) {
-            notifications.push({
-              type: "EVENT_CREATED",
-              attendee: event.event_organizer,
-              eventName: event.event_name,
-              timestamp: event.block_timestamp,
-              blockNumber: event.block_number,
-            });
-          }
-        });
-
-        // Check event registrations
-        eventData.events?.registeredForEvents?.forEach((event: any) => {
-          if (
-            formatAddress(event.attendee.toLowerCase()) ===
-            address.toLowerCase()
-          ) {
-            notifications.push({
-              type: "EVENT_REGISTRATION",
-              attendee: event.attendee,
-              timestamp: event.block_timestamp,
-              blockNumber: event.block_number,
-            });
-          }
-        });
-
-        //TODO: check for registration status changed
-      }
-
-      // Sort notifications by timestamp (most recent first)
-      return notifications.sort((a: any, b: any) => b.timestamp - a.timestamp);
-      // return notifications;
     };
-    const filteredNotifications = filterNotificationsByAddress(address);
-    setResultData(filteredNotifications);
-    // console.log("what does it return", filterNotificationsByAddress(address));
-  }, [data, coursedata, eventdata]);
+
+    fetchUserData();
+  }, [address, fetchCIDContent]);
 
   const formatTimestamp = (timestamp: number) => {
-    // Convert from seconds to milliseconds if needed
     const date = new Date(timestamp * 1000);
-
-    if (isNaN(date.getTime())) return "Invalid date"; // Handle invalid Date objects
-
+    if (isNaN(date.getTime())) return "Invalid date";
     return format(date, "MMM dd, yyyy HH:mm:ss");
   };
 
-  // First fix the mapping function
-  const mapResultDataToGrids = (resultData: any[]) => {
-    return resultData
-      .map((notification) => {
-        // Keep the original type in the mapped data
-        const baseData = {
-          type: notification.type,
-          certification: "View certifications",
-          nftImg: "",
-        };
-
-        switch (notification.type) {
-          case "EVENT_REGISTRATION":
-            return {
-              ...baseData,
-              eventName: "Event Registration",
-              status: "Registered",
-              date: formatTimestamp(notification.timestamp),
-            };
-          case "ATTENDANCE_MARKED":
-            return {
-              ...baseData,
-              eventName: "Event Attendance",
-              status: "Attendance Verified",
-              date: formatTimestamp(notification.timestamp),
-            };
-          case "EVENT_CREATED":
-            return {
-              ...baseData,
-              eventName: notification.eventName || "New Event",
-              status: "Event Created",
-              date: formatTimestamp(notification.timestamp),
-            };
-          case "COURSE_CREATED":
-            return {
-              ...baseData,
-              eventName: notification.uri || "New Course",
-              status: "Course Created",
-              date: "BCK Web3 Pro",
-            };
-          case "CERT_CLAIMED":
-            return {
-              ...baseData,
-              eventName: "Certificate Claimed",
-              status: "Certificate Claimed",
-              date: formatTimestamp(notification.timestamp),
-            };
-          default:
-            return null;
-        }
-      })
-      .filter(Boolean);
-  };
-
-  // Then update the gridsData transformation
+  // Update the gridsData transformation
   const updatedGridsData = React.useMemo(() => {
-    const mappedResultData = mapResultDataToGrids(resultData);
-
     return gridsData.map((grid) => {
       switch (grid.name) {
         case "Events": {
-          const eventData = mappedResultData.filter((item: any) =>
-            [
-              "EVENT_REGISTRATION",
-              "ATTENDANCE_MARKED",
-              "EVENT_CREATED",
-            ].includes(item.type),
+          const eventData = resultData.filter((item: any) =>
+            ["COURSE_TAKEN"].includes(item.type),
           );
 
           return {
@@ -422,8 +290,17 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
         }
 
         case "Courses": {
-          const courseData = mappedResultData.filter((item: any) =>
-            ["COURSE_CREATED"].includes(item.type),
+          // Use processedCoursesData if available
+          if (processedCoursesData.length > 0) {
+            console.log("Using processedCoursesData for display");
+            return {
+              ...grid,
+              eventsData: processedCoursesData,
+            };
+          }
+
+          const courseData = resultData.filter((item: any) =>
+            ["COURSE_CREATED", "COURSE_TAKEN"].includes(item.type),
           );
 
           return {
@@ -433,7 +310,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
         }
 
         case "Certifications": {
-          const certData = mappedResultData.filter((item: any) =>
+          const certData = resultData.filter((item: any) =>
             ["CERT_CLAIMED"].includes(item.type),
           );
 
@@ -447,20 +324,45 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
           return grid;
       }
     });
-  }, [resultData, gridsData]);
+  }, [resultData, gridsData, processedCoursesData]);
 
   const filteredGridsData = React.useMemo(() => {
     if (activeFilter === "All") return updatedGridsData;
     return updatedGridsData.filter((item) => item.name === activeFilter);
   }, [updatedGridsData, activeFilter]);
 
-  // Add this helper function
-  const formatAddress = (addr: string) => {
-    if (addr.startsWith("0x")) {
-      return addr.startsWith("0x0") ? addr : "0x0" + addr.slice(2);
+  const handleSubmit = (
+    e: React.FormEvent,
+    searchValue: string,
+    router: any,
+  ) => {
+    e.preventDefault();
+    if (searchValue) {
+      router.push(`/Explorer/${searchValue}`);
     }
-    return "0x0" + addr;
   };
+
+  const updateDropdownPosition = () => {
+    if (filterButtonRef.current) {
+      const rect = filterButtonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY,
+        left: rect.right - 120,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isFilterOpen) {
+      updateDropdownPosition();
+      window.addEventListener("scroll", updateDropdownPosition);
+      window.addEventListener("resize", updateDropdownPosition);
+    }
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPosition);
+      window.removeEventListener("resize", updateDropdownPosition);
+    };
+  }, [isFilterOpen]);
 
   return (
     <div className="bg-[#F5F7FA] w-full">
@@ -486,7 +388,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
                   <Input
                     name="search by address"
                     type="text"
-                    placeholder="Search an address | organization | Course"
+                    placeholder="Search an address | course | organization"
                     value={searchValue}
                     onChange={handleChange}
                     className="w-full h-[50px] p-2 pl-10 rounded-xl text-[15px] focus:outline-none font-medium text-[#817676] placeholder-[#817676]"
@@ -510,10 +412,53 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
                 </div>
 
                 <div className="hidden lg:flex h-[42px] w-[20%] rounded-xl items-center justify-center bg-[#4A90E21F] border-[1px] border-[#6B6D6E] space-x-1">
-                  <h1 className="text-[#2D3A4B] text-[14px] leading-[21px] font-medium">
-                    All Filters
-                  </h1>
-                  <RiArrowDropDownLine className="h-[20px] w-[20px] text-[#2D3A4B]" />
+                  <button
+                    ref={filterButtonRef}
+                    type="button"
+                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    className="flex items-center justify-center space-x-2 w-full h-full"
+                  >
+                    <h1 className="text-[#2D3A4B] text-[14px] leading-[21px] font-medium">
+                      {activeFilter}
+                    </h1>
+                    <RiArrowDropDownLine className="h-[20px] w-[20px] text-[#2D3A4B]" />
+                  </button>
+
+                  {isFilterOpen &&
+                    typeof window !== "undefined" &&
+                    createPortal(
+                      <div
+                        className="fixed w-[120px] bg-[#F5F7FA] rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.1)] z-[9999] border border-[#e8e9ea]"
+                        style={{
+                          top: `${dropdownPosition.top}px`,
+                          left: `${dropdownPosition.left}px`,
+                        }}
+                      >
+                        {[
+                          "All",
+                          "Events",
+                          "Organizations",
+                          "Certifications",
+                          "Courses",
+                        ].map((filter) => (
+                          <button
+                            key={filter}
+                            onClick={() => {
+                              setActiveFilter(filter);
+                              setIsFilterOpen(false);
+                            }}
+                            className={`w-full px-4 py-2.5 text-left text-sm transition-colors duration-200 ${
+                              activeFilter === filter
+                                ? "bg-[#4A90E2] text-white"
+                                : "text-[#2D3A4B] hover:bg-[#4A90E21F]"
+                            }`}
+                          >
+                            {filter}
+                          </button>
+                        ))}
+                      </div>,
+                      document.body,
+                    )}
                 </div>
               </div>
             </form>
@@ -527,7 +472,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
               <Button
                 key={index}
                 onClick={() => setActiveFilter(category)}
-                className={`hidden lg:flex rounded-lg py-2 px-4 h-[42px] items-center w-[90px] text-sm ${
+                className={` lg:flex rounded-lg py-2 px-4 h-[42px] items-center w-[90px] text-sm ${
                   activeFilter === category
                     ? "bg-[#4A90E2] text-white"
                     : "bg-[#4A90E21F] text-[#2d3a4b]"
@@ -547,19 +492,251 @@ const ExploreResult: React.FC<{ params: Params }> = ({ params }) => {
       <div className="mx-4 lg:mx-36">
         {activeFilter === "All" ? (
           // Show all grids when "All" is selected
-          updatedGridsData.map((item: any, i: any) => (
-            <ResultGrid
-              key={i}
-              address={address || ""}
-              item={item}
-              eventsData={item.eventsData}
-              generatePageNumbers={generatePageNumbers}
-              goToPage={goToPage}
-              currentPage={currentPage}
-            />
-          ))
-        ) : // Show filtered grid when a specific category is selected
-        filteredGridsData.length > 0 ? (
+          <>
+            {updatedGridsData.map((item: any, i: any) => (
+              <ResultGrid
+                key={i}
+                address={address || ""}
+                item={item}
+                eventsData={item.eventsData}
+                generatePageNumbers={generatePageNumbers}
+                goToPage={goToPage}
+                currentPage={currentPage}
+              />
+            ))}
+            {/* Organizations Overview Table - Show when "All" is selected */}
+            <div className="w-full gap-10 bg-white rounded-lg mb-32 py-5 border border-[#b9b9ba] mt-6 pb-8 gap-4 lg:gap-20">
+              <div className="border-b-2 border-[#b9b9ba] mx-4 sm:mx-0 sm:flex">
+                <div className="flex gap-2 w-auto rounded-xl sm:ml-12 sm:mr-6 items-center border-[1px] border-[#6B6D6E] p-3 mb-3 w-64">
+                  <Image
+                    src={organization}
+                    alt="organization"
+                    className="mr-2"
+                  />
+                  <h1>Organizations Overview</h1>
+                </div>
+
+                <div className="bg-[#9B51E052]  flex gap-2 w-auto rounded-xl items-center px-4 sm:py-0 py-2 mb-3 w-48 ">
+                  <h1 className="text-[12px] text-[#9B51E0] font-medium leading-[12px]">
+                    <span className="text-[#9B51E0]">0</span> Organizations
+                    found
+                  </h1>
+                </div>
+              </div>
+
+              <div className="mx-4 lg:mx-12 mt-12">
+                <div className="overflow-x-auto -mx-4 lg:mx-0">
+                  <div className="min-w-[800px]">
+                    <table className="w-full">
+                      <thead>
+                        <tr>
+                          <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-left">
+                            Key
+                          </th>
+                          <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                            Status
+                          </th>
+                          <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                            Organizations | Courses
+                          </th>
+                          <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                            Tutors
+                          </th>
+                          <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                            Certifications
+                          </th>
+                          <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                            Created
+                          </th>
+                          <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                            Students
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="hover:bg-gray-50">
+                          <td className="py-3 px-3 lg:px-6">
+                            <span className="text-[12px] lg:text-[14px] text-[#333333] break-all">
+                              {shortenAddress(address)}
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 lg:px-6">
+                            <div className="inline-flex p-1.5 lg:p-2 rounded-lg text-[10px] lg:text-xs items-center justify-center bg-[#C4FFA2] text-[#115E2C]">
+                              Verified
+                            </div>
+                          </td>
+                          <td className="py-3 px-3 lg:px-6 text-center">
+                            <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                              0 | 0
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 lg:px-6 text-center">
+                            <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                              0
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 lg:px-6 text-center">
+                            <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                              0
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 lg:px-6 text-center">
+                            <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                              2024-03-15
+                            </span>
+                          </td>
+                          <td className="py-3 px-3 lg:px-6 text-center">
+                            <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                              0
+                            </span>
+                          </td>
+                        </tr>
+                        <tr className="hover:bg-gray-50">
+                          <td colSpan={7} className="py-4 lg:py-6 px-3 lg:px-6">
+                            <div className="text-[12px] lg:text-[14px] text-[#333333] leading-relaxed">
+                              <h3 className="font-medium mb-2">
+                                Organization Information
+                              </h3>
+                              <p className="text-[#817676]">
+                                This organization is dedicated to providing
+                                high-quality educational content and
+                                professional development opportunities. With a
+                                focus on blockchain technology and decentralized
+                                learning, we offer comprehensive courses
+                                designed to equip students with practical skills
+                                and industry-relevant knowledge. Our curriculum
+                                is regularly updated to reflect the latest
+                                developments in the field, ensuring that our
+                                students stay ahead of the curve. We maintain a
+                                strong commitment to academic excellence and
+                                student success, supported by our team of
+                                experienced educators and industry
+                                professionals.
+                              </p>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : activeFilter === "Organizations" ? (
+          // Show only Organizations Overview when "Organizations" is selected
+          <div className="w-full gap-10 bg-white rounded-lg mb-32 py-5 border border-[#b9b9ba] mt-6 pb-8">
+            <div className="border-b-2 border-[#b9b9ba] mx-4 sm:mx-0 sm:flex">
+              <div className="flex gap-2 w-auto rounded-xl sm:ml-12 sm:mr-6 items-center border-[1px] border-[#6B6D6E] p-3 mb-3 w-64">
+                <Image src={organization} alt="organization" className="mr-2" />
+                <h1>Organizations Overview</h1>
+              </div>
+
+              <div className="bg-[#9B51E052]  flex gap-2 w-auto rounded-xl items-center px-4 sm:py-0 py-2 mb-3 w-48 ">
+                <h1 className="text-[12px] text-[#9B51E0] font-medium leading-[12px]">
+                  <span className="text-[#9B51E0]">0</span> Organizations found
+                </h1>
+              </div>
+            </div>
+
+            <div className="mx-4 lg:mx-12 mt-12">
+              <div className="overflow-x-auto -mx-4 lg:mx-0">
+                <div className="min-w-[800px]">
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-left">
+                          Key
+                        </th>
+                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                          Status
+                        </th>
+                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                          Organizations | Courses
+                        </th>
+                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                          Tutors
+                        </th>
+                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                          Certifications
+                        </th>
+                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                          Created
+                        </th>
+                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                          Students
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="hover:bg-gray-50">
+                        <td className="py-3 px-3 lg:px-6">
+                          <span className="text-[12px] lg:text-[14px] text-[#333333] break-all">
+                            {shortenAddress(address)}
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 lg:px-6">
+                          <div className="inline-flex p-1.5 lg:p-2 rounded-lg text-[10px] lg:text-xs items-center justify-center bg-[#C4FFA2] text-[#115E2C]">
+                            Verified
+                          </div>
+                        </td>
+                        <td className="py-3 px-3 lg:px-6 text-center">
+                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                            0 | 0
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 lg:px-6 text-center">
+                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                            0
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 lg:px-6 text-center">
+                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                            0
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 lg:px-6 text-center">
+                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                            2024-03-15
+                          </span>
+                        </td>
+                        <td className="py-3 px-3 lg:px-6 text-center">
+                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                            0
+                          </span>
+                        </td>
+                      </tr>
+                      <tr className="hover:bg-gray-50">
+                        <td colSpan={7} className="py-4 lg:py-6 px-3 lg:px-6">
+                          <div className="text-[12px] lg:text-[14px] text-[#333333] leading-relaxed">
+                            <h3 className="font-medium mb-2">
+                              Organization Information
+                            </h3>
+                            <p className="text-[#817676]">
+                              This organization is dedicated to providing
+                              high-quality educational content and professional
+                              development opportunities. With a focus on
+                              blockchain technology and decentralized learning,
+                              we offer comprehensive courses designed to equip
+                              students with practical skills and
+                              industry-relevant knowledge. Our curriculum is
+                              regularly updated to reflect the latest
+                              developments in the field, ensuring that our
+                              students stay ahead of the curve. We maintain a
+                              strong commitment to academic excellence and
+                              student success, supported by our team of
+                              experienced educators and industry professionals.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : filteredGridsData.length > 0 ? (
           // Show filtered grid when there are matches
           filteredGridsData.map((item: any, i: any) => (
             <ResultGrid

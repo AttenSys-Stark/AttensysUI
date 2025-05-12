@@ -44,6 +44,9 @@ import videoHero from "@/assets/video.svg";
 import videoClip from "@/assets/video_clip.svg";
 import certIcon from "@/assets/certificate-outline.svg";
 import rich from "@/assets/Richin2024.svg";
+import graduate from "@/assets/game-icons_graduate-cap.svg";
+import certificate from "@/assets/bx_certification.svg";
+import event from "@/assets/Vector.svg";
 
 export const courseSetup = [
   {
@@ -104,27 +107,27 @@ export const notifCategory = [
       },
       {
         icon: certIcon,
-        msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
+        msg: "Your Certification for the completion of the Web Development on APTOS course is ready.",
       },
       {
         icon: free_books,
-        msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
+        msg: "Your Certification for the completion of the Web Development on APTOS course is ready.",
       },
       {
         icon: free_books,
-        msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
+        msg: "Your Certification for the completion of the Web Development on APTOS course is ready.",
       },
       {
         icon: free_books,
-        msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
+        msg: "Your Certification for the completion of the Web Development on APTOS course is ready.",
       },
       {
         icon: free_books,
-        msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
+        msg: "Your Certification for the completion of the Web Development on APTOS course is ready.",
       },
       {
         icon: free_books,
-        msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
+        msg: "Your Certification for the completion of the Web Development on APTOS course is ready.",
       },
     ],
   },
@@ -137,7 +140,7 @@ export const notifCategory = [
       },
       {
         icon: free_books,
-        msg: "Your Certification for the completion of the  “Web Development on APTOS” course is ready.",
+        msg: "Your Certification for the completion of the Web Development on APTOS course is ready.",
       },
       {
         icon: certIcon,
@@ -275,43 +278,43 @@ export const certContent = [
     certificates: [
       {
         img: Swisstaler,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: digital,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: liveNft,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: digital,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: liveNft,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
     ],
   },
@@ -322,35 +325,35 @@ export const certContent = [
     certificates: [
       {
         img: Swisstaler,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: topNotch,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: liveNft,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: liveNft,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
     ],
   },
@@ -361,35 +364,35 @@ export const certContent = [
     certificates: [
       {
         img: Swisstaler,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: topNotch,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: liveNft,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
       {
         img: liveNft,
-        cert_name: "Blockchain Africa ‘24",
+        cert_name: "Blockchain Africa '24",
         recipient: "0x3C4kB...J29",
-        author: "Blockchain Africa ‘24",
+        author: "Blockchain Africa '24",
         nft_description:
-          "This NFT certifies that 0x3C4B...D12 has successfully completed the ‘Blockchain Fundamentals’ course provided by Blockchain Academy Pro.",
+          "This NFT certifies that 0x3C4B...D12 has successfully completed the 'Blockchain Fundamentals' course provided by Blockchain Academy Pro.",
       },
     ],
   },
@@ -582,13 +585,6 @@ export const guestdata = [
     date: "12/25/2024",
   },
   {
-    name: "Akinbola Taiwo",
-    address: "1Lbcfr7...ZnX71",
-    status: "Approved",
-    role: "N/A",
-    date: "12/25/2024",
-  },
-  {
     name: "Akinbola Kehinde",
     address: "1Lbcfr7...ZnX71",
     status: "Approved",
@@ -604,20 +600,6 @@ export const guestdata = [
   },
   {
     name: "Akinbola Kehinde",
-    address: "1Lbcfr7...ZnX71",
-    status: "Approved",
-    role: "N/A",
-    date: "12/25/2024",
-  },
-  {
-    name: "Akinbola Kehinde",
-    address: "1Lbcfr7...ZnX71",
-    status: "Approved",
-    role: "N/A",
-    date: "12/25/2024",
-  },
-  {
-    name: "Akinbola Taiwo",
     address: "1Lbcfr7...ZnX71",
     status: "Approved",
     role: "N/A",
@@ -834,78 +816,6 @@ export const HighlightData = [
 ];
 
 export const allEventData = [
-  {
-    name: "TechXperience UK",
-    hall: "Shoprite Ikeja City Mall",
-    city: "Ikeja, Lagos",
-    date: "Saturday, October 12",
-    time: "8:30 AM - 9:30 AM",
-    fee: "10",
-    image: Orange,
-  },
-  {
-    name: "TechXperience UK",
-    hall: "Shoprite Ikeja City Mall",
-    city: "Ikeja, Lagos",
-    date: "Saturday, October 12",
-    time: "8:30 AM - 9:30 AM",
-    fee: "10",
-    image: saibat,
-  },
-  {
-    name: "TechXperience UK",
-    hall: "Shoprite Ikeja City Mall",
-    city: "Ikeja, Lagos",
-    date: "Saturday, October 12",
-    time: "8:30 AM - 9:30 AM",
-    fee: "10",
-    image: stunt,
-  },
-  {
-    name: "TechXperience UK",
-    hall: "Shoprite Ikeja City Mall",
-    city: "Ikeja, Lagos",
-    date: "Saturday, October 12",
-    time: "8:30 AM - 9:30 AM",
-    fee: "10",
-    image: social,
-  },
-  {
-    name: "TechXperience UK",
-    hall: "Shoprite Ikeja City Mall",
-    city: "Ikeja, Lagos",
-    date: "Saturday, October 12",
-    time: "8:30 AM - 9:30 AM",
-    fee: "10",
-    image: grapic,
-  },
-  {
-    name: "TechXperience UK",
-    hall: "Shoprite Ikeja City Mall",
-    city: "Ikeja, Lagos",
-    date: "Saturday, October 12",
-    time: "8:30 AM - 9:30 AM",
-    fee: "10",
-    image: last,
-  },
-  {
-    name: "TechXperience UK",
-    hall: "Shoprite Ikeja City Mall",
-    city: "Ikeja, Lagos",
-    date: "Saturday, October 12",
-    time: "8:30 AM - 9:30 AM",
-    fee: "10",
-    image: sunder,
-  },
-  {
-    name: "TechXperience UK",
-    hall: "Shoprite Ikeja City Mall",
-    city: "Ikeja, Lagos",
-    date: "Saturday, October 12",
-    time: "8:30 AM - 9:30 AM",
-    fee: "10",
-    image: summer,
-  },
   {
     name: "TechXperience UK",
     hall: "Shoprite Ikeja City Mall",
@@ -1399,177 +1309,171 @@ export const explorerData = [
 
 export const eventsData = [
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "3 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "3 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "3 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "3 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "1 mon",
   },
   {
-    eventName: "Blockchain Africa ‘24",
+    eventName: "Blockchain Africa '24",
     status: "Attendance Verified",
     certification: "View certifications",
     nftImg: "",
     date: "2 mon",
-  },
-  {
-    eventName: "Blockchain Africa ‘24",
-    status: "Attendance Verified",
-    certification: "View certifications",
-    nftImg: "",
-    date: "1 mon",
   },
 ];
 
 export const gridsData = [
   {
+    img: event,
     name: "Events",
     subProp: [
       "Key",
@@ -1588,18 +1492,15 @@ export const gridsData = [
     eventsData: [],
   },
   {
+    img: graduate,
     name: "Courses",
-    subProp: ["Key", "Status", "Courses", "Completed courses", "Ongoing"],
+    subProp: ["Key", "Status", "Courses"],
     viewPartName: "All Courses",
-    heading: [
-      "Course Name",
-      "Completion status",
-      "Certifications",
-      "Organization",
-    ],
+    heading: ["Course Name", "Completion status", "Certifications", "Date"],
     eventsData: [],
   },
   {
+    img: certificate,
     name: "Certifications",
     subProp: [
       "Key",
@@ -1609,7 +1510,12 @@ export const gridsData = [
       "Total",
     ],
     viewPartName: "All Certifications",
-    heading: ["Activity type", "Completion status", "Certifications", "Issuer"],
+    heading: [
+      "Activity type",
+      "Completion status",
+      "Certifications",
+      "Date certified",
+    ],
     eventsData: [],
   },
 ];
