@@ -19,8 +19,8 @@ import {
   useContract,
   useSendTransaction,
 } from "@starknet-react/core";
-import { attensysOrgAddress } from "./../deployments/contracts";
-import { attensysOrgAbi } from "./../deployments/abi";
+import { attensysOrgAddress } from "../deployments/contracts";
+import { attensysOrgAbi } from "../deployments/abi";
 import { RpcProvider, Contract, Account, ec, json } from "starknet";
 import { useWallet } from "@/hooks/useWallet";
 import { NetworkSwitchButton } from "./connect/NetworkSwitchButton";
