@@ -67,17 +67,6 @@ const ResultGrid: React.FC<ResultGridProps> = ({
   console.log("the result:", item.eventsData);
   // console.log("the result:", item);
   const renderContent = (arg: string) => {
-    const eventCount = item.eventsData.filter(
-      (event) => event.type === "COURSE_TAKEN",
-    ).length;
-    const markedCount = item.eventsData.filter(
-      (event) =>
-        event.type === "COURSE_TAKEN" && event.status === "Course Complete",
-    ).length;
-    const unmarkedCount = item.eventsData.filter(
-      (event) =>
-        event.type === "COURSE_TAKEN" && event.status !== "Course Complete",
-    ).length;
     const certCount = item.eventsData.filter(
       (event) => event.type === "COURSE",
     ).length;
@@ -112,17 +101,17 @@ const ResultGrid: React.FC<ResultGridProps> = ({
       case "Registered events":
         return (
           <h1 className="text-[12px] font-medium leading-[16px] text-[#817676]">
-            <span className="text-[#9B51E0]">{eventCount}</span> events
+            <span className="text-[#9B51E0]">{0}</span> events
           </h1>
         );
       case "Marked attendance":
         return (
           <div className="flex flex-col sm:flex-row space-x-0 sm:space-x-4">
             <h1 className="text-[12px] font-medium leading-[16px] text-[#817676]">
-              <span className="text-[#9B51E0]">{markedCount}</span> marked
+              <span className="text-[#9B51E0]">{0}</span> marked
             </h1>
             <h1 className="text-[12px] font-medium leading-[16px] text-[#817676]">
-              <span className="text-[#9B51E0]">{unmarkedCount}</span> unmarked
+              <span className="text-[#9B51E0]">{0}</span> unmarked
             </h1>
           </div>
         );
@@ -161,7 +150,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     <div className="w-full">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-10">
         {/* Left Column - Overview Section */}
-        <div className="row-span-2 bg-white rounded-lg mb-6 py-5 border border-[#b9b9ba]">
+        <div className="hidden sm:block row-span-2 bg-white rounded-lg mb-6 py-5 border border-[#b9b9ba]">
           <div className="border-b-2 border-[#b9b9ba]">
             <div className="flex gap-2 w-auto rounded-xl mx-12 items-center border-[1px] border-[#6B6D6E] p-3 mb-3">
               <Image src={item.img} alt="img" className="mr-2" />
@@ -199,7 +188,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
             </div>
           </div>
 
-          <div className="h-[308px] w-full over">
+          <div className="min-h-[308px] w-full">
             {item.eventsData.length > 0 ? (
               <>
                 {/* Desktop Table */}
@@ -278,7 +267,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                 </div>
 
                 {/* Mobile Cards */}
-                <div className="lg:hidden space-y-4">
+                <div className="lg:hidden space-y-4 h-auto min-h-[308px] overflow-y-auto">
                   {item.eventsData
                     .slice((currentPage - 1) * 6, currentPage * 6)
                     .map((data, index) => (
@@ -327,46 +316,6 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                       </div>
                     ))}
                 </div>
-
-                {item.eventsData.length > 6 && (
-                  <div className="flex justify-center space-x-2 pb-4 pt-10">
-                    <button
-                      onClick={() => goToPage(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      className="px-4 py-1.5 border-[#D0D5DD] border-[1px] rounded disabled:opacity-50"
-                    >
-                      {"<"}
-                    </button>
-                    {generatePageNumbers().map((page, index) =>
-                      page === "..." ? (
-                        <span key={index} className="px-2 text-base mt-2">
-                          ...
-                        </span>
-                      ) : (
-                        <button
-                          key={index}
-                          onClick={() => goToPage(page as number)}
-                          className={`px-4 py-1.5 rounded text-[14px] ${
-                            currentPage === page
-                              ? "bg-none text-[#000000] border-[#9B51E0] border-[1px]"
-                              : "bg-none text-[#000000]"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ),
-                    )}
-                    <button
-                      onClick={() => goToPage(currentPage + 1)}
-                      disabled={
-                        currentPage === Math.ceil(item.eventsData.length / 6)
-                      }
-                      className="px-4 py-1.5 border-[#D0D5DD] border-[1px] text-sm rounded disabled:opacity-50"
-                    >
-                      {">"}
-                    </button>
-                  </div>
-                )}
               </>
             ) : (
               <div className="h-full w-full flex items-center justify-center">
@@ -385,20 +334,74 @@ const ResultGrid: React.FC<ResultGridProps> = ({
           className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative max-w-[90%] max-h-[90%]">
+          <div className="relative bg-white rounded-lg p-6 max-w-[90%] max-h-[90%] flex flex-col lg:flex-row gap-6">
             <button
               onClick={handleCloseOverlay}
               className="absolute -top-4 -right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
             >
               <IoClose className="w-6 h-6 text-gray-600" />
             </button>
-            <Image
-              src={selectedImage}
-              alt="Enlarged view"
-              width={800}
-              height={800}
-              className="object-contain rounded-lg shadow-xl"
-            />
+
+            {/* Image Section */}
+            <div className="flex-1">
+              <Image
+                src={selectedImage}
+                alt="Enlarged view"
+                width={800}
+                height={800}
+                className="object-contain rounded-lg shadow-xl w-full h-full"
+              />
+            </div>
+
+            {/* Course Information Section */}
+            <div className="flex-1 flex flex-col gap-4">
+              <div className="border-b border-gray-200 pb-4">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+                  Course Details
+                </h2>
+                {item.eventsData.map(
+                  (event, index) =>
+                    event.nftImg === selectedImage && (
+                      <div key={index} className="space-y-3">
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-700">
+                            Course Title
+                          </h3>
+                          <p className="text-gray-600">{event.eventName}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-700">
+                            Status
+                          </h3>
+                          <div
+                            className={`inline-flex p-2 rounded-lg text-sm items-center justify-center ${
+                              event.status === "Course Complete"
+                                ? "bg-[#C4FFA2] text-[#115E2C]"
+                                : "bg-[#F6A61C2B] text-[#730404]"
+                            }`}
+                          >
+                            {event.status}
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-700">
+                            Certification
+                          </h3>
+                          <p className="text-[#5801A9]">
+                            {event.certification}
+                          </p>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-medium text-gray-700">
+                            Date
+                          </h3>
+                          <p className="text-gray-600">{event.date}</p>
+                        </div>
+                      </div>
+                    ),
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}

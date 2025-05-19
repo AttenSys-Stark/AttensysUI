@@ -46,7 +46,7 @@ import certIcon from "@/assets/certificate-outline.svg";
 import rich from "@/assets/Richin2024.svg";
 import graduate from "@/assets/game-icons_graduate-cap.svg";
 import certificate from "@/assets/bx_certification.svg";
-import event from "@/assets/Vector.svg";
+import event from "@/assets/Vector2.svg";
 
 export const courseSetup = [
   {
