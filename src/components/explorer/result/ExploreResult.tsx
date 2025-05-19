@@ -64,6 +64,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
   const { fetchCIDContent } = useFetchCID();
   const [coursesData, setCoursesData] = useState<CourseType[]>([]);
   const [processedCoursesData, setProcessedCoursesData] = useState<any[]>([]);
+  const [noOrg, setNoOrg] = useState(true);
 
   const itemsPerPage = 10;
 
@@ -144,9 +145,8 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                 date: formatTimestamp(
                   course.block_timestamp || Date.now() / 1000,
                 ),
-                certification: isCertified
-                  ? "Certificate Available"
-                  : "No Certificate",
+                certification: "Certificate Available",
+
                 nftImg: courseData.data.courseImage
                   ? `https://ipfs.io/ipfs/${courseData.data.courseImage}`
                   : "",
@@ -472,7 +472,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
               <Button
                 key={index}
                 onClick={() => setActiveFilter(category)}
-                className={` lg:flex rounded-lg py-2 px-4 h-[42px] items-center w-[90px] text-sm ${
+                className={` lg:flex rounded-lg py-2 px-4 h-[42px] items-center w-[100px] text-sm ${
                   activeFilter === category
                     ? "bg-[#4A90E2] text-white"
                     : "bg-[#4A90E21F] text-[#2d3a4b]"
@@ -489,7 +489,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
       </div>
 
       {/* Grid Results */}
-      <div className="mx-4 lg:mx-36">
+      <div className="mx-4 lg:mx-36 mb-12">
         {activeFilter === "All" ? (
           // Show all grids when "All" is selected
           <>
@@ -505,7 +505,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
               />
             ))}
             {/* Organizations Overview Table - Show when "All" is selected */}
-            <div className="w-full gap-10 bg-white rounded-lg mb-32 py-5 border border-[#b9b9ba] mt-6 pb-8 gap-4 lg:gap-20">
+            <div className="bg-white rounded-lg py-5 border border-[#b9b9ba] mt-6 mb-6">
               <div className="border-b-2 border-[#b9b9ba] mx-4 sm:mx-0 sm:flex">
                 <div className="flex gap-2 w-auto rounded-xl sm:ml-12 sm:mr-6 items-center border-[1px] border-[#6B6D6E] p-3 mb-3 w-64">
                   <Image
@@ -516,7 +516,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                   <h1>Organizations Overview</h1>
                 </div>
 
-                <div className="bg-[#9B51E052]  flex gap-2 w-auto rounded-xl items-center px-4 sm:py-0 py-2 mb-3 w-48 ">
+                <div className="bg-[#9B51E052] flex gap-2 w-auto rounded-xl items-center px-4 sm:py-0 py-2 mb-3 w-48">
                   <h1 className="text-[12px] text-[#9B51E0] font-medium leading-[12px]">
                     <span className="text-[#9B51E0]">0</span> Organizations
                     found
@@ -524,8 +524,141 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                 </div>
               </div>
 
+              {noOrg ? (
+                <div className="w-full min-h-[308px] flex items-center justify-center">
+                  <div className="mx-4 lg:mx-12">
+                    <p>This address has no organization data</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="mx-4 lg:mx-12">
+                  <div className="overflow-x-auto -mx-4 lg:mx-0">
+                    <div className="min-w-[800px]">
+                      <table className="w-full">
+                        <thead>
+                          <tr>
+                            <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-left">
+                              Key
+                            </th>
+                            <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                              Status
+                            </th>
+                            <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                              Organizations | Courses
+                            </th>
+                            <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                              Tutors
+                            </th>
+                            <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                              Certifications
+                            </th>
+                            <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                              Created
+                            </th>
+                            <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
+                              Students
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="hover:bg-gray-50">
+                            <td className="py-3 px-3 lg:px-6">
+                              <span className="text-[12px] lg:text-[14px] text-[#333333] break-all">
+                                {shortenAddress(address)}
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 lg:px-6">
+                              <div className="inline-flex p-1.5 lg:p-2 rounded-lg text-[10px] lg:text-xs items-center justify-center bg-[#C4FFA2] text-[#115E2C]">
+                                Verified
+                              </div>
+                            </td>
+                            <td className="py-3 px-3 lg:px-6 text-center">
+                              <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                                0 | 0
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 lg:px-6 text-center">
+                              <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                                0
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 lg:px-6 text-center">
+                              <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                                0
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 lg:px-6 text-center">
+                              <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                                2024-03-15
+                              </span>
+                            </td>
+                            <td className="py-3 px-3 lg:px-6 text-center">
+                              <span className="text-[12px] lg:text-[14px] text-[#333333]">
+                                0
+                              </span>
+                            </td>
+                          </tr>
+                          <tr className="hover:bg-gray-50">
+                            <td
+                              colSpan={7}
+                              className="py-4 lg:py-6 px-3 lg:px-6"
+                            >
+                              <div className="text-[12px] lg:text-[14px] text-[#333333] leading-relaxed">
+                                <h3 className="font-medium mb-2">
+                                  Organization Information
+                                </h3>
+                                <p className="text-[#817676]">
+                                  This organization is dedicated to providing
+                                  high-quality educational content and
+                                  professional development opportunities. With a
+                                  focus on blockchain technology and
+                                  decentralized learning, we offer comprehensive
+                                  courses designed to equip students with
+                                  practical skills and industry-relevant
+                                  knowledge. Our curriculum is regularly updated
+                                  to reflect the latest developments in the
+                                  field, ensuring that our students stay ahead
+                                  of the curve. We maintain a strong commitment
+                                  to academic excellence and student success,
+                                  supported by our team of experienced educators
+                                  and industry professionals.
+                                </p>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : activeFilter === "Organizations" ? (
+          // Show only Organizations Overview when "Organizations" is selected
+          <div className="w-full  bg-white rounded-lg py-5 border border-[#b9b9ba] mt-6">
+            <div className="border-b-2 border-[#b9b9ba] mx-4 sm:mx-0 sm:flex">
+              <div className="flex gap-2 w-auto rounded-xl sm:ml-12 sm:mr-6 items-center border-[1px] border-[#6B6D6E] p-3 mb-3 w-64">
+                <Image src={organization} alt="organization" className="mr-2" />
+                <h1>Organizations Overview</h1>
+              </div>
+
+              <div className="bg-[#9B51E052]  flex gap-2 w-auto rounded-xl items-center px-4 sm:py-0 py-2 mb-3 w-48 ">
+                <h1 className="text-[12px] text-[#9B51E0] font-medium leading-[12px]">
+                  <span className="text-[#9B51E0]">0</span> Organizations found
+                </h1>
+              </div>
+            </div>
+
+            {noOrg ? (
+              <div className="w-full min-h-[308px] flex items-center justify-center">
+                <div className="mx-4 lg:mx-12">
+                  <p>This address has no organization data</p>
+                </div>
+              </div>
+            ) : (
               <div className="mx-4 lg:mx-12 mt-12">
-                <div className="overflow-x-auto -mx-4 lg:mx-0">
+                <div className="overflow-x-auto mx-4 lg:mx-0">
                   <div className="min-w-[800px]">
                     <table className="w-full">
                       <thead>
@@ -621,120 +754,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                   </div>
                 </div>
               </div>
-            </div>
-          </>
-        ) : activeFilter === "Organizations" ? (
-          // Show only Organizations Overview when "Organizations" is selected
-          <div className="w-full gap-10 bg-white rounded-lg mb-32 py-5 border border-[#b9b9ba] mt-6 pb-8">
-            <div className="border-b-2 border-[#b9b9ba] mx-4 sm:mx-0 sm:flex">
-              <div className="flex gap-2 w-auto rounded-xl sm:ml-12 sm:mr-6 items-center border-[1px] border-[#6B6D6E] p-3 mb-3 w-64">
-                <Image src={organization} alt="organization" className="mr-2" />
-                <h1>Organizations Overview</h1>
-              </div>
-
-              <div className="bg-[#9B51E052]  flex gap-2 w-auto rounded-xl items-center px-4 sm:py-0 py-2 mb-3 w-48 ">
-                <h1 className="text-[12px] text-[#9B51E0] font-medium leading-[12px]">
-                  <span className="text-[#9B51E0]">0</span> Organizations found
-                </h1>
-              </div>
-            </div>
-
-            <div className="mx-4 lg:mx-12 mt-12">
-              <div className="overflow-x-auto -mx-4 lg:mx-0">
-                <div className="min-w-[800px]">
-                  <table className="w-full">
-                    <thead>
-                      <tr>
-                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-left">
-                          Key
-                        </th>
-                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
-                          Status
-                        </th>
-                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
-                          Organizations | Courses
-                        </th>
-                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
-                          Tutors
-                        </th>
-                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
-                          Certifications
-                        </th>
-                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
-                          Created
-                        </th>
-                        <th className="py-3 px-3 lg:px-6 border-b-2 border-[#b9b9ba] text-[12px] text-center">
-                          Students
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="hover:bg-gray-50">
-                        <td className="py-3 px-3 lg:px-6">
-                          <span className="text-[12px] lg:text-[14px] text-[#333333] break-all">
-                            {shortenAddress(address)}
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 lg:px-6">
-                          <div className="inline-flex p-1.5 lg:p-2 rounded-lg text-[10px] lg:text-xs items-center justify-center bg-[#C4FFA2] text-[#115E2C]">
-                            Verified
-                          </div>
-                        </td>
-                        <td className="py-3 px-3 lg:px-6 text-center">
-                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
-                            0 | 0
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 lg:px-6 text-center">
-                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
-                            0
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 lg:px-6 text-center">
-                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
-                            0
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 lg:px-6 text-center">
-                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
-                            2024-03-15
-                          </span>
-                        </td>
-                        <td className="py-3 px-3 lg:px-6 text-center">
-                          <span className="text-[12px] lg:text-[14px] text-[#333333]">
-                            0
-                          </span>
-                        </td>
-                      </tr>
-                      <tr className="hover:bg-gray-50">
-                        <td colSpan={7} className="py-4 lg:py-6 px-3 lg:px-6">
-                          <div className="text-[12px] lg:text-[14px] text-[#333333] leading-relaxed">
-                            <h3 className="font-medium mb-2">
-                              Organization Information
-                            </h3>
-                            <p className="text-[#817676]">
-                              This organization is dedicated to providing
-                              high-quality educational content and professional
-                              development opportunities. With a focus on
-                              blockchain technology and decentralized learning,
-                              we offer comprehensive courses designed to equip
-                              students with practical skills and
-                              industry-relevant knowledge. Our curriculum is
-                              regularly updated to reflect the latest
-                              developments in the field, ensuring that our
-                              students stay ahead of the curve. We maintain a
-                              strong commitment to academic excellence and
-                              student success, supported by our team of
-                              experienced educators and industry professionals.
-                            </p>
-                          </div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         ) : filteredGridsData.length > 0 ? (
           // Show filtered grid when there are matches
