@@ -7,6 +7,7 @@ import up from "@/assets/up.svg";
 import down from "@/assets/down.svg";
 import show_arrow from "@/assets/show_arrow.svg";
 import { IoClose } from "react-icons/io5";
+import { shortenAddress } from "@/utils/helpers";
 
 interface Events {
   type: string;
@@ -41,10 +42,6 @@ interface ResultGridProps {
   goToPage: (page: any) => void;
   currentPage: number;
 }
-
-const shortenAddress = (address: any) => {
-  return address.slice(0, 10) + "..." + address.slice(-10);
-};
 
 const ResultGrid: React.FC<ResultGridProps> = ({
   address,
@@ -237,7 +234,12 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                             <td className="py-3 px-6 whitespace-nowrap h-[60px]">
                               <div className="flex items-center justify-center h-full">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[#5801A9]">
+                                  <span
+                                    className="text-[#5801A9] cursor-pointer"
+                                    onClick={() =>
+                                      handleImageClick(data.nftImg)
+                                    }
+                                  >
                                     {data.certification}
                                   </span>
                                   {data.nftImg && (
@@ -294,7 +296,10 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                         <div className="px-6 py-4">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="text-[#5801A9] text-sm">
+                              <span
+                                className="text-[#5801A9] text-sm cursor-pointer"
+                                onClick={() => handleImageClick(data.nftImg)}
+                              >
                                 {data.certification}
                               </span>
                               {data.nftImg && (
@@ -331,75 +336,56 @@ const ResultGrid: React.FC<ResultGridProps> = ({
       {/* Image Overlay */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+          className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="relative bg-white rounded-lg p-6 max-w-[90%] max-h-[90%] flex flex-col lg:flex-row gap-6">
+          <div className="relative bg-white rounded-xl max-w-4xl w-full">
             <button
               onClick={handleCloseOverlay}
-              className="absolute -top-4 -right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
+              className="absolute -top-3 -right-3 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors z-10"
             >
-              <IoClose className="w-6 h-6 text-gray-600" />
+              <IoClose className="w-5 h-5 text-gray-600" />
             </button>
 
-            {/* Image Section */}
-            <div className="flex-1">
-              <Image
-                src={selectedImage}
-                alt="Enlarged view"
-                width={800}
-                height={800}
-                className="object-contain rounded-lg shadow-xl w-full h-full"
-              />
-            </div>
+            <div className="p-6">
+              <div className="flex flex-col lg:flex-row gap-8">
+                {/* Image Section */}
+                <div className="flex-1">
+                  <Image
+                    src={selectedImage}
+                    alt="Certificate"
+                    width={600}
+                    height={400}
+                    className="object-contain rounded-lg shadow-lg w-full h-full"
+                  />
+                </div>
 
-            {/* Course Information Section */}
-            <div className="flex-1 flex flex-col gap-4">
-              <div className="border-b border-gray-200 pb-4">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                  Course Details
-                </h2>
-                {item.eventsData.map(
-                  (event, index) =>
-                    event.nftImg === selectedImage && (
-                      <div key={index} className="space-y-3">
-                        <div>
-                          <h3 className="text-lg font-medium text-gray-700">
-                            Course Title
-                          </h3>
-                          <p className="text-gray-600">{event.eventName}</p>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-medium text-gray-700">
-                            Status
-                          </h3>
-                          <div
-                            className={`inline-flex p-2 rounded-lg text-sm items-center justify-center ${
-                              event.status === "Course Complete"
-                                ? "bg-[#C4FFA2] text-[#115E2C]"
-                                : "bg-[#F6A61C2B] text-[#730404]"
-                            }`}
-                          >
-                            {event.status}
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-medium text-gray-700">
-                            Certification
-                          </h3>
-                          <p className="text-[#5801A9]">
-                            {event.certification}
-                          </p>
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-medium text-gray-700">
-                            Date
-                          </h3>
-                          <p className="text-gray-600">{event.date}</p>
-                        </div>
-                      </div>
-                    ),
-                )}
+                {/* Course Information Section */}
+                <div className="flex-1 flex flex-col justify-center">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                    Certificate Details
+                  </h2>
+                  <div className="space-y-4">
+                    <p className="text-gray-600">
+                      This {shortenAddress(address)} has been certified for
+                      taking{" "}
+                      <span className="text-[#4A90E2] font-medium">
+                        {(() => {
+                          const event = item.eventsData.find(
+                            (event) => event.nftImg === selectedImage,
+                          );
+                          return event?.eventName === "Certificate Claimed"
+                            ? "the course"
+                            : event?.eventName;
+                        })()}
+                      </span>
+                    </p>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <span className="inline-block w-2 h-2 bg-[#C4FFA2] rounded-full"></span>
+                      <span>Certificate Verified</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

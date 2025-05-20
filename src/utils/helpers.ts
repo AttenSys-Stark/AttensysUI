@@ -3,6 +3,11 @@ import { attensysCourseAbi } from "@/deployments/abi";
 import { Contract } from "starknet";
 import { provider } from "@/constants";
 import { gql, request } from "graphql-request";
+
+export const shortenAddress = (address: any) => {
+  return address.slice(0, 10) + "..." + address.slice(-10);
+};
+
 const courseContract = new Contract(
   attensysCourseAbi,
   attensysCourseAddress,
