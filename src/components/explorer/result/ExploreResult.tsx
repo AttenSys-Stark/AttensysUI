@@ -7,7 +7,7 @@ import organization from "@/assets/octicon_organization-24.svg";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { eventsData, gridsData } from "@/constants/data";
 import ResultGrid from "./ResultGrid";
-import { handleSubmit } from "@/utils/helpers";
+import { handleSubmit, shortenAddress } from "@/utils/helpers";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { createPortal } from "react-dom";
@@ -92,10 +92,6 @@ const ExploreResult: React.FC<{ params: Params }> = ({
 
   const handleChange = (event: { target: { value: any } }) => {
     setSearchValue(event.target.value);
-  };
-
-  const shortenAddress = (address: any) => {
-    return address.slice(0, 10) + "..." + address.slice(-10);
   };
 
   const courseContract = new Contract(
