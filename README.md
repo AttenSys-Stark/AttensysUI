@@ -1,119 +1,85 @@
-# Attensys
+# 🎓 AttenSys: The Onchain Infrastructure for Education, Bootcamps, and Verifiable Learning
 
-## Overview
+**AttenSys** is a next-generation educational platform designed to enhance how courses, bootcamps, and certifications are created, managed, and verified — entirely onchain.  
+Built on **Starknet**, AttenSys provides a secure, transparent, and efficient ecosystem for educators, organizations, and learners worldwide.
 
-AttenSys is a platform designed to revolutionize the management of educational certifications for participating in bootcamps, attendance tracking for events & online classes, and online courses certifications. It offers a secure, transparent, and user-friendly solution for organizations, educational institutions, and event planners to streamline their processes and enhance user engagement. By leveraging Starknet, AttenSys ensures the authenticity and traceability of certifications and attendance records while simplifying course participation and event management.
+At its core, AttenSys solves one of the most pressing issues in modern education and event management: the lack of **trust**, **automation**, and **verifiability** in how participation, learning, and credentials are recorded and recognized.
 
-## Key Features
+---
 
-### 1. Event Management
+## 🚀 Key Pillars of the Platform
 
-- Create and manage events seamlessly.
-- Enable participants to register for events.
-- Mark attendance using QR code scanning.
-- Issue certificates in the form of NFTs for attendees upon successful participation
+### 1. 🧑‍🏫 Online Course Creation and Marketplace
 
-### 2. Online Course Management
+AttenSys offers a robust interface for instructors and content creators to design, publish, and monetize educational content. Features include:
 
-- Offer paid or free online courses similar to platforms like Udemy.
-- Allow content creators to upload course materials, including recorded video lectures.
-- Issue certificates to participants upon course completion.
-- Track participant progress with an intuitive system.
+- Support for both **paid and free courses**
+- **Video hosting and streaming**
+- **Student progress tracking**
+- **NFT-based certification** upon course completion (optional per creator)
 
-### 3. Bootcamp Attendance Management
+> This empowers educators to focus on teaching, while AttenSys handles delivery, management, and credential issuance.
 
-- Organize and manage bootcamp classes.
-- Facilitate student registration and attendance tracking.
-- Automate certificate issuance at the end of the program.
+---
 
-### 4. Blockchain Integration
+### 2. 🏕️ Bootcamp Attendance Management System
 
-- Certification and attendance records are stored securely on the blockchain (Starknet).
-- Users can verify the authenticity of certifications via the platform's explorer, similar to Etherscan.
+AttenSys streamlines the end-to-end management of bootcamps or class-based programs — whether virtual or physical:
 
-### 5. User Role Management
+- Create bootcamp programs and class schedules
+- Allow students to **register**, **mark attendance**, and **track participation**
+- Automatically issue **NFT certificates** at program completion
+- View and audit attendance in a **tamper-proof** onchain format
 
-- AttenSys supports various user roles to meet different needs:
-- Administrators: Oversee platform usage, manage users, and ensure smooth operations.
-- Instructors: Create and manage courses, upload materials, and track participant progress.
-- Students/Participants: Enroll in courses & bootcamps, attend events, and earn certificates.
-- Event Organizers: Manage events, track registrations, and handle attendance.
-- Public Explorer: Verify the authenticity of certificates and attendance records
+> ⚠️ Currently in **MVP stage**, being tested by real organizations, with mainnet deployment coming soon.
 
-### 6. Sponsorship and Api endpoint
+---
 
-- Attensys will facilitate sponsorship for events organization and Bootcamps
-- Third party apps will be able to verify certificates through attensys api endpoints
+### 3. 🛡️ Onchain Certification and Verification
 
-## Benefits
+AttenSys ensures that issued certificates are **verifiable**, **fraud-proof**, and **portable**:
 
-### For Organizations
+- Certificates are NFTs representing **proof of learning or participation**
+- Public verification via the **AttenSys Explorer**
+- **API access** for third-party apps to integrate automated credential verification
 
-- Simplify event/bootcamp management and attendance tracking for classes and events (access to metrics).
-- Enhance credibility with verifiable, blockchain-based certificates.
-- Increase sponsorship opportunities through transparent records.
+---
 
-### For Educators
+## 👥 Multi-Role System
 
-- Monetize knowledge by creating paid courses.
-- Automate course and certificate management.
-- Track participation
+AttenSys supports multiple user types with tailored experiences:
 
-### For Participants
+- **Content Creators & Instructors**: Publish courses, upload videos, track progress, and issue certificates.
+- **Students & Participants**: Register for courses or bootcamps, mark attendance, and earn credentials.
+- **Organizations**: Manage programs, track participation, and issue or sponsor certifications.
+- **Explorers/Employers**: Verify course completion and attendance via a public explorer or API.
 
-- Access high-quality courses and events.
-- Earn and showcase verifiable certificates.
-- Build a professional portfolio with blockchain-backed records.
+---
 
-## How It Works
+## 📌 Current Status
 
-### Registration
+- ✅ **Course platform is live** and in production on testnet — mainnet-worthy.
+- ⚙️ **Bootcamp feature is in MVP**, being refined through real usage.
+- 🚀 Actively preparing for full **mainnet deployment on Starknet**.
 
-- Organizations creates profile, proceeds to creating bootcamp & add instructors. Event planners create events every other user only needs to connect wallet.
-- Participants register for courses, bootcamps or events.
+---
 
-### Attendance Tracking
+## 🌟 What Makes AttenSys Unique
 
-- Events utilize QR codes for attendance marking. students only need to interact with a button to sign.
+- **Web3-native**, fully onchain-first infrastructure for education and events
+- **Scalable** for everything from small local workshops to global bootcamps
+- **NFT-based certifications** that are portable, verifiable, and fraud-resistant
+- Fully supports **proof-of-attendance** and **proof-of-learning** use cases
 
-### Certificate Issuance
+---
 
-- Upon completion, certificates are automatically issued and stored on the blockchain.
-- Users can share and verify certificates through the AttenSys explorer.
+## 📈 The Opportunity
 
-### Course and Event Management
+The global **EdTech market** is projected to exceed **$400 billion by 2026**, driven by the rise of remote learning, credential verifiability, and decentralized education.
 
-- Admins and organizers manage materials, track progress, and oversee attendance effortlessly.
+**AttenSys is strategically positioned** at the intersection of blockchain, education, and automation — ready to become the **infrastructure layer for verifiable digital learning in Web3 and beyond**.
 
-## Use Cases
-
-### Universities and Schools
-
-- Manage academic records, track attendance, and issue secure transcripts.
-
-### Corporate Training
-
-- Conduct employee training sessions and reward certifications upon completion.
-
-### Event Planners
-
-- Organize large-scale conferences or workshops with real-time attendance tracking and automated certification.
-
-### Bootcamps
-
-- Streamline the management of coding bootcamps and other intensive programs.
-
-### Educators
-
-- Create paid/free courses
-
-## Why Choose AttenSys?
-
-- Transparency: Blockchain-backed certificates ensure authenticity and trust.
-- Automation: Reduce manual overhead with automated processes.
-- Scalability: Designed to handle large-scale events and courses.
-- User-Friendly: Intuitive interface for all user roles.
-- Security: Robust architecture ensures data integrity and privacy.
+---
 
 ## Running locally:
 
@@ -130,7 +96,9 @@ Create .env.local in root folder. Obtain the field data by creating an account a
 NEXT_PUBLIC_PINATA_JWT=
 NEXT_PUBLIC_GATEWAY_URL=
 ```
-intialize mkcert 
+
+intialize mkcert
+
 ```bash
 # Install mkcert if needed
 brew install mkcert  # macOS
