@@ -219,7 +219,6 @@ const Header = () => {
     } else if (arg == "Events") {
       // router.push("/Discoverevent");
     } else if (arg == "Bootcamps") {
-      // e.stopPropagation();
       setbootcampdropstat(!bootcampdropstat);
       setcourseStatus(false);
     }

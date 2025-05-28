@@ -135,13 +135,16 @@ const MyCertifications = (props: any) => {
             />
             <p className="text-gray-500 text-lg">No certificate</p>
             <button
-              className="text-white px-6 py-2 rounded-lg transition-colors"
+              className="text-white px-6 py-2 rounded-lg transition-colors opacity-50 cursor-not-allowed  relative"
               style={{
                 background:
                   "linear-gradient(103.42deg, #9B51E0 16.73%, #4A90E2 64.74%)",
               }}
             >
               Browse course
+              <span className="absolute -top-1.5 -right-10 bg-red-800 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap transform rotate-12">
+                Coming Soon
+              </span>
             </button>
           </div>
         </div>
