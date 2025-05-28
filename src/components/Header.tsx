@@ -220,8 +220,8 @@ const Header = () => {
       // router.push("/Discoverevent");
     } else if (arg == "Bootcamps") {
       // e.stopPropagation();
-      // setbootcampdropstat(!bootcampdropstat);
-      // setcourseStatus(false);
+      setbootcampdropstat(!bootcampdropstat);
+      setcourseStatus(false);
     }
   };
   const [isCoursesOpen, setIsCoursesOpen] = useState(false);
@@ -331,7 +331,7 @@ const Header = () => {
                       <div className="flex text-sm xlg:space-x-24">
                         {navigation.map((item, index) => {
                           const isComingSoon =
-                            item.name === "Events" || item.name === "Bootcamps";
+                            item.name === "Events";
 
                           return (
                             <div key={item.name} className="relative group">
