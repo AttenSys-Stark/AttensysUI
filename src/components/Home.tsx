@@ -12,6 +12,7 @@ import ControllerConnector from "@cartridge/connector/controller";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "./ui/LoadingSpinner";
+import { LoginForm } from "./login-form";
 
 const HomePage = () => {
   const [grid, setGrid] = useState({
@@ -403,20 +404,25 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center text-white px-4">
-        <h1 className="font-extrabold text-2xl md:text-[30px] lg:mb-2">
-          Atten<span className="text-[#9B51E0]">sys</span>
-        </h1>
-        <p className="text-3xl md:text-[48px] font-bold mb-2 lg:mb-4 lg:leading-[60px]">
-          {/* Track, Stream, <br className="hidden sm:block" />
+      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center  text-white px-4">
+        <div className="flex items-center justify-between">
+          <div className="text-left w-[50%]">
+            <h1 className="font-extrabold text-2xl md:text-[30px] lg:mb-2 text-center">
+              Atten<span className="text-[#9B51E0]">sys</span>
+            </h1>
+            <p className="text-3xl md:text-[48px] font-bold mb-2 lg:mb-4 lg:leading-[60px]">
+              {/* Track, Stream, <br className="hidden sm:block" />
           and Secure Your Certifications */}
-          Buy Courses to Learn, Sell <br /> Courses to Earn
-        </p>
-        <p className="text-sm md:text-[17px] font-light mb-4 max-w-3xl opacity-90">
-          Simplifying certificate issuance for courses, course management,
-          STRK-powered course purchases, secure access, and learning.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0">
+              Buy Courses to Learn, Sell Courses to Earn
+            </p>
+            <p className="text-sm md:text-[17px] font-light mb-4 max-w-3xl opacity-90">
+              Simplifying certificate issuance for courses, course management,
+              STRK-powered course purchases, secure access, and learning.
+            </p>
+          </div>
+          <LoginForm />
+        </div>
+        {/* <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0">
           <button
             onClick={handleConnect}
             className={`px-4 py-2 sm:px-6 sm:py-3 ${iswalletconnecting ? "bg-[#9B51E0]" : "bg-white"}  text-indigo-700 rounded-lg font-medium hover:bg-opacity-90 transition w-full sm:w-auto`}
@@ -427,7 +433,7 @@ const HomePage = () => {
               "Login/Signup"
             )}
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
