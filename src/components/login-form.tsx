@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,25 +17,185 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth.client";
 import { signIn } from "@/server/users";
+import {
+  authStateListener,
+  getCurrentUser,
+  signInUser,
+} from "@/lib/services/authService";
+import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
+import { useSetAtom } from "jotai";
+import { loginUserWithEmail, resetUserPassword } from "@/lib/userutils";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 
 export function LoginForm() {
   const [loginResult, formAction, isLoading] = useActionState(signIn, null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isloaderLoading, setIsloaderLoading] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
 
   const router = useRouter();
+  const setLoginorsignup = useSetAtom(loginorsignup);
 
   if (loginResult?.redirect) {
     router.push(loginResult.redirect);
   }
 
   const handleLoginWithGoogle = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-      callbackURL: "/Home",
-    });
+    try {
+      const user = await signInUser();
+      if (user) {
+        router.push("/Home");
+        console.log("Signed in user:", user);
+        // Redirect or update UI
+      } else {
+        console.log("error in Signed in user:", user);
+        // Redirect or update UI
+      }
+    } catch (error) {
+      toast.error("Sign in failed", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      console.error("Sign in failed:", error);
+    }
   };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsloaderLoading(true);
+    try {
+      const user = await loginUserWithEmail(email, password);
+      if (user) {
+        router.push("/Home");
+        toast.success("Login successful", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      }
+    } catch (error: any) {
+      // toast.error(error.message);
+      toast.error("Invalid email or password", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      console.log("error in login:", error);
+    } finally {
+      setIsloaderLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    try {
+      await resetUserPassword(resetEmail);
+      setResetSent(true);
+      // toast.success("Password reset email sent!");
+      console.log("Password reset email sent!");
+    } catch (error: any) {
+      // toast.error(error.message);
+      console.log("error in reset password:", error);
+    }
+  };
+
+  if (showReset) {
+    return (
+      <Card className="w-[40%]">
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl">Reset Password</CardTitle>
+          <CardDescription>
+            {resetSent
+              ? `Check ${resetEmail} for reset instructions`
+              : "Enter your email to receive a reset link"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!resetSent ? (
+            <div className="grid gap-4">
+              <div className="grid gap-3">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  required
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                />
+              </div>
+              <Button
+                onClick={handleResetPassword}
+                className="w-full bg-[#9B51E0]"
+              >
+                Send Reset Link
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setShowReset(false)}
+                className="w-full"
+              >
+                Back to Login
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-center">
+                We&apos;ve sent password reset instructions to {resetEmail}
+              </p>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setShowReset(false);
+                  setResetSent(false);
+                }}
+                className="w-full"
+              >
+                Back to Login
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-[40%]">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Bounce}
+      />
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Welcome back</CardTitle>
         <CardDescription>Login with your Google account</CardDescription>
@@ -78,19 +238,28 @@ export function LoginForm() {
                   name="email"
                   placeholder="m@example.com"
                   required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
-                  <a
-                    href="#"
+                  <Button
+                    onClick={() => setShowReset(true)}
                     className="ml-auto text-sm underline-offset-4 hover:underline"
                   >
                     Forgot your password?
-                  </a>
+                  </Button>
                 </div>
-                <Input id="password" type="password" name="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
                 <div className="text-center h-6">
                   {loginResult?.errors && (
                     <p className="text-destructive">
@@ -103,10 +272,11 @@ export function LoginForm() {
               </div>
               <Button
                 type="submit"
+                onClick={handleLogin}
                 disabled={isLoading}
                 className="w-full bg-[#9B51E0]"
               >
-                {isLoading ? (
+                {isloaderLoading ? (
                   <Loader2 className="size-4 animate-spin" />
                 ) : (
                   "Login"
@@ -115,7 +285,11 @@ export function LoginForm() {
             </div>
             <div className="text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="underline underline-offset-4">
+              <Link
+                href=""
+                onClick={() => setLoginorsignup(true)}
+                className="underline underline-offset-4"
+              >
                 Sign up
               </Link>
             </div>

@@ -13,7 +13,9 @@ import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import { LoginForm } from "./login-form";
-
+import { SignupForm } from "./signup-form";
+import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
 const HomePage = () => {
   const [grid, setGrid] = useState({
     cols: 0,
@@ -31,7 +33,7 @@ const HomePage = () => {
   const [username, setUsername] = useState<string>();
   const [iswalletconnecting, setiswalletconnecting] = useState(false);
   const router = useRouter();
-
+  const [loginorsignupstat, setLoginorsignupstat] = useAtom(loginorsignup);
   useEffect(() => {
     if (!address) return;
     controller?.username()?.then((n) => setUsername(n));
@@ -420,8 +422,9 @@ const HomePage = () => {
               STRK-powered course purchases, secure access, and learning.
             </p>
           </div>
-          <LoginForm />
+          {loginorsignupstat ? <SignupForm /> : <LoginForm />}
         </div>
+        {/* <SignupForm /> */}
         {/* <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0">
           <button
             onClick={handleConnect}

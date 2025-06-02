@@ -28,7 +28,7 @@ export const signIn = async (
       values: {
         text: "Successfully signed in.",
       },
-      redirect: "/ai-selector",
+      redirect: "/Home",
     };
   } catch (e: unknown) {
     const error = e as Error;
@@ -67,7 +67,7 @@ export const signUp = async (
       values: {
         text: "Successfully signed up.",
       },
-      redirect: "/ai-selector",
+      redirect: "/Home",
     };
   } catch (e) {
     const error = e as Error;
