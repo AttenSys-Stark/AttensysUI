@@ -16,6 +16,8 @@ import { LoginForm } from "./login-form";
 import { SignupForm } from "./signup-form";
 import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
+import { AccountHandler } from "@/helpers/accounthandler";
+import { Button } from "@headlessui/react";
 const HomePage = () => {
   const [grid, setGrid] = useState({
     cols: 0,
@@ -35,11 +37,11 @@ const HomePage = () => {
   const router = useRouter();
   const [loginorsignupstat, setLoginorsignupstat] = useAtom(loginorsignup);
   useEffect(() => {
-    if (!address) return;
-    controller?.username()?.then((n) => setUsername(n));
-    if (address) {
-      router.push("/Home");
-    }
+    // if (!address) return;
+    // controller?.username()?.then((n) => setUsername(n));
+    // if (address) {
+    //   router.push("/Home");
+    // }
   }, [address, controller]);
 
   const handleConnect = async () => {
@@ -409,6 +411,7 @@ const HomePage = () => {
       <div className="absolute inset-0 z-50 flex flex-col items-center justify-center  text-white px-4">
         <div className="flex items-center justify-between">
           <div className="text-left w-[50%]">
+            {/* <Button onClick={() => AccountHandler()}>Create test</Button> */}
             <h1 className="font-extrabold text-2xl md:text-[30px] lg:mb-2 text-center">
               Atten<span className="text-[#9B51E0]">sys</span>
             </h1>

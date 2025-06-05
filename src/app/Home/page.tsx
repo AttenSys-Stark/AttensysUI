@@ -26,6 +26,9 @@ const HomePage = () => {
         setIsAuthenticated(true);
         setLoading(false);
       }
+      if (user) {
+        console.log("user Data", user);
+      }
     });
 
     // Add a timeout to ensure we don't show loader indefinitely

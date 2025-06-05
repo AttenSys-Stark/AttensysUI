@@ -38,19 +38,24 @@ const googleProvider = new GoogleAuthProvider();
 //   console.error("Anonymous sign-in failed:", error);
 // });
 // Function to handle Google Sign-In
-const signInWithGoogle = async () => {
+const signInWithGoogle = async (
+  onAccountProgress?: (status: string) => void,
+) => {
   try {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
     // Create/update user profile in Firestore
-    await createUserProfile({
-      uid: user.uid,
-      email: user.email || "",
-      displayName: user.displayName || "",
-      photoURL: user.photoURL || null,
-      emailVerified: user.emailVerified,
-    });
+    await createUserProfile(
+      {
+        uid: user.uid,
+        email: user.email || "",
+        displayName: user.displayName || "",
+        photoURL: user.photoURL || null,
+        emailVerified: user.emailVerified,
+      },
+      onAccountProgress,
+    );
 
     return user;
   } catch (error) {
@@ -63,6 +68,7 @@ const signUpWithEmail = async (
   email: string,
   password: string,
   displayName: string,
+  onAccountProgress?: (status: string) => void,
 ) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(
@@ -73,13 +79,16 @@ const signUpWithEmail = async (
     const user = userCredential.user;
 
     // Create user profile in Firestore
-    await createUserProfile({
-      uid: user.uid,
-      email: user.email || email,
-      displayName: displayName,
-      photoURL: null,
-      emailVerified: false,
-    });
+    await createUserProfile(
+      {
+        uid: user.uid,
+        email: user.email || email,
+        displayName: displayName,
+        photoURL: null,
+        emailVerified: false,
+      },
+      onAccountProgress,
+    );
 
     // Send verification email
     await sendEmailVerification(user);
@@ -88,6 +97,7 @@ const signUpWithEmail = async (
       user,
       requiresVerification: true,
       message: "Check your email to complete sign up",
+      displayname: displayName,
     };
   } catch (error) {
     console.error("Email Sign Up Error:", error);

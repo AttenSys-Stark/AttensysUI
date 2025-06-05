@@ -7,6 +7,8 @@ import {
   waitForEmailVerification,
 } from "./firebase/client";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { AccountHandler } from "@/helpers/accounthandler";
+import { encryptPrivateKey } from "@/helpers/encrypt";
 
 interface UserProfile {
   uid: string;
@@ -19,11 +21,48 @@ interface UserProfile {
   updatedAt?: Date;
 }
 
-export const createUserProfile = async (user: UserProfile) => {
+export const createUserProfile = async (
+  user: UserProfile,
+  onAccountProgress?: (status: string) => void,
+) => {
   if (!user || !user.uid) return null;
+  const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+  if (!encryptionSecret) {
+    throw new Error("Encryption secret is not set");
+  }
 
   const userRef = doc(db, "users", user.uid);
   const userSnapshot = await getDoc(userRef);
+
+  let accountData = {};
+  let accountCreated = false;
+
+  // Check if user needs a Starknet account
+  const needsStarknetAccount =
+    !userSnapshot.exists() ||
+    !userSnapshot.data()?.starknetPrivateKey ||
+    !userSnapshot.data()?.starknetAddress;
+
+  if (needsStarknetAccount) {
+    try {
+      onAccountProgress?.("Creating Starknet account...");
+      const { privateKeyAX, AXcontractFinalAddress } =
+        await AccountHandler(onAccountProgress);
+      const encryptedPrivateKey = encryptPrivateKey(
+        privateKeyAX,
+        encryptionSecret,
+      );
+      accountData = {
+        starknetPrivateKey: encryptedPrivateKey,
+        starknetAddress: AXcontractFinalAddress,
+      };
+      accountCreated = true;
+    } catch (err) {
+      onAccountProgress?.("Error creating Starknet account");
+      console.error("Error creating Starknet account:", err);
+      throw err;
+    }
+  }
 
   const userData = {
     uid: user.uid,
@@ -33,6 +72,7 @@ export const createUserProfile = async (user: UserProfile) => {
     emailVerified: user.emailVerified,
     lastLogin: serverTimestamp(),
     updatedAt: serverTimestamp(),
+    ...accountData,
     ...(!userSnapshot.exists() && { createdAt: serverTimestamp() }),
   };
 
@@ -40,6 +80,7 @@ export const createUserProfile = async (user: UserProfile) => {
     await setDoc(userRef, userData, { merge: true });
     return userData;
   } catch (error) {
+    onAccountProgress?.("Error saving user profile");
     console.error("Error creating/updating user profile:", error);
     throw error;
   }
@@ -59,9 +100,15 @@ export const signUpUserWithEmail = async (
   email: string,
   password: string,
   displayName: string,
+  onAccountProgress?: (status: string) => void,
 ): Promise<any | null> => {
   try {
-    const user = await signUpWithEmail(email, password, displayName);
+    const user = await signUpWithEmail(
+      email,
+      password,
+      displayName,
+      onAccountProgress,
+    );
     return user;
   } catch (error) {
     console.error("Email sign up error:", error);

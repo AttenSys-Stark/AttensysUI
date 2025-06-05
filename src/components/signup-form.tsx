@@ -41,6 +41,7 @@ export function SignupForm() {
   const [status, setStatus] = useState<"form" | "waiting" | "verified">("form");
   const [verificationMessage, setVerificationMessage] = useState("");
   const [currentUser, setCurrentUser] = useState<any | null>(null);
+  const [accountStatus, setAccountStatus] = useState<string | null>(null);
 
   const router = useRouter();
   const setLoginorsignup = useSetAtom(loginorsignup);
@@ -89,7 +90,13 @@ export function SignupForm() {
     }
     try {
       setStatus("waiting");
-      const user = await signUpUserWithEmail(email, password, name);
+      setAccountStatus("Creating user profile...");
+      const user = await signUpUserWithEmail(
+        email,
+        password,
+        name,
+        setAccountStatus,
+      );
       setVerificationMessage(user.message);
       setCurrentUser(user?.user);
 
@@ -129,17 +136,17 @@ export function SignupForm() {
     <Card className="w-[40%]">
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Create an account</CardTitle>
-        <CardDescription>
+        {/* <CardDescription>
           {status === "waiting"
             ? "Verify your email to continue"
             : "Sign up with your Google account"}
-        </CardDescription>
+        </CardDescription> */}
       </CardHeader>
       <CardContent>
         {status === "form" ? (
           <form action={formAction}>
             <div className="grid gap-6">
-              <div className="flex flex-col gap-4">
+              {/* <div className="flex flex-col gap-4">
                 <Button
                   variant="outline"
                   className="w-full flex items-center gap-2 bg-[#9B51E0]"
@@ -157,13 +164,13 @@ export function SignupForm() {
                   </svg>
                   Sign up with Google
                 </Button>
-              </div>
-              <div className="relative text-center text-sm">
-                <span className="bg-card text-muted-foreground relative z-10 px-2">
+              </div> */}
+              {/* <div className="relative text-center text-sm"> */}
+              {/* <span className="bg-card text-muted-foreground relative z-10 px-2">
                   Or continue with
-                </span>
-                <div className="absolute left-0 right-0 bottom-0 h-px bg-border" />
-              </div>
+                </span> */}
+              {/* <div className="absolute left-0 right-0 bottom-0 h-px bg-border" /> */}
+              {/* </div> */}
               <div className="grid gap-6">
                 <div className="grid gap-3">
                   <Label htmlFor="name">Name</Label>
@@ -251,11 +258,12 @@ export function SignupForm() {
             <Loader2 className="size-8 animate-spin" />
             <p className="text-center">
               {verificationMessage ||
-                "Check your email inbox and click the verification link to complete your sign up."}
+                "Initializing account, this will only take a moment..."}
             </p>
             <p className="text-sm text-muted-foreground">
               You&apos;ll be automatically redirected once verified.
             </p>
+            <p className="text-sm text-muted-foreground">{accountStatus}</p>
           </div>
         )}
       </CardContent>
