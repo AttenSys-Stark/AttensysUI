@@ -25,7 +25,10 @@ import {
 } from "@tanstack/react-query";
 import ControllerConnector from "@cartridge/connector/controller";
 import { SessionPolicies } from "@cartridge/presets";
-import { attensysCourseAddress } from "@/deployments/contracts";
+import {
+  attensysCourseAddress,
+  attensysOrgAddress,
+} from "@/deployments/contracts";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -105,6 +108,40 @@ const policies: SessionPolicies = {
           name: "purchase course",
           entrypoint: "acquire_a_course",
           description: "purchase a course",
+        },
+      ],
+    },
+    [attensysOrgAddress]: {
+      methods: [
+        {
+          name: "create bootcamp",
+          entrypoint: "create_bootcamp",
+          description: "create a bootcamp",
+        },
+        {
+          name: "register for bootcamp",
+          entrypoint: "register_for_bootcamp",
+          description: "register for a bootcamp",
+        },
+        {
+          name: "admin approve registration",
+          entrypoint: "approve_registration",
+          description: "approve a registrant's registration",
+        },
+        {
+          name: "mark attendance for a class",
+          entrypoint: "mark_attendance_for_a_class",
+          description: "mark attendance for a class",
+        },
+        {
+          name: "batch certify students",
+          entrypoint: "batch_certify_students",
+          description: "batch certify students",
+        },
+        {
+          name: "single certify student",
+          entrypoint: "single_certify_student",
+          description: "certify a single student",
         },
       ],
     },
