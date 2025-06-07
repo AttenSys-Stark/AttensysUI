@@ -21,6 +21,8 @@ import { attensysOrgAddress } from "@/deployments/contracts";
 import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
 import { ThreeDots } from "react-loader-spinner";
+import { useAccount, useConnect } from "@starknet-react/core";
+import ControllerConnector from "@cartridge/connector/controller";
 
 const CourseOutlinecard = (props: any) => {
   const playerRef = useRef<ReactPlayer | null>(null);
@@ -30,6 +32,16 @@ const CourseOutlinecard = (props: any) => {
   const org = searchParams.get("org");
   const [spinner, setSpinner] = useState(false);
   const [class_attendance_status, setclass_attendance_status] = useState(false);
+  const [username, setUsername] = useState<string>();
+  const { account, address } = useAccount();
+  const { connect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
+
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setUsername(n));
+    console.log(address, "address");
+  }, [address, controller]);
 
   const TruncatedText = ({
     text,
@@ -79,7 +91,7 @@ const CourseOutlinecard = (props: any) => {
     const organizationContract = new Contract(
       attensysOrgAbi,
       attensysOrgAddress,
-      wallet?.account,
+      account,
     );
     const sign_calldata = organizationContract.populate(
       "mark_attendance_for_a_class",
@@ -87,7 +99,7 @@ const CourseOutlinecard = (props: any) => {
       [org, org, Number(props.classid), id],
     );
 
-    const callContract = await wallet?.account.execute([
+    const callContract = await account?.execute([
       {
         contractAddress: attensysOrgAddress,
         entrypoint: "mark_attendance_for_a_class",
@@ -95,8 +107,8 @@ const CourseOutlinecard = (props: any) => {
       },
     ]);
     //@ts-ignore
-    wallet?.account?.provider
-      .waitForTransaction(callContract.transaction_hash)
+    account?.provider
+      .waitForTransaction(callContract?.transaction_hash)
       .then(() => {})
       .catch((e: any) => {
         console.error("Error: ", e);

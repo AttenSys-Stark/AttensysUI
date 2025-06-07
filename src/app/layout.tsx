@@ -114,6 +114,11 @@ const policies: SessionPolicies = {
     [attensysOrgAddress]: {
       methods: [
         {
+          name: "create organization profile",
+          entrypoint: "create_org_profile",
+          description: "create an organization profile",
+        },
+        {
           name: "create bootcamp",
           entrypoint: "create_bootcamp",
           description: "create a bootcamp",
@@ -129,6 +134,11 @@ const policies: SessionPolicies = {
           description: "approve a registrant's registration",
         },
         {
+          name: "admin decline registration",
+          entrypoint: "decline_registration",
+          description: "decline a registrant's registration",
+        },
+        {
           name: "mark attendance for a class",
           entrypoint: "mark_attendance_for_a_class",
           description: "mark attendance for a class",
@@ -142,6 +152,21 @@ const policies: SessionPolicies = {
           name: "single certify student",
           entrypoint: "single_certify_student",
           description: "certify a single student",
+        },
+        {
+          name: "add instructor to organization",
+          entrypoint: "add_instructor_to_org",
+          description: "add an instructor to the organization",
+        },
+        {
+          name: "add active meet link",
+          entrypoint: "add_active_meet_link",
+          description: "add active meet link",
+        },
+        {
+          name: "add uploaded video link",
+          entrypoint: "add_uploaded_video_link",
+          description: "add link to uploaded video",
         },
       ],
     },

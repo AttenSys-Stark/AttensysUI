@@ -1,5 +1,5 @@
 import { Input } from "@headlessui/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import batch from "@/assets/batch.svg";
 import single from "@/assets/single.svg";
@@ -9,6 +9,8 @@ import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { Contract } from "starknet";
 import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
+import { useAccount, useConnect } from "@starknet-react/core";
+import ControllerConnector from "@cartridge/connector/controller";
 
 const Certifications = () => {
   const [inputValue, setinputValue] = useState("");
@@ -18,11 +20,21 @@ const Certifications = () => {
   const org = searchParams.get("org");
   const [awarding, setAwarding] = useState(false);
   const [batchawarding, setbatchawarding] = useState(false);
+  const [orgname, setOrgname] = useState<string>();
+  const { address, account } = useAccount();
+  const { connect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
+
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setOrgname(n));
+    console.log(address, "address");
+  }, [address, controller]);
 
   const organizationContract = new Contract(
     attensysOrgAbi,
     attensysOrgAddress,
-    wallet?.account,
+    account,
   );
 
   const handleChange = (event: { target: { value: any } }) => {
@@ -37,7 +49,7 @@ const Certifications = () => {
       [org, id, inputValue],
     );
 
-    const callContract = await wallet?.account.execute([
+    const callContract = await account?.execute([
       {
         contractAddress: attensysOrgAddress,
         entrypoint: "single_certify_student",
@@ -46,8 +58,8 @@ const Certifications = () => {
     ]);
 
     //@ts-ignore
-    wallet?.account?.provider
-      .waitForTransaction(callContract.transaction_hash)
+    account?.provider
+      .waitForTransaction(callContract?.transaction_hash)
       .then(() => {})
       .catch((e: any) => {
         console.error("Error: ", e);
@@ -65,7 +77,7 @@ const Certifications = () => {
       [org, id],
     );
 
-    const callContract = await wallet?.account.execute([
+    const callContract = await account?.execute([
       {
         contractAddress: attensysOrgAddress,
         entrypoint: "batch_certify_students",
@@ -74,8 +86,8 @@ const Certifications = () => {
     ]);
 
     //@ts-ignore
-    wallet?.account?.provider
-      .waitForTransaction(callContract.transaction_hash)
+    account?.provider
+      .waitForTransaction(callContract?.transaction_hash)
       .then(() => {})
       .catch((e: any) => {
         console.error("Error: ", e);

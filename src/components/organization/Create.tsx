@@ -39,6 +39,8 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { Contract } from "starknet";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useAccount, useConnect } from "@starknet-react/core";
+import ControllerConnector from "@cartridge/connector/controller";
 
 const format = "h:mm a";
 const now = moment().hour(0).minute(0);
@@ -102,6 +104,16 @@ const Create = (props: any) => {
   const [numOfClassesToCreate, setNumOfClassesToCreate] = useState<
     number | any
   >(1);
+  const [orgname, setOrgname] = useState<string>();
+  const { account, address } = useAccount();
+  const { connect: starknetReactConnect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
+
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setOrgname(n));
+    console.log(address, "address");
+  }, [address, controller]);
 
   useEffect(() => {
     const autoConnect = async () => {
@@ -267,7 +279,7 @@ const Create = (props: any) => {
         const organizationContract = new Contract(
           attensysOrgAbi,
           attensysOrgAddress,
-          wallet?.account,
+          account,
         );
 
         const create_bootcamp_calldata = organizationContract.populate(
@@ -286,7 +298,7 @@ const Create = (props: any) => {
           ],
         );
 
-        const callContract = await wallet?.account.execute([
+        const callContract = await account?.execute([
           {
             contractAddress: attensysOrgAddress,
             entrypoint: "create_bootcamp",
@@ -295,7 +307,7 @@ const Create = (props: any) => {
         ]);
 
         //@ts-ignore
-        await wallet?.account?.provider?.waitForTransaction(
+        await account?.provider?.waitForTransaction(
           callContract?.transaction_hash,
         );
         console.log("Submitted successfully");

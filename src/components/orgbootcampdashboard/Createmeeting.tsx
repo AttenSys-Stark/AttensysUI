@@ -34,6 +34,8 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { useSearchParams } from "next/navigation";
 import { pinata } from "../../../utils/config";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useAccount, useConnect } from "@starknet-react/core";
+import ControllerConnector from "@cartridge/connector/controller";
 
 export default function Createmeeting(prop: any) {
   const [open, setOpen] = useState(prop.status);
@@ -41,9 +43,19 @@ export default function Createmeeting(prop: any) {
   const [status, setStatus] = useState(false);
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [link, setLink] = useState("");
+  const [orgname, setOrgname] = useState<string>();
+  const { account, address } = useAccount();
+  const { connect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
   const searchParams = useSearchParams();
   const org = searchParams.get("org");
   const id = searchParams.get("id");
+
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setOrgname(n));
+    console.log(address, "address");
+  }, [address, controller]);
 
   useEffect(() => {
     if (open) {
@@ -69,7 +81,7 @@ export default function Createmeeting(prop: any) {
       const organizationContract = new Contract(
         attensysOrgAbi,
         attensysOrgAddress,
-        wallet?.account,
+        account,
       );
       const add_active_meet_link_calldata = organizationContract.populate(
         "add_active_meet_link",
@@ -77,7 +89,7 @@ export default function Createmeeting(prop: any) {
         [linkUpload.IpfsHash, Number(id), true, org],
       );
 
-      const callContract = await wallet?.account.execute([
+      const callContract = await account?.execute([
         {
           contractAddress: attensysOrgAddress,
           entrypoint: "add_active_meet_link",
@@ -85,8 +97,8 @@ export default function Createmeeting(prop: any) {
         },
       ]);
       //@ts-ignore
-      await wallet?.account?.provider
-        .waitForTransaction(callContract.transaction_hash)
+      await account?.provider
+        .waitForTransaction(callContract?.transaction_hash)
         .then(() => {})
         .catch((e: any) => {
           console.error("Error: ", e);

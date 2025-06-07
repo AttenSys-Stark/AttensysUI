@@ -6,6 +6,8 @@ import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import { useFetchCID } from "@/hooks/useFetchCID";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import ControllerConnector from "@cartridge/connector/controller";
+import { useAccount, useConnect } from "@starknet-react/core";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -23,11 +25,21 @@ const MobileStudentApprovalCard = (props: any) => {
     isLoading: isCIDFetchLoading,
   } = useFetchCID();
   const id = searchParams.get("id");
+  const [orgname, setOrgname] = useState<string>();
+  const { account, address } = useAccount();
+  const { connect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
+
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setOrgname(n));
+    console.log(address, "address");
+  }, [address, controller]);
 
   const organizationContract = new Contract(
     attensysOrgAbi,
     attensysOrgAddress,
-    wallet?.account,
+    account,
   );
 
   const getIpfsData = async () => {
@@ -53,16 +65,14 @@ const MobileStudentApprovalCard = (props: any) => {
         "approve_registration",
         [props?.info?.address_of_student, id],
       );
-      const callContract = await wallet?.account.execute([
+      const callContract = await account?.execute([
         {
           contractAddress: attensysOrgAddress,
           entrypoint: "approve_registration",
           calldata: approve_calldata.calldata,
         },
       ]);
-      await wallet?.account?.provider.waitForTransaction(
-        callContract.transaction_hash,
-      );
+      await account?.waitForTransaction(callContract?.transaction_hash!);
     } catch (error) {
       console.error("Approval failed:", error);
     } finally {
