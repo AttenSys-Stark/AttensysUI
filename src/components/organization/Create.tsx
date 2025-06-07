@@ -306,10 +306,7 @@ const Create = (props: any) => {
           },
         ]);
 
-        //@ts-ignore
-        await account?.provider?.waitForTransaction(
-          callContract?.transaction_hash,
-        );
+        await account?.waitForTransaction(callContract?.transaction_hash!);
         console.log("Submitted successfully");
 
         //@ts-ignore

@@ -106,9 +106,8 @@ const CourseOutlinecard = (props: any) => {
         calldata: sign_calldata.calldata,
       },
     ]);
-    //@ts-ignore
-    account?.provider
-      .waitForTransaction(callContract?.transaction_hash)
+    account
+      ?.waitForTransaction(callContract?.transaction_hash!)
       .then(() => {})
       .catch((e: any) => {
         console.error("Error: ", e);

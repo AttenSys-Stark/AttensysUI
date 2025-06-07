@@ -133,7 +133,6 @@ const Addinstructor = (props: any) => {
           ],
         );
 
-        //@ts-ignore
         const multiCall = await account?.execute([
           {
             contractAddress: attensysOrgAddress,
@@ -147,8 +146,7 @@ const Addinstructor = (props: any) => {
           },
         ]);
 
-        //@ts-ignore
-        await account?.provider.waitForTransaction(multiCall?.transaction_hash);
+        await account?.waitForTransaction(multiCall?.transaction_hash!);
         console.log("Done Submitting");
         setUploading(false);
         setOrganizationData(ResetOrgRegData);

@@ -57,9 +57,8 @@ const Certifications = () => {
       },
     ]);
 
-    //@ts-ignore
-    account?.provider
-      .waitForTransaction(callContract?.transaction_hash)
+    account
+      ?.waitForTransaction(callContract?.transaction_hash!)
       .then(() => {})
       .catch((e: any) => {
         console.error("Error: ", e);
@@ -85,9 +84,8 @@ const Certifications = () => {
       },
     ]);
 
-    //@ts-ignore
-    account?.provider
-      .waitForTransaction(callContract?.transaction_hash)
+    account
+      ?.waitForTransaction(callContract?.transaction_hash!)
       .then(() => {})
       .catch((e: any) => {
         console.error("Error: ", e);

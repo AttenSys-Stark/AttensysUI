@@ -88,7 +88,7 @@ const Pendinglist = (props: any) => {
         "decline_registration",
         [props?.info?.address_of_student, id],
       );
-      const callContract = await wallet?.account.execute([
+      const callContract = await account?.execute([
         {
           contractAddress: attensysOrgAddress,
           entrypoint: "decline_registration",
@@ -96,9 +96,7 @@ const Pendinglist = (props: any) => {
         },
       ]);
 
-      await wallet?.account?.provider.waitForTransaction(
-        callContract.transaction_hash,
-      );
+      await account?.waitForTransaction(callContract?.transaction_hash!);
     } catch (error) {
       console.error("Decline failed:", error);
     } finally {
@@ -157,7 +155,7 @@ const Pendinglist = (props: any) => {
 
   useEffect(() => {
     getIpfsData();
-  }, [wallet]);
+  }, [account, address]);
 
   const renderStatus = (arg: any) => {
     if (arg == "both") {

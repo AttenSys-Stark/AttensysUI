@@ -96,9 +96,8 @@ export default function Createmeeting(prop: any) {
           calldata: add_active_meet_link_calldata.calldata,
         },
       ]);
-      //@ts-ignore
-      await account?.provider
-        .waitForTransaction(callContract?.transaction_hash)
+      await account
+        ?.waitForTransaction(callContract?.transaction_hash!)
         .then(() => {})
         .catch((e: any) => {
           console.error("Error: ", e);

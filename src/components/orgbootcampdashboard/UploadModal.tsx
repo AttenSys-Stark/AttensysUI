@@ -230,7 +230,7 @@ export default function UploadModal(prop: any) {
           ],
         );
 
-        const callContract = await wallet?.account.execute([
+        const callContract = await account?.execute([
           {
             contractAddress: attensysOrgAddress,
             entrypoint: "add_uploaded_video_link",
@@ -238,10 +238,7 @@ export default function UploadModal(prop: any) {
           },
         ]);
 
-        //@ts-ignore
-        await account?.provider.waitForTransaction(
-          callContract.transaction_hash,
-        );
+        await account?.waitForTransaction(callContract?.transaction_hash!);
       }
     } catch (error) {
       console.error("Error during save:", error);

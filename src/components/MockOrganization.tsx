@@ -69,7 +69,7 @@ const MockOrganization = () => {
   const registerOrg = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
-      organizationContract.connect(wallet?.account);
+      organizationContract.connect(account!);
       const myCall = organizationContract.populate("create_org_profile", [
         "web3",
         "http://w3bnft.com",
@@ -132,7 +132,7 @@ const MockOrganization = () => {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
-    organizationContract.connect(wallet?.account);
+    organizationContract.connect(account!);
     const myCall = organizationContract.populate("get_org_instructors", [
       orgInputValue,
     ]);
