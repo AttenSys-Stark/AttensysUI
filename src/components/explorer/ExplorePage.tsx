@@ -23,6 +23,7 @@ import {
 } from "@/utils/helpers";
 
 import { usePinataAccess } from "@/hooks/usePinataAccess";
+import CourseList from "../CourseList";
 
 const ExplorePage = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -241,6 +242,7 @@ const ExplorePage = () => {
         </div>
         <EventFeed data={eventData} />
       </div>
+      <CourseList />
     </div>
   );
 };

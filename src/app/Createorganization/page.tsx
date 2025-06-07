@@ -12,6 +12,8 @@ import {
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import { useAtom } from "jotai";
 import CreateLanding from "@/components/createorganization/CreateLanding";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   const [status, setstatus] = useAtom(coursestatusAtom);
@@ -24,6 +26,8 @@ const Index = () => {
     setstatus(false);
   };
   return (
+    <>
+    <Header />
     <div onClick={handlePageClick}>
       {status && (
         <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
@@ -38,8 +42,10 @@ const Index = () => {
         <Bootcampdropdown />
       </div>
 
-      <CreateLanding />
-    </div>
+        <CreateLanding />
+      </div>
+      <Footer />
+    </>
   );
 };
 
