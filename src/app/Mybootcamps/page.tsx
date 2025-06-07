@@ -9,6 +9,8 @@ import {
 import ExplorePage from "@/components/explorer/ExplorePage";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import MybootcampLanding from "@/components/mybootcamp/MybootcampLanding";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   const [status, setStatus] = useAtom(coursestatusAtom);
@@ -22,6 +24,8 @@ const Index = () => {
   };
 
   return (
+    <>
+    <Header />
     <div onClick={handlePageClick}>
       {status && (
         <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
@@ -36,8 +40,10 @@ const Index = () => {
         <Bootcampdropdown />
       </div>
 
-      <MybootcampLanding />
-    </div>
+        <MybootcampLanding />
+      </div>
+      <Footer />
+    </>
   );
 };
 
