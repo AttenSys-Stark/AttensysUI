@@ -25,7 +25,10 @@ import {
 } from "@tanstack/react-query";
 import ControllerConnector from "@cartridge/connector/controller";
 import { SessionPolicies } from "@cartridge/presets";
-import { attensysCourseAddress } from "@/deployments/contracts";
+import {
+  attensysCourseAddress,
+  attensysOrgAddress,
+} from "@/deployments/contracts";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -105,6 +108,65 @@ const policies: SessionPolicies = {
           name: "purchase course",
           entrypoint: "acquire_a_course",
           description: "purchase a course",
+        },
+      ],
+    },
+    [attensysOrgAddress]: {
+      methods: [
+        {
+          name: "create organization profile",
+          entrypoint: "create_org_profile",
+          description: "create an organization profile",
+        },
+        {
+          name: "create bootcamp",
+          entrypoint: "create_bootcamp",
+          description: "create a bootcamp",
+        },
+        {
+          name: "register for bootcamp",
+          entrypoint: "register_for_bootcamp",
+          description: "register for a bootcamp",
+        },
+        {
+          name: "admin approve registration",
+          entrypoint: "approve_registration",
+          description: "approve a registrant's registration",
+        },
+        {
+          name: "admin decline registration",
+          entrypoint: "decline_registration",
+          description: "decline a registrant's registration",
+        },
+        {
+          name: "mark attendance for a class",
+          entrypoint: "mark_attendance_for_a_class",
+          description: "mark attendance for a class",
+        },
+        {
+          name: "batch certify students",
+          entrypoint: "batch_certify_students",
+          description: "batch certify students",
+        },
+        {
+          name: "single certify student",
+          entrypoint: "single_certify_student",
+          description: "certify a single student",
+        },
+        {
+          name: "add instructor to organization",
+          entrypoint: "add_instructor_to_org",
+          description: "add an instructor to the organization",
+        },
+        {
+          name: "add active meet link",
+          entrypoint: "add_active_meet_link",
+          description: "add active meet link",
+        },
+        {
+          name: "add uploaded video link",
+          entrypoint: "add_uploaded_video_link",
+          description: "add link to uploaded video",
         },
       ],
     },

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useAtom } from "jotai";
 import {
@@ -24,6 +24,8 @@ import { pinata } from "../../../utils/config";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useAccount, useConnect } from "@starknet-react/core";
+import ControllerConnector from "@cartridge/connector/controller";
 
 const RegistrationDetails = (props: any) => {
   const [regModal, setRegModal] = useAtom(registerModal);
@@ -38,6 +40,16 @@ const RegistrationDetails = (props: any) => {
   const [email, setEmail] = useState("");
   const [uploading, setUploading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [orgname, setOrgname] = useState<string>();
+  const { account, address } = useAccount();
+  const { connect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
+
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setOrgname(n));
+    console.log(address, "address");
+  }, [address, controller]);
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -72,13 +84,13 @@ const RegistrationDetails = (props: any) => {
         const organizationContract = new Contract(
           attensysOrgAbi,
           attensysOrgAddress,
-          wallet?.account,
+          account,
         );
         const register_calldata = organizationContract.populate(
           "register_for_bootcamp",
           [props.org_info, props.id_info, studentDataUpload.IpfsHash],
         );
-        const callContract = await wallet?.account.execute([
+        const callContract = await account?.execute([
           {
             contractAddress: attensysOrgAddress,
             entrypoint: "register_for_bootcamp",
@@ -90,9 +102,7 @@ const RegistrationDetails = (props: any) => {
         // setregistrationsuccessstatus(true);
         // setDetailsEntryLoadingStatus(false);
 
-        await wallet?.account?.provider.waitForTransaction(
-          callContract.transaction_hash,
-        );
+        await account?.waitForTransaction(callContract?.transaction_hash!);
         console.log("Registration successful");
         setregistrationsuccessstatus(true);
       }

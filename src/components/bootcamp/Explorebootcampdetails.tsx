@@ -15,6 +15,7 @@ import { useSearchParams } from "next/navigation";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Previous from "../courses/course-form/previous";
 import { useFetchCID } from "@/hooks/useFetchCID";
+import { useAccount } from "@starknet-react/core";
 
 const Explorebootcampdetails = () => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
@@ -34,6 +35,7 @@ const Explorebootcampdetails = () => {
   const org = searchParams.get("org");
   const [isLoading, setIsLoading] = useState(true);
   const { fetchCIDContent, getError } = useFetchCID();
+  const { address, account } = useAccount();
 
   const orgContract = new Contract(
     attensysOrgAbi,
@@ -98,7 +100,7 @@ const Explorebootcampdetails = () => {
       const specific_org_info =
         await orgContract?.get_specific_organization_registered_bootcamp(
           org,
-          wallet?.selectedAddress,
+          address,
         );
 
       const bootcampInfoArray = await Promise.all(
@@ -141,7 +143,7 @@ const Explorebootcampdetails = () => {
     };
 
     fetchData();
-  }, [wallet]);
+  }, [account, address]);
 
   function truncateAddress(address: any): string {
     const start = address?.slice(0, 10);
