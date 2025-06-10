@@ -281,8 +281,103 @@ const Adminpanel = (props: any) => {
     }
     // alert(`Approve course ${course.course_identifier}`);
   };
-  const handleDisapprove = (course: any) => {
-    // TODO: Call contract or API to disapprove
+  const handleDisapprove = async (course: any) => {
+    if (!account || !account.address) {
+      toast.error("Wallet/account not loaded. Please wait or re-login.", {
+        /* ... */
+      });
+      console.log("account:", account);
+      return;
+    }
+    setApproving(true);
+    // TODO: Call contract or API to approve
+    const courseContract = new Contract(
+      attensysCourseAbi,
+      attensysCourseAddress,
+      account,
+    );
+    // console.log("courseContract:", course.course_identifier);
+
+    try {
+      const approve_calldata = await courseContract.populate(
+        "toggle_course_approval",
+        [course.course_identifier, false],
+      );
+      // Prepare the call for AVNU Gasless SDK
+      const calls = [
+        {
+          contractAddress: attensysCourseAddress,
+          entrypoint: "toggle_course_approval",
+          calldata: approve_calldata.calldata,
+        },
+      ];
+      // Use AVNU Gasless SDK
+      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+      if (!avnuApiKey) {
+        throw new Error("Missing AVNU API key in environment variables");
+      }
+      const response = await executeCalls(
+        account,
+        calls,
+        {
+          gasTokenAddress: STRK_ADDRESS,
+        },
+        {
+          apiKey: avnuApiKey,
+          baseUrl: "https://sepolia.api.avnu.fi",
+        },
+      );
+      // Wait for transaction confirmation
+      let tx = await provider.waitForTransaction(response.transactionHash);
+      if (
+        ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+          (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+        (tx as any)?.execution_status === "SUCCEEDED"
+      ) {
+        setApproving(false);
+
+        toast.success("approval successful", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        return;
+      } else {
+        setApproving(false);
+        toast.error("approval failed", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        return;
+      }
+    } catch (err) {
+      setApproving(false);
+      console.log("Error populating calldata (gasless):", err);
+      toast.error("approval failed", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+    }
     alert(`Disapprove course ${course.course_identifier}`);
   };
 
