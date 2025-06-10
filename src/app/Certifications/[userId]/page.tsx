@@ -17,11 +17,14 @@ import { attensysCourseAddress } from "@/deployments/contracts";
 import { useFetchCID } from "@/hooks/useFetchCID";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MoonLoader } from "react-spinners";
-import { Contract } from "starknet";
+import { Account, Contract } from "starknet";
 import { connect } from "starknetkit";
 import { useAccount, useConnect } from "@starknet-react/core";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { auth } from "@/lib/firebase/client";
+import { getUserProfile } from "@/lib/userutils";
+import { decryptPrivateKey } from "@/helpers/encrypt";
 
 interface CourseType {
   data: any;
@@ -51,7 +54,9 @@ const Index = () => {
   const { fetchCIDContent } = useFetchCID();
   const userId = null;
   const search = searchParams.get("userId");
-  const { address } = useAccount();
+  const [account, setAccount] = useState<any>();
+  const [address, setAddress] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
 
   const handlePageClick = () => {
     setbootcampdropstat(false);
@@ -146,6 +151,42 @@ const Index = () => {
     console.log("Certified Courses updated:", certifiedCourses);
   }, [certifiedCourses]);
 
+  useEffect(() => {
+    const logStarknetCredentials = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user && user.uid) {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            console.log("starknetAddress:", profile.starknetAddress);
+            console.log("starknetPrivateKey:", decryptedPrivateKey);
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            console.log("userAccount:", userAccount);
+            setAccount(userAccount);
+            setAddress(profile.starknetAddress);
+            setUsername(profile.displayName);
+          } else {
+            console.log("No user profile found in Firestore.");
+          }
+        } else {
+          console.log("No authenticated user found.");
+        }
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+      }
+    };
+    logStarknetCredentials();
+  }, []);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#f5f7fa] flex items-center justify-center">
@@ -186,6 +227,7 @@ const Index = () => {
           <MyCertifications
             address={address}
             certifiedCourses={certifiedCourses}
+            username={username}
           />
         )}
       </div>

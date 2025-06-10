@@ -35,6 +35,7 @@ interface CourseType {
   uri: Uri;
   course_ipfs_uri: string;
   is_suspended: boolean;
+  is_approved: boolean;
 }
 
 const Index = () => {
@@ -86,18 +87,21 @@ const Index = () => {
       const resolved = await Promise.all(
         allCourses.map(async (course) => {
           if (!course.course_ipfs_uri) return null;
+          console.log("Fetching course details:", course);
           try {
-            const detailed = await fetchCIDContent(course.course_ipfs_uri);
-            if (detailed) {
-              return {
-                ...detailed,
-                course_identifier: course.course_identifier,
-                owner: course.owner,
-                course_ipfs_uri: course.course_ipfs_uri,
-                is_suspended: course.is_suspended,
-              };
+            if (course.is_approved) {
+              const detailed = await fetchCIDContent(course.course_ipfs_uri);
+              if (detailed) {
+                return {
+                  ...detailed,
+                  course_identifier: course.course_identifier,
+                  owner: course.owner,
+                  course_ipfs_uri: course.course_ipfs_uri,
+                  is_suspended: course.is_suspended,
+                };
+              }
+              return detailed;
             }
-            return detailed;
           } catch {
             return null;
           }

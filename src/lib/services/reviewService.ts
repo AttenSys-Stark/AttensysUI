@@ -25,8 +25,23 @@ export const submitReview = async (
       throw new Error("User must be authenticated to submit a review");
     }
 
+    // Defensive: Validate rating and videoId
+    if (
+      typeof review.rating !== "number" ||
+      review.rating < 1 ||
+      review.rating > 5
+    ) {
+      throw new Error("Rating must be a number between 1 and 5");
+    }
+    if (typeof review.videoId !== "string" || !review.videoId.trim()) {
+      throw new Error("videoId must be a non-empty string");
+    }
+
+    // Defensive: Remove any userId from input
+    const { userId, ...reviewData } = review;
+
     const docRef = await addDoc(reviewsCollection, {
-      ...review,
+      ...reviewData,
       videoId: review.videoId,
       userId: user.uid, // Ensure the userId matches the authenticated user
       createdAt: serverTimestamp(),
@@ -34,7 +49,9 @@ export const submitReview = async (
     return docRef.id;
   } catch (error) {
     console.error("Error submitting review:", error);
-    throw new Error("Failed to submit review");
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to submit review",
+    );
   }
 };
 
@@ -42,7 +59,7 @@ export const getReviewsForVideo = async (
   videoId: string,
 ): Promise<Review[]> => {
   console.log("Querying reviews for videoId:", videoId);
-  await signInUser();
+  // await signInUser();
   console.log("Current auth state:", auth.currentUser?.uid);
   try {
     const q = query(reviewsCollection, where("videoId", "==", videoId));
@@ -63,7 +80,7 @@ export const getAverageRatingForVideo = async (
   videoId: string,
 ): Promise<AverageRating> => {
   try {
-    await signInUser();
+    // await signInUser();
     const reviews = await getReviewsForVideo(videoId);
     if (reviews.length === 0) {
       return { average: 0, count: 0 };

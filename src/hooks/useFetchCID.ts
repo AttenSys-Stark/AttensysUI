@@ -52,15 +52,59 @@ export const useFetchCID = () => {
   const fetchWithRetry = useCallback(
     async (CID: string, retryCount = 0): Promise<any> => {
       try {
-        return await pinata.gateways.get(CID);
-      } catch (error: any) {
+        console.log("Fetching CID:", CID);
+
+        // Remove the .catch() and handle errors in the try-catch
+        const response = await pinata.gateways.get(CID);
+        // console.log("Response:", response);
+        return response;
+      } catch (error: unknown) {
+        // Use unknown type for better type safety
+        // Normalize the error to an object we can work with
+        const normalizedError = error as
+          | Error
+          | {
+              message?: string;
+              response?: { status?: number };
+              name?: string;
+              code?: string;
+            };
+
+        // Check for any type of forbidden/authentication error
+        const isAuthError =
+          normalizedError?.message?.includes("403") ||
+          normalizedError?.message?.includes("Authentication Failed") ||
+          (typeof normalizedError === "object" &&
+            "response" in normalizedError &&
+            (normalizedError as any)?.response?.status === 403) ||
+          normalizedError?.name === "AuthenticationError" ||
+          (typeof normalizedError === "object" &&
+            "code" in normalizedError &&
+            (normalizedError as any)?.code === "ERR_ID:00006");
+
+        if (isAuthError) {
+          console.warn(
+            `Access denied for CID ${CID}:`,
+            normalizedError.message,
+          );
+          return null;
+        }
+
         if (retryCount < DEFAULT_MAX_RETRIES) {
+          console.log(
+            `Retrying (${retryCount + 1}/${DEFAULT_MAX_RETRIES}) for CID ${CID}`,
+          );
           await new Promise((resolve) =>
             setTimeout(resolve, RETRY_DELAY * (retryCount + 1)),
           );
           return fetchWithRetry(CID, retryCount + 1);
         }
-        throw new Error(`Failed to fetch CID ${CID}: ${error.message}`);
+
+        console.error(
+          `Final fetch failure for CID ${CID}:`,
+          normalizedError.message,
+        );
+        return null;
       }
     },
     [],
@@ -76,7 +120,7 @@ export const useFetchCID = () => {
         return cachedResponse;
       }
       try {
-        console.log("Serving from network", CID);
+        // console.log("Serving from network", CID);
         let data = await fetchWithRetry(CID);
         cache.set(CID, data);
 

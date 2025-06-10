@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Contract } from "starknet";
+import { Account, Contract } from "starknet";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
 import { provider } from "@/constants";
@@ -11,6 +11,12 @@ import AddLecture from "./course-form/AddLecture";
 import { Bounce, toast } from "react-toastify";
 import { useExplorer } from "@starknet-react/core";
 import { pinata as pinataclone } from "../../../utils/config";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase/client";
+import { getUserProfile } from "@/lib/userutils";
+import { decryptPrivateKey } from "@/helpers/encrypt";
+import { executeCalls } from "@avnu/gasless-sdk";
+import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 
 interface EditCoursePanelProps {
   isOpen: boolean;
@@ -55,7 +61,9 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
   const [showAddlecture, setShowAddLecture] = useState(false);
   const [savingstate, setsavingstate] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { account, address } = useAccount();
+  // const { account, address } = useAccount();
+  const [account, setAccount] = useState<any>();
+  const [address, setAddress] = useState<string>("");
   const { createAccessLink } = usePinataAccess();
   const explorer = useExplorer();
   const playerRef = useRef<ReactPlayer | null>(null);
@@ -164,17 +172,39 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
             dataUpload.IpfsHash,
           ],
         );
+        const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+        if (!avnuApiKey) {
+          throw new Error("Missing AVNU API key in environment variables");
+        }
 
-        const callCourseContract = await account?.execute([
+        const callCourseContract = await executeCalls(
+          account,
+          [
+            {
+              contractAddress: attensysCourseAddress,
+              entrypoint: "add_replace_course_content",
+              calldata: editcourse_calldata.calldata,
+            },
+          ],
           {
-            contractAddress: attensysCourseAddress,
-            entrypoint: "add_replace_course_content",
-            calldata: editcourse_calldata.calldata,
+            gasTokenAddress: STRK_ADDRESS,
           },
-        ]);
+          {
+            apiKey: avnuApiKey,
+            baseUrl: "https://sepolia.api.avnu.fi",
+          },
+        );
         console.log("result", callCourseContract);
+        let tx = await provider.waitForTransaction(
+          callCourseContract.transactionHash,
+        );
+
         //@ts-ignore
-        if (callCourseContract?.code == "SUCCESS") {
+        if (
+          ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+            (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+          (tx as any)?.execution_status === "SUCCEEDED"
+        ) {
           await new Promise((resolve) => setTimeout(resolve, 3000));
           toast.success(
             <div>
@@ -182,13 +212,13 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
               <br />
               Transaction hash:{" "}
               <a
-                href={`${explorer.transaction(callCourseContract?.transaction_hash)}`}
+                href={`${explorer.transaction(callCourseContract?.transactionHash)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ color: "blue", textDecoration: "underline" }}
               >
-                {callCourseContract?.transaction_hash
-                  ? `${callCourseContract.transaction_hash.slice(0, 6)}...${callCourseContract.transaction_hash.slice(-4)}`
+                {callCourseContract?.transactionHash
+                  ? `${callCourseContract.transactionHash.slice(0, 6)}...${callCourseContract.transactionHash.slice(-4)}`
                   : ""}
               </a>
             </div>,
@@ -350,6 +380,44 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
     }));
   };
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.uid) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            if (!decryptedPrivateKey) {
+              console.error("Failed to decrypt private key");
+              setAccount(undefined);
+              return;
+            }
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            setAccount(userAccount);
+            setAddress(profile.starknetAddress);
+          } else {
+            console.log("No user profile found in Firestore.");
+            setAccount(undefined);
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          setAccount(undefined);
+        }
+      } else {
+        console.log("No authenticated user found.");
+        setAccount(undefined);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
   return (
     <>
       {/* Backdrop */}
