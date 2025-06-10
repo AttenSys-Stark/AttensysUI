@@ -381,14 +381,6 @@ const Adminpanel = (props: any) => {
     alert(`Disapprove course ${course.course_identifier}`);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <MoonLoader color="#9B51E0" size={40} />
-      </div>
-    );
-  }
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user && user.uid) {
@@ -426,7 +418,13 @@ const Adminpanel = (props: any) => {
     });
     return () => unsubscribe();
   }, []);
-
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <MoonLoader color="#9B51E0" size={40} />
+      </div>
+    );
+  }
   return (
     <div
       className="admin-panel-root"
