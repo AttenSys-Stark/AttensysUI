@@ -12,6 +12,8 @@ import Coursedropdown from "@/components/courses/Coursedropdown";
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import { useAtom } from "jotai";
 import BootcampLanding from "@/components/bootcamp/BootcampLanding";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   const [courseDropdown, setCourseDropdown] = useAtom(coursestatusAtom);
@@ -29,21 +31,25 @@ const Index = () => {
   });
 
   return (
-    <div onClick={handlePageClick}>
-      {courseDropdown && (
-        <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
-      )}
-      {bootcampDropdown && (
-        <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
-      )}
-      <div onClick={(e) => e.stopPropagation()}>
-        <Coursedropdown />
+    <>
+      <Header />
+      <div onClick={handlePageClick}>
+        {courseDropdown && (
+          <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
+        )}
+        {bootcampDropdown && (
+          <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
+        )}
+        <div onClick={(e) => e.stopPropagation()}>
+          <Coursedropdown />
+        </div>
+        <div onClick={(e) => e.stopPropagation()}>
+          <Bootcampdropdown />
+        </div>
+        <BootcampLanding />
       </div>
-      <div onClick={(e) => e.stopPropagation()}>
-        <Bootcampdropdown />
-      </div>
-      <BootcampLanding />
-    </div>
+      <Footer />
+    </>
   );
 };
 
