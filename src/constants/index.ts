@@ -18,6 +18,7 @@ const STARKNET_CHAIN_ID =
 export const provider = new RpcProvider({
   nodeUrl: NODE_URL,
   chainId: STARKNET_CHAIN_ID,
+  specVersion: "0.7",
 });
 
 export const ARGENT_SESSION_SERVICE_BASE_URL =

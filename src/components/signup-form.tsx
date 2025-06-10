@@ -31,8 +31,9 @@ import {
 } from "@/lib/userutils";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
+import { toast, ToastContainer } from "react-toastify";
 
-export function SignupForm() {
+export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
   const [signUpResult, formAction, isLoading] = useActionState(signUp, null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -111,6 +112,9 @@ export function SignupForm() {
         });
     } catch (error: any) {
       if (error?.code === "auth/email-already-in-use") {
+        setStatus("form");
+        setAccountStatus("Email already in use");
+        toast.error("Email already in use");
         console.log("Email already in use");
       }
     }
@@ -133,7 +137,8 @@ export function SignupForm() {
   }, [status, currentUser]);
 
   return (
-    <Card className="w-[40%]">
+    <Card className="w-[100%] lg:w-[40%]">
+      <ToastContainer />
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Create an account</CardTitle>
         {/* <CardDescription>
@@ -245,7 +250,11 @@ export function SignupForm() {
                 Already have an account?{" "}
                 <Link
                   href=""
-                  onClick={() => setLoginorsignup(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (onLoginClick) onLoginClick();
+                    else setLoginorsignup(false);
+                  }}
                   className="underline underline-offset-4"
                 >
                   Login

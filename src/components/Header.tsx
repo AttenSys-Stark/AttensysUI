@@ -47,11 +47,17 @@ import { courseQuestions } from "@/constants/data";
 import { useWallet } from "@/hooks/useWallet";
 import { NetworkSwitchButton } from "./connect/NetworkSwitchButton";
 import { connectWallet } from "@/utils/connectWallet";
-import { CatridgeConnect } from "./connect/CatridgeConnect";
+import { Userlogin, useFirebaseFirstName } from "./connect/Userlogin";
 import { useAccount, useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 import debounce from "lodash.debounce";
 import { courseSearchTerms as wordList } from "@/utils/searchterms";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase/client";
+import { getUserProfile } from "@/lib/userutils";
+import { decryptPrivateKey } from "@/helpers/encrypt";
+import { Account } from "starknet";
+import { provider } from "@/constants";
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
@@ -79,7 +85,9 @@ const Header = () => {
     wallet: hookWallet,
     isConnecting,
   } = useWallet();
-  const { account, address } = useAccount();
+  // const { account, address } = useAccount();
+  const [account, setAccount] = useState<any>();
+  const [address, setAddress] = useState<string>("");
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
   const [username, setUsername] = useState<string>();
@@ -92,6 +100,8 @@ const Header = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const firstName = useFirebaseFirstName();
 
   const handleComingSoonClick = (e: any) => {
     e.preventDefault(); // Prevent default link behavior
@@ -235,10 +245,49 @@ const Header = () => {
     setIsBootcampsOpen(false);
   };
 
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setUsername(n));
+  // }, [address, controller]);
+
   useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setUsername(n));
-  }, [address, controller]);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.uid) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            if (!decryptedPrivateKey) {
+              console.error("Failed to decrypt private key");
+              setAccount(undefined);
+              return;
+            }
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            setAccount(userAccount);
+            setAddress(profile.starknetAddress);
+          } else {
+            console.log("No user profile found in Firestore.");
+            setAccount(undefined);
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          setAccount(undefined);
+        }
+      } else {
+        console.log("No authenticated user found.");
+        setAccount(undefined);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <>
@@ -329,8 +378,7 @@ const Header = () => {
                     <div className="hidden lg:flex">
                       <div className="flex text-sm xlg:space-x-24">
                         {navigation.map((item, index) => {
-                          const isComingSoon =
-                            item.name === "Events";
+                          const isComingSoon = item.name === "Events";
 
                           return (
                             <div key={item.name} className="relative group">
@@ -375,7 +423,12 @@ const Header = () => {
                     </div>
                   </div>
                   <div className="absolute inset-y-0 right-0 items-center hidden md:hidden lg:flex sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                    <CatridgeConnect />
+                    {firstName && (
+                      <span className="mr-6 text-gray-700 font-light italic text-sm">
+                        Welcome, {firstName}
+                      </span>
+                    )}
+                    <Userlogin />
                   </div>
                 </div>
               </div>
@@ -753,7 +806,7 @@ const Header = () => {
                   {/* 🔹 Connect/Disconnect Wallet button */}
 
                   <div className="px-4 py-3">
-                    <CatridgeConnect />
+                    <Userlogin />
                   </div>
                 </div>
               </DisclosurePanel>

@@ -20,6 +20,7 @@ interface CourseType {
   uri: Uri;
   course_ipfs_uri: string;
   is_suspended: boolean;
+  is_approved: boolean;
 }
 
 interface Uri {
@@ -100,24 +101,25 @@ const CarouselComp: React.FC<ChildComponentProps> = ({
           console.warn(`Skipping invalid IPFS URL: ${course.course_ipfs_uri}`);
           return null;
         }
-
-        const content = await fetchCIDContent(course.course_ipfs_uri);
-        if (content) {
-          return {
-            ...content,
-            course_identifier: course.course_identifier,
-            owner: course.owner,
-            course_ipfs_uri: course.course_ipfs_uri,
-            is_suspended: course.is_suspended,
-          };
+        if (course.is_approved) {
+          const content = await fetchCIDContent(course.course_ipfs_uri);
+          if (content) {
+            return {
+              ...content,
+              course_identifier: course.course_identifier,
+              owner: course.owner,
+              course_ipfs_uri: course.course_ipfs_uri,
+              is_suspended: course.is_suspended,
+            };
+          }
+          return null;
         }
-        return null;
       }),
     );
 
     // Filter out null values
     const validCourses = resolvedCourses.filter(
-      (course): course is CourseType => course !== null,
+      (course): course is CourseType => course !== null && course !== undefined,
     );
 
     // Remove duplicates before updating state
@@ -127,7 +129,7 @@ const CarouselComp: React.FC<ChildComponentProps> = ({
         ...validCourses.filter(
           (newCourse) =>
             !prevCourses.some(
-              (prev) => prev.data.courseName === newCourse.data.courseName,
+              (prev) => prev?.data?.courseName === newCourse?.data?.courseName,
             ),
         ),
       ];
@@ -163,11 +165,13 @@ const CarouselComp: React.FC<ChildComponentProps> = ({
       >
         {randomIndices.map((index) => (
           <div key={index}>
-            <CardWithLink
-              data={courseData[index]}
-              wallet={wallet}
-              rating={averagereviewrating}
-            />
+            {courseData[index] !== undefined && (
+              <CardWithLink
+                data={courseData[index]}
+                wallet={wallet}
+                rating={averagereviewrating}
+              />
+            )}
           </div>
         ))}
       </Carousel>
@@ -192,12 +196,15 @@ const CarouselComp: React.FC<ChildComponentProps> = ({
         minimumTouchDrag={80}
       >
         {randomIndices.map((index) => (
+          // console.log("coursell data",courseData[index]),
           <div key={index}>
-            <CardWithLink
-              data={courseData[index]}
-              wallet={wallet}
-              rating={averagereviewrating}
-            />
+            {courseData[index] !== undefined && (
+              <CardWithLink
+                data={courseData[index]}
+                wallet={wallet}
+                rating={averagereviewrating}
+              />
+            )}
           </div>
         ))}
       </Carousel>

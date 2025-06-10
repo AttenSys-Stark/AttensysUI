@@ -37,6 +37,8 @@ interface UserSideBarProps {
   selected: string;
   setSelected: (value: string) => void;
   refreshCourses: () => Promise<void>;
+  username: string;
+  address: string;
 }
 interface argprop {
   no: number;
@@ -52,6 +54,8 @@ const UserSideBar = ({
   selected = "All NFTs",
   setSelected,
   refreshCourses,
+  username,
+  address,
 }: UserSideBarProps) => {
   const [sideProperties, setSideProperties] = useState([
     {
@@ -76,9 +80,9 @@ const UserSideBar = ({
     },
   ]);
   const { connect, connectors } = useConnect();
-  const controller = connectors[0] as ControllerConnector;
-  const { address } = useAccount();
-  const [username, setUsername] = useState<string>();
+  // const controller = connectors[0] as ControllerConnector;
+  // const { address } = useAccount();
+  // const [username, setUsername] = useState<string>();
   const [isDropdownOpen, setIsDropdownOpen] = useState(true);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -164,11 +168,11 @@ const UserSideBar = ({
     }
   };
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setUsername(n));
-    console.log(address, "address");
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setUsername(n));
+  //   console.log(address, "address");
+  // }, [address, controller]);
 
   useEffect(() => {
     if (wallet?.address != undefined) {
@@ -318,7 +322,7 @@ const UserSideBar = ({
         ${isDropdownOpen && page != "myCertificate" ? "max-h-[220px] opacity-100" : "max-h-0 opacity-0"}
       `}
             >
-              <BalanceModal />
+              <BalanceModal account={wallet} address={address} />
             </div>
           </div>
 

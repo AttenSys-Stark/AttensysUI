@@ -18,7 +18,7 @@ import { useEffect, useState, useRef } from "react";
 import { LuBadgeCheck } from "react-icons/lu";
 import ReactPlayer from "react-player/lazy";
 
-import { Contract } from "starknet";
+import { Account, Contract } from "starknet";
 import StarRating from "../bootcamp/StarRating";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { CardWithLink } from "./Cards";
@@ -42,6 +42,10 @@ import { Erc20Abi } from "@/deployments/erc20abi";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import { Dialog, DialogBackdrop, DialogPanel, Button } from "@headlessui/react";
+import { onAuthStateChanged } from "firebase/auth";
+import { getUserProfile } from "@/lib/userutils";
+import { decryptPrivateKey } from "@/helpers/encrypt";
+import { executeCalls } from "@avnu/gasless-sdk";
 
 interface CourseType {
   data: any;
@@ -86,7 +90,7 @@ const LecturePage = (props: any) => {
     getError,
     isLoading: isCIDFetchLoading,
   } = useFetchCID();
-  const { account, address } = useAccount();
+  // const { account, address } = useAccount();
   const explorer = useExplorer();
   const [txnHash, setTxnHash] = useState<string>();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -104,6 +108,8 @@ const LecturePage = (props: any) => {
   const [coursePrice, setCoursePrice] = useState<number>(0);
   const [paymentValue, setPaymentValue] = useState<number>(0);
   const [isConfirmModalOpen, setisConfirmModalOpen] = useState(false);
+  const [account, setAccount] = useState<any>();
+  const [address, setAddress] = useState<any>();
 
   const searchParams = useSearchParams();
   const ultimate_id = searchParams.get("id");
@@ -322,23 +328,47 @@ const LecturePage = (props: any) => {
         "acquire_a_course",
         [Number(ultimate_id)],
       );
-      const callCourseContract = await account?.execute([
+
+      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+      if (!avnuApiKey) {
+        throw new Error("Missing AVNU API key in environment variables");
+      }
+
+      const callCourseContract = await executeCalls(
+        account,
+        [
+          {
+            contractAddress: STRK_ADDRESS,
+            entrypoint: "approve",
+            calldata: approve_calldata.calldata,
+          },
+          {
+            contractAddress: attensysCourseAddress,
+            entrypoint: "acquire_a_course",
+            calldata: take_course_calldata.calldata,
+          },
+        ],
         {
-          contractAddress: STRK_ADDRESS,
-          entrypoint: "approve",
-          calldata: approve_calldata.calldata,
+          gasTokenAddress: STRK_ADDRESS,
         },
         {
-          contractAddress: attensysCourseAddress,
-          entrypoint: "acquire_a_course",
-          calldata: take_course_calldata.calldata,
+          apiKey: avnuApiKey,
+          baseUrl: "https://sepolia.api.avnu.fi",
         },
-      ]);
+      );
 
       console.log("call returns", callCourseContract);
-      setTxnHash(callCourseContract?.transaction_hash);
+      let tx = await provider.waitForTransaction(
+        callCourseContract.transactionHash,
+      );
+
+      setTxnHash(callCourseContract?.transactionHash);
       //@ts-ignore
-      if (callCourseContract?.code == "SUCCESS") {
+      if (
+        ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+          (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+        (tx as any)?.execution_status === "SUCCEEDED"
+      ) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         setIsTakingCourse(true);
         setShowOverlay(false);
@@ -349,13 +379,13 @@ const LecturePage = (props: any) => {
             <br />
             Transaction hash:{" "}
             <a
-              href={`${explorer.transaction(callCourseContract?.transaction_hash)}`}
+              href={`${explorer.transaction(callCourseContract?.transactionHash)}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: "blue", textDecoration: "underline" }}
             >
-              {callCourseContract?.transaction_hash
-                ? `${callCourseContract.transaction_hash.slice(0, 6)}...${callCourseContract.transaction_hash.slice(-4)}`
+              {callCourseContract?.transactionHash
+                ? `${callCourseContract.transactionHash.slice(0, 6)}...${callCourseContract.transactionHash.slice(-4)}`
                 : ""}
             </a>
           </div>,
@@ -424,29 +454,52 @@ const LecturePage = (props: any) => {
       [Number(ultimate_id)],
     );
 
-    const callCourseContract = await account?.execute([
+    const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+    if (!avnuApiKey) {
+      throw new Error("Missing AVNU API key in environment variables");
+    }
+
+    const callCourseContract = await executeCalls(
+      account,
+      [
+        {
+          contractAddress: attensysCourseAddress,
+          entrypoint: "finish_course_claim_certification",
+          calldata: course_certificate_calldata.calldata,
+        },
+      ],
       {
-        contractAddress: attensysCourseAddress,
-        entrypoint: "finish_course_claim_certification",
-        calldata: course_certificate_calldata.calldata,
+        gasTokenAddress: STRK_ADDRESS,
       },
-    ]);
-    setTxnHash(callCourseContract?.transaction_hash);
+      {
+        apiKey: avnuApiKey,
+        baseUrl: "https://sepolia.api.avnu.fi",
+      },
+    );
+    let tx = await provider.waitForTransaction(
+      callCourseContract.transactionHash,
+    );
+
+    setTxnHash(callCourseContract?.transactionHash);
     //@ts-ignore
-    if (callCourseContract?.code == "SUCCESS") {
+    if (
+      ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+        (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+      (tx as any)?.execution_status === "SUCCEEDED"
+    ) {
       toast.success(
         <div>
           Congratulations, you&apos;re certified!
           <br />
           Transaction hash:{" "}
           <a
-            href={`${explorer.transaction(callCourseContract?.transaction_hash)}`}
+            href={`${explorer.transaction(callCourseContract?.transactionHash)}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: "blue", textDecoration: "underline" }}
           >
-            {callCourseContract?.transaction_hash
-              ? `${callCourseContract.transaction_hash.slice(0, 6)}...${callCourseContract.transaction_hash.slice(-4)}`
+            {callCourseContract?.transactionHash
+              ? `${callCourseContract.transactionHash.slice(0, 6)}...${callCourseContract.transactionHash.slice(-4)}`
               : ""}
           </a>
         </div>,
@@ -568,6 +621,45 @@ const LecturePage = (props: any) => {
   }, []);
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.uid) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            if (!decryptedPrivateKey) {
+              console.error("Failed to decrypt private key");
+              setAccount(undefined);
+              return;
+            }
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            setAccount(userAccount);
+            setAddress(profile.starknetAddress);
+          } else {
+            console.log("No user profile found in Firestore.");
+            setAccount(undefined);
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          setAccount(undefined);
+        }
+      } else {
+        console.log("No authenticated user found.");
+        setAccount(undefined);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     const checkReview = async () => {
       if (address) {
         const exists = await courseContract?.get_review_status(
@@ -606,11 +698,11 @@ const LecturePage = (props: any) => {
     };
   }, [props?.data?.courseDescription, props?.data?.targetAudienceDesc]);
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setUsername(n));
-    console.log(address, "address");
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setUsername(n));
+  //   console.log(address, "address");
+  // }, [address, controller]);
 
   // Store average ratings for each course by identifier
   const [averageRatings, setAverageRatings] = useState<{ [key: string]: any }>(

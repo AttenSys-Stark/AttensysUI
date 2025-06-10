@@ -13,6 +13,7 @@ import {
   onAuthStateChanged,
   reload,
   sendPasswordResetEmail,
+  signOut,
 } from "firebase/auth";
 import { createUserProfile, getUserProfile } from "../userutils";
 
@@ -28,7 +29,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-auth.setPersistence(browserLocalPersistence);
 
 // Initialize Google provider
 const googleProvider = new GoogleAuthProvider();
@@ -42,6 +42,7 @@ const signInWithGoogle = async (
   onAccountProgress?: (status: string) => void,
 ) => {
   try {
+    await auth.setPersistence(browserLocalPersistence);
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
@@ -206,6 +207,17 @@ const sendPasswordReset = async (email: string) => {
   }
 };
 
+// Sign out all authenticated users (Google, email, etc.)
+const signOutAll = async () => {
+  try {
+    await signOut(auth);
+    return true;
+  } catch (error) {
+    console.error("Sign out error:", error);
+    throw error;
+  }
+};
+
 export {
   db,
   auth,
@@ -216,4 +228,5 @@ export {
   signInWithEmail,
   waitForEmailVerification,
   sendPasswordReset,
+  signOutAll,
 };

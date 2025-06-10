@@ -27,7 +27,7 @@ import { useSetAtom } from "jotai";
 import { loginUserWithEmail, resetUserPassword } from "@/lib/userutils";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 
-export function LoginForm() {
+export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
   const [loginResult, formAction, isLoading] = useActionState(signIn, null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -191,7 +191,7 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-[40%]">
+    <Card className="w-[100%] lg:w-[40%]">
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -308,7 +308,11 @@ export function LoginForm() {
               Don&apos;t have an account?{" "}
               <Link
                 href=""
-                onClick={() => setLoginorsignup(true)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onSignupClick) onSignupClick();
+                  else setLoginorsignup(true);
+                }}
                 className="underline underline-offset-4"
               >
                 Sign up

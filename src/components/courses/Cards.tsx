@@ -31,7 +31,7 @@ export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
         <div className="w-full h-28 rounded-t-xl">
           <Image
             className="object-cover h-full w-full rounded-t-xl"
-            alt={data?.data.courseImage}
+            alt="image"
             src={`https://ipfs.io/ipfs/${data?.data.courseImage}`}
             width={200}
             height={200}

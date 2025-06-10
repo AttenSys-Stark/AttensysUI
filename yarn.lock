@@ -17,6 +17,11 @@
   resolved "https://registry.yarnpkg.com/@alloc/quick-lru/-/quick-lru-5.2.0.tgz#7bf68b20c0a350f936915fcae06f58e32007ce30"
   integrity sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==
 
+"@avnu/gasless-sdk@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@avnu/gasless-sdk/-/gasless-sdk-0.1.8.tgz#5b8e4b693b8a95ece10b337692dee3e757c3ac61"
+  integrity sha512-0URzcZ3WAOWmMVhz/hk8BJhGwHP2VPoG7qiaYAntpxRReN+K5V0vKn5g9ksTwUTcEId8pF4ozdfyPm6gT9XMCg==
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.27.1":
   version "7.27.1"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.27.1.tgz#200f715e66d52a23b221a9435534a91cc13ad5be"
