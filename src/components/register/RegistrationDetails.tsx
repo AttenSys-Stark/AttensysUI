@@ -101,8 +101,10 @@ const RegistrationDetails = (props: any) => {
         // setIsRegistering(false);
         // setregistrationsuccessstatus(true);
         // setDetailsEntryLoadingStatus(false);
-
-        await account?.waitForTransaction(callContract?.transaction_hash!);
+        if (!callContract) {
+          throw new Error("Transaction not executed");
+        }
+        await account?.waitForTransaction(callContract?.transaction_hash);
         console.log("Registration successful");
         setregistrationsuccessstatus(true);
       }

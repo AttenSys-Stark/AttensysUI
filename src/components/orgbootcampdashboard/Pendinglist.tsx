@@ -72,8 +72,10 @@ const Pendinglist = (props: any) => {
           calldata: approve_calldata.calldata,
         },
       ]);
-
-      await account?.waitForTransaction(callContract?.transaction_hash!);
+      if (!callContract) {
+        throw new Error("Transaction not executed");
+      }
+      await account?.waitForTransaction(callContract?.transaction_hash);
     } catch (error) {
       console.error("Approval failed:", error);
     } finally {
@@ -95,8 +97,10 @@ const Pendinglist = (props: any) => {
           calldata: approve_calldata.calldata,
         },
       ]);
-
-      await account?.waitForTransaction(callContract?.transaction_hash!);
+      if (!callContract) {
+        throw new Error("Transaction not executed");
+      }
+      await account?.waitForTransaction(callContract?.transaction_hash);
     } catch (error) {
       console.error("Decline failed:", error);
     } finally {

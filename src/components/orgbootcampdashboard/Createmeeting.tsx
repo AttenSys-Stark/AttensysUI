@@ -96,8 +96,11 @@ export default function Createmeeting(prop: any) {
           calldata: add_active_meet_link_calldata.calldata,
         },
       ]);
+      if (!callContract) {
+        throw new Error("Transaction not executed");
+      }
       await account
-        ?.waitForTransaction(callContract?.transaction_hash!)
+        ?.waitForTransaction(callContract?.transaction_hash)
         .then(() => {})
         .catch((e: any) => {
           console.error("Error: ", e);

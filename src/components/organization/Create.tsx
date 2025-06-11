@@ -305,8 +305,10 @@ const Create = (props: any) => {
             calldata: create_bootcamp_calldata.calldata,
           },
         ]);
-
-        await account?.waitForTransaction(callContract?.transaction_hash!);
+        if (!callContract) {
+          throw new Error("Transaction not executed");
+        }
+        await account?.waitForTransaction(callContract?.transaction_hash);
         console.log("Submitted successfully");
 
         //@ts-ignore

@@ -145,8 +145,10 @@ const Addinstructor = (props: any) => {
             calldata: add_instructor_calldata.calldata,
           },
         ]);
-
-        await account?.waitForTransaction(multiCall?.transaction_hash!);
+        if (!multiCall) {
+          throw new Error("Transaction Execution failed");
+        }
+        await account?.waitForTransaction(multiCall?.transaction_hash);
         console.log("Done Submitting");
         setUploading(false);
         setOrganizationData(ResetOrgRegData);

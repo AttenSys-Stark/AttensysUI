@@ -237,8 +237,10 @@ export default function UploadModal(prop: any) {
             calldata: videolink_calldata.calldata,
           },
         ]);
-
-        await account?.waitForTransaction(callContract?.transaction_hash!);
+        if (!callContract) {
+          throw new Error("Transaction not executed");
+        }
+        await account?.waitForTransaction(callContract?.transaction_hash);
       }
     } catch (error) {
       console.error("Error during save:", error);

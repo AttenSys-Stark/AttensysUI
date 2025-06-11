@@ -56,9 +56,11 @@ const Certifications = () => {
         calldata: cerify_calldata.calldata,
       },
     ]);
-
+    if (!callContract) {
+      throw new Error("Transaction not executed");
+    }
     account
-      ?.waitForTransaction(callContract?.transaction_hash!)
+      ?.waitForTransaction(callContract?.transaction_hash)
       .then(() => {})
       .catch((e: any) => {
         console.error("Error: ", e);
@@ -83,9 +85,11 @@ const Certifications = () => {
         calldata: cerify_calldata.calldata,
       },
     ]);
-
+    if (!callContract) {
+      throw new Error("Transaction not executed");
+    }
     account
-      ?.waitForTransaction(callContract?.transaction_hash!)
+      ?.waitForTransaction(callContract?.transaction_hash)
       .then(() => {})
       .catch((e: any) => {
         console.error("Error: ", e);
