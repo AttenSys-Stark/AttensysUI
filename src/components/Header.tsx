@@ -329,7 +329,7 @@ const Header = () => {
                     <div className="hidden lg:flex">
                       <div className="flex text-sm xlg:space-x-24">
                         {navigation.map((item, index) => {
-                          const isComingSoon = item.name === "Events";
+                          const isComingSoon = item.name === "Events" || item.name === "Bootcamps";
 
                           return (
                             <div key={item.name} className="relative group">
