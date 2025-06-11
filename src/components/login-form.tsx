@@ -239,7 +239,7 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
                         fill="currentColor"
                       />
                     </svg>
-                    Login with Google
+                    Continue with Google
                   </div>
                 )}
               </Button>
