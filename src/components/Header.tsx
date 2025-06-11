@@ -442,7 +442,7 @@ const Header = () => {
 
                 {/* Logo */}
                 <Link
-                  href="/"
+                  href="/Home"
                   className="flex justify-center flex-1 z-10"
                   onClick={() => close()}
                 >
