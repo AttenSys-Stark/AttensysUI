@@ -55,6 +55,7 @@ interface CourseType {
   uri: Uri;
   course_ipfs_uri: string;
   is_suspended: boolean;
+  is_approved: boolean;
 }
 
 interface Uri {
@@ -177,24 +178,25 @@ const LecturePage = (props: any) => {
           console.warn(`Skipping invalid IPFS URL: ${course.course_ipfs_uri}`);
           return null;
         }
-
-        const content = await fetchCIDContent(course.course_ipfs_uri);
-        if (content) {
-          return {
-            ...content,
-            course_identifier: course.course_identifier,
-            owner: course.owner,
-            course_ipfs_uri: course.course_ipfs_uri,
-            is_suspended: course.is_suspended,
-          };
+        if (course.is_approved) {
+          const content = await fetchCIDContent(course.course_ipfs_uri);
+          if (content) {
+            return {
+              ...content,
+              course_identifier: course.course_identifier,
+              owner: course.owner,
+              course_ipfs_uri: course.course_ipfs_uri,
+              is_suspended: course.is_suspended,
+            };
+          }
+          return null;
         }
-        return null;
       }),
     );
 
     // Filter out null values
     const validCourses = resolvedCourses.filter(
-      (course): course is CourseType => course !== null,
+      (course): course is CourseType => course !== null && course !== undefined,
     );
 
     // Remove duplicates before updating state
@@ -1282,15 +1284,18 @@ const LecturePage = (props: any) => {
               {courseData
                 .sort(() => Math.random() - 0.5)
                 .slice(0, 2)
-                .map((item: any, id: any) => (
-                  <div key={id}>
-                    <CardWithLink
-                      wallet={props.wallet}
-                      data={item}
-                      rating={averageRatings}
-                    />
-                  </div>
-                ))}
+                .map((item: any, id: any) => {
+                  console.log("courseData[id]", courseData[id]);
+                  return (
+                    <div key={id}>
+                      <CardWithLink
+                        wallet={account}
+                        data={item}
+                        rating={averageRatings}
+                      />
+                    </div>
+                  );
+                })}
             </div>
           </div>
 
@@ -1361,15 +1366,18 @@ const LecturePage = (props: any) => {
         <div className="hidden xl:block w-[30%] h-[1020px]">
           <h1>Courses you might like</h1>
           <div className="space-y-10 overflow-x-auto max-h-[1020px] overflow-y-auto">
-            {courseData.map((item: any, id: any) => (
-              <div key={id}>
-                <CardWithLink
-                  wallet={props.wallet}
-                  data={item}
-                  rating={averageRatings}
-                />
-              </div>
-            ))}
+            {courseData.map((item: any, id: any) => {
+              console.log("courseData[id]", courseData[id]);
+              return (
+                <div key={id}>
+                  <CardWithLink
+                    wallet={account}
+                    data={item}
+                    rating={averageRatings}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
