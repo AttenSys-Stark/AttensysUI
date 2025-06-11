@@ -378,7 +378,8 @@ const Header = () => {
                     <div className="hidden lg:flex">
                       <div className="flex text-sm xlg:space-x-24">
                         {navigation.map((item, index) => {
-                          const isComingSoon = item.name === "Events" || item.name === "Bootcamps";
+                          const isComingSoon =
+                            item.name === "Events" || item.name === "Bootcamps";
 
                           return (
                             <div key={item.name} className="relative group">
@@ -571,7 +572,7 @@ const Header = () => {
                   {/* 📌 Barra superior con logo y botón de cerrar */}
                   <div className="flex items-center justify-between px-4 py-3 border-b">
                     <Link
-                      href="/"
+                      href="/Home"
                       className="flex items-center"
                       onClick={() => close()}
                     >
@@ -628,7 +629,7 @@ const Header = () => {
 
                   <nav className="px-4 space-y-2">
                     <Link
-                      href="/"
+                      href="/Home"
                       className="block px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                       onClick={() => close()}
                     >
