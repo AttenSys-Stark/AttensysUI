@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Emailinput from "../overview/Emailinput";
 import { Button } from "@headlessui/react";
 import cross from "@/assets/cross.svg";
@@ -19,6 +19,8 @@ import { specificOrgRoute } from "@/state/connectedWalletStarknetkitNext";
 
 import { FileObject } from "pinata";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import { useAccount, useConnect } from "@starknet-react/core";
+import ControllerConnector from "@cartridge/connector/controller";
 const emptyData: FileObject = {
   name: "",
   type: "",
@@ -42,13 +44,23 @@ const ResetOrgRegData = {
 };
 
 const Addinstructor = (props: any) => {
-  const { connectorDataAccount } = props;
+  // const { connectorDataAccount } = props;
   const [emailList, setEmailList] = useState<string[]>([]);
   const [AddressList, setAddressList] = useState<string[]>([]);
   const [organizationData, setOrganizationData] = useAtom(organzationInitState);
   const [specificOrg, setSpecificOrg] = useAtom(specificOrgRoute);
   const [uploading, setUploading] = useState(false);
+  const [orgname, setOrgname] = useState<string>();
+  const { account, address } = useAccount();
+  const { connect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
   // const [cidToContract, setCidToContract] = useState<string>("")
+
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setOrgname(n));
+    console.log(address, "address");
+  }, [address, controller]);
 
   const handleEmailsChange = (emails: string[]) => {
     setEmailList(emails);
@@ -70,6 +82,7 @@ const Addinstructor = (props: any) => {
   // function to handle multicall of create_org and add_instructor functions from contract
   const handle_multicall_routing = async () => {
     setUploading(true);
+    // if (!account || !address) return
     try {
       const OrgBannerupload = await pinata.upload.file(
         organizationData.organizationBanner,
@@ -100,7 +113,7 @@ const Addinstructor = (props: any) => {
         const organizationContract = new Contract(
           attensysOrgAbi,
           attensysOrgAddress,
-          connectorDataAccount,
+          account,
         );
 
         const create_org_calldata = organizationContract.populate(
@@ -120,8 +133,7 @@ const Addinstructor = (props: any) => {
           ],
         );
 
-        //@ts-ignore
-        const multiCall = await connectorDataAccount.execute([
+        const multiCall = await account?.execute([
           {
             contractAddress: attensysOrgAddress,
             entrypoint: "create_org_profile",
@@ -133,11 +145,10 @@ const Addinstructor = (props: any) => {
             calldata: add_instructor_calldata.calldata,
           },
         ]);
-
-        //@ts-ignore
-        await connectorDataAccount?.provider.waitForTransaction(
-          multiCall.transaction_hash,
-        );
+        if (!multiCall) {
+          throw new Error("Transaction Execution failed");
+        }
+        await account?.waitForTransaction(multiCall?.transaction_hash);
         console.log("Done Submitting");
         setUploading(false);
         setOrganizationData(ResetOrgRegData);

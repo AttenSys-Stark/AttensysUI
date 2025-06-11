@@ -16,6 +16,7 @@ import Create from "./Create";
 import Heading from "./Heading";
 import Organizationtabs from "./Organizationtabs";
 import Panel from "./Panel";
+import { useAccount } from "@starknet-react/core";
 
 const Organizationlanding = (prop: any) => {
   const [createOverlayStat] = useAtom(createbootcampoverlay);
@@ -37,6 +38,7 @@ const Organizationlanding = (prop: any) => {
   const [isLoadingIPFS, setIsLoadingIPFS] = useState(false);
   const [isLoadingOrgInfo, setIsLoadingOrgInfo] = useState(false);
   const [isLoadingBootcamps, setIsLoadingBootcamps] = useState(false);
+  const { account, address } = useAccount();
   const {
     fetchCIDContent,
     getError,
@@ -94,7 +96,7 @@ const Organizationlanding = (prop: any) => {
     setIsLoadingOrgInfo(true);
 
     try {
-      const org_info = await orgContract?.get_org_info(wallet?.selectedAddress);
+      const org_info = await orgContract?.get_org_info(address);
       setNumberofClasses(Number(org_info.number_of_all_classes));
       setNumberofTutors(Number(org_info.number_of_instructors));
       setStudentNumber(Number(org_info.number_of_students));
@@ -112,9 +114,8 @@ const Organizationlanding = (prop: any) => {
   const getAllOrgBootcamp = async () => {
     setIsLoadingBootcamps(true);
     try {
-      const org_boot_camp_info = await orgContract?.get_all_org_bootcamps(
-        wallet?.selectedAddress,
-      );
+      const org_boot_camp_info =
+        await orgContract?.get_all_org_bootcamps(address);
       setBootcampdataInfo(org_boot_camp_info);
     } catch (error) {
       console.error("Error fetching bootcamps:", error);
@@ -139,7 +140,7 @@ const Organizationlanding = (prop: any) => {
   useEffect(() => {
     getOrgInfo();
     getAllOrgBootcamp();
-  }, [wallet, createbootebootcampstat]);
+  }, [account, address, createbootebootcampstat]);
 
   function truncateAddress(address: any): string {
     const start = address?.slice(0, 10);

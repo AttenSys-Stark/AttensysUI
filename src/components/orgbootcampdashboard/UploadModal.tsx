@@ -32,6 +32,8 @@ import { attensysOrgAddress } from "@/deployments/contracts";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { pinata } from "../../../utils/config";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import { useAccount, useConnect } from "@starknet-react/core";
+import ControllerConnector from "@cartridge/connector/controller";
 interface FormData {
   topic: string;
   description: string;
@@ -76,6 +78,16 @@ export default function UploadModal(prop: any) {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const [uploadhash, setUploadHash] = useState("");
+  const [orgname, setOrgname] = useState<string>();
+  const { account, address } = useAccount();
+  const { connect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
+
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setOrgname(n));
+    console.log(address, "address");
+  }, [address, controller]);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -204,7 +216,7 @@ export default function UploadModal(prop: any) {
         const organizationContract = new Contract(
           attensysOrgAbi,
           attensysOrgAddress,
-          wallet?.account,
+          account,
         );
 
         const videolink_calldata = organizationContract.populate(
@@ -213,23 +225,22 @@ export default function UploadModal(prop: any) {
             Dataupload.IpfsHash,
             true,
             //@ts-ignore
-            wallet?.selectedAddress,
+            address,
             prop.status.idnumber,
           ],
         );
 
-        const callContract = await wallet?.account.execute([
+        const callContract = await account?.execute([
           {
             contractAddress: attensysOrgAddress,
             entrypoint: "add_uploaded_video_link",
             calldata: videolink_calldata.calldata,
           },
         ]);
-
-        //@ts-ignore
-        await wallet?.account?.provider.waitForTransaction(
-          callContract.transaction_hash,
-        );
+        if (!callContract) {
+          throw new Error("Transaction not executed");
+        }
+        await account?.waitForTransaction(callContract?.transaction_hash);
       }
     } catch (error) {
       console.error("Error during save:", error);
