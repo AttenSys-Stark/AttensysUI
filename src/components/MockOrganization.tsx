@@ -18,12 +18,14 @@ import {
   useReadContract,
   useContract,
   useSendTransaction,
+  useConnect,
 } from "@starknet-react/core";
 import { attensysOrgAddress } from "./../deployments/contracts";
 import { attensysOrgAbi } from "./../deployments/abi";
 import { RpcProvider, Contract, Account, ec, json } from "starknet";
 import { useWallet } from "@/hooks/useWallet";
 import { NetworkSwitchButton } from "./connect/NetworkSwitchButton";
+import ControllerConnector from "@cartridge/connector/controller";
 
 const MockOrganization = () => {
   const [wallet] = useAtom(walletStarknetkit);
@@ -44,6 +46,10 @@ const MockOrganization = () => {
     org_name: "",
   });
   const [isSuccess, setIsSuccess] = useState(false);
+  const [orgname, setOrgname] = useState<string>();
+  const { account, address } = useAccount();
+  const { connect, connectors } = useConnect();
+  const controller = connectors[0] as ControllerConnector;
 
   //initialize provider with a Sepolia Testnet node
   const organizationContract = new Contract(
@@ -52,12 +58,18 @@ const MockOrganization = () => {
     provider,
   );
 
+  useEffect(() => {
+    if (!address) return;
+    controller.username()?.then((n) => setOrgname(n));
+    console.log(address, "address");
+  }, [address, controller]);
+
   // core write and read functions
 
   const registerOrg = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
-      organizationContract.connect(wallet?.account);
+      organizationContract.connect(account!);
       const myCall = organizationContract.populate("create_org_profile", [
         "web3",
         "http://w3bnft.com",
@@ -74,10 +86,11 @@ const MockOrganization = () => {
   };
 
   const handleOnSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    if (!account) return;
     event.preventDefault();
-    organizationContract.connect(wallet?.account);
+    organizationContract.connect(account);
     const myCall = organizationContract.populate("get_org_info", [
-      wallet?.account.address,
+      account.address,
     ]);
     const res = await organizationContract.get_org_info(myCall.calldata);
     if (res != undefined) {
@@ -107,7 +120,7 @@ const MockOrganization = () => {
 
   const handleGetAllOrg = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    organizationContract.connect(wallet?.account);
+    organizationContract.connect(account!);
     const myCall = organizationContract.populate("get_all_org_info", []);
     const res = await organizationContract.get_all_org_info(myCall.calldata);
     if (res != undefined) {
@@ -119,7 +132,7 @@ const MockOrganization = () => {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
-    organizationContract.connect(wallet?.account);
+    organizationContract.connect(account!);
     const myCall = organizationContract.populate("get_org_instructors", [
       orgInputValue,
     ]);
@@ -134,7 +147,7 @@ const MockOrganization = () => {
   ) => {
     try {
       event.preventDefault();
-      organizationContract.connect(wallet?.account);
+      organizationContract.connect(account!);
       const myCall = organizationContract.populate("create_a_class", [
         classOrgValue,
       ]);
@@ -149,7 +162,7 @@ const MockOrganization = () => {
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
-    organizationContract.connect(wallet?.account);
+    organizationContract.connect(account!);
     const myCall = organizationContract.populate("get_instructor_part_of_org", [
       instructorInputValue,
     ]);
