@@ -7,11 +7,14 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { Loader2 } from "lucide-react";
+import { useAtom } from "jotai";
+import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
 
 const HomePage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginorsignupstat, setLoginorsignupstat] = useAtom(loginorsignup);
 
   useEffect(() => {
     // Use a local variable to track the mounted state
@@ -25,6 +28,7 @@ const HomePage = () => {
       } else {
         setIsAuthenticated(true);
         setLoading(false);
+        setLoginorsignupstat(false);
       }
       if (user) {
         console.log("user Data", user);
