@@ -6,11 +6,35 @@ export interface Course {
   courseIdentifier: number;
   owner?: string;
   candidate?: string;
-  blockNumber?: number;
-  blockTimestamp?: number;
-  timestamp?: string;
-  type?: string;
-  // Add other fields as needed
+  blockNumber: number;
+  timestamp: string;
+  // Course created specific fields
+  courseAddress?: string;
+  courseCreator?: string;
+  accessment?: boolean;
+  baseUri?: string;
+  name?: string;
+  symbol?: string;
+  courseIpfsUri?: string;
+  isApproved?: boolean;
+  // Course replaced specific fields
+  owner_?: string;
+  newCourseUri?: string;
+  // Course price updated specific fields
+  newPrice?: number;
+  // Event type for UI display
+  type?:
+    | "created"
+    | "acquired"
+    | "replaced"
+    | "cert-claimed"
+    | "admin-transferred"
+    | "suspended"
+    | "unsuspended"
+    | "removed"
+    | "price-updated"
+    | "approved"
+    | "unapproved";
 }
 
 const handleResponse = async (response: Response): Promise<any> => {
@@ -23,71 +47,87 @@ const handleResponse = async (response: Response): Promise<any> => {
   return response.json();
 };
 
+// Helper function to add event type to courses
+const addEventType = (courses: Course[], type: Course["type"]): Course[] => {
+  return courses.map((course) => ({ ...course, type }));
+};
+
 export const api = {
   // Get all acquired courses
   getAcquiredCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/acquired`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "acquired");
   },
 
   // Get all created courses
   getCreatedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/created`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "created");
   },
 
   // Get all replaced courses
   getReplacedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/replaced`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "replaced");
   },
 
   // Get all cert claimed courses
   getCertClaimedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/cert-claimed`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "cert-claimed");
   },
 
   // Get all admin transferred courses
   getAdminTransferredCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/admin-transferred`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "admin-transferred");
   },
 
   // Get all suspended courses
   getSuspendedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/suspended`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "suspended");
   },
 
   // Get all unsuspended courses
   getUnsuspendedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/unsuspended`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "unsuspended");
   },
 
   // Get all removed courses
   getRemovedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/removed`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "removed");
   },
 
   // Get all price updated courses
   getPriceUpdatedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/price-updated`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "price-updated");
   },
 
   // Get all approved courses
   getApprovedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/approved`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "approved");
   },
 
   // Get all unapproved courses
   getUnapprovedCourses: async (): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/unapproved`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "unapproved");
   },
 
   // Get course by identifier
@@ -99,6 +139,7 @@ export const api = {
   // Get courses by owner
   getCoursesByOwner: async (owner: string): Promise<Course[]> => {
     const response = await fetch(`${API_BASE_URL}/courses/owner/${owner}`);
-    return handleResponse(response);
+    const courses = await handleResponse(response);
+    return addEventType(courses, "acquired");
   },
 };

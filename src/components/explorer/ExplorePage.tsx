@@ -242,7 +242,6 @@ const ExplorePage = () => {
         </div>
         <EventFeed data={eventData} />
       </div>
-      <CourseList />
     </div>
   );
 };
