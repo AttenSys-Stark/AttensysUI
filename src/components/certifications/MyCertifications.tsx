@@ -5,12 +5,14 @@ import red_love from "@/assets/red_love.svg";
 import love from "@/assets/love.svg";
 import card from "@/assets/card.svg";
 import { useFetchCID } from "@/hooks/useFetchCID";
+import { useRouter } from "next/navigation";
 
 const MyCertifications = (props: any) => {
   const [selected, setSelected] = useState("All NFTs");
   const [page, setPage] = useState("");
   const [certificates, setCertificates] = useState<any[]>([]);
   const { fetchCIDContent } = useFetchCID();
+  const router = useRouter();
 
   useEffect(() => {
     setPage("myCertificate");
@@ -135,16 +137,19 @@ const MyCertifications = (props: any) => {
             />
             <p className="text-gray-500 text-lg">No certificate</p>
             <button
-              className="text-white px-6 py-2 rounded-lg transition-colors opacity-50 cursor-not-allowed  relative"
+              className="text-white px-6 py-2 rounded-lg transition-colors opacity-50 relative"
               style={{
                 background:
                   "linear-gradient(103.42deg, #9B51E0 16.73%, #4A90E2 64.74%)",
               }}
+              onClick={() => {
+                router.push("/Course");
+              }}
             >
               Browse course
-              <span className="absolute -top-1.5 -right-10 bg-red-800 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap transform rotate-12">
+              {/* <span className="absolute -top-1.5 -right-10 bg-red-800 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm whitespace-nowrap transform rotate-12">
                 Coming Soon
-              </span>
+              </span> */}
             </button>
           </div>
         </div>
