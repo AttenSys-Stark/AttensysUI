@@ -130,6 +130,12 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
     setIsSaving(true);
 
     try {
+      // Get current user's email
+      const currentUser = auth.currentUser;
+      if (!currentUser?.email) {
+        throw new Error("No user email found");
+      }
+
       const blob = dataURLtoBlob(courseData.courseImage.url);
 
       const realFile = new File([blob], courseData.courseImage.name, {
@@ -155,6 +161,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
         coursePricing: courseData.coursePricing,
         promoAndDiscount: courseData.promoAndDiscount,
         publishWithCertificate: courseData.publishWithCertificate,
+        creatorEmail: currentUser.email,
       });
       console.log("dataUpload", dataUpload);
 
@@ -213,6 +220,52 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
               (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
             (tx as any)?.execution_status === "SUCCEEDED"
           ) {
+            // Send notifications
+            try {
+              // Notify admin about new course
+              await fetch(
+                "https://attensys-1a184d8bebe7.herokuapp.com/api/notify-admin-new-course",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Origin: window.location.origin,
+                  },
+                  credentials: "include",
+                  mode: "cors",
+                  body: JSON.stringify({
+                    adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+                    creatorName: courseData.courseCreator,
+                    courseName: courseData.courseName,
+                  }),
+                },
+              );
+
+              // Notify course creator
+              await fetch(
+                "https://attensys-1a184d8bebe7.herokuapp.com/api/course-creation-notification",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Origin: window.location.origin,
+                  },
+                  credentials: "include",
+                  mode: "cors",
+                  body: JSON.stringify({
+                    email: currentUser.email,
+                    username: courseData.courseCreator,
+                    courseName: courseData.courseName,
+                  }),
+                },
+              );
+            } catch (notificationError) {
+              console.warn("Error sending notifications:", notificationError);
+              // Don't fail the course creation if notifications fail
+            }
+
             toast.success("Course Creation successful!", {
               position: "top-right",
               autoClose: 5000,

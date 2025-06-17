@@ -45,6 +45,7 @@ const Adminpanel = (props: any) => {
   const [videoUrls, setVideoUrls] = useState<{ [key: string]: string }>({});
   const [account, setAccount] = useState<any>();
   const [approving, setApproving] = useState(false);
+  const [disapproving, setDispproving] = useState(false);
 
   // Sort courses: non-approved first, then unsuspended first
   const sortedCourses = [...props.courseData]
@@ -182,7 +183,12 @@ const Adminpanel = (props: any) => {
   }, [props.courseData]);
 
   // Approve/disapprove handlers (to be implemented)
-  const handleApprove = async (course: any) => {
+  const handleApprove = async (
+    course: any,
+    email_creator: string,
+    courseName_: string,
+    courseCreator_: string,
+  ) => {
     if (!account || !account.address) {
       toast.error("Wallet/account not loaded. Please wait or re-login.", {
         /* ... */
@@ -197,7 +203,6 @@ const Adminpanel = (props: any) => {
       attensysCourseAddress,
       account,
     );
-    // console.log("courseContract:", course.course_identifier);
 
     try {
       const approve_calldata = await courseContract.populate(
@@ -235,9 +240,32 @@ const Adminpanel = (props: any) => {
           (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
         (tx as any)?.execution_status === "SUCCEEDED"
       ) {
-        setApproving(false);
+        // Send approval notification
+        try {
+          await fetch(
+            "https://attensys-1a184d8bebe7.herokuapp.com/api/course-approval-notification",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: email_creator,
+                username: courseCreator_,
+                courseName: courseName_,
+              }),
+            },
+          );
+        } catch (notificationError) {
+          console.warn(
+            "Error sending approval notification:",
+            notificationError,
+          );
+          // Don't fail the approval process if notification fails
+        }
 
-        toast.success("approval successful", {
+        setApproving(false);
+        toast.success("Course approved successfully", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -251,7 +279,7 @@ const Adminpanel = (props: any) => {
         return;
       } else {
         setApproving(false);
-        toast.error("approval failed", {
+        toast.error("Course approval failed", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -267,7 +295,7 @@ const Adminpanel = (props: any) => {
     } catch (err) {
       setApproving(false);
       console.log("Error populating calldata (gasless):", err);
-      toast.error("approval failed", {
+      toast.error("Course approval failed", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -279,9 +307,13 @@ const Adminpanel = (props: any) => {
         transition: Bounce,
       });
     }
-    // alert(`Approve course ${course.course_identifier}`);
   };
-  const handleDisapprove = async (course: any) => {
+  const handleDisapprove = async (
+    course: any,
+    email_creator: string,
+    courseName_: string,
+    courseCreator_: string,
+  ) => {
     if (!account || !account.address) {
       toast.error("Wallet/account not loaded. Please wait or re-login.", {
         /* ... */
@@ -289,14 +321,13 @@ const Adminpanel = (props: any) => {
       console.log("account:", account);
       return;
     }
-    setApproving(true);
+    setDispproving(true);
     // TODO: Call contract or API to approve
     const courseContract = new Contract(
       attensysCourseAbi,
       attensysCourseAddress,
       account,
     );
-    // console.log("courseContract:", course.course_identifier);
 
     try {
       const approve_calldata = await courseContract.populate(
@@ -334,9 +365,34 @@ const Adminpanel = (props: any) => {
           (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
         (tx as any)?.execution_status === "SUCCEEDED"
       ) {
-        setApproving(false);
+        // Send disapproval notification
+        try {
+          await fetch(
+            "https://attensys-1a184d8bebe7.herokuapp.com/api/course-disapproval-notification",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: email_creator,
+                username: courseCreator_,
+                courseName: courseName_,
+                reason:
+                  "Course content does not meet our quality standards. Please review and make necessary improvements.",
+              }),
+            },
+          );
+        } catch (notificationError) {
+          console.warn(
+            "Error sending disapproval notification:",
+            notificationError,
+          );
+          // Don't fail the disapproval process if notification fails
+        }
 
-        toast.success("approval successful", {
+        setDispproving(false);
+        toast.success("Course disapproved successfully", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -349,8 +405,8 @@ const Adminpanel = (props: any) => {
         });
         return;
       } else {
-        setApproving(false);
-        toast.error("approval failed", {
+        setDispproving(false);
+        toast.error("Course disapproval failed", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -364,9 +420,9 @@ const Adminpanel = (props: any) => {
         return;
       }
     } catch (err) {
-      setApproving(false);
+      setDispproving(false);
       console.log("Error populating calldata (gasless):", err);
-      toast.error("approval failed", {
+      toast.error("Course disapproval failed", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -378,7 +434,6 @@ const Adminpanel = (props: any) => {
         transition: Bounce,
       });
     }
-    alert(`Disapprove course ${course.course_identifier}`);
   };
 
   useEffect(() => {
@@ -647,7 +702,14 @@ const Adminpanel = (props: any) => {
                     }}
                   >
                     <button
-                      onClick={() => handleApprove(course)}
+                      onClick={() =>
+                        handleApprove(
+                          course,
+                          cid.data.creatorEmail,
+                          cid.data.courseName,
+                          cid.data.courseCreator,
+                        )
+                      }
                       style={{
                         background: "#28a745",
                         color: "#fff",
@@ -670,7 +732,14 @@ const Adminpanel = (props: any) => {
                       )}
                     </button>
                     <button
-                      onClick={() => handleDisapprove(course)}
+                      onClick={() =>
+                        handleDisapprove(
+                          course,
+                          cid.data.creatorEmail,
+                          cid.data.courseName,
+                          cid.data.courseCreator,
+                        )
+                      }
                       style={{
                         background: "#dc3545",
                         color: "#fff",
@@ -682,7 +751,15 @@ const Adminpanel = (props: any) => {
                         fontSize: 16,
                       }}
                     >
-                      Disapprove
+                      {disapproving ? (
+                        <MoonLoader
+                          color="#000000"
+                          size={16}
+                          className="text-white"
+                        />
+                      ) : (
+                        "Disapprove"
+                      )}
                     </button>
                   </div>
                 </div>

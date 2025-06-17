@@ -78,7 +78,10 @@ export const AccountHandler = async (
   progressCallback?.("Initializing user account...");
   const { transaction_hash: transferTxHash } =
     await account0.execute(transferCall);
-  await provider.waitForTransaction(transferTxHash);
+  await provider.waitForTransaction(transferTxHash, {
+    retryInterval: 2000,
+    successStates: ["ACCEPTED_ON_L2"],
+  });
 
   const balanceofnewaccountTransfer =
     await erc20Contract.balance_of(AXcontractAddress);
@@ -102,7 +105,10 @@ export const AccountHandler = async (
   progressCallback?.("Almost there...");
   const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } =
     await accountAX.deployAccount(deployAccountPayload, { version: 3 });
-  await provider.waitForTransaction(AXdAth);
+  await provider.waitForTransaction(AXdAth, {
+    retryInterval: 2000,
+    successStates: ["ACCEPTED_ON_L2"],
+  });
   progressCallback?.("Account created!");
   return {
     privateKeyAX,

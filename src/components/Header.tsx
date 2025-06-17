@@ -102,6 +102,10 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   const firstName = useFirebaseFirstName();
+  const truncatedFirstName =
+    firstName && firstName.length > 8
+      ? firstName.slice(0, 10) + "..."
+      : firstName;
 
   const handleComingSoonClick = (e: any) => {
     e.preventDefault(); // Prevent default link behavior
@@ -426,7 +430,7 @@ const Header = () => {
                   <div className="absolute inset-y-0 right-0 items-center hidden md:hidden lg:flex sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                     {firstName && (
                       <span className="mr-6 text-gray-700 font-light italic text-sm">
-                        Welcome, {firstName}
+                        <span>Welcome, {truncatedFirstName}</span>
                       </span>
                     )}
                     <Userlogin />

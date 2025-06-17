@@ -14,6 +14,8 @@ module.exports = withMT({
     extend: {
       animation: {
         breathing: "breathing 3s ease-in-out infinite",
+        "spin-slow": "spin 2s linear infinite",
+        "spin-fast": "spin 0.5s linear infinite",
       },
       keyframes: {
         breathing: {
@@ -49,9 +51,18 @@ module.exports = withMT({
           "linear-gradient(180deg, rgba(155, 81, 224, 0.32) 0%, rgba(74, 144, 226, 0.32) 100%)",
         "bootcreate-gradient":
           "linear-gradient(90deg, #4A90E2 0%, #9B51E0 100%)",
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-conic":
+          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       }),
       boxShadow: {
         "custom-blue": "0px 4px 100px 0px rgba(74, 144, 226, 0.5)",
+        "custom-1": "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        "custom-2": "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        "custom-3": "0px 4px 4px rgba(0, 0, 0, 0.25)",
+        1: "1px",
+        2: "2px",
+        3: "3px",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -59,12 +70,11 @@ module.exports = withMT({
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {},
-      animation: {
-        "spin-slow": "spin 2s linear infinite",
-        "spin-fast": "spin 0.5s linear infinite",
-      },
       borderWidth: {
         3: "3px",
+      },
+      fontFamily: {
+        sans: ["Space Grotesk", "sans-serif"],
       },
     },
   },

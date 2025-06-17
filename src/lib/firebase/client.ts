@@ -16,6 +16,10 @@ import {
   signOut,
 } from "firebase/auth";
 import { createUserProfile, getUserProfile } from "../userutils";
+import { AccountHandler } from "@/helpers/accounthandler";
+import { Account } from "starknet";
+import { encryptPrivateKey, decryptPrivateKey } from "@/helpers/encrypt";
+import { provider } from "@/constants";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -30,13 +34,17 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Initialize Google provider
+// Initialize Google provider with custom configuration
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  prompt: "select_account",
+});
 
 // Initialize anonymous auth immediately
 // signInAnonymously(auth).catch((error) => {
 //   console.error("Anonymous sign-in failed:", error);
 // });
+
 // Function to handle Google Sign-In
 const signInWithGoogle = async (
   onAccountProgress?: (status: string) => void,
@@ -57,6 +65,34 @@ const signInWithGoogle = async (
       },
       onAccountProgress,
     );
+
+    // Send login notification
+    try {
+      const response = await fetch(
+        "https://attensys-1a184d8bebe7.herokuapp.com/api/login-notification",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Origin: window.location.origin,
+          },
+          credentials: "include",
+          mode: "cors",
+          body: JSON.stringify({
+            email: user.email,
+            username: user.displayName || user.email,
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.warn("Login notification could not be sent:", errorText);
+      }
+    } catch (notificationError) {
+      console.warn("Error sending login notification:", notificationError);
+    }
 
     return user;
   } catch (error) {
@@ -180,17 +216,147 @@ const signInWithEmail = async (email: string, password: string) => {
       };
     }
 
-    // Update last login time in Firestore
-    const userRef = doc(db, "users", user.uid);
-    await setDoc(
-      userRef,
-      {
-        lastLogin: serverTimestamp(),
-      },
-      { merge: true },
-    );
+    // Get user profile to check if they have a Starknet account
+    const userProfile = await getUserProfile(user.uid);
+    const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
 
-    return user;
+    if (!encryptionSecret) {
+      throw new Error("Encryption secret is not set");
+    }
+
+    // Check if user needs a Starknet account
+    const needsStarknetAccount =
+      !userProfile ||
+      !userProfile.starknetPrivateKey ||
+      !userProfile.starknetAddress;
+
+    if (needsStarknetAccount) {
+      try {
+        // Create Starknet account using AccountHandler
+        const { privateKeyAX, AXcontractFinalAddress } = await AccountHandler();
+        const encryptedPrivateKey = encryptPrivateKey(
+          privateKeyAX,
+          encryptionSecret,
+        );
+
+        // Update user profile with Starknet account details
+        const userRef = doc(db, "users", user.uid);
+        await setDoc(
+          userRef,
+          {
+            starknetPrivateKey: encryptedPrivateKey,
+            starknetAddress: AXcontractFinalAddress,
+            lastLogin: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true },
+        );
+
+        // Create new account instance with the generated credentials
+        const newAccount = new Account(
+          provider,
+          AXcontractFinalAddress,
+          privateKeyAX,
+        );
+
+        // Send login notification
+        try {
+          const response = await fetch(
+            "https://attensys-1a184d8bebe7.herokuapp.com/api/login-notification",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+                Origin: window.location.origin,
+              },
+              credentials: "include",
+              mode: "cors",
+              body: JSON.stringify({
+                email: user.email,
+                username: user.displayName || user.email,
+              }),
+            },
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.warn("Login notification could not be sent:", errorText);
+          }
+        } catch (notificationError) {
+          console.warn("Error sending login notification:", notificationError);
+        }
+
+        return {
+          ...user,
+          account: newAccount,
+          starknetAddress: AXcontractFinalAddress,
+        };
+      } catch (err) {
+        console.error("Error creating Starknet account:", err);
+        throw err;
+      }
+    } else {
+      // User already has a Starknet account, decrypt and create account instance
+      const decryptedPrivateKey = decryptPrivateKey(
+        userProfile.starknetPrivateKey,
+        encryptionSecret,
+      );
+
+      if (!decryptedPrivateKey) {
+        throw new Error("Failed to decrypt private key");
+      }
+
+      const existingAccount = new Account(
+        provider,
+        userProfile.starknetAddress,
+        decryptedPrivateKey,
+      );
+
+      // Update last login time
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(
+        userRef,
+        {
+          lastLogin: serverTimestamp(),
+        },
+        { merge: true },
+      );
+
+      // Send login notification
+      try {
+        const response = await fetch(
+          "https://attensys-1a184d8bebe7.herokuapp.com/api/login-notification",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+              Origin: window.location.origin,
+            },
+            credentials: "include",
+            mode: "cors",
+            body: JSON.stringify({
+              email: user.email,
+              username: user.displayName || user.email,
+            }),
+          },
+        );
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.warn("Login notification could not be sent:", errorText);
+        }
+      } catch (notificationError) {
+        console.warn("Error sending login notification:", notificationError);
+      }
+
+      return {
+        ...user,
+        account: existingAccount,
+        starknetAddress: userProfile.starknetAddress,
+      };
+    }
   } catch (error) {
     console.error("Email Sign In Error:", error);
     throw error;

@@ -78,6 +78,38 @@ export const createUserProfile = async (
 
   try {
     await setDoc(userRef, userData, { merge: true });
+
+    // Send welcome email only for new users
+    if (!userSnapshot.exists()) {
+      try {
+        console.log("Attempting to send welcome email to:", user.email);
+        const response = await fetch(
+          "https://attensys-1a184d8bebe7.herokuapp.com/api/welcome-email",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({
+              email: user.email,
+              username: user.displayName || user.email,
+            }),
+          },
+        );
+
+        const responseData = await response.text();
+        console.log("Welcome email response:", response.status, responseData);
+
+        if (!response.ok) {
+          console.warn("Welcome email could not be sent:", responseData);
+        }
+      } catch (emailError) {
+        // Log the error but don't fail the profile creation process
+        console.warn("Error sending welcome email:", emailError);
+      }
+    }
+
     return userData;
   } catch (error) {
     onAccountProgress?.("Error saving user profile");
