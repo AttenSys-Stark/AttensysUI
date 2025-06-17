@@ -15,7 +15,7 @@ import { IoIosRemoveCircleOutline } from "react-icons/io";
 import { BsTrash } from "react-icons/bs";
 import { BsPencil } from "react-icons/bs";
 import { Dialog, DialogBackdrop, DialogPanel, Button } from "@headlessui/react";
-import { Contract } from "starknet";
+import { Account, Contract } from "starknet";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
 import { provider } from "@/constants";
@@ -26,6 +26,12 @@ import EditCoursePanel from "./EditCoursePanel";
 import { pinata } from "../../../utils/config";
 import { getAverageRatingForVideo } from "@/lib/services/reviewService";
 import { RatingDisplay } from "../RatingDisplay";
+import { onAuthStateChanged } from "firebase/auth";
+import { getUserProfile } from "@/lib/userutils";
+import { auth } from "@/lib/firebase/client";
+import { decryptPrivateKey } from "@/helpers/encrypt";
+import { executeCalls } from "@avnu/gasless-sdk";
+import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 
 interface ItemProps {
   courses: Course[];
@@ -70,7 +76,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [localCourseData, setLocalCourseData] = useState(courseData);
-  const { account } = useAccount();
+  const [account, setAccount] = useState<any>();
 
   // console.log("courseData:", courseData);
   // console.log("item.courses:", item.courses);
@@ -115,6 +121,44 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     };
     fetchAllRatings();
   }, [courseData, currentPage]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.uid) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            if (!decryptedPrivateKey) {
+              console.error("Failed to decrypt private key");
+              setAccount(undefined);
+              return;
+            }
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            setAccount(userAccount);
+          } else {
+            console.log("No user profile found in Firestore.");
+            setAccount(undefined);
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          setAccount(undefined);
+        }
+      } else {
+        console.log("No authenticated user found.");
+        setAccount(undefined);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const generatePageNumbers = () => {
     const pageNumbers = [];
@@ -164,6 +208,10 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     try {
       setIsDeleting(true);
       // // Find the matching course from item.c
+      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+      if (!avnuApiKey) {
+        throw new Error("Missing AVNU API key in environment variables");
+      }
 
       const courseContract = new Contract(
         attensysCourseAbi,
@@ -174,19 +222,47 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
       const myCall = courseContract.populate("remove_course", [
         Number(courseToDelete),
       ]);
-      const res = await courseContract.remove_course(myCall.calldata);
-      await provider.waitForTransaction(res.transaction_hash);
 
-      setDeleteSuccess(true);
-      await refreshCourses();
+      const callCourseContract = await executeCalls(
+        account,
+        [
+          {
+            contractAddress: attensysCourseAddress,
+            entrypoint: "remove_course",
+            calldata: myCall.calldata,
+          },
+        ],
+        {
+          gasTokenAddress: STRK_ADDRESS,
+        },
+        {
+          apiKey: avnuApiKey,
+          baseUrl: "https://sepolia.api.avnu.fi",
+        },
+      );
 
-      // Close modal after 2 seconds
-      setTimeout(() => {
-        setIsDeleteModalOpen(false);
-        setCourseToDelete(null);
-        setDeleteSuccess(false);
-        setIsDeleting(false);
-      }, 2000);
+      let tx = await provider.waitForTransaction(
+        callCourseContract.transactionHash,
+      );
+
+      // const res = await courseContract.remove_course(myCall.calldata);
+      // await provider.waitForTransaction(res.transaction_hash);
+      if (
+        ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+          (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+        (tx as any)?.execution_status === "SUCCEEDED"
+      ) {
+        setDeleteSuccess(true);
+        await refreshCourses();
+
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          setIsDeleteModalOpen(false);
+          setCourseToDelete(null);
+          setDeleteSuccess(false);
+          setIsDeleting(false);
+        }, 2000);
+      }
     } catch (error) {
       console.error("Error deleting course:", error);
       setIsDeleting(false);

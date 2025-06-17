@@ -371,13 +371,44 @@ const LecturePage = (props: any) => {
           (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
         (tx as any)?.execution_status === "SUCCEEDED"
       ) {
+        // Send purchase notification
+        try {
+          const user = auth.currentUser;
+          if (user) {
+            const userProfile = await getUserProfile(user.uid);
+            if (userProfile) {
+              await fetch(
+                "https://attensys-1a184d8bebe7.herokuapp.com/api/course-purchase-notification",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    email: user.email,
+                    username: userProfile.displayName,
+                    courseName: props?.data?.courseName,
+                    price: coursePrice,
+                  }),
+                },
+              );
+            }
+          }
+        } catch (notificationError) {
+          console.warn(
+            "Error sending purchase notification:",
+            notificationError,
+          );
+          // Don't fail the purchase process if notification fails
+        }
+
         await new Promise((resolve) => setTimeout(resolve, 3000));
         setIsTakingCourse(true);
         setShowOverlay(false);
         setIsUploading(false);
         toast.success(
           <div>
-            Purchase sucessful!
+            Purchase successful!
             <br />
             Transaction hash:{" "}
             <a
@@ -408,7 +439,7 @@ const LecturePage = (props: any) => {
         setIsTakingCourse(false);
         setShowOverlay(true);
         setIsUploading(false);
-        toast.error("purchase failed", {
+        toast.error("Purchase failed", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -420,9 +451,9 @@ const LecturePage = (props: any) => {
           transition: Bounce,
         });
       }
-      // }
     } catch (error) {
-      toast.error("purchase failed, reload & try again", {
+      setIsUploading(false);
+      toast.error("Purchase failed, reload & try again", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -434,8 +465,6 @@ const LecturePage = (props: any) => {
         transition: Bounce,
       });
     }
-
-    // localStorage.setItem(`course_${courseId}_taken`, "true");
   };
 
   const handleFinishCourseClaimCertfificate = async () => {
