@@ -115,14 +115,10 @@ const EventFeed = () => {
 
     console.log("All processed events:", allEvents);
 
-    // Sort by timestamp descending (newest first)
-    allEvents.sort((a, b) => {
-      const dateA = new Date(a.timestamp).getTime();
-      const dateB = new Date(b.timestamp).getTime();
-      return dateB - dateA;
-    });
+    // Sort by blockNumber descending (newest first)
+    allEvents.sort((a, b) => b.blockNumber - a.blockNumber);
 
-    console.log("Sorted events:", allEvents);
+    console.log("Sorted events by block number:", allEvents);
     setEvents(allEvents);
   }, [queries.map((q) => q.data).join(",")]);
 
