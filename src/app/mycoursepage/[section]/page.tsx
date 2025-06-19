@@ -14,6 +14,10 @@ import { MoonLoader } from "react-spinners";
 import { FileObject } from "pinata";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useRouter } from "next/navigation";
+import { auth } from "@/lib/firebase/client";
+import { onAuthStateChanged } from "firebase/auth";
+import { Loader2 } from "lucide-react";
 
 // file setup
 const emptyData: FileObject = {
@@ -62,6 +66,9 @@ const Index = () => {
   const params = useParams();
   const section = params.section;
   const [loading, setLoading] = useState(true);
+  const [isloading, setisLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
 
   const handlePageClick = () => {
     setbootcampdropstat(false);
@@ -76,6 +83,50 @@ const Index = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    // Use a local variable to track the mounted state
+    let isMounted = true;
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!isMounted) return;
+
+      if (!user) {
+        router.push("/");
+      } else {
+        setIsAuthenticated(true);
+        setisLoading(false);
+      }
+      if (user) {
+        // console.log("user Data", user);
+      }
+    });
+
+    // Add a timeout to ensure we don't show loader indefinitely
+    const timeout = setTimeout(() => {
+      if (isMounted && loading) {
+        setLoading(false);
+      }
+    }, 2000); // 2 seconds timeout
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeout);
+      unsubscribe();
+    };
+  }, [router]);
+
+  if (isloading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // or a redirect message
+  }
 
   return (
     <>

@@ -5,18 +5,24 @@ import Image from "next/image";
 import { provider } from "@/constants";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
-import { Contract } from "starknet";
+import { cairo, Contract, Uint256 } from "starknet";
 import { useAccount } from "@starknet-react/core";
 import { Erc20Abi } from "@/deployments/erc20abi";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 import { Bounce, ToastContainer, toast } from "react-toastify";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { executeCalls } from "@avnu/gasless-sdk";
 
-const BalanceModal = () => {
+interface BalanceModalProps {
+  account: any;
+  address: string;
+}
+
+const BalanceModal = ({ account, address }: BalanceModalProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [step, setStep] = useState(1); // 1: Input, 2: Confirm, 3: Processing, 4: Success
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [amount, setAmount] = useState<number | null>(0);
+  const [amount, setAmount] = useState<number>(0);
   const [error, setError] = useState("");
   const [userClaimables, setUserClaimables] = useState(0);
   const [userClaimablesStrk, setuserClaimablesStrk] = useState(0);
@@ -25,7 +31,7 @@ const BalanceModal = () => {
   const [claimingstatus, setclaimingstatus] = useState(false);
   const [usdDisplay, setUsdDisplay] = useState(0);
   const [soldCourses, setsoldCourses] = useState(0);
-  const { account, address } = useAccount();
+  // const { account, address } = useAccount();
 
   const courseContract = new Contract(
     attensysCourseAbi,
@@ -55,17 +61,37 @@ const BalanceModal = () => {
       const claim_calldata = await courseContract.populate("creator_withdraw", [
         userClaimablesStrk,
       ]);
-
-      const callCourseContract = await account?.execute([
+      // Prepare the call for AVNU Gasless SDK
+      const calls = [
         {
           contractAddress: attensysCourseAddress,
           entrypoint: "creator_withdraw",
           calldata: claim_calldata.calldata,
         },
-      ]);
-      console.log("call returns", callCourseContract);
-      //@ts-ignore
-      if (callCourseContract?.code == "SUCCESS") {
+      ];
+      // Use AVNU Gasless SDK
+      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+      if (!avnuApiKey) {
+        throw new Error("Missing AVNU API key in environment variables");
+      }
+      const response = await executeCalls(
+        account,
+        calls,
+        {
+          gasTokenAddress: STRK_ADDRESS,
+        },
+        {
+          apiKey: avnuApiKey,
+          baseUrl: "https://sepolia.api.avnu.fi",
+        },
+      );
+      // Wait for transaction confirmation
+      let tx = await provider.waitForTransaction(response.transactionHash);
+      if (
+        ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+          (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+        (tx as any)?.execution_status === "SUCCEEDED"
+      ) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         setclaimingstatus(false);
         toast.success("Claim successful", {
@@ -81,7 +107,7 @@ const BalanceModal = () => {
         });
         return;
       } else {
-        setclaimingstatus(true);
+        setclaimingstatus(false);
         toast.error("claim failed", {
           position: "top-right",
           autoClose: 5000,
@@ -96,7 +122,8 @@ const BalanceModal = () => {
         return;
       }
     } catch (err) {
-      console.log("Error populating calldata:", err);
+      console.log("Error populating calldata (gasless):", err);
+      setclaimingstatus(false);
       toast.error("claim failed", {
         position: "top-right",
         autoClose: 5000,
@@ -115,7 +142,7 @@ const BalanceModal = () => {
     setIsModalOpen(true);
     setStep(1);
     setRecipientAddress("");
-    setAmount(null);
+    setAmount(0);
     setError("");
   };
 
@@ -136,30 +163,59 @@ const BalanceModal = () => {
     setStep(3);
     try {
       const erc20Contract = new Contract(Erc20Abi, STRK_ADDRESS, account);
-      const transfer_calldata = await erc20Contract.populate("transfer", [
-        recipientAddress,
-        (amount ?? 0) * 10 ** 18,
-      ]);
-
-      const callErc20Contract = await account?.execute([
+      const toTransferTk: Uint256 = cairo.uint256(amount * 10 ** 18);
+      // Prepare the call
+      const calls = [
         {
           contractAddress: STRK_ADDRESS,
           entrypoint: "transfer",
-          calldata: transfer_calldata.calldata,
+          calldata: [recipientAddress, toTransferTk.low, toTransferTk.high],
         },
-      ]);
-      //@ts-ignore
-      if (callErc20Contract?.code == "SUCCESS") {
+      ];
+      // Use AVNU Gasless SDK
+      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+      if (!avnuApiKey) {
+        throw new Error("Missing AVNU API key in environment variables");
+      }
+      const response = await executeCalls(
+        account,
+        calls,
+        {
+          gasTokenAddress: STRK_ADDRESS,
+        },
+        {
+          apiKey: avnuApiKey,
+          baseUrl: "https://sepolia.api.avnu.fi",
+        },
+      );
+      // Wait for transaction confirmation
+      let tx = await provider.waitForTransaction(response.transactionHash);
+      if (
+        ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+          (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+        (tx as any)?.execution_status === "SUCCEEDED"
+      ) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
         setStep(4);
       } else {
         setError("Withdrawal failed. Please try again.");
         setStep(1);
       }
-    } catch (err) {
-      console.log("error trasnfering:", err);
+    } catch (err: any) {
+      console.log("error (gasless) transferring:", err);
       setError("Withdrawal failed. Please try again.");
       setStep(1);
+      toast.error("withdrawal failed", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 

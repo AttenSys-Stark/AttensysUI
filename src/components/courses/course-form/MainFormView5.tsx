@@ -19,12 +19,19 @@ import {
 import { lectures } from "@/constants/data";
 import { attensysCourseAddress } from "@/deployments/contracts";
 import { attensysCourseAbi } from "@/deployments/abi";
-import { Contract } from "starknet";
+import { Account, Contract } from "starknet";
 import { useRouter } from "next/navigation";
 import { handleCreateCourse } from "@/utils/helpers";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { toast, Bounce, ToastContainer } from "react-toastify";
 import { useAccount } from "@starknet-react/core";
+import { STRK_ADDRESS } from "@/deployments/erc20Contract";
+import { executeCalls } from "@avnu/gasless-sdk";
+import { provider } from "@/constants";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase/client";
+import { getUserProfile } from "@/lib/userutils";
+import { decryptPrivateKey } from "@/helpers/encrypt";
 
 interface ChildComponentProps {
   courseData: any;
@@ -83,7 +90,9 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showRetry, setShowRetry] = useState(false);
-  const { account, address } = useAccount();
+  // const { account, address } = useAccount();
+  const [account, setAccount] = useState<any>();
+  const [address, setAddress] = useState<string>("");
   const [txnHash, setTxnHash] = useState<string>();
 
   const router = useRouter();
@@ -116,10 +125,17 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
   }
 
   const handleCourseUpload = async (e: any) => {
+    // console.log("account", account);
     setIsUploading(true);
     setIsSaving(true);
 
     try {
+      // Get current user's email
+      const currentUser = auth.currentUser;
+      if (!currentUser?.email) {
+        throw new Error("No user email found");
+      }
+
       const blob = dataURLtoBlob(courseData.courseImage.url);
 
       const realFile = new File([blob], courseData.courseImage.name, {
@@ -145,6 +161,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
         coursePricing: courseData.coursePricing,
         promoAndDiscount: courseData.promoAndDiscount,
         publishWithCertificate: courseData.publishWithCertificate,
+        creatorEmail: currentUser.email,
       });
       console.log("dataUpload", dataUpload);
 
@@ -157,7 +174,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
             account,
           );
 
-          const create_course_calldata = courseContract.populate(
+          const create_course_calldata = await courseContract.populate(
             "create_course",
             [
               address,
@@ -170,18 +187,85 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
             ],
           );
 
-          const callCourseContract = await account?.execute([
+          const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+          if (!avnuApiKey) {
+            throw new Error("Missing AVNU API key in environment variables");
+          }
+          const callCourseContract = await executeCalls(
+            account,
+            [
+              {
+                contractAddress: attensysCourseAddress,
+                entrypoint: "create_course",
+                calldata: create_course_calldata.calldata,
+              },
+            ],
             {
-              contractAddress: attensysCourseAddress,
-              entrypoint: "create_course",
-              calldata: create_course_calldata.calldata,
+              gasTokenAddress: STRK_ADDRESS,
             },
-          ]);
-          setTxnHash(callCourseContract?.transaction_hash);
-          console.log("hash", callCourseContract?.transaction_hash);
+            {
+              apiKey: avnuApiKey,
+              baseUrl: "https://sepolia.api.avnu.fi",
+            },
+          );
+          let tx = await provider.waitForTransaction(
+            callCourseContract.transactionHash,
+          );
+
+          setTxnHash(callCourseContract?.transactionHash);
+          console.log("hash", callCourseContract?.transactionHash);
           //@ts-ignore
-          if (callCourseContract?.code == "SUCCESS") {
-            // await new Promise((resolve) => setTimeout(resolve, 3000));
+          if (
+            ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+              (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+            (tx as any)?.execution_status === "SUCCEEDED"
+          ) {
+            // Send notifications
+            try {
+              // Notify admin about new course
+              await fetch(
+                "https://attensys-1a184d8bebe7.herokuapp.com/api/notify-admin-new-course",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Origin: window.location.origin,
+                  },
+                  credentials: "include",
+                  mode: "cors",
+                  body: JSON.stringify({
+                    adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+                    creatorName: courseData.courseCreator,
+                    courseName: courseData.courseName,
+                  }),
+                },
+              );
+
+              // Notify course creator
+              await fetch(
+                "https://attensys-1a184d8bebe7.herokuapp.com/api/course-creation-notification",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Origin: window.location.origin,
+                  },
+                  credentials: "include",
+                  mode: "cors",
+                  body: JSON.stringify({
+                    email: currentUser.email,
+                    username: courseData.courseCreator,
+                    courseName: courseData.courseName,
+                  }),
+                },
+              );
+            } catch (notificationError) {
+              console.warn("Error sending notifications:", notificationError);
+              // Don't fail the course creation if notifications fail
+            }
+
             toast.success("Course Creation successful!", {
               position: "top-right",
               autoClose: 5000,
@@ -193,16 +277,20 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
               theme: "light",
               transition: Bounce,
             });
+            router.push(`/mycoursepage/${address}/?id=created`);
+          } else {
+            toast.error("Course Creation failed, Try again", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+              transition: Bounce,
+            });
           }
-          router.push(`/mycoursepage/${address}/?id=created`);
-          // // Create a deep copy of the course data
-          // const courseDataCopy = JSON.parse(JSON.stringify(courseData));
-
-          // // Store the copy in localStorage
-          // localStorage.setItem("courseData", JSON.stringify(courseDataCopy));
-
-          // Route to landing page first
-          // handleCreateCourse(e, "course-landing-page", router);
         } catch (error: any) {
           toast.error("Course Creation failed, Try again", {
             position: "top-right",
@@ -237,6 +325,45 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
   }, [courseData.courseImage]);
 
   useEffect(() => {}, [receiptData]);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.uid) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            if (!decryptedPrivateKey) {
+              console.error("Failed to decrypt private key");
+              setAccount(undefined);
+              return;
+            }
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            setAccount(userAccount);
+            setAddress(profile.starknetAddress);
+          } else {
+            console.log("No user profile found in Firestore.");
+            setAccount(undefined);
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          setAccount(undefined);
+        }
+      } else {
+        console.log("No authenticated user found.");
+        setAccount(undefined);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="lg:flex">

@@ -12,7 +12,12 @@ import ControllerConnector from "@cartridge/connector/controller";
 import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "./ui/LoadingSpinner";
-
+import { LoginForm } from "./login-form";
+import { SignupForm } from "./signup-form";
+import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
+import { AccountHandler } from "@/helpers/accounthandler";
+import { Button } from "@headlessui/react";
 const HomePage = () => {
   const [grid, setGrid] = useState({
     cols: 0,
@@ -30,13 +35,17 @@ const HomePage = () => {
   const [username, setUsername] = useState<string>();
   const [iswalletconnecting, setiswalletconnecting] = useState(false);
   const router = useRouter();
+  const [loginorsignupstat, setLoginorsignupstat] = useAtom(loginorsignup);
+  const [mobileView, setMobileView] = useState<"welcome" | "login" | "signup">(
+    "welcome",
+  );
 
   useEffect(() => {
-    if (!address) return;
-    controller?.username()?.then((n) => setUsername(n));
-    if (address) {
-      router.push("/Home");
-    }
+    // if (!address) return;
+    // controller?.username()?.then((n) => setUsername(n));
+    // if (address) {
+    //   router.push("/Home");
+    // }
   }, [address, controller]);
 
   const handleConnect = async () => {
@@ -403,30 +412,80 @@ const HomePage = () => {
         </div>
       </div>
 
-      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center text-white px-4">
-        <h1 className="font-extrabold text-2xl md:text-[30px] lg:mb-2">
-          Atten<span className="text-[#9B51E0]">sys</span>
-        </h1>
-        <p className="text-3xl md:text-[48px] font-bold mb-2 lg:mb-4 lg:leading-[60px]">
-          {/* Track, Stream, <br className="hidden sm:block" />
-          and Secure Your Certifications */}
-          Buy Courses to Learn, Sell <br /> Courses to Earn
-        </p>
-        <p className="text-sm md:text-[17px] font-light mb-4 max-w-3xl opacity-90">
-          Simplifying certificate issuance for courses, course management,
-          STRK-powered course purchases, secure access, and learning.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4 sm:px-0">
-          <button
-            onClick={handleConnect}
-            className={`px-4 py-2 sm:px-6 sm:py-3 ${iswalletconnecting ? "bg-[#9B51E0]" : "bg-white"}  text-indigo-700 rounded-lg font-medium hover:bg-opacity-90 transition w-full sm:w-auto`}
-          >
-            {iswalletconnecting ? (
-              <LoadingSpinner variant="button" size="sm" colorVariant="white" />
-            ) : (
-              "Login/Signup"
-            )}
-          </button>
+      <div className="absolute inset-0 z-50 flex flex-col items-center justify-center text-white px-4">
+        {/* Desktop layout: side-by-side */}
+        <div className="hidden md:flex items-center justify-between w-full max-w-5xl">
+          <div className="text-left w-[50%]">
+            <h1 className="font-extrabold text-2xl md:text-[30px] lg:mb-2 text-center">
+              Atten<span className="text-[#9B51E0]">sys</span>
+            </h1>
+            <p className="text-3xl md:text-[48px] font-bold mb-2 lg:mb-4 lg:leading-[60px]">
+              Buy Courses to Learn, Sell Courses to Earn
+            </p>
+            <p className="text-sm md:text-[17px] font-light mb-4 max-w-3xl opacity-90">
+              Simplifying certificate issuance for courses, course management,
+              STRK-powered course purchases, secure access, and learning.
+            </p>
+          </div>
+          {loginorsignupstat ? <SignupForm /> : <LoginForm />}
+        </div>
+
+        {/* Mobile layout: stacked, flow-based */}
+        <div className="md:hidden w-full max-w-md">
+          {mobileView === "welcome" && (
+            <div className="flex flex-col items-center text-center">
+              <h1 className="font-extrabold text-2xl mb-2">
+                Atten<span className="text-[#9B51E0]">sys</span>
+              </h1>
+              <p className="text-2xl font-bold mb-2">
+                Buy Courses to Learn, Sell Courses to Earn
+              </p>
+              <p className="text-sm font-light mb-6 opacity-90">
+                Simplifying certificate issuance for courses, course management,
+                STRK-powered course purchases, secure access, and learning.
+              </p>
+              <div className="flex flex-col gap-3 w-full">
+                <button
+                  onClick={() => setMobileView("login")}
+                  className="w-full py-2 rounded-lg bg-white text-indigo-700 font-semibold text-lg shadow hover:bg-indigo-50 transition"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => setMobileView("signup")}
+                  className="w-full py-2 rounded-lg bg-[#9B51E0] text-white font-semibold text-lg shadow hover:bg-[#7E3AC2] transition"
+                >
+                  Signup
+                </button>
+              </div>
+            </div>
+          )}
+          {mobileView === "login" && (
+            <div className="relative">
+              <button
+                onClick={() => setMobileView("welcome")}
+                className="absolute left-0 top-0 text-[#9B51E0] font-bold text-lg mb-2"
+              >
+                ← Back
+              </button>
+              <div className="pt-8">
+                <LoginForm onSignupClick={() => setMobileView("signup")} />
+              </div>
+            </div>
+          )}
+          {mobileView === "signup" && (
+            <div className="relative">
+              <button
+                onClick={() => setMobileView("welcome")}
+                className="absolute left-0 top-0 text-[#9B51E0] font-bold text-lg mb-2"
+              >
+                ← Back
+              </button>
+              <div className="pt-8">
+                <SignupForm onLoginClick={() => setMobileView("login")} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

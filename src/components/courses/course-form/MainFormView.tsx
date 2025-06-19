@@ -20,6 +20,10 @@ import {
   courseInitState,
   connectorAtom,
 } from "@/state/connectedWalletStarknetkitNext";
+import { auth } from "@/lib/firebase/client";
+import { getUserProfile } from "@/lib/userutils";
+import { decryptPrivateKey } from "@/helpers/encrypt";
+import { Account } from "starknet";
 
 interface ChildComponentProps {
   courseData: any;
@@ -54,7 +58,9 @@ const MainFormView: React.FC<ChildComponentProps> = ({
   const [skillError, setSkillError] = useState("");
   const [levelError, setLevelError] = useState("");
   const [wallet, setWallet] = useAtom(walletStarknetkit);
-  const { account, address } = useAccount();
+  const [account, setAccount] = useState<any>();
+  const [address, setAddress] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
   const [controllerUsername, setControllerUsername] = useState<string>("");
@@ -62,30 +68,61 @@ const MainFormView: React.FC<ChildComponentProps> = ({
 
   useEffect(() => {
     let isMounted = true;
-    if (controller && typeof controller.username === "function") {
-      const usernamePromise = controller.username();
-      if (usernamePromise instanceof Promise) {
-        usernamePromise.then((n) => {
-          if (isMounted) setControllerUsername(n || "");
-          if (isMounted) {
-            setCourseData((prevData) => ({
-              ...prevData,
-              courseCreator: n || "",
-            }));
-          }
-        });
-      } else {
-        setControllerUsername(usernamePromise || "");
+    if (username) {
+      if (isMounted) setControllerUsername(username || "");
+      if (isMounted) {
         setCourseData((prevData) => ({
           ...prevData,
-          courseCreator: usernamePromise || "",
+          courseCreator: username || "",
         }));
       }
+    } else {
+      setControllerUsername(username || "");
+      setCourseData((prevData) => ({
+        ...prevData,
+        courseCreator: username || "",
+      }));
     }
     return () => {
       isMounted = false;
     };
-  }, [controller]);
+  }, [account, username]);
+
+  useEffect(() => {
+    const logStarknetCredentials = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user && user.uid) {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            console.log("starknetAddress:", profile.starknetAddress);
+            console.log("starknetPrivateKey:", decryptedPrivateKey);
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            console.log("userAccount:", userAccount);
+            setAccount(userAccount);
+            setAddress(profile.starknetAddress);
+            setUsername(profile.displayName);
+          } else {
+            console.log("No user profile found in Firestore.");
+          }
+        } else {
+          console.log("No authenticated user found.");
+        }
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+      }
+    };
+    logStarknetCredentials();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

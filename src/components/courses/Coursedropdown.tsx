@@ -6,12 +6,19 @@ import { courseQuestions } from "@/constants/data";
 import { useRouter } from "next/navigation";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useAccount } from "@starknet-react/core";
+import { getUserProfile } from "@/lib/userutils";
+import { auth } from "@/lib/firebase/client";
+import { decryptPrivateKey } from "@/helpers/encrypt";
+import { Account } from "starknet";
+import { provider } from "@/constants";
 
 const Coursedropdown = () => {
   const [status, setcourseStatus] = useAtom(coursestatusAtom);
   const router = useRouter();
   const [wallet] = useAtom(walletStarknetkit);
-  const { account, address } = useAccount();
+  const [account, setAccount] = useState<any>();
+  const [address, setAddress] = useState<string>("");
+  // const { account, address } = useAccount();
 
   const handleNavigation = (path: string) => {
     setcourseStatus(false);
@@ -28,6 +35,41 @@ const Coursedropdown = () => {
       setVisible(false);
     }
   }, [status]);
+
+  useEffect(() => {
+    const logStarknetCredentials = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user && user.uid) {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            // console.log("starknetAddress:", profile.starknetAddress);
+            // console.log("starknetPrivateKey:", decryptedPrivateKey);
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            // console.log("userAccount:", userAccount);
+            setAccount(userAccount);
+            setAddress(profile.starknetAddress);
+          } else {
+            console.log("No user profile found in Firestore.");
+          }
+        } else {
+          console.log("No authenticated user found.");
+        }
+      } catch (err) {
+        console.error("Error fetching user profile:", err);
+      }
+    };
+    logStarknetCredentials();
+  }, []); // Only on mount
 
   return (
     <>
@@ -72,6 +114,7 @@ const Coursedropdown = () => {
                   } else {
                     handleNavigation(`/mycoursepage/${address}`);
                   }
+                  // handleNavigation(`/mycoursepage/${address}`);
                 }}
                 className=" cursor-pointer"
               >

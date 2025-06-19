@@ -1,37 +1,40 @@
-import { auth } from "../firebase/client";
+import { authClient } from "../auth.client";
+import { auth, signInWithGoogle } from "../firebase/client";
 import {
   signInAnonymously,
   onAuthStateChanged,
   User,
   AuthError,
+  User as FirebaseUser,
 } from "firebase/auth";
+import { createUserProfile, getUserProfile } from "../userutils";
 
-export const signInUser = async (): Promise<User> => {
+interface IUser {
+  id: string;
+  email: string;
+  name: string;
+  image: string | null;
+  emailVerified: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+type AuthData =
+  | { user: IUser; token: string; redirect: false; url?: undefined }
+  | { url: string; redirect: true; user?: never };
+
+export const signInUser = async (
+  onAccountProgress?: (status: string) => void,
+): Promise<FirebaseUser | null> => {
   try {
-    // Check if already signed in
-    if (auth.currentUser) return auth.currentUser;
-
-    const userCredential = await signInAnonymously(auth);
-    return userCredential.user;
+    // Sign in with Google
+    const user = await signInWithGoogle(onAccountProgress);
+    return user;
   } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      "message" in error
-    ) {
-      console.error("Authentication error details:", {
-        code: (error as { code: string }).code,
-        message: (error as { message: string }).message,
-        fullError: error,
-      });
-    } else {
-      console.error("Unknown authentication error:", error);
-    }
+    console.error("Authentication error:", error);
     throw error;
   }
 };
-
 export const getCurrentUser = (): User | null => {
   return auth.currentUser;
 };

@@ -18,7 +18,7 @@ import { useEffect, useState, useRef } from "react";
 import { LuBadgeCheck } from "react-icons/lu";
 import ReactPlayer from "react-player/lazy";
 
-import { Contract } from "starknet";
+import { Account, Contract } from "starknet";
 import StarRating from "../bootcamp/StarRating";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { CardWithLink } from "./Cards";
@@ -42,6 +42,10 @@ import { Erc20Abi } from "@/deployments/erc20abi";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 import { ToastContainer, toast, Bounce } from "react-toastify";
 import { Dialog, DialogBackdrop, DialogPanel, Button } from "@headlessui/react";
+import { onAuthStateChanged } from "firebase/auth";
+import { getUserProfile } from "@/lib/userutils";
+import { decryptPrivateKey } from "@/helpers/encrypt";
+import { executeCalls } from "@avnu/gasless-sdk";
 
 interface CourseType {
   data: any;
@@ -51,6 +55,7 @@ interface CourseType {
   uri: Uri;
   course_ipfs_uri: string;
   is_suspended: boolean;
+  is_approved: boolean;
 }
 
 interface Uri {
@@ -86,7 +91,7 @@ const LecturePage = (props: any) => {
     getError,
     isLoading: isCIDFetchLoading,
   } = useFetchCID();
-  const { account, address } = useAccount();
+  // const { account, address } = useAccount();
   const explorer = useExplorer();
   const [txnHash, setTxnHash] = useState<string>();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -104,6 +109,8 @@ const LecturePage = (props: any) => {
   const [coursePrice, setCoursePrice] = useState<number>(0);
   const [paymentValue, setPaymentValue] = useState<number>(0);
   const [isConfirmModalOpen, setisConfirmModalOpen] = useState(false);
+  const [account, setAccount] = useState<any>();
+  const [address, setAddress] = useState<any>();
 
   const searchParams = useSearchParams();
   const ultimate_id = searchParams.get("id");
@@ -171,24 +178,25 @@ const LecturePage = (props: any) => {
           console.warn(`Skipping invalid IPFS URL: ${course.course_ipfs_uri}`);
           return null;
         }
-
-        const content = await fetchCIDContent(course.course_ipfs_uri);
-        if (content) {
-          return {
-            ...content,
-            course_identifier: course.course_identifier,
-            owner: course.owner,
-            course_ipfs_uri: course.course_ipfs_uri,
-            is_suspended: course.is_suspended,
-          };
+        if (course.is_approved) {
+          const content = await fetchCIDContent(course.course_ipfs_uri);
+          if (content) {
+            return {
+              ...content,
+              course_identifier: course.course_identifier,
+              owner: course.owner,
+              course_ipfs_uri: course.course_ipfs_uri,
+              is_suspended: course.is_suspended,
+            };
+          }
+          return null;
         }
-        return null;
       }),
     );
 
     // Filter out null values
     const validCourses = resolvedCourses.filter(
-      (course): course is CourseType => course !== null,
+      (course): course is CourseType => course !== null && course !== undefined,
     );
 
     // Remove duplicates before updating state
@@ -322,40 +330,95 @@ const LecturePage = (props: any) => {
         "acquire_a_course",
         [Number(ultimate_id)],
       );
-      const callCourseContract = await account?.execute([
+
+      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+      if (!avnuApiKey) {
+        throw new Error("Missing AVNU API key in environment variables");
+      }
+
+      const callCourseContract = await executeCalls(
+        account,
+        [
+          {
+            contractAddress: STRK_ADDRESS,
+            entrypoint: "approve",
+            calldata: approve_calldata.calldata,
+          },
+          {
+            contractAddress: attensysCourseAddress,
+            entrypoint: "acquire_a_course",
+            calldata: take_course_calldata.calldata,
+          },
+        ],
         {
-          contractAddress: STRK_ADDRESS,
-          entrypoint: "approve",
-          calldata: approve_calldata.calldata,
+          gasTokenAddress: STRK_ADDRESS,
         },
         {
-          contractAddress: attensysCourseAddress,
-          entrypoint: "acquire_a_course",
-          calldata: take_course_calldata.calldata,
+          apiKey: avnuApiKey,
+          baseUrl: "https://sepolia.api.avnu.fi",
         },
-      ]);
+      );
 
       console.log("call returns", callCourseContract);
-      setTxnHash(callCourseContract?.transaction_hash);
+      let tx = await provider.waitForTransaction(
+        callCourseContract.transactionHash,
+      );
+
+      setTxnHash(callCourseContract?.transactionHash);
       //@ts-ignore
-      if (callCourseContract?.code == "SUCCESS") {
+      if (
+        ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+          (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+        (tx as any)?.execution_status === "SUCCEEDED"
+      ) {
+        // Send purchase notification
+        try {
+          const user = auth.currentUser;
+          if (user) {
+            const userProfile = await getUserProfile(user.uid);
+            if (userProfile) {
+              await fetch(
+                "https://attensys-1a184d8bebe7.herokuapp.com/api/course-purchase-notification",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    email: user.email,
+                    username: userProfile.displayName,
+                    courseName: props?.data?.courseName,
+                    price: coursePrice,
+                  }),
+                },
+              );
+            }
+          }
+        } catch (notificationError) {
+          console.warn(
+            "Error sending purchase notification:",
+            notificationError,
+          );
+          // Don't fail the purchase process if notification fails
+        }
+
         await new Promise((resolve) => setTimeout(resolve, 3000));
         setIsTakingCourse(true);
         setShowOverlay(false);
         setIsUploading(false);
         toast.success(
           <div>
-            Purchase sucessful!
+            Purchase successful!
             <br />
             Transaction hash:{" "}
             <a
-              href={`${explorer.transaction(callCourseContract?.transaction_hash)}`}
+              href={`${explorer.transaction(callCourseContract?.transactionHash)}`}
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: "blue", textDecoration: "underline" }}
             >
-              {callCourseContract?.transaction_hash
-                ? `${callCourseContract.transaction_hash.slice(0, 6)}...${callCourseContract.transaction_hash.slice(-4)}`
+              {callCourseContract?.transactionHash
+                ? `${callCourseContract.transactionHash.slice(0, 6)}...${callCourseContract.transactionHash.slice(-4)}`
                 : ""}
             </a>
           </div>,
@@ -376,7 +439,7 @@ const LecturePage = (props: any) => {
         setIsTakingCourse(false);
         setShowOverlay(true);
         setIsUploading(false);
-        toast.error("purchase failed", {
+        toast.error("Purchase failed", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -388,9 +451,9 @@ const LecturePage = (props: any) => {
           transition: Bounce,
         });
       }
-      // }
     } catch (error) {
-      toast.error("purchase failed, reload & try again", {
+      setIsUploading(false);
+      toast.error("Purchase failed, reload & try again", {
         position: "top-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -402,8 +465,6 @@ const LecturePage = (props: any) => {
         transition: Bounce,
       });
     }
-
-    // localStorage.setItem(`course_${courseId}_taken`, "true");
   };
 
   const handleFinishCourseClaimCertfificate = async () => {
@@ -424,29 +485,52 @@ const LecturePage = (props: any) => {
       [Number(ultimate_id)],
     );
 
-    const callCourseContract = await account?.execute([
+    const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
+    if (!avnuApiKey) {
+      throw new Error("Missing AVNU API key in environment variables");
+    }
+
+    const callCourseContract = await executeCalls(
+      account,
+      [
+        {
+          contractAddress: attensysCourseAddress,
+          entrypoint: "finish_course_claim_certification",
+          calldata: course_certificate_calldata.calldata,
+        },
+      ],
       {
-        contractAddress: attensysCourseAddress,
-        entrypoint: "finish_course_claim_certification",
-        calldata: course_certificate_calldata.calldata,
+        gasTokenAddress: STRK_ADDRESS,
       },
-    ]);
-    setTxnHash(callCourseContract?.transaction_hash);
+      {
+        apiKey: avnuApiKey,
+        baseUrl: "https://sepolia.api.avnu.fi",
+      },
+    );
+    let tx = await provider.waitForTransaction(
+      callCourseContract.transactionHash,
+    );
+
+    setTxnHash(callCourseContract?.transactionHash);
     //@ts-ignore
-    if (callCourseContract?.code == "SUCCESS") {
+    if (
+      ((tx as any)?.finality_status === "ACCEPTED_ON_L2" ||
+        (tx as any)?.finality_status === "ACCEPTED_ON_L1") &&
+      (tx as any)?.execution_status === "SUCCEEDED"
+    ) {
       toast.success(
         <div>
           Congratulations, you&apos;re certified!
           <br />
           Transaction hash:{" "}
           <a
-            href={`${explorer.transaction(callCourseContract?.transaction_hash)}`}
+            href={`${explorer.transaction(callCourseContract?.transactionHash)}`}
             target="_blank"
             rel="noopener noreferrer"
             style={{ color: "blue", textDecoration: "underline" }}
           >
-            {callCourseContract?.transaction_hash
-              ? `${callCourseContract.transaction_hash.slice(0, 6)}...${callCourseContract.transaction_hash.slice(-4)}`
+            {callCourseContract?.transactionHash
+              ? `${callCourseContract.transactionHash.slice(0, 6)}...${callCourseContract.transactionHash.slice(-4)}`
               : ""}
           </a>
         </div>,
@@ -568,6 +652,45 @@ const LecturePage = (props: any) => {
   }, []);
 
   useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user && user.uid) {
+        try {
+          const profile = await getUserProfile(user.uid);
+          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          if (profile) {
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            if (!decryptedPrivateKey) {
+              console.error("Failed to decrypt private key");
+              setAccount(undefined);
+              return;
+            }
+            const userAccount = new Account(
+              provider,
+              profile.starknetAddress,
+              decryptedPrivateKey,
+            );
+            setAccount(userAccount);
+            setAddress(profile.starknetAddress);
+          } else {
+            console.log("No user profile found in Firestore.");
+            setAccount(undefined);
+          }
+        } catch (err) {
+          console.error("Error fetching user profile:", err);
+          setAccount(undefined);
+        }
+      } else {
+        console.log("No authenticated user found.");
+        setAccount(undefined);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     const checkReview = async () => {
       if (address) {
         const exists = await courseContract?.get_review_status(
@@ -606,11 +729,11 @@ const LecturePage = (props: any) => {
     };
   }, [props?.data?.courseDescription, props?.data?.targetAudienceDesc]);
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setUsername(n));
-    console.log(address, "address");
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setUsername(n));
+  //   console.log(address, "address");
+  // }, [address, controller]);
 
   // Store average ratings for each course by identifier
   const [averageRatings, setAverageRatings] = useState<{ [key: string]: any }>(
@@ -1190,15 +1313,18 @@ const LecturePage = (props: any) => {
               {courseData
                 .sort(() => Math.random() - 0.5)
                 .slice(0, 2)
-                .map((item: any, id: any) => (
-                  <div key={id}>
-                    <CardWithLink
-                      wallet={props.wallet}
-                      data={item}
-                      rating={averageRatings}
-                    />
-                  </div>
-                ))}
+                .map((item: any, id: any) => {
+                  console.log("courseData[id]", courseData[id]);
+                  return (
+                    <div key={id}>
+                      <CardWithLink
+                        wallet={account}
+                        data={item}
+                        rating={averageRatings}
+                      />
+                    </div>
+                  );
+                })}
             </div>
           </div>
 
@@ -1269,15 +1395,18 @@ const LecturePage = (props: any) => {
         <div className="hidden xl:block w-[30%] h-[1020px]">
           <h1>Courses you might like</h1>
           <div className="space-y-10 overflow-x-auto max-h-[1020px] overflow-y-auto">
-            {courseData.map((item: any, id: any) => (
-              <div key={id}>
-                <CardWithLink
-                  wallet={props.wallet}
-                  data={item}
-                  rating={averageRatings}
-                />
-              </div>
-            ))}
+            {courseData.map((item: any, id: any) => {
+              console.log("courseData[id]", courseData[id]);
+              return (
+                <div key={id}>
+                  <CardWithLink
+                    wallet={account}
+                    data={item}
+                    rating={averageRatings}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
