@@ -74,7 +74,7 @@ const EventFeed = () => {
               message = `${truncateAddress(item.candidate || "")} claimed certificate for course #${item.courseIdentifier}`;
               break;
             case "AdminTransferred":
-              message = `${truncateAddress(item.newAdmin || "")} became admin`;
+              message = `${truncateAddress(item.owner_ || "")} became admin`;
               break;
             case "AcquiredCourse":
               message = `${truncateAddress(item.owner || "")} acquired course #${item.courseIdentifier}`;
@@ -166,7 +166,7 @@ const EventFeed = () => {
   });
 
   return (
-    <div className="max-w-[92%] mx-auto mt-4">
+    <div className=" mx-auto mt-4">
       {/* Header row */}
       <div className="flex justify-between items-center py-3 px-4 bg-[#ECD9FF] rounded-lg mb-2">
         <div className="flex items-center">

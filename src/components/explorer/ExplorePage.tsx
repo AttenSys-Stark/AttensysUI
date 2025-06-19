@@ -23,7 +23,6 @@ import {
 } from "@/utils/helpers";
 
 import { usePinataAccess } from "@/hooks/usePinataAccess";
-import CourseList from "../CourseList";
 
 const ExplorePage = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -228,8 +227,8 @@ const ExplorePage = () => {
       </div>
 
       {/* Table Section */}
-      <div className="min-h-[930px] mx-auto bg-white mt-4 rounded-lg mb-24 p-4 md:p-6">
-        <div className="flex bg-[#9B51E052] bg-opacity-[35%] md:bg-[#9B51E052] xl:bg-transparent h-[80px] rounded-xl xl:max-h-20 justify-between items-center px-5 md:px-5 xl:px-12 mt-10 max-w-[92%] mx-auto">
+      <div className="min-h-[930px] mx-auto bg-white mt-4 rounded-lg mb-24 p-2 md:p-3">
+        <div className="flex bg-[#9B51E052] bg-opacity-[35%] md:bg-[#9B51E052] xl:bg-transparent h-[80px] rounded-xl xl:max-h-20 justify-between items-center px-5 sm:px-0  mx-auto">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
             Recent Activity
           </h2>
@@ -240,7 +239,7 @@ const ExplorePage = () => {
             </Button>
           </div>
         </div>
-        <EventFeed data={eventData} />
+        <EventFeed />
       </div>
     </div>
   );
