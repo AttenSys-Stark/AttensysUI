@@ -249,6 +249,13 @@ const UserSideBar = ({
     refreshCourses(); // Fetch courses when the wallet address changes
   }, []);
 
+  // Set activeSection to match selected prop
+  useEffect(() => {
+    if (selected && selected !== "All NFTs") {
+      setActiveSection(selected);
+    }
+  }, [selected]);
+
   return (
     <>
       <div className="bg-gradient-to-r block lg:hidden from-[#4A90E2] to-[#9B51E0] py-4 px-8 xl:w-[400px]">
@@ -433,7 +440,9 @@ const UserSideBar = ({
 
                     {item.title === "Create a course" && <CreateACourse />}
 
-                    {item.title === "Notification" && <Notification />}
+                    {item.title === "Notification" && (
+                      <Notification wallet={wallet} address={address} />
+                    )}
                   </>
                 )}
               </div>

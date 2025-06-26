@@ -150,6 +150,9 @@ const MyCourses = (props: any) => {
   useEffect(() => {
     if (routeid == "created") {
       setSelected("Courses created");
+    } else {
+      // Default to Notification section when page loads
+      setSelected("Notification");
     }
   }, [routeid]);
 
@@ -175,6 +178,10 @@ const MyCourses = (props: any) => {
             console.log("userAccount:", userAccount);
             setAccount(userAccount);
             setAddress(profile.starknetAddress);
+            console.log(
+              "Setting address from profile:",
+              profile.starknetAddress,
+            );
             setUsername(profile.displayName);
           } else {
             console.log("No user profile found in Firestore.");
@@ -245,12 +252,12 @@ const MyCourses = (props: any) => {
         <div>{selected == "Create a course" ? <CreateACourse /> : null}</div>
 
         <div>
-          {selected == "" || selected == "Notification" ? (
-            <Notification wallet={account} />
+          {selected === "Notification" ? (
+            <Notification wallet={account} address={address} />
           ) : null}
 
-          {selected == "" && routeid == "created" ? (
-            <Notification wallet={account} />
+          {selected === "" && routeid == "created" ? (
+            <Notification wallet={account} address={address} />
           ) : null}
         </div>
       </div>
