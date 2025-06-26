@@ -53,7 +53,7 @@ import ControllerConnector from "@cartridge/connector/controller";
 import debounce from "lodash.debounce";
 import { courseSearchTerms as wordList } from "@/utils/searchterms";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/lib/firebase/client";
+import { auth, setAuthTokenCookie } from "@/lib/firebase/client";
 import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKey } from "@/helpers/encrypt";
 import { Account } from "starknet";
@@ -88,6 +88,7 @@ const Header = () => {
   // const { account, address } = useAccount();
   const [account, setAccount] = useState<any>();
   const [address, setAddress] = useState<string>("");
+  const [firebaseUserId, setFirebaseUserId] = useState<string>("");
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
   const [username, setUsername] = useState<string>();
@@ -106,6 +107,49 @@ const Header = () => {
     firstName && firstName.length > 8
       ? firstName.slice(0, 10) + "..."
       : firstName;
+
+  const handleAccountCenterClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    if (!firebaseUserId) {
+      console.log("No firebaseUserId available, user not authenticated");
+      alert("Please log in to access your Account Center");
+      return;
+    }
+
+    // Check if auth token cookie exists
+    const cookies = document.cookie.split(";");
+    const authTokenCookie = cookies.find((cookie) =>
+      cookie.trim().startsWith("firebase-auth-token="),
+    );
+
+    if (!authTokenCookie) {
+      console.log("No auth token cookie found");
+      // Try to refresh the token
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        console.log("Attempting to refresh auth token...");
+        setAuthTokenCookie(currentUser)
+          .then(() => {
+            console.log("Auth token refreshed, navigating to Account Center");
+            router.push(`/mycoursepage/${firebaseUserId}`);
+          })
+          .catch((error) => {
+            console.error("Failed to refresh auth token:", error);
+            alert("Please log in to access your Account Center");
+          });
+      } else {
+        alert("Please log in to access your Account Center");
+      }
+      return;
+    }
+
+    console.log(
+      "Navigating to Account Center with firebaseUserId:",
+      firebaseUserId,
+    );
+    router.push(`/mycoursepage/${firebaseUserId}`);
+  };
 
   const handleComingSoonClick = (e: any) => {
     e.preventDefault(); // Prevent default link behavior
@@ -256,7 +300,14 @@ const Header = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log("Header: Firebase auth state changed", {
+        user: user ? { uid: user.uid, email: user.email } : null,
+        firebaseUserId: firebaseUserId,
+      });
+
       if (user && user.uid) {
+        setFirebaseUserId(user.uid);
+        console.log("Header: Setting firebaseUserId to", user.uid);
         try {
           const profile = await getUserProfile(user.uid);
           const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
@@ -288,6 +339,7 @@ const Header = () => {
       } else {
         console.log("No authenticated user found.");
         setAccount(undefined);
+        setFirebaseUserId("");
       }
     });
     return () => unsubscribe();
@@ -679,9 +731,13 @@ const Header = () => {
                           </Link>
 
                           <Link
-                            href={`/mycoursepage/${address}`}
+                            href={`/mycoursepage/${firebaseUserId}`}
                             className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
-                            onClick={() => close()}
+                            onClick={handleAccountCenterClick}
+                            style={{
+                              pointerEvents: firebaseUserId ? "auto" : "none",
+                              opacity: firebaseUserId ? 1 : 0.5,
+                            }}
                           >
                             <Image
                               src={ImagenCourses2}
@@ -691,6 +747,11 @@ const Header = () => {
                               className="mr-2"
                             />
                             Account Center
+                            {!firebaseUserId && (
+                              <span className="ml-2 text-xs text-red-500">
+                                (Login required)
+                              </span>
+                            )}
                           </Link>
 
                           <Link

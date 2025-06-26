@@ -52,8 +52,10 @@ const setAuthTokenCookie = async (user: any) => {
     if (typeof window === "undefined") return;
 
     const token = await user.getIdToken();
+    console.log("Setting auth token cookie for user:", user.uid);
     // Set cookie with token (expires in 1 hour)
     document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; secure; samesite=strict`;
+    console.log("Auth token cookie set successfully");
   } catch (error) {
     console.error("Error setting auth token cookie:", error);
   }
