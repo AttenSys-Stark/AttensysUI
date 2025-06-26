@@ -48,6 +48,9 @@ googleProvider.setCustomParameters({
 // Function to set Firebase auth token in cookies
 const setAuthTokenCookie = async (user: any) => {
   try {
+    // Only run in browser environment
+    if (typeof window === "undefined") return;
+
     const token = await user.getIdToken();
     // Set cookie with token (expires in 1 hour)
     document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; secure; samesite=strict`;
@@ -58,6 +61,9 @@ const setAuthTokenCookie = async (user: any) => {
 
 // Function to clear auth token cookie
 const clearAuthTokenCookie = () => {
+  // Only run in browser environment
+  if (typeof window === "undefined") return;
+
   document.cookie =
     "firebase-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 };
@@ -414,6 +420,9 @@ const signOutAll = async () => {
 
 // Initialize auth state listener to manage token cookies
 const initializeAuthListener = () => {
+  // Only run in browser environment
+  if (typeof window === "undefined") return;
+
   return onAuthStateChanged(auth, async (user) => {
     if (user) {
       // User is signed in, set/refresh token cookie
@@ -425,8 +434,10 @@ const initializeAuthListener = () => {
   });
 };
 
-// Initialize the auth listener
-initializeAuthListener();
+// Initialize the auth listener only in browser
+if (typeof window !== "undefined") {
+  initializeAuthListener();
+}
 
 export {
   db,
