@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,10 +15,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signUp } from "@/server/users";
 import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
 import { useSetAtom } from "jotai";
-import { signIn } from "@/server/users";
 import {
   authStateListener,
   getCurrentUser,
@@ -34,7 +32,6 @@ import { auth } from "@/lib/firebase/client";
 import { toast, ToastContainer } from "react-toastify";
 
 export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
-  const [signUpResult, formAction, isLoading] = useActionState(signUp, null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,10 +43,6 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
 
   const router = useRouter();
   const setLoginorsignup = useSetAtom(loginorsignup);
-
-  if (signUpResult?.redirect) {
-    router.push(signUpResult.redirect);
-  }
 
   const handleSignupWithGoogle = async () => {
     try {
@@ -84,6 +77,7 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
   ) => {
     setRepeatPassword(e.target.value);
   };
+
   const handlesignupclick = async () => {
     if (password !== repeatPassword) {
       console.log("Passwords do not match");
@@ -134,7 +128,9 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
       });
       return () => unsubscribe();
     }
-  }, [status, currentUser]);
+  }, [status, currentUser, router]);
+
+  const isWaiting = status === "waiting";
 
   return (
     <Card className="w-[100%] lg:w-[40%]">
@@ -149,7 +145,7 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
       </CardHeader>
       <CardContent>
         {status === "form" ? (
-          <form action={formAction}>
+          <form>
             <div className="grid gap-6">
               {/* <div className="flex flex-col gap-4">
                 <Button
@@ -176,90 +172,80 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
                 </span> */}
               {/* <div className="absolute left-0 right-0 bottom-0 h-px bg-border" /> */}
               {/* </div> */}
-              <div className="grid gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    type="text"
-                    name="name"
-                    placeholder="John Doe"
-                    required
-                    value={name}
-                    onChange={handleNameChange}
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    placeholder="m@example.com"
-                    required
-                    value={email}
-                    onChange={handleEmailChange}
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Password</Label>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    name="password"
-                    required
-                    value={password}
-                    onChange={handlePasswordChange}
-                  />
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Repeat Password</Label>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    name="password"
-                    required
-                    value={repeatPassword}
-                    onChange={handleRepeatPasswordChange}
-                  />
-                  <div className="text-center h-6">
-                    {signUpResult?.errors && (
-                      <p className="text-destructive">
-                        {signUpResult.errors.message}
-                      </p>
-                    )}
-
-                    {signUpResult?.values && <p>{signUpResult.values.text}</p>}
-                  </div>
-                </div>
-                <Button
-                  disabled={isLoading}
-                  onClick={handlesignupclick}
-                  className="w-full bg-[#9B51E0]"
-                >
-                  {isLoading ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    "Sign up"
-                  )}
-                </Button>
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={handleNameChange}
+                  required
+                />
               </div>
-              <div className="text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href=""
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (onLoginClick) onLoginClick();
-                    else setLoginorsignup(false);
-                  }}
-                  className="underline underline-offset-4"
-                >
-                  Login
-                </Link>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={handleEmailChange}
+                  required
+                />
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={handlePasswordChange}
+                  required
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="repeatPassword">Repeat Password</Label>
+                <Input
+                  id="repeatPassword"
+                  type="password"
+                  placeholder="Repeat your password"
+                  value={repeatPassword}
+                  onChange={handleRepeatPasswordChange}
+                  required
+                />
+              </div>
+              <div className="text-center h-6">
+                {accountStatus && (
+                  <p className="text-destructive">{accountStatus}</p>
+                )}
+              </div>
+              <Button
+                disabled={isWaiting}
+                onClick={handlesignupclick}
+                className="w-full bg-[#9B51E0]"
+              >
+                {isWaiting ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  "Sign up"
+                )}
+              </Button>
+            </div>
+            <div className="text-center text-sm">
+              Already have an account?{" "}
+              <Link
+                href=""
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (onLoginClick) onLoginClick();
+                  else setLoginorsignup(false);
+                }}
+                className="underline underline-offset-4"
+              >
+                Login
+              </Link>
             </div>
           </form>
         ) : (

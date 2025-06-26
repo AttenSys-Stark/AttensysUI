@@ -261,10 +261,6 @@ const MyCourses = (props: any) => {
           ) : null}
         </div>
       </div>
-      {console.log(
-        "MyCourses - address being passed to Notification:",
-        address,
-      )}
     </div>
   );
 };

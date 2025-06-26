@@ -3,7 +3,7 @@
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -15,8 +15,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authClient } from "@/lib/auth.client";
-import { signIn } from "@/server/users";
 import {
   authStateListener,
   getCurrentUser,
@@ -28,7 +26,6 @@ import { loginUserWithEmail, resetUserPassword } from "@/lib/userutils";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 
 export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
-  const [loginResult, formAction, isLoading] = useActionState(signIn, null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isloaderLoading, setIsloaderLoading] = useState(false);
@@ -40,10 +37,6 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
 
   const router = useRouter();
   const setLoginorsignup = useSetAtom(loginorsignup);
-
-  if (loginResult?.redirect) {
-    router.push(loginResult.redirect);
-  }
 
   const handleLoginWithGoogle = async () => {
     setAccountloadProgress(true);
@@ -216,7 +209,7 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
         )}
       </CardHeader>
       <CardContent>
-        <form action={formAction}>
+        <form>
           <div className="grid gap-6">
             <div className="flex flex-col gap-4">
               <Button
@@ -282,19 +275,13 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <div className="text-center h-6">
-                  {loginResult?.errors && (
-                    <p className="text-destructive">
-                      {loginResult.errors.message}
-                    </p>
-                  )}
-
-                  {loginResult?.values && <p>{loginResult.values.text}</p>}
+                  {accountStatus && <p>{accountStatus}</p>}
                 </div>
               </div>
               <Button
                 type="submit"
                 onClick={handleLogin}
-                disabled={isLoading}
+                disabled={isloaderLoading}
                 className="w-full bg-[#9B51E0]"
               >
                 {isloaderLoading ? (
