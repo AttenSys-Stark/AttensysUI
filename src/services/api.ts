@@ -21,8 +21,28 @@ export interface Course {
   newCourseUri?: string;
   // Course price updated specific fields
   newPrice?: number;
+  // Admin transferred specific fields
+  newAdmin?: string;
   // Event type for UI display
   type?:
+    | "created"
+    | "acquired"
+    | "replaced"
+    | "cert-claimed"
+    | "admin-transferred"
+    | "suspended"
+    | "unsuspended"
+    | "removed"
+    | "price-updated"
+    | "approved"
+    | "unapproved"
+    | "COURSE_CREATED"
+    | "COURSE_REPLACED"
+    | "CERT_CLAIMED"
+    | "ADMIN_TRANSFERRED"
+    | "COURSE_ACQUIRED";
+  // Event type for API consistency
+  eventType?:
     | "created"
     | "acquired"
     | "replaced"
@@ -39,10 +59,14 @@ export interface Course {
 const handleResponse = async (response: Response): Promise<any> => {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+    console.error(
+      `API Error: ${response.status} - ${errorData.details || errorData.error || "Failed to fetch data"}`,
+    );
     throw new Error(
       errorData.details || errorData.error || "Failed to fetch data",
     );
   }
+
   return response.json();
 };
 
@@ -140,5 +164,12 @@ export const api = {
     const response = await fetch(`${API_BASE_URL}/courses/owner/${owner}`);
     const courses = await handleResponse(response);
     return addEventType(courses, "acquired");
+  },
+
+  // Get all events for a specific address (personalized notifications)
+  getEventsByAddress: async (address: string): Promise<Course[]> => {
+    const response = await fetch(`${API_BASE_URL}/events/address/${address}`);
+    const events = await handleResponse(response);
+    return events;
   },
 };
