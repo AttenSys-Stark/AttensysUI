@@ -142,6 +142,5 @@
       "eslint --cache --fix",
       "git add"
     ]
-  },
-  "packageManager": "yarn@4.9.2"
+  }
 }
