@@ -18,6 +18,7 @@ import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAccount } from "@starknet-react/core";
 
 const orgContract = new Contract(attensysOrgAbi, attensysOrgAddress, provider);
 
@@ -31,6 +32,7 @@ const Bootcampdropdown = () => {
   const [orgname, setOrgname] = useAtom(orgnameatom);
   const [visible, setVisible] = useState(false);
   const router = useRouter();
+  const { address } = useAccount();
 
   const handleNavigation = (path: string) => {
     setuniversalLoad(true);
@@ -39,9 +41,7 @@ const Bootcampdropdown = () => {
   };
 
   const getOrgInfo = async () => {
-    const org_info = await orgContract?.get_org_info(
-      wallet?.selectedAddress ?? "0x0",
-    );
+    const org_info = await orgContract?.get_org_info(address ?? "0x0");
     // console.info(org_info);
 
     if (org_info?.org_name != "") {

@@ -8,10 +8,12 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
 import { useAtom } from "jotai";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
+import { useAccount } from "@starknet-react/core";
 
 const MybootcampLanding = () => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [mybootcampDataInfo, setMyBootcampdataInfo] = useState<any[]>([]);
+  const { account, address } = useAccount();
 
   const orgContract = new Contract(
     attensysOrgAbi,
@@ -20,9 +22,8 @@ const MybootcampLanding = () => {
   );
 
   const getMybootcampData = async () => {
-    const my_bootcamps_info = await orgContract?.get_registered_bootcamp(
-      wallet?.selectedAddress,
-    );
+    const my_bootcamps_info =
+      await orgContract?.get_registered_bootcamp(address);
     console.log("my bootcamp data", my_bootcamps_info);
 
     const newBootcampData = await Promise.all(
@@ -41,7 +42,7 @@ const MybootcampLanding = () => {
 
   useEffect(() => {
     getMybootcampData();
-  }, [wallet]);
+  }, [account, address]);
 
   return (
     <div className="h-auto w-full bg-[#F5F7FA] pb-8">
