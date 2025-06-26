@@ -1,4 +1,3 @@
-import { authClient } from "../auth.client";
 import { auth, signInWithGoogle } from "../firebase/client";
 import {
   signInAnonymously,
@@ -8,20 +7,6 @@ import {
   User as FirebaseUser,
 } from "firebase/auth";
 import { createUserProfile, getUserProfile } from "../userutils";
-
-interface IUser {
-  id: string;
-  email: string;
-  name: string;
-  image: string | null;
-  emailVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-type AuthData =
-  | { user: IUser; token: string; redirect: false; url?: undefined }
-  | { url: string; redirect: true; user?: never };
 
 export const signInUser = async (
   onAccountProgress?: (status: string) => void,
@@ -35,6 +20,7 @@ export const signInUser = async (
     throw error;
   }
 };
+
 export const getCurrentUser = (): User | null => {
   return auth.currentUser;
 };
