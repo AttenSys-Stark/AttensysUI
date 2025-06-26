@@ -45,6 +45,23 @@ googleProvider.setCustomParameters({
 //   console.error("Anonymous sign-in failed:", error);
 // });
 
+// Function to set Firebase auth token in cookies
+const setAuthTokenCookie = async (user: any) => {
+  try {
+    const token = await user.getIdToken();
+    // Set cookie with token (expires in 1 hour)
+    document.cookie = `firebase-auth-token=${token}; path=/; max-age=3600; secure; samesite=strict`;
+  } catch (error) {
+    console.error("Error setting auth token cookie:", error);
+  }
+};
+
+// Function to clear auth token cookie
+const clearAuthTokenCookie = () => {
+  document.cookie =
+    "firebase-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+};
+
 // Function to handle Google Sign-In
 const signInWithGoogle = async (
   onAccountProgress?: (status: string) => void,
@@ -53,6 +70,9 @@ const signInWithGoogle = async (
     await auth.setPersistence(browserLocalPersistence);
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
+
+    // Set auth token in cookie
+    await setAuthTokenCookie(user);
 
     // Create/update user profile in Firestore
     await createUserProfile(
@@ -114,6 +134,9 @@ const signUpWithEmail = async (
       password,
     );
     const user = userCredential.user;
+
+    // Set auth token in cookie
+    await setAuthTokenCookie(user);
 
     // Create user profile in Firestore
     await createUserProfile(
@@ -205,6 +228,9 @@ const signInWithEmail = async (email: string, password: string) => {
       password,
     );
     const user = userCredential.user;
+
+    // Set auth token in cookie
+    await setAuthTokenCookie(user);
 
     // Check if email is verified
     if (!user.emailVerified) {
@@ -377,12 +403,30 @@ const sendPasswordReset = async (email: string) => {
 const signOutAll = async () => {
   try {
     await signOut(auth);
+    // Clear auth token cookie
+    clearAuthTokenCookie();
     return true;
   } catch (error) {
     console.error("Sign out error:", error);
     throw error;
   }
 };
+
+// Initialize auth state listener to manage token cookies
+const initializeAuthListener = () => {
+  return onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // User is signed in, set/refresh token cookie
+      await setAuthTokenCookie(user);
+    } else {
+      // User is signed out, clear token cookie
+      clearAuthTokenCookie();
+    }
+  });
+};
+
+// Initialize the auth listener
+initializeAuthListener();
 
 export {
   db,
@@ -395,4 +439,6 @@ export {
   waitForEmailVerification,
   sendPasswordReset,
   signOutAll,
+  setAuthTokenCookie,
+  clearAuthTokenCookie,
 };
