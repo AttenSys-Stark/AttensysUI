@@ -52,6 +52,7 @@ const Index = () => {
   const [courseData, setCourseData] = useState<CourseType[]>([]);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const { fetchCIDContent } = useFetchCID();
   const searchParams = useSearchParams();
@@ -92,6 +93,15 @@ const Index = () => {
       if (!user) {
         router.push("/");
       } else {
+        // Check if user is admin
+        if (user.email !== "attensyshq@gmail.com") {
+          // User is not admin, redirect to Home
+          router.push("/Home");
+          return;
+        }
+
+        // User is admin
+        setIsAdmin(true);
         setIsAuthenticated(true);
         setLoading(false);
       }
@@ -124,7 +134,14 @@ const Index = () => {
     router.push("/Course");
   };
 
-  // if (!mounted) return null;
+  // Show loading spinner while checking admin status
+  if (loading || !isAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>

@@ -11,11 +11,15 @@ import {
 } from "@/state/connectedWalletStarknetkitNext";
 import HomePage from "@/components/Home";
 import RootLayout from "@/app/layout";
+import { auth } from "@/lib/firebase/client";
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [wallet, setWallet] = useAtom(walletStarknetkitNextAtom);
   const { autoConnectWallet } = useWallet();
   const [universalLoad, setuniversalLoad] = useAtom(universalloadingstatus);
+  const router = useRouter();
 
   useEffect(() => {
     if (wallet) return;
@@ -33,6 +37,18 @@ export default function Home() {
   useEffect(() => {
     setuniversalLoad(false);
   });
+
+  // Check if user is authenticated and redirect to Home
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is authenticated, redirect to Home
+        router.push("/Home");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
 
   return (
     <div>
