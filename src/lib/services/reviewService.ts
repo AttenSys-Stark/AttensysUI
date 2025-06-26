@@ -18,6 +18,12 @@ export const submitReview = async (
   review: Omit<Review, "id" | "createdAt">,
 ): Promise<string> => {
   try {
+    if (!auth || !db) {
+      throw new Error(
+        "Firebase is not configured. Please check your environment variables.",
+      );
+    }
+
     // Get current user
     const user = auth.currentUser;
 
@@ -60,6 +66,12 @@ export const getReviewsForVideo = async (
 ): Promise<Review[]> => {
   console.log("Querying reviews for videoId:", videoId);
   // await signInUser();
+
+  if (!auth || !db) {
+    console.warn("Firebase is not configured. Cannot fetch reviews.");
+    return [];
+  }
+
   console.log("Current auth state:", auth.currentUser?.uid);
   try {
     const q = query(reviewsCollection, where("videoId", "==", videoId));

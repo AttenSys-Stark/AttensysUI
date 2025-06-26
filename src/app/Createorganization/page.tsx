@@ -27,20 +27,20 @@ const Index = () => {
   };
   return (
     <>
-    <Header />
-    <div onClick={handlePageClick}>
-      {status && (
-        <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
-      )}
-      {bootcampdropstat && (
-        <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
-      )}
-      <div onClick={(e) => e.stopPropagation()}>
+      {/* <Header /> */}
+      <div onClick={handlePageClick}>
+        {status && (
+          <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
+        )}
+        {bootcampdropstat && (
+          <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
+        )}
+        {/* <div onClick={(e) => e.stopPropagation()}>
         <Coursedropdown />
       </div>
       <div onClick={(e) => e.stopPropagation()}>
         <Bootcampdropdown />
-      </div>
+      </div> */}
 
         <CreateLanding />
       </div>

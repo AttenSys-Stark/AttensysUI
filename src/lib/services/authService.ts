@@ -35,10 +35,19 @@ export const signInUser = async (
     throw error;
   }
 };
+
 export const getCurrentUser = (): User | null => {
+  if (!auth) {
+    console.warn("Firebase auth is not available");
+    return null;
+  }
   return auth.currentUser;
 };
 
 export const authStateListener = (callback: (user: User | null) => void) => {
+  if (!auth) {
+    console.warn("Firebase auth is not available");
+    return () => {}; // Return empty unsubscribe function
+  }
   return onAuthStateChanged(auth, callback);
 };

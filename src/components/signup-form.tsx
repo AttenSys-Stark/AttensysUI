@@ -123,6 +123,11 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
   // Add listener for auth state changes
   useEffect(() => {
     if (status === "waiting" && currentUser) {
+      if (!auth) {
+        console.warn("Firebase auth is not available");
+        return;
+      }
+
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
         if (user && user.uid === currentUser.uid) {
           const isVerified = await checkEmailVerification(user);

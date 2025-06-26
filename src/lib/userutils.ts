@@ -26,6 +26,13 @@ export const createUserProfile = async (
   onAccountProgress?: (status: string) => void,
 ) => {
   if (!user || !user.uid) return null;
+
+  if (!db) {
+    throw new Error(
+      "Firebase is not configured. Please check your environment variables.",
+    );
+  }
+
   const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
   if (!encryptionSecret) {
     throw new Error("Encryption secret is not set");
@@ -120,6 +127,12 @@ export const createUserProfile = async (
 
 export const getUserProfile = async (uid: string) => {
   if (!uid) return null;
+
+  if (!db) {
+    console.warn("Firebase is not configured. Cannot get user profile.");
+    return null;
+  }
+
   const userRef = doc(db, "users", uid);
   const userSnapshot = await getDoc(userRef);
   if (userSnapshot.exists()) {

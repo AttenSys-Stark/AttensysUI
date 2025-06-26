@@ -21,6 +21,18 @@ import { Account } from "starknet";
 import { encryptPrivateKey, decryptPrivateKey } from "@/helpers/encrypt";
 import { provider } from "@/constants";
 
+// Check if Firebase configuration is available
+const isFirebaseConfigured = () => {
+  return !!(
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+    process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN &&
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET &&
+    process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID &&
+    process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  );
+};
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -30,15 +42,31 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Initialize Firebase only if configuration is available
+let app: any = null;
+let auth: any = null;
+let db: any = null;
+let googleProvider: any = null;
 
-// Initialize Google provider with custom configuration
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: "select_account",
-});
+if (isFirebaseConfigured()) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+
+    // Initialize Google provider with custom configuration
+    googleProvider = new GoogleAuthProvider();
+    googleProvider.setCustomParameters({
+      prompt: "select_account",
+    });
+  } catch (error) {
+    console.warn("Firebase initialization failed:", error);
+  }
+} else {
+  console.warn(
+    "Firebase configuration is missing. Firebase features will be disabled.",
+  );
+}
 
 // Initialize anonymous auth immediately
 // signInAnonymously(auth).catch((error) => {
@@ -49,6 +77,12 @@ googleProvider.setCustomParameters({
 const signInWithGoogle = async (
   onAccountProgress?: (status: string) => void,
 ) => {
+  if (!isFirebaseConfigured() || !auth || !googleProvider) {
+    throw new Error(
+      "Firebase is not configured. Please check your environment variables.",
+    );
+  }
+
   try {
     await auth.setPersistence(browserLocalPersistence);
     const result = await signInWithPopup(auth, googleProvider);
@@ -107,6 +141,12 @@ const signUpWithEmail = async (
   displayName: string,
   onAccountProgress?: (status: string) => void,
 ) => {
+  if (!isFirebaseConfigured() || !auth) {
+    throw new Error(
+      "Firebase is not configured. Please check your environment variables.",
+    );
+  }
+
   try {
     const userCredential = await createUserWithEmailAndPassword(
       auth,
@@ -143,6 +183,12 @@ const signUpWithEmail = async (
 };
 
 const checkEmailVerification = async (user: any): Promise<boolean> => {
+  if (!isFirebaseConfigured() || !auth || !db) {
+    throw new Error(
+      "Firebase is not configured. Please check your environment variables.",
+    );
+  }
+
   // Reload user data to get latest verification status
   await reload(user);
 
@@ -164,6 +210,12 @@ const checkEmailVerification = async (user: any): Promise<boolean> => {
 
 // Add auth state listener for verification check
 const waitForEmailVerification = (user: any): Promise<any> => {
+  if (!isFirebaseConfigured() || !auth) {
+    throw new Error(
+      "Firebase is not configured. Please check your environment variables.",
+    );
+  }
+
   return new Promise((resolve, reject) => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser && currentUser.uid === user.uid) {
@@ -198,6 +250,12 @@ const waitForEmailVerification = (user: any): Promise<any> => {
 };
 
 const signInWithEmail = async (email: string, password: string) => {
+  if (!isFirebaseConfigured() || !auth) {
+    throw new Error(
+      "Firebase is not configured. Please check your environment variables.",
+    );
+  }
+
   try {
     const userCredential = await signInWithEmailAndPassword(
       auth,
@@ -364,6 +422,12 @@ const signInWithEmail = async (email: string, password: string) => {
 };
 
 const sendPasswordReset = async (email: string) => {
+  if (!isFirebaseConfigured() || !auth) {
+    throw new Error(
+      "Firebase is not configured. Please check your environment variables.",
+    );
+  }
+
   try {
     await sendPasswordResetEmail(auth, email);
     return true;
@@ -375,6 +439,12 @@ const sendPasswordReset = async (email: string) => {
 
 // Sign out all authenticated users (Google, email, etc.)
 const signOutAll = async () => {
+  if (!isFirebaseConfigured() || !auth) {
+    throw new Error(
+      "Firebase is not configured. Please check your environment variables.",
+    );
+  }
+
   try {
     await signOut(auth);
     return true;

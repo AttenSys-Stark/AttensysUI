@@ -66,85 +66,86 @@ const Index = () => {
   }, []);
 
   // Fetch all course base data
-  useEffect(() => {
-    let isMounted = true;
-    const fetchCourses = async () => {
-      try {
-        const res = await getAllCoursesInfo();
-        if (isMounted) setAllCourses(res);
-      } catch (err) {
-        console.error("Error fetching course list", err);
-      }
-    };
-    fetchCourses();
-    return () => {
-      isMounted = false;
-    };
-  }, [provider]);
+  //   useEffect(() => {
+  //     let isMounted = true;
+  //     const fetchCourses = async () => {
+  //       try {
+  //         const res = await getAllCoursesInfo();
+  //         if (isMounted) setAllCourses(res);
+  //       } catch (err) {
+  //         console.error("Error fetching course list", err);
+  //       }
+  //     };
+  //     fetchCourses();
+  //     return () => {
+  //       isMounted = false;
+  //     };
+  //   }, [provider]);
 
-  useEffect(() => {
-    // Use a local variable to track the mounted state
-    let isMounted = true;
+  //   useEffect(() => {
+  //     // Use a local variable to track the mounted state
+  //     let isMounted = true;
 
-    if (!auth) {
-      console.warn("Firebase auth is not available");
-      setLoading(false);
-      return;
-    }
+  //     if (!auth) {
+  //       console.warn("Firebase auth is not available");
+  //       setLoading(false);
+  //       return;
+  //     }
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!isMounted) return;
+  //     const unsubscribe = onAuthStateChanged(auth, (user) => {
+  //       if (!isMounted) return;
 
-      if (!user) {
-        router.push("/");
-      } else {
-        setIsAuthenticated(true);
-        setLoading(false);
-      }
-      if (user) {
-        console.log("user Data", user);
-      }
-    });
+  //       if (!user) {
+  //         router.push("/");
+  //       } else {
+  //         setIsAuthenticated(true);
+  //         setLoading(false);
+  //       }
+  //       if (user) {
+  //         console.log("user Data", user);
+  //       }
+  //     });
 
-    // Add a timeout to ensure we don't show loader indefinitely
-    const timeout = setTimeout(() => {
-      if (isMounted && loading) {
-        setLoading(false);
-      }
-    }, 2000); // 2 seconds timeout
+  //     // Add a timeout to ensure we don't show loader indefinitely
+  //     const timeout = setTimeout(() => {
+  //       if (isMounted && loading) {
+  //         setLoading(false);
+  //       }
+  //     }, 2000); // 2 seconds timeout
 
-    return () => {
-      isMounted = false;
-      clearTimeout(timeout);
-      unsubscribe();
-    };
-  }, [router]);
+  //     return () => {
+  //       isMounted = false;
+  //       clearTimeout(timeout);
+  //       unsubscribe();
+  //     };
+  //   }, [router]);
 
-  // UI Events
-  const handlePageClick = () => {
-    setBootcampDropStat(false);
-    setStatus(false);
-  };
+  //   // UI Events
+  //   const handlePageClick = () => {
+  //     setBootcampDropStat(false);
+  //     setStatus(false);
+  //   };
 
-  const clearSearch = () => {
-    router.push("/Course");
-  };
+  //   const clearSearch = () => {
+  //     router.push("/Course");
+  //   };
 
   // if (!mounted) return null;
 
   return (
     <>
-      <Header />
-      <div onClick={handlePageClick}>
+      {/* <Header /> */}
+      <h1>Leave header space here</h1>
+      {/* <div onClick={handlePageClick}> */}
+      <div>
         {(status || bootcampDropStat) && (
           <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
         )}
 
         <div onClick={(e) => e.stopPropagation()}>
-          <Coursedropdown />
-          <Bootcampdropdown />
+          {/* <Coursedropdown /> */}
+          {/* <Bootcampdropdown /> */}
         </div>
-        <Adminpanel courseData={allCourses} />
 
         <Footer />
       </div>

@@ -20,6 +20,12 @@ const HomePage = () => {
     // Use a local variable to track the mounted state
     let isMounted = true;
 
+    if (!auth) {
+      console.warn("Firebase auth is not available");
+      setLoading(false);
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!isMounted) return;
 

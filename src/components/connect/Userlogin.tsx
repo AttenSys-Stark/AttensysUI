@@ -28,6 +28,11 @@ export function Userlogin({
 
   // Listen for Firebase user changes
   useEffect(() => {
+    if (!auth) {
+      console.warn("Firebase auth is not available");
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setFirebaseUser(user);
       let name = null;
@@ -115,6 +120,11 @@ export function Userlogin({
 export function useFirebaseFirstName() {
   const [firstName, setFirstName] = useState<string | null>(null);
   useEffect(() => {
+    if (!auth) {
+      console.warn("Firebase auth is not available");
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       let name = null;
       if (user) {
