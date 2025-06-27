@@ -18,6 +18,10 @@ interface NotificationItem {
   name?: string;
 }
 
+interface CourseDetails {
+  [key: number]: string; // courseIdentifier -> courseName
+}
+
 interface NotificationProps {
   wallet?: any;
   address?: string;
@@ -37,11 +41,50 @@ const normalizeAddress = (address: string): string => {
 
 const Notification = ({ wallet, address }: NotificationProps) => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [courseDetails, setCourseDetails] = useState<CourseDetails>({});
 
   // Use address prop if available, otherwise try to get from wallet
   const effectiveAddress =
     address || wallet?.address || wallet?.selectedAddress;
   const normalizedAddress = normalizeAddress(effectiveAddress);
+
+  // Function to fetch course details by identifier
+  const fetchCourseDetails = async (
+    courseIdentifier: number,
+  ): Promise<string> => {
+    if (courseDetails[courseIdentifier]) {
+      return courseDetails[courseIdentifier];
+    }
+
+    try {
+      const course = await api.getCourseByIdentifier(
+        courseIdentifier.toString(),
+      );
+      const courseName = course.name || `Course #${courseIdentifier}`;
+
+      // Cache the result
+      setCourseDetails((prev) => ({
+        ...prev,
+        [courseIdentifier]: courseName,
+      }));
+
+      return courseName;
+    } catch (error) {
+      console.error(
+        `Error fetching course details for ${courseIdentifier}:`,
+        error,
+      );
+      return `Course #${courseIdentifier}`;
+    }
+  };
+
+  // Function to get course name (with caching)
+  const getCourseName = async (courseIdentifier: number): Promise<string> => {
+    if (courseDetails[courseIdentifier]) {
+      return courseDetails[courseIdentifier];
+    }
+    return await fetchCourseDetails(courseIdentifier);
+  };
 
   const {
     data: eventsData,
@@ -64,12 +107,71 @@ const Notification = ({ wallet, address }: NotificationProps) => {
         const testResponse = await fetch(
           `${apiUrl}/events/address/${normalizedAddress}`,
         );
-  
+
         const result = await api.getEventsByAddress(normalizedAddress);
-      
-        return result;
+
+        // Also fetch course approval events for courses created by this user
+        const [approvedCourses, unapprovedCourses] = await Promise.all([
+          api.getApprovedCourses(),
+          api.getUnapprovedCourses(),
+        ]);
+
+        // Filter approval events for courses created by this user
+        // We need to fetch course details to get the creator address
+        const userApprovedCourses = [];
+        const userUnapprovedCourses = [];
+
+        // Check approved courses
+        for (const course of approvedCourses) {
+          try {
+            const courseDetails = await api.getCourseByIdentifier(
+              course.courseIdentifier.toString(),
+            );
+            if (courseDetails.courseCreator === normalizedAddress) {
+              userApprovedCourses.push(course);
+            }
+          } catch (error) {
+            console.error(
+              `Error fetching course details for ${course.courseIdentifier}:`,
+              error,
+            );
+          }
+        }
+
+        // Check unapproved courses
+        for (const course of unapprovedCourses) {
+          try {
+            const courseDetails = await api.getCourseByIdentifier(
+              course.courseIdentifier.toString(),
+            );
+            if (courseDetails.courseCreator === normalizedAddress) {
+              userUnapprovedCourses.push(course);
+            }
+          } catch (error) {
+            console.error(
+              `Error fetching course details for ${course.courseIdentifier}:`,
+              error,
+            );
+          }
+        }
+
+        // Combine all events
+        const allEvents = [
+          ...result,
+          ...userApprovedCourses.map((course) => ({
+            ...course,
+            type: "COURSE_APPROVED",
+            eventType: "approved",
+          })),
+          ...userUnapprovedCourses.map((course) => ({
+            ...course,
+            type: "COURSE_UNAPPROVED",
+            eventType: "unapproved",
+          })),
+        ];
+
+        return allEvents;
       } catch (err) {
-     
         // Don't throw the error, return empty array instead
         return [];
       }
@@ -81,38 +183,63 @@ const Notification = ({ wallet, address }: NotificationProps) => {
   });
 
   React.useEffect(() => {
-   
-
     if (!eventsData || !Array.isArray(eventsData)) {
       setNotifications([]);
       return;
     }
 
-   
-    const processedNotifications: NotificationItem[] = eventsData.map(
-      (event: Course) => {
-       
+    const processNotifications = async () => {
+      const processedNotifications: NotificationItem[] = [];
+
+      for (const event of eventsData) {
         let message = "";
         let id = `${event.type || "unknown"}-${event.id}`;
 
         switch (event.type) {
-          case "COURSE_CREATED":
-            message = `You created course '${event.name || "Unnamed"}'`;
+          case "COURSE_CREATED": {
+            message = `You created '${event.name || "Unnamed"}'`;
             break;
-          case "COURSE_REPLACED":
-            message = `You replaced course #${event.courseIdentifier}`;
+          }
+          case "COURSE_REPLACED": {
+            const replacedCourseName = await getCourseName(
+              event.courseIdentifier,
+            );
+            message = `You replaced "${replacedCourseName}"`;
             break;
-          case "CERT_CLAIMED":
-            message = `You claimed certificate for course #${event.courseIdentifier}`;
+          }
+          case "CERT_CLAIMED": {
+            const certCourseName = await getCourseName(event.courseIdentifier);
+            message = `You claimed certificate for "${certCourseName}"`;
             break;
-          case "ADMIN_TRANSFERRED":
+          }
+          case "ADMIN_TRANSFERRED": {
             message = `You became an admin`;
             break;
-          case "COURSE_ACQUIRED":
-            message = `You acquired course #${event.courseIdentifier}`;
+          }
+          case "COURSE_ACQUIRED": {
+            const acquiredCourseName = await getCourseName(
+              event.courseIdentifier,
+            );
+            message = `You acquired "${acquiredCourseName}"`;
             break;
-          default:
+          }
+          case "COURSE_APPROVED": {
+            const approvedCourseName = await getCourseName(
+              event.courseIdentifier,
+            );
+            message = `"${approvedCourseName}" was approved`;
+            break;
+          }
+          case "COURSE_UNAPPROVED": {
+            const unapprovedCourseName = await getCourseName(
+              event.courseIdentifier,
+            );
+            message = `"${unapprovedCourseName}" was unapproved`;
+            break;
+          }
+          default: {
             message = `${event.type || "Unknown"} event`;
+          }
         }
 
         const notification = {
@@ -130,18 +257,20 @@ const Notification = ({ wallet, address }: NotificationProps) => {
           name: event.name,
         };
 
-    
-        return notification;
-      },
-    );
+        processedNotifications.push(notification);
+      }
 
+      // Sort by block number (newest first)
+      processedNotifications.sort(
+        (a: NotificationItem, b: NotificationItem) =>
+          b.blockNumber - a.blockNumber,
+      );
 
-    // Sort by block number (newest first)
-    processedNotifications.sort((a, b) => b.blockNumber - a.blockNumber);
-  
+      setNotifications(processedNotifications);
+    };
 
-    setNotifications(processedNotifications);
-  }, [eventsData]);
+    processNotifications();
+  }, [eventsData, courseDetails]);
 
   const formatTimestamp = (timestamp: string) => {
     try {
@@ -225,6 +354,8 @@ const Notification = ({ wallet, address }: NotificationProps) => {
                             COURSE_REPLACED: "bg-amber-500",
                             ADMIN_TRANSFERRED: "bg-purple-500",
                             COURSE_ACQUIRED: "bg-blue-500",
+                            COURSE_APPROVED: "bg-green-500",
+                            COURSE_UNAPPROVED: "bg-orange-500",
                           } as Record<string, string>
                         )[item.type] || "bg-gray-400"
                       }`}

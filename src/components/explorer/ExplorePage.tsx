@@ -227,7 +227,7 @@ const ExplorePage = () => {
       </div>
 
       {/* Table Section */}
-      <div className="min-h-[930px] mx-auto bg-white mt-4 rounded-lg mb-24 p-2 md:p-3">
+      <div className="min-h-[930px] mx-auto bg-white my-4 rounded-lg p-2 md:p-3">
         <div className="flex bg-[#9B51E052] bg-opacity-[35%] md:bg-[#9B51E052] xl:bg-transparent h-[80px] rounded-xl xl:max-h-20 justify-between items-center px-5 sm:px-0  mx-auto">
           <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
             Recent Activity
