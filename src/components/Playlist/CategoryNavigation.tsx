@@ -14,16 +14,19 @@ const CategoryNavigation = () => {
   ];
 
   return (
-    <div className="bg-blue-500 px-6 py-3">
-      <div className="flex space-x-6 overflow-x-auto">
-        {categories.map((category, index) => (
-          <button
-            key={index}
-            className="text-white whitespace-nowrap hover:text-blue-200 transition-colors"
-          >
-            {category}
-          </button>
-        ))}
+    <div className="bg-blue-500 py-4">
+      <div className="flex justify-center items-center">
+        <nav className="flex flex-wrap gap-6 px-4">
+          {categories.map((category, index) => (
+            <a
+              key={index}
+              href="#"
+              className="text-white hover:text-blue-100 transition-colors duration-200 whitespace-nowrap"
+            >
+              {category}
+            </a>
+          ))}
+        </nav>
       </div>
     </div>
   );
