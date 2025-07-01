@@ -1,5 +1,5 @@
-// Data/courseData.ts
-import { Course } from "../types/Course";
+// src/data/courseData.ts
+import { Course } from "@/types/Course";
 
 export const mostViewedCourses: Course[] = [
   {
@@ -44,17 +44,37 @@ export const mostViewedCourses: Course[] = [
   },
   {
     id: "5",
-    title: "Decentralized Applications",
+    title: "Blockchain Fundamentals",
     provider: "Tech Innovators Hub",
     providerLogo: "/img/profile1.jpg",
-    views: "124K",
+    views: "126K",
     classes: "16",
     image: "/img/kony.jpg",
     category: "cybersecurity",
   },
   {
     id: "6",
-    title: "Tokenomics & Governance",
+    title: "Smart Contract Development",
+    provider: "Tech Innovators Hub",
+    providerLogo: "/img/profile1.jpg",
+    views: "126K",
+    classes: "16",
+    image: "/img/kony.jpg",
+    category: "cybersecurity",
+  },
+  {
+    id: "7",
+    title: "Blockchain Fundamentals",
+    provider: "Tech Innovators Hub",
+    providerLogo: "/img/profile1.jpg",
+    views: "126K",
+    classes: "16",
+    image: "/img/kony.jpg",
+    category: "cybersecurity",
+  },
+  {
+    id: "8",
+    title: "Smart Contract Development",
     provider: "Tech Innovators Hub",
     providerLogo: "/img/profile1.jpg",
     views: "126K",
@@ -66,7 +86,7 @@ export const mostViewedCourses: Course[] = [
 
 export const web3AfrikaCourses: Course[] = [
   {
-    id: "7",
+    id: "9",
     title: "Time to Buy",
     provider: "Web3Afrika",
     providerLogo: "/img/profile2.png",
@@ -76,7 +96,7 @@ export const web3AfrikaCourses: Course[] = [
     category: "cryptocurrency",
   },
   {
-    id: "8",
+    id: "10",
     title: "Web3 Project Management",
     provider: "Web3Afrika",
     providerLogo: "/img/profile2.png",
@@ -86,22 +106,22 @@ export const web3AfrikaCourses: Course[] = [
     category: "cryptocurrency",
   },
   {
-    id: "9",
-    title: "Decentralized Finance (DeFi)",
+    id: "11",
+    title: "Time to Buy",
     provider: "Web3Afrika",
     providerLogo: "/img/profile2.png",
-    views: "72K",
-    classes: "8",
+    views: "58K",
+    classes: "10",
     image: "/img/buy.jpg",
     category: "cryptocurrency",
   },
   {
-    id: "10",
-    title: "Cross-Chain Interoperability",
+    id: "12",
+    title: "Time to Buy",
     provider: "Web3Afrika",
     providerLogo: "/img/profile2.png",
-    views: "33K",
-    classes: "6",
+    views: "58K",
+    classes: "10",
     image: "/img/buy.jpg",
     category: "cryptocurrency",
   },
@@ -109,7 +129,7 @@ export const web3AfrikaCourses: Course[] = [
 
 export const moonshotCourses: Course[] = [
   {
-    id: "11",
+    id: "13",
     title: "Market Dynamics",
     provider: "Moonshot Africa",
     providerLogo: "/img/profile3.png",
@@ -120,7 +140,7 @@ export const moonshotCourses: Course[] = [
     category: "investing",
   },
   {
-    id: "12",
+    id: "14",
     title: "Growth Hacking with Web3",
     provider: "Moonshot Africa",
     providerLogo: "/img/profile3.png",
@@ -131,25 +151,25 @@ export const moonshotCourses: Course[] = [
     category: "investing",
   },
   {
-    id: "13",
-    title: "Building Scalable dApps",
+    id: "15",
+    title: "Market Dynamics",
     provider: "Moonshot Africa",
     providerLogo: "/img/profile3.png",
-    views: "310K",
-    classes: "12",
+    views: "598.7K",
+    classes: "8",
     image: "/img/elementary.jpg",
-    estimatedRevenue: "$7,100",
+    estimatedRevenue: "$6,965",
     category: "investing",
   },
   {
-    id: "14",
-    title: "Token Sale Strategies",
+    id: "16",
+    title: "Growth Hacking with Web3",
     provider: "Moonshot Africa",
     providerLogo: "/img/profile3.png",
-    views: "255K",
-    classes: "9",
+    views: "420K",
+    classes: "10",
     image: "/img/elementary.jpg",
-    estimatedRevenue: "$4,800",
+    estimatedRevenue: "$5,200",
     category: "investing",
   },
 ];

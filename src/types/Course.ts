@@ -1,3 +1,4 @@
+// src/types/Course.ts
 export interface Course {
   id: string;
   title: string;
@@ -6,6 +7,6 @@ export interface Course {
   views: string;
   classes: string;
   image: string;
-  estimatedRevenue?: string;
   category: string;
+  estimatedRevenue?: string;
 }

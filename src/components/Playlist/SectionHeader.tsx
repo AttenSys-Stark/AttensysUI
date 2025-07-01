@@ -1,23 +1,20 @@
-// components/SectionHeader.tsx
+// src/components/playlist/SectionHeader.tsx
 import React from "react";
 
 interface SectionHeaderProps {
   title: string;
-  logoColor?: string;
-  showLogo?: boolean;
+  count?: number;
 }
 
-const SectionHeader: React.FC<SectionHeaderProps> = ({
-  title,
-  logoColor = "bg-black",
-  showLogo = false,
-}) => {
+const SectionHeader: React.FC<SectionHeaderProps> = ({ title, count }) => {
   return (
-    <div className="flex items-center mb-6">
-      {showLogo && (
-        <div className={`w-8 h-8 ${logoColor} rounded-full mr-3`}></div>
+    <div className="flex items-center justify-between mb-6">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900">{title}</h2>
+      {count && (
+        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+          {count} cursos
+        </span>
       )}
-      <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
     </div>
   );
 };

@@ -1,6 +1,6 @@
 // components/RevenueCard.tsx
 import React from "react";
-import { BookOpen } from "lucide-react";
+import { Eye, BookOpen } from "lucide-react";
 import { Course } from "@/types/Course";
 
 interface RevenueCardProps {
@@ -9,12 +9,12 @@ interface RevenueCardProps {
 
 const RevenueCard: React.FC<RevenueCardProps> = ({ course }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow min-w-0">
       <div className="relative">
         <img
           src={course.image}
           alt={course.title}
-          className="w-full h-32 object-cover"
+          className="w-full h-40 object-cover"
         />
         <div className="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-bold">
           {course.views}
@@ -29,26 +29,28 @@ const RevenueCard: React.FC<RevenueCardProps> = ({ course }) => {
         </div>
       </div>
 
-      <div className="p-4">
-        <div className="flex items-center mb-2">
+      <div className="p-4 pt-3">
+        <div className="flex items-start mb-4">
           <img
             src={course.providerLogo}
             alt={course.provider}
-            className="w-6 h-6 rounded-full mr-2 object-cover"
+            className="w-8 h-8 rounded-full mr-3 object-cover flex-shrink-0"
           />
-          <div>
-            <h3 className="font-semibold text-sm text-gray-800">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-base text-gray-900 leading-tight mb-2 line-clamp-2">
               {course.title}
             </h3>
-            <p className="text-xs text-gray-600">{course.provider}</p>
+            <p className="text-sm text-gray-600 mb-3">{course.provider}</p>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-purple-600 font-semibold">
+                Certified Courses
+              </span>
+              <span className="text-blue-600 flex items-center">
+                <BookOpen className="w-4 h-4 mr-1" />
+                {course.classes} classes
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div className="text-xs">
-          <span className="text-purple-600 font-semibold">
-            Certified Courses
-          </span>
-          <span className="text-gray-500 ml-1">• {course.classes} classes</span>
         </div>
       </div>
     </div>

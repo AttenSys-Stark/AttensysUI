@@ -3,13 +3,13 @@ import React from "react";
 
 const DecorativeBanner: React.FC = () => {
   return (
-    <div className="h-32 rounded-lg mb-12 relative overflow-hidden">
+    <div className="w-screen h-[322px] relative overflow-hidden mb-12 ml-[calc(-50vw+50%)] mr-[calc(-50vw+50%)]">
       <img
         src="/img/banner.jpg"
         alt="Banner decorativo"
         className="w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-purple-700/20 to-pink-600/20">
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-900/30 via-purple-700/30 to-pink-600/30">
         <div className="absolute inset-0 opacity-30">
           <svg viewBox="0 0 100 100" className="w-full h-full">
             <path
