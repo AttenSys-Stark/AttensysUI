@@ -10,7 +10,6 @@ import CategoryNavigation from "@/components/Playlist/CategoryNavigation";
 import MobileFilters from "@/components/Playlist/MobileFilters";
 import DecorativeBanner from "@/components/Playlist/DecorativeBanner"; // 👈 Importar el banner
 
-// Importar datos y tipos
 import {
   mostViewedCourses,
   web3AfrikaCourses,
@@ -25,7 +24,6 @@ const PlaylistPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navegación de categorías - Escritorio */}
       <CategoryNavigation />
 
       {/* Header móvil */}
@@ -69,7 +67,6 @@ const PlaylistPage = () => {
         </div>
       </div>
 
-      {/* Barra superior en escritorio */}
       <div className="hidden lg:block bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -77,39 +74,16 @@ const PlaylistPage = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Buscar cursos..."
+                placeholder="Search courses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setViewMode("grid")}
-                className={`p-2 rounded-lg transition-colors ${
-                  viewMode === "grid"
-                    ? "bg-blue-100 text-blue-600"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-              >
-                <Grid className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`p-2 rounded-lg transition-colors ${
-                  viewMode === "list"
-                    ? "bg-blue-100 text-blue-600"
-                    : "text-gray-500 hover:bg-gray-100"
-                }`}
-              >
-                <List className="w-5 h-5" />
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Contenido principal */}
       <div className="container mx-auto px-4 py-6 lg:py-8">
         {/* Most Viewed */}
         <section className="mb-12">
@@ -127,7 +101,6 @@ const PlaylistPage = () => {
           </div>
         </section>
 
-        {/* 🎯 Banner decorativo entre secciones */}
         <DecorativeBanner />
 
         {/* Web3Afrika */}
@@ -146,7 +119,6 @@ const PlaylistPage = () => {
           </div>
         </section>
 
-        {/* Moonshot Africa */}
         <section className="mb-12">
           <SectionHeader
             title="Moonshot Africa"
@@ -166,7 +138,6 @@ const PlaylistPage = () => {
         </section>
       </div>
 
-      {/* Filtros móviles */}
       <MobileFilters
         isOpen={isFiltersOpen}
         onClose={() => setIsFiltersOpen(false)}

@@ -1,4 +1,3 @@
-// components/DecorativeBanner.tsx
 import React from "react";
 
 const DecorativeBanner: React.FC = () => {

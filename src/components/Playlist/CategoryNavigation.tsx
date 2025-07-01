@@ -1,4 +1,3 @@
-// src/components/playlist/CategoryNavigation.tsx
 import React, { useState } from "react";
 
 const CategoryNavigation = () => {

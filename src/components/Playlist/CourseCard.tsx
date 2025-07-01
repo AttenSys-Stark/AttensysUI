@@ -1,4 +1,3 @@
-// src/components/playlist/CourseCard.tsx
 import React from "react";
 import { Eye, BookOpen } from "lucide-react";
 import { Course } from "@/types/Course";

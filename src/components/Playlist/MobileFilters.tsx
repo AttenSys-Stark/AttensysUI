@@ -1,4 +1,3 @@
-// src/components/playlist/MobileFilters.tsx
 import React, { useState } from "react";
 import { X } from "lucide-react";
 
@@ -34,7 +33,7 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({ isOpen, onClose }) => {
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900">
-              Filtros y Categorías
+              Filters & Categories
             </h3>
             <button
               onClick={onClose}
@@ -47,7 +46,7 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({ isOpen, onClose }) => {
 
         <div className="p-4 overflow-y-auto">
           <div className="mb-6">
-            <h4 className="font-medium text-gray-900 mb-3">Categorías</h4>
+            <h4 className="font-medium text-gray-900 mb-3">Categories</h4>
             <div className="space-y-2">
               {categories.map((category) => (
                 <button
@@ -70,7 +69,7 @@ const MobileFilters: React.FC<MobileFiltersProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
-              Aplicar Filtros
+              Apply Filters
             </button>
           </div>
         </div>
