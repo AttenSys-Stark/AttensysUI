@@ -46,6 +46,10 @@ import { onAuthStateChanged } from "firebase/auth";
 import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKey } from "@/helpers/encrypt";
 import { executeCalls } from "@avnu/gasless-sdk";
+import { ShareButton, ShareModal, ShareData } from "@/components/sharing";
+import AuthRequiredModal from "../auth/AuthRequiredModal";
+import { useRouter } from "next/navigation";
+import { generateShareableUrl } from "@/utils/sharing";
 
 interface CourseType {
   data: any;
@@ -112,6 +116,15 @@ const LecturePage = (props: any) => {
   const [account, setAccount] = useState<any>();
   const [address, setAddress] = useState<any>();
 
+  // Sharing functionality
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [shareData, setShareData] = useState<ShareData>({
+    title: "",
+    description: "",
+    url: "",
+    courseId: "",
+  });
+
   const searchParams = useSearchParams();
   const ultimate_id = searchParams.get("id");
 
@@ -120,6 +133,12 @@ const LecturePage = (props: any) => {
     attensysCourseAddress,
     provider,
   );
+
+  const [showAuthModal, setShowAuthModal] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [courseApproved, setCourseApproved] = useState<boolean | null>(null);
+  const router = useRouter ? useRouter() : null;
 
   // Fetch reviews and average rating in parallel, sends empty string if undefined
   const fetchReviewsAndRating = async () => {
@@ -262,6 +281,33 @@ const LecturePage = (props: any) => {
       );
     } catch (err) {
       console.error("Error in find:", err);
+    }
+  };
+
+  // Check if the current course is approved
+  const checkCourseApproval = () => {
+    if (!ultimate_id || courses.length === 0) return;
+    console.log("here as props", props?.data);
+    if (!props?.data?.courseImage) return;
+
+    const foundCourse = courses.find((course, index) => {
+      return props?.data?.courseImage === courseData[index]?.data?.courseImage;
+    });
+
+    if (foundCourse && foundCourse.course_identifier !== courseId) {
+      setCourseId(foundCourse.course_identifier);
+    }
+
+    const course = courses.find(
+      (c) => Number(c.course_identifier) === Number(ultimate_id),
+    );
+    console.log("course", course);
+    if (course) {
+      setCourseApproved(course.is_approved);
+      console.log("Course approval status:", course.is_approved);
+    } else {
+      setCourseApproved(false);
+      console.log("Course not found or not approved");
     }
   };
 
@@ -605,18 +651,11 @@ const LecturePage = (props: any) => {
     getCourse();
   }, [courses]);
 
-  // useEffect(() => {
-  //   console.log("here as props", props?.data);
-  //   if (!props?.data?.courseImage) return;
-
-  //   const foundCourse = courses.find((course, index) => {
-  //     return props?.data?.courseImage === courseData[index]?.data?.courseImage;
-  //   });
-
-  //   if (foundCourse && foundCourse.course_identifier !== courseId) {
-  //     setCourseId(foundCourse.course_identifier);
-  //   }
-  // }, [courses, courseData, props?.data?.courseImage, courseId]);
+  useEffect(() => {
+    if (courses.length > 0 && ultimate_id) {
+      checkCourseApproval();
+    }
+  }, [courses, ultimate_id]);
 
   useEffect(() => {
     if (ultimate_id && ultimate_id !== undefined) {
@@ -653,11 +692,39 @@ const LecturePage = (props: any) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user && user.uid) {
+      console.log(
+        "Auth state changed - user:",
+        user?.uid,
+        "emailVerified:",
+        user?.emailVerified,
+        "showAuthModal before:",
+        showAuthModal,
+      );
+      if (!user) {
+        setShowAuthModal(true);
+        setAuthChecked(true);
+      } else {
+        // Check if user has both email verification AND Starknet address before considering them fully authenticated
         try {
           const profile = await getUserProfile(user.uid);
-          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
-          if (profile) {
+          // Check both Firebase user emailVerified and profile emailVerified as fallback
+          const isEmailVerified = user.emailVerified || profile?.emailVerified;
+
+          console.log("Auth state check:", {
+            userId: user.uid,
+            hasProfile: !!profile,
+            hasStarknetAddress: !!profile?.starknetAddress,
+            userEmailVerified: user.emailVerified,
+            profileEmailVerified: profile?.emailVerified,
+            isEmailVerified: isEmailVerified,
+            completeSetup: Boolean(
+              profile && profile.starknetAddress && isEmailVerified,
+            ),
+          });
+
+          if (profile && profile.starknetAddress && isEmailVerified) {
+            // User has complete account setup
+            const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
             const decryptedPrivateKey = decryptPrivateKey(
               profile.starknetPrivateKey,
               encryptionSecret,
@@ -665,6 +732,8 @@ const LecturePage = (props: any) => {
             if (!decryptedPrivateKey) {
               console.error("Failed to decrypt private key");
               setAccount(undefined);
+              setAuthChecked(true);
+              setShowAuthModal(true);
               return;
             }
             const userAccount = new Account(
@@ -674,21 +743,197 @@ const LecturePage = (props: any) => {
             );
             setAccount(userAccount);
             setAddress(profile.starknetAddress);
+            setAuthChecked(true);
+            setShowAuthModal(false);
           } else {
-            console.log("No user profile found in Firestore.");
+            // User is authenticated but doesn't have complete setup yet (still in signup process)
+            console.log(
+              "User authenticated but account setup not complete yet",
+            );
+            if (!isEmailVerified) {
+              console.log("Email not verified yet");
+            }
+            if (!profile?.starknetAddress) {
+              console.log("Starknet address not created yet");
+            }
             setAccount(undefined);
+            setAddress(undefined);
+            setShowAuthModal(true);
+            // Don't set authChecked to true yet - keep showing loading
+
+            // Start polling for complete account setup (email verification + Starknet address)
+            const checkCompleteAccountSetup = async () => {
+              try {
+                // Reload user to get latest email verification status
+                await user.reload();
+                const updatedUser = auth.currentUser;
+
+                const currentProfile = await getUserProfile(user.uid);
+                console.log("Polling check:", {
+                  hasProfile: !!currentProfile,
+                  hasStarknetAddress: !!currentProfile?.starknetAddress,
+                  emailVerified: updatedUser?.emailVerified,
+                  profileEmailVerified: currentProfile?.emailVerified,
+                  userId: user.uid,
+                });
+
+                // Check both Firebase user emailVerified and profile emailVerified as fallback
+                const isEmailVerified =
+                  updatedUser?.emailVerified || currentProfile?.emailVerified;
+
+                if (
+                  currentProfile &&
+                  currentProfile.starknetAddress &&
+                  isEmailVerified
+                ) {
+                  console.log(
+                    "Complete account setup detected - email verified and Starknet address created",
+                  );
+                  const encryptionSecret =
+                    process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+                  const decryptedPrivateKey = decryptPrivateKey(
+                    currentProfile.starknetPrivateKey,
+                    encryptionSecret,
+                  );
+                  if (decryptedPrivateKey) {
+                    const userAccount = new Account(
+                      provider,
+                      currentProfile.starknetAddress,
+                      decryptedPrivateKey,
+                    );
+                    setAccount(userAccount);
+                    setAddress(currentProfile.starknetAddress);
+                    setAuthChecked(true);
+                    setShowAuthModal(false);
+                    setAuthLoading(false);
+                    return true;
+                  }
+                }
+                return false;
+              } catch (error) {
+                console.error(
+                  "Error checking for complete account setup:",
+                  error,
+                );
+                return false;
+              }
+            };
+
+            // Poll every 3 seconds for up to 60 seconds (longer duration for email verification)
+            const pollInterval = setInterval(async () => {
+              const isComplete = await checkCompleteAccountSetup();
+              if (isComplete) {
+                clearInterval(pollInterval);
+              }
+            }, 3000);
+
+            // Stop polling after 60 seconds and show auth modal
+            setTimeout(() => {
+              clearInterval(pollInterval);
+              if (!authChecked) {
+                setAuthChecked(true);
+                setShowAuthModal(true);
+              }
+            }, 60000);
           }
         } catch (err) {
           console.error("Error fetching user profile:", err);
           setAccount(undefined);
+          setAuthChecked(true);
+          setShowAuthModal(true);
         }
-      } else {
-        console.log("No authenticated user found.");
-        setAccount(undefined);
       }
     });
-    return () => unsubscribe();
+    // Fallback: if authChecked is not set after 1s, show modal
+    const fallback = setTimeout(() => {
+      if (!authChecked) {
+        setShowAuthModal(true);
+        setAuthChecked(true);
+      }
+    }, 1000);
+    return () => {
+      unsubscribe();
+      clearTimeout(fallback);
+    };
   }, []);
+
+  // Additional check for already authenticated users on component mount
+  useEffect(() => {
+    const checkCurrentAuthState = async () => {
+      // Add a small delay to ensure auth state is properly determined
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      const currentUser = auth.currentUser;
+      console.log(
+        "Component mount check - currentUser:",
+        currentUser?.uid,
+        "emailVerified:",
+        currentUser?.emailVerified,
+      );
+
+      // If we already have an address, user is authenticated - close modal immediately
+      if (address) {
+        console.log("Address already exists, closing modal immediately");
+        setShowAuthModal(false);
+        setAuthChecked(true);
+        setAuthLoading(false);
+        return;
+      }
+
+      if (currentUser) {
+        // Manually trigger the auth state check for already authenticated users
+        try {
+          const profile = await getUserProfile(currentUser.uid);
+          const isEmailVerified =
+            currentUser.emailVerified || profile?.emailVerified;
+
+          console.log("Manual auth check:", {
+            hasProfile: !!profile,
+            hasStarknetAddress: !!profile?.starknetAddress,
+            isEmailVerified: isEmailVerified,
+          });
+
+          if (profile && profile.starknetAddress && isEmailVerified) {
+            const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+            const decryptedPrivateKey = decryptPrivateKey(
+              profile.starknetPrivateKey,
+              encryptionSecret,
+            );
+            if (decryptedPrivateKey) {
+              const userAccount = new Account(
+                provider,
+                profile.starknetAddress,
+                decryptedPrivateKey,
+              );
+              setAccount(userAccount);
+              setAddress(profile.starknetAddress);
+              setAuthChecked(true);
+              setShowAuthModal(false);
+              setAuthLoading(false);
+              console.log("Manual auth check - modal closed");
+              return; // Exit early to prevent further processing
+            }
+          }
+          // If we reach here, user is not fully authenticated
+          setAuthChecked(true);
+          setAuthLoading(false);
+          // Keep showAuthModal as true (already set in initial state)
+        } catch (error) {
+          console.error("Error in manual auth check:", error);
+          // Keep showAuthModal as true (already set in initial state)
+          setAuthChecked(true);
+          setAuthLoading(false);
+        }
+      } else {
+        // No user - show modal
+        setAuthChecked(true);
+        setAuthLoading(false);
+        // Keep showAuthModal as true (already set in initial state)
+      }
+    };
+
+    checkCurrentAuthState();
+  }, [address]); // Run on mount and when address changes
 
   useEffect(() => {
     const checkReview = async () => {
@@ -762,378 +1007,236 @@ const LecturePage = (props: any) => {
     fetchAllRatings();
   }, [courseData]);
 
+  // Sharing handlers
+  const handleShareClick = () => {
+    if (props?.data && ultimate_id) {
+      // Generate a professional shareable URL instead of using current page URL
+      const shareableUrl = generateShareableUrl(
+        ultimate_id,
+        props.data.courseName,
+      );
+
+      setShareData({
+        title: props.data.courseName || "Course",
+        description:
+          props.data.courseDescription || "Check out this amazing course!",
+        url: shareableUrl,
+        courseId: ultimate_id,
+      });
+      setIsShareModalOpen(true);
+    }
+  };
+
+  const handleShareModalClose = () => {
+    setIsShareModalOpen(false);
+  };
+
+  const handleShareSuccess = (platform: string) => {
+    toast.success(`Shared on ${platform}!`, {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  };
+
+  // Add this near other useState hooks
+  const [accessUrls, setAccessUrls] = useState<(string | undefined)[]>([]);
+
+  // Fetch all access URLs when courseCurriculum changes
+  useEffect(() => {
+    async function fetchAccessUrls() {
+      if (!props?.data?.courseCurriculum) return;
+      const urls = await Promise.all(
+        props.data.courseCurriculum.map((lecture: any) =>
+          createAccess(lecture.video),
+        ),
+      );
+      setAccessUrls(urls);
+    }
+    fetchAccessUrls();
+  }, [props?.data?.courseCurriculum]);
+
+  if (authLoading) {
+    return (
+      <div className="pt-6 pb-36 w-full">
+        <div className="flex justify-center items-center min-h-screen">
+          <LoadingSpinner size="lg" colorVariant="primary" />
+        </div>
+      </div>
+    );
+  }
+
+  // Check if course is approved - if not, show error message
+  if (courseApproved === false) {
+    return (
+      <div className="pt-6 pb-36 w-full">
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-[#2D3A4B] mb-4">
+              Course Not Available
+            </h2>
+            <p className="text-[#2D3A4B] mb-6">
+              This course is currently pending approval and is not available for
+              viewing.
+            </p>
+            <button
+              onClick={() => router?.push("/Home")}
+              className="bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold hover:bg-[#8a4ad0] transition-colors"
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  console.log(
+    "Rendering LecturePage - showAuthModal:",
+    showAuthModal,
+    "authChecked:",
+    authChecked,
+    "address:",
+    address,
+  );
+
   return (
-    <div className="pt-6  pb-36 w-full">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick={false}
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-        transition={Bounce}
-      />
-      {/* Video and Title */}
-      <div className="flex flex-none w-full text-sm space-x-3 items-center px-6 sm:px-12">
-        <div className="flex flex-none space-x-2 items-center">
-          <Image
-            src={graduate}
-            className="h-[25px] w-[25px]"
-            alt="stream_video"
-          />
-          <p className="text-[16px] text-[#2D3A4B] font-semibold">My Courses</p>
+    <>
+      {!authLoading && authChecked && showAuthModal && (
+        <AuthRequiredModal
+          open={showAuthModal}
+          coursePath={
+            typeof window !== "undefined"
+              ? window.location.pathname + window.location.search
+              : ""
+          }
+        />
+      )}
+      <div className="pt-6  pb-36 w-full">
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          transition={Bounce}
+        />
+        {/* Video and Title */}
+        <div className="flex flex-none w-full text-sm space-x-3 items-center px-6 sm:px-12">
+          <div className="flex flex-none space-x-2 items-center">
+            <Image
+              src={graduate}
+              className="h-[25px] w-[25px]"
+              alt="stream_video"
+            />
+            <p className="text-[16px] text-[#2D3A4B] font-semibold">
+              My Courses
+            </p>
+          </div>
+          <span className="text-[#9B51E0]">|</span>{" "}
+          <p className="w-full truncate text-[16px] text-[#2D3A4B] font-semibold">
+            {props?.data?.courseName}
+          </p>
         </div>
-        <span className="text-[#9B51E0]">|</span>{" "}
-        <p className="w-full truncate text-[16px] text-[#2D3A4B] font-semibold">
-          {props?.data?.courseName}
-        </p>
-      </div>
 
-      {/* ReactPlayer & lecture*/}
-      <div className="w-[100%]  mx-auto flex justify-between items-center px-6 sm:px-12 mt-5">
-        <div className="w-full xl:w-[67%] h-[33vh] xl:h-[543px] rounded-xl overflow-hidden relative">
-          {selectedVideo && (
-            <>
-              <div className="absolute inset-0 overflow-hidden">
-                <ReactPlayer
-                  url={selectedVideo}
-                  width="100%"
-                  height="100%"
-                  className="rounded-xl"
-                  controls
-                  playing={!showOverlay}
-                  config={{
-                    file: {
-                      attributes: {
-                        controlsList: "nodownload",
+        {/* ReactPlayer & lecture*/}
+        <div className="w-[100%]  mx-auto flex justify-between items-center px-6 sm:px-12 mt-5">
+          <div className="w-full xl:w-[67%] h-[33vh] xl:h-[543px] rounded-xl overflow-hidden relative">
+            {selectedVideo && (
+              <>
+                <div
+                  className="absolute inset-0 overflow-hidden"
+                  onContextMenu={(e) => e.preventDefault()}
+                >
+                  <ReactPlayer
+                    url={selectedVideo}
+                    width="100%"
+                    height="100%"
+                    className="rounded-xl"
+                    controls
+                    playing={!showOverlay}
+                    config={{
+                      file: {
+                        attributes: {
+                          controlsList: "nodownload",
+                        },
                       },
-                    },
-                  }}
-                />
-              </div>
-              {showOverlay && !isTakingCourse && (
-                <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-xl">
-                  <div className="text-white text-center p-6">
-                    <h2 className="text-2xl font-bold mb-4">Course Locked</h2>
-                    <p className="mb-6">Take this course to start learning</p>
-                    <button
-                      className={`bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold`}
-                      onClick={handleconfirmation}
-                      disabled={isUploading}
-                    >
-                      {isUploading ? (
-                        <div className="flex items-center gap-2">
-                          <LoadingSpinner size="sm" colorVariant="white" />
-                          Processing...
-                        </div>
-                      ) : isConfirmModalOpen ? (
-                        "Waiting for confirmation"
-                      ) : (
-                        `Buy Course ${coursePrice === 0 ? "(Free)" : `($${coursePrice})`}`
-                      )}
-                    </button>
-                  </div>
+                    }}
+                  />
                 </div>
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="hidden xl:block w-[30%] h-[543px] space-y-4">
-          <div className="flex space-x-2  justify-center bg-gradient-to-r from-[#5801a9] to-[#4a90e2] text-white items-center text-sm py-3 px-7 rounded-xl">
-            <HiBadgeCheck color="#fff" />
-            <p>Attensys Certified Course</p>
-          </div>
-          <h1 className="text-[16px] text-[#2D3A4B] leading-[22px] font-semibold">
-            Lecture ({props?.data?.courseCurriculum.length})
-          </h1>
-
-          <div className="h-[440px] w-[100%] bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide">
-            {props?.data?.courseCurriculum
-              ?.slice()
-              .reverse()
-              .map((item: any, i: any) => {
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                const [accessUrl, setAccessUrl] = useState<string | undefined>(
-                  undefined,
-                );
-
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                useEffect(() => {
-                  let isMounted = true;
-                  createAccess(item.video).then((url) => {
-                    if (isMounted) setAccessUrl(url);
-                  });
-                  return () => {
-                    isMounted = false;
-                  };
-                }, [item.video]);
-
-                return (
-                  <div
-                    key={i}
-                    className="flex w-full items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-                    onClick={() => handleVideoClick(accessUrl, item.name)}
-                  >
-                    <div className="w-8 flex-shrink-0">
-                      <p className="font-bold text-[#5801a9]">{i + 1}</p>
-                    </div>
-                    <div className="w-[145px] h-[94px] rounded-xl border-4 border flex-shrink-0 overflow-hidden">
-                      {accessUrl ? (
-                        <ReactPlayer
-                          url={accessUrl}
-                          controls={false}
-                          playing={false}
-                          width="100%"
-                          height="100%"
-                          playIcon={<></>}
-                          onDuration={(duration) => handleDuration(i, duration)}
-                        />
-                      ) : (
-                        <div className="flex items-center justify-center w-full h-full">
-                          <LoadingSpinner size="sm" colorVariant="primary" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-grow ml-6">
-                      <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
-                        {item.name}
-                      </p>
-                      <h1 className="text-[8px] text-[#333333] leading-[14px] font-medium">
-                        Creator address
-                      </h1>
-                      <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
-                        <p className="text-xs px-7 py-1">
-                          {durations[i]
-                            ? formatDuration(durations[i])
-                            : "0:00:00"}
-                        </p>
-                      </div>
+                {showOverlay && !isTakingCourse && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center rounded-xl">
+                    <div className="text-white text-center p-6">
+                      <h2 className="text-2xl font-bold mb-4">Course Locked</h2>
+                      <p className="mb-6">Take this course to start learning</p>
+                      <button
+                        className={`bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold`}
+                        onClick={handleconfirmation}
+                        disabled={isUploading}
+                      >
+                        {isUploading ? (
+                          <div className="flex items-center gap-2">
+                            <LoadingSpinner size="sm" colorVariant="white" />
+                            Processing...
+                          </div>
+                        ) : isConfirmModalOpen ? (
+                          "Waiting for confirmation"
+                        ) : (
+                          `Buy Course ${coursePrice === 0 ? "(Free)" : `($${coursePrice})`}`
+                        )}
+                      </button>
                     </div>
                   </div>
-                );
-              })}
-          </div>
-        </div>
-      </div>
-
-      <div className="w-[100%] mx-auto flex justify-between items-center sm:px-12 px-6 mt-5">
-        <div
-          className="w-full 
-        xl:w-[67%] space-y-3"
-        >
-          <div className="flex space-x-14 justify-between">
-            <div className="space-y-2">
-              {selectedLectureName && (
-                <h1 className="text-[16px]font-bold text-[24px] text-[#2D3A4B] leading-[31px]">
-                  {selectedLectureName}
-                </h1>
-              )}
-            </div>
-            <div className="hidden xl:flex sm:ml-5 space-x-2 items-center">
-              <GrDiamond color="#2D3A4B" className="h-[20px] w-[20px]" />
-              <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-                Difficulty level: {props?.data?.difficultyLevel}
-              </p>
-            </div>
-
-            <div className="hidden xl:flex space-x-2 items-center">
-              <div>
-                {isCertified ? (
-                  <div className="hidden xl:flex space-x-2 items-center">
-                    <div>
-                      <LuBadgeCheck className="h-[20px] w-[20px] text-[#5801A9]" />
-                    </div>
-                    <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-                      Certificate of Completion
-                    </p>
-                  </div>
-                ) : isTakingCourse ? (
-                  <button
-                    className={`hidden sm:block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold`}
-                    onClick={handleFinishCourseClaimCertfificate}
-                    disabled={isUploading}
-                  >
-                    {isUploading ? (
-                      <div className="flex items-center gap-2">
-                        <LoadingSpinner size="sm" colorVariant="white" />
-                        Claiming Certificate...
-                      </div>
-                    ) : (
-                      "Get Certificate"
-                    )}
-                  </button>
-                ) : null}
-              </div>
-              {/* {txnHash && (
-                <div>
-                  <a
-                    className="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
-                    href={explorer.transaction(txnHash)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Tx Hash
-                  </a>
-                </div>
-              )} */}
-            </div>
-          </div>
-          <div>
-            <p className="text-[14px] text-[#2D3A4B] leading-[18px] font-medium">
-              Created by{" "}
-              <span className="underline text-[#5801A9]">
-                {props?.data?.courseCreator}
-              </span>
-            </p>
-          </div>
-          {/* Mobile Get Certificate Button */}
-          <div className="xl:hidden flex space-x-2 items-center">
-            {isCertified ? (
-              <div className="flex space-x-2 items-center">
-                <div>
-                  <LuBadgeCheck className="h-[20px] w-[20px] text-[#5801A9]" />
-                </div>
-                <p className="text-[14px] text-[#2D3A4B] leading-[22px] font-medium">
-                  Certificate of Completion
-                </p>
-              </div>
-            ) : isTakingCourse ? (
-              <button
-                className={`bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold`}
-                onClick={handleFinishCourseClaimCertfificate}
-                disabled={isUploading}
-              >
-                {isUploading ? (
-                  <div className="flex items-center gap-2">
-                    <LoadingSpinner size="sm" colorVariant="white" />
-                    Claiming Certificate...
-                  </div>
-                ) : (
-                  "Get Certificate"
                 )}
-              </button>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="bg-[url('/hero_asset.png')] text-white p-10 rounded-xl w-[30%] hidden xl:flex items-center justify-center h-[85px]">
-          <Image src={attensys_logo} alt="logo" />
-        </div>
-      </div>
-
-      <div className="w-[100%] mx-auto flex justify-between px-6 xl:px-12 mt-5">
-        <div className="w-full xl:w-[67%] h-auto space-y-12">
-          <div className="h-auto w-full rounded-xl xl:bg-[#FFFFFF] xl:border-[1px] xl:border-[#D9D9D9] xl:p-10">
-            <div className="pb-4">
-              <p className="font-bold py-2 text-[14px] text-[#333333] leading-[22px]">
-                About this course
-              </p>
-              <div className="relative">
-                <p className="text-[14px] text-[#333333] leading-[22px] font-light">
-                  {isExpanded
-                    ? props?.data?.courseDescription
-                    : props?.data?.courseDescription?.slice(0, 200) +
-                      (showSeeMore ? "..." : "")}
-                  {showSeeMore && !isExpanded && (
-                    <span
-                      className="text-blue-600 cursor-pointer hover:underline ml-1"
-                      onClick={() => setIsExpanded(true)}
-                    >
-                      see more
-                    </span>
-                  )}
-                  {showSeeMore && isExpanded && (
-                    <span
-                      className="text-blue-600 cursor-pointer hover:underline ml-1"
-                      onClick={() => setIsExpanded(false)}
-                    >
-                      see less
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className="py-4">
-              <p className="font-bold py-2 text-[14px] text-[#333333] leading-[22px]">
-                {" "}
-                Student Requirements
-              </p>
-              <ul className="text-[14px] text-[#333333] leading-[22px] font-light list-disc">
-                {props?.data?.studentRequirements}
-              </ul>
-            </div>
-            <div className="py-6">
-              <p className="font-bold py-2 text-[14px] text-[#333333] leading-[22px]">
-                Target Audience
-              </p>
-              <div className="text-[#333333] text-[14px] font-light leading-[22px]">
-                <p>
-                  {isTargetExpanded
-                    ? props?.data?.targetAudienceDesc
-                    : props?.data?.targetAudienceDesc?.slice(0, 200) +
-                      (showTargetSeeMore ? "..." : "")}
-                  {showTargetSeeMore && !isTargetExpanded && (
-                    <span
-                      className="text-blue-600 cursor-pointer hover:underline ml-1"
-                      onClick={() => setIsTargetExpanded(true)}
-                    >
-                      see more
-                    </span>
-                  )}
-                  {showTargetSeeMore && isTargetExpanded && (
-                    <span
-                      className="text-blue-600 cursor-pointer hover:underline ml-1"
-                      onClick={() => setIsTargetExpanded(false)}
-                    >
-                      see less
-                    </span>
-                  )}
-                </p>
-              </div>
-            </div>
+              </>
+            )}
           </div>
 
-          {/* Lectures */}
-          <div className="flex xl:hidden flex-col">
-            <p className="mt-8 font-semibold">
-              Lectures({props?.data?.courseCurriculum.length})
-            </p>
-            <div className=" w-[100%] bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide">
+          <div className="hidden xl:block w-[30%] h-[543px] space-y-4">
+            <div className="flex space-x-2  justify-center bg-gradient-to-r from-[#5801a9] to-[#4a90e2] text-white items-center text-sm py-3 px-7 rounded-xl">
+              <HiBadgeCheck color="#fff" />
+              <p>Attensys Certified Course</p>
+            </div>
+            <h1 className="text-[16px] text-[#2D3A4B] leading-[22px] font-semibold">
+              Lecture ({props?.data?.courseCurriculum.length})
+            </h1>
+
+            <div className="h-[440px] w-[100%] bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide">
               {props?.data?.courseCurriculum
                 ?.slice()
                 .reverse()
                 .map((item: any, i: any) => {
-                  // eslint-disable-next-line react-hooks/rules-of-hooks
-                  const [accessUrl, setAccessUrl] = useState<
-                    string | undefined
-                  >(undefined);
-
-                  // eslint-disable-next-line react-hooks/rules-of-hooks
-                  useEffect(() => {
-                    let isMounted = true;
-                    createAccess(item.video).then((url) => {
-                      if (isMounted) setAccessUrl(url);
-                    });
-                    return () => {
-                      isMounted = false;
-                    };
-                  }, [item.video]);
-
+                  // Calculate the correct index for accessUrls (since we reversed the array)
+                  const accessUrl =
+                    accessUrls[props.data.courseCurriculum.length - 1 - i];
                   return (
                     <div
                       key={i}
                       className="flex w-full items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => handleVideoClick(accessUrl, item.name)}
+                      onClick={() => {
+                        if (window.innerWidth < 1024)
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        handleVideoClick(accessUrl, item.name);
+                      }}
                     >
                       <div className="w-8 flex-shrink-0">
                         <p className="font-bold text-[#5801a9]">{i + 1}</p>
                       </div>
-                      <div className="w-[150px] h-[97px] rounded-xl border-4 border flex-shrink-0">
+                      <div
+                        className="w-[145px] h-[94px] rounded-xl border-4 border flex-shrink-0 overflow-hidden"
+                        onContextMenu={(e) => e.preventDefault()}
+                      >
                         {accessUrl ? (
                           <ReactPlayer
                             url={accessUrl}
@@ -1156,6 +1259,9 @@ const LecturePage = (props: any) => {
                         <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
                           {item.name}
                         </p>
+                        <h1 className="text-[8px] text-[#333333] leading-[14px] font-medium">
+                          Creator address
+                        </h1>
                         <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
                           <p className="text-xs px-7 py-1">
                             {durations[i]
@@ -1169,201 +1275,317 @@ const LecturePage = (props: any) => {
                 })}
             </div>
           </div>
+        </div>
 
-          {/* Comments */}
-          <div className="space-y-4 hidden xl:flex flex-col">
-            <h1 className="text-[16px] font-bold text-[#2D3A4B] leading-[22px]">
-              Leave a review
-            </h1>
-            <div className="h-auto pb-10 w-full rounded-xl bg-[#FFFFFF] border-[1px] border-[#D9D9D9]">
-              <div className="flex justify-between items-center h-[100px] w-full border-b-[1px] border-b-[#EBECEE] px-10">
-                <div className="h-full w-[30%] flex items-center justify-center border-r-[1px] border-r-[#EBECEE]">
-                  <div className="flex items-center w-full space-x-3">
-                    <Image src={profile_pic} alt="pic" width={60} />
-                    <div className="space-y-1">
-                      <h4 className="text-[16px] text-[#333333] leading-[22px] font-semibold">
-                        {username}
-                      </h4>
-                      <p className="text-[#9b51e0] text-[12px] font-medium leading-[14px]">
-                        {!!address &&
-                        typeof address === "string" &&
-                        address.trim() !== ""
-                          ? shortHex(address)
-                          : "Login"}
-                      </p>
+        <div className="w-[100%] mx-auto flex justify-between items-center sm:px-12 px-6 mt-5">
+          <div className="w-full xl:w-[67%]">
+            {/* Course Header Section */}
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+              {/* Left Side - Course Title and Creator */}
+              <div className="flex-1 sm:space-y-3 space-y-1">
+                {selectedLectureName && (
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                    <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-[#2D3A4B] leading-tight">
+                      {selectedLectureName}
+                    </h1>
+                    {/* Difficulty Level - Desktop */}
+                    <div className="hidden sm:flex items-center gap-2 px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-50 rounded-lg border border-gray-200 w-fit">
+                      <GrDiamond className="h-3 w-3 text-[#2D3A4B]" />
+                      <span className="text-xs font-medium text-[#2D3A4B]">
+                        {props?.data?.difficultyLevel}
+                      </span>
                     </div>
                   </div>
-                </div>
-                <div className="h-full w-[30%] space-x-3 flex items-center border-r-[1px] border-r-[#EBECEE]">
-                  <h1 className="text-[14px] text-[#333333] leading-[16px] font-medium">
-                    {courseaveragerate?.count} students reviewed this course
-                  </h1>
-                </div>
-                <div className="h-full w-[30%] flex items-center space-x-3">
-                  <RatingDisplay rating={courseaveragerate} size="sm" />
-                </div>
-              </div>
-              {/* <div className="px-10 mt-8 flex items-center space-x-4">
-                <input
-                  type="text"
-                  placeholder="What do you think about this course?"
-                  className="w-[75%] h-[45px] border shadow-dm p-6 rounded-xl text-[14px] font-medium leading-[16px]"
-                />
-
-                <button className="hidden sm:block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold">
-                  Send review
-                </button>
-              </div>   */}
-              <div>
-                {!hasReviewed && isTakingCourse && (
-                  <ReviewForm
-                    videoId={props?.data?.courseName?.toString() + ultimate_id}
-                    userId={address?.toString() || ""}
-                    onSubmit={async (review) => {
-                      let user = getCurrentUser();
-                      if (!user) {
-                        user = await signInUser();
-                      }
-                      await submitReview({
-                        ...review,
-                        userId: auth.currentUser!.uid,
-                        videoId: `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
-                      });
-                      handleRatingSubmit();
-                      fetchReviewsAndRating();
-                      setHasReviewed(true);
-                    }}
-                  />
                 )}
-              </div>
-
-              <div className="px-10 mt-10 space-y-10 h-[380px] overflow-y-scroll pb-10 ">
-                {/* <div className="space-y-6">
-                  <div className="flex space-x-3 items-center">
-                    <div className="h-[64px] w-[64px] bg-[#9B51E01A] text-[20px] text-[#101928] leading-[24px] rounded-full flex items-center justify-center">
-                      OM
-                    </div>
-                    <div className="space-y-1">
-                      <h1 className="text-[14px] text-[#333333] font-semibold leading-[22px]">
-                        Olivia
-                      </h1>
-                      <StarRating totalStars={5} starnumber={4} />
-                    </div>
-                  </div>
-                  <p className="w-[730px] text-[14px] text-[#333333] font-medium leading-[22px]">
-                    Halfway through the course and lots of information given in
-                    every chapter. Concise and easy to understand, very useful
-                    to apply to any Web design journey!
-                  </p>
-                </div>
-
-                <div className="space-y-6 w-full">
-                  <div className="flex space-x-3 items-center">
-                    <div className="h-[64px] w-[64px] bg-[#9B51E01A] text-[20px] text-[#101928] leading-[24px] rounded-full flex items-center justify-center">
-                      OM
-                    </div>
-                    <div className="space-y-1">
-                      <h1 className="text-[14px] text-[#333333] font-semibold leading-[22px]">
-                        Olivia
-                      </h1>
-                      <StarRating totalStars={5} starnumber={4} />
-                    </div>
-                  </div>
-                  <p className="w-[730px] text-[14px] text-[#333333] font-medium leading-[22px]">
-                    Halfway through the course and lots of information given in
-                    every chapter. Concise and easy to understand, very useful
-                    to apply to any Web design journey!
-                  </p>
-                </div>
-
-                <div className="space-y-6">
-                  <div className="flex space-x-3 items-center">
-                    <div className="h-[64px] w-[64px] bg-[#9B51E01A] text-[20px] text-[#101928] leading-[24px] rounded-full flex items-center justify-center">
-                      OM
-                    </div>
-                    <div className="space-y-1">
-                      <h1 className="text-[14px] text-[#333333] font-semibold leading-[22px]">
-                        Olivia
-                      </h1>
-                      <StarRating totalStars={5} starnumber={4} />
-                    </div>
-                  </div>
-                  <p className="w-[730px] text-[14px] text-[#333333] font-medium leading-[22px]">
-                    Halfway through the course and lots of information given in
-                    every chapter. Concise and easy to understand, very useful
-                    to apply to any Web design journey!
-                  </p>
-                </div>
-               */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                  <div className="md:col-span-2">
-                    <ReviewsList reviews={coursereview} />
-                  </div>
+                <div className="flex items-center gap-2 text-sm text-[#2D3A4B] mb-0">
+                  <span className="font-medium">Created by</span>
+                  <span className="text-[#5801A9] font-semibold underline hover:text-[#9B51E0] transition-colors cursor-pointer">
+                    {props?.data?.courseCreator}
+                  </span>
                 </div>
               </div>
+
+              {/* Right Side - Action Buttons and Info */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:gap-4">
+                {/* Share Button - Desktop */}
+                <div className="hidden lg:flex">
+                  <ShareButton
+                    onClick={handleShareClick}
+                    variant="outline"
+                    size="md"
+                  >
+                    Share Course
+                  </ShareButton>
+                </div>
+
+                {/* Certificate/Get Certificate Button - Desktop Only */}
+                <div className="hidden lg:flex items-center">
+                  {isCertified ? (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
+                      <LuBadgeCheck className="h-4 w-4 text-green-600" />
+                      <span className="text-sm font-medium text-green-700">
+                        Certified
+                      </span>
+                    </div>
+                  ) : isTakingCourse ? (
+                    <button
+                      className="bg-gradient-to-r from-[#9B51E0] to-[#5801A9] hover:from-[#5801A9] hover:to-[#9B51E0] text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#9B51E0] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                      onClick={handleFinishCourseClaimCertfificate}
+                      disabled={isUploading}
+                    >
+                      {isUploading ? (
+                        <div className="flex items-center gap-2">
+                          <LoadingSpinner size="sm" colorVariant="white" />
+                          <span>Claiming...</span>
+                        </div>
+                      ) : (
+                        "Get Certificate"
+                      )}
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Actions Row - All on same line */}
+            <div className="lg:hidden flex items-center justify-between gap-3 border-t border-gray-100">
+              {/* Difficulty Level - Mobile */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg border border-gray-200">
+                <GrDiamond className="h-4 w-4 text-[#2D3A4B]" />
+                <span className="text-sm font-medium text-[#2D3A4B]">
+                  {props?.data?.difficultyLevel}
+                </span>
+              </div>
+
+              {/* Mobile Certificate Button */}
+              <div className="flex items-center">
+                {isCertified ? (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-green-50 rounded-lg border border-green-200">
+                    <LuBadgeCheck className="h-4 w-4 text-green-600" />
+                    <span className="text-sm font-medium text-green-700">
+                      Certified
+                    </span>
+                  </div>
+                ) : isTakingCourse ? (
+                  <button
+                    className="bg-gradient-to-r from-[#9B51E0] to-[#5801A9] hover:from-[#5801A9] hover:to-[#9B51E0] text-white font-semibold px-3 py-2 rounded-lg transition-all duration-200 text-sm shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-[#9B51E0] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    onClick={handleFinishCourseClaimCertfificate}
+                    disabled={isUploading}
+                  >
+                    {isUploading ? (
+                      <div className="flex items-center gap-1">
+                        <LoadingSpinner size="sm" colorVariant="white" />
+                        <span>Claiming</span>
+                      </div>
+                    ) : (
+                      "Get Certificate"
+                    )}
+                  </button>
+                ) : null}
+              </div>
+
+              {/* Share Button - Mobile */}
+              <ShareButton
+                onClick={handleShareClick}
+                variant="outline"
+                size="md"
+              >
+                Share
+              </ShareButton>
             </div>
           </div>
 
-          {/* Courses you might like - Mobile */}
-          <div className="block xl:hidden mt-0 sm:mt-8">
-            <h1 className="text-[16px] font-semibold mb-4">
-              Courses you might like
-            </h1>
-            <div className="space-y-4 overflow-x-auto">
-              {courseData
-                .sort(() => Math.random() - 0.5)
-                .slice(0, 2)
-                .map((item: any, id: any) => {
-                  console.log("courseData[id]", courseData[id]);
-                  return (
-                    <div key={id}>
-                      <CardWithLink
-                        wallet={account}
-                        data={item}
-                        rating={averageRatings}
-                      />
-                    </div>
-                  );
-                })}
-            </div>
+          <div className="bg-[url('/hero_asset.png')] text-white p-10 rounded-xl w-[30%] hidden xl:flex items-center justify-center h-[85px]">
+            <Image src={attensys_logo} alt="logo" />
           </div>
+        </div>
 
-          <div className="block xl:hidden">
-            <div className="border-b-[1px] border-b-[#949494] justify-center xl:mx-48 flex space-x-2 items-center h-[50px]">
-              <div className="h-full w-[100%] flex items-center space-x-3">
-                <RatingDisplay rating={courseaveragerate} size="sm" />
+        <div className="w-[100%] mx-auto flex justify-between px-6 xl:px-12 mt-5">
+          <div className="w-full xl:w-[67%] h-auto space-y-12">
+            <div className="h-auto w-full rounded-xl xl:bg-[#FFFFFF] xl:border-[1px] xl:border-[#D9D9D9] xl:p-10">
+              <div className="pb-4">
+                <p className="font-bold py-2 text-[14px] text-[#333333] leading-[22px]">
+                  About this course
+                </p>
+                <div className="relative">
+                  <p className="text-[14px] text-[#333333] leading-[22px] font-light">
+                    {isExpanded
+                      ? props?.data?.courseDescription
+                      : props?.data?.courseDescription?.slice(0, 200) +
+                        (showSeeMore ? "..." : "")}
+                    {showSeeMore && !isExpanded && (
+                      <span
+                        className="text-blue-600 cursor-pointer hover:underline ml-1"
+                        onClick={() => setIsExpanded(true)}
+                      >
+                        see more
+                      </span>
+                    )}
+                    {showSeeMore && isExpanded && (
+                      <span
+                        className="text-blue-600 cursor-pointer hover:underline ml-1"
+                        onClick={() => setIsExpanded(false)}
+                      >
+                        see less
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="py-4">
+                <p className="font-bold py-2 text-[14px] text-[#333333] leading-[22px]">
+                  {" "}
+                  Student Requirements
+                </p>
+                <ul className="text-[14px] text-[#333333] leading-[22px] font-light list-disc">
+                  {props?.data?.studentRequirements}
+                </ul>
+              </div>
+              <div className="py-4">
+                <p className="font-bold py-2 text-[14px] text-[#333333] leading-[22px]">
+                  Target Audience
+                </p>
+                <div className="text-[#333333] text-[14px] font-light leading-[22px]">
+                  <p>
+                    {isTargetExpanded
+                      ? props?.data?.targetAudienceDesc
+                      : props?.data?.targetAudienceDesc?.slice(0, 200) +
+                        (showTargetSeeMore ? "..." : "")}
+                    {showTargetSeeMore && !isTargetExpanded && (
+                      <span
+                        className="text-blue-600 cursor-pointer hover:underline ml-1"
+                        onClick={() => setIsTargetExpanded(true)}
+                      >
+                        see more
+                      </span>
+                    )}
+                    {showTargetSeeMore && isTargetExpanded && (
+                      <span
+                        className="text-blue-600 cursor-pointer hover:underline ml-1"
+                        onClick={() => setIsTargetExpanded(false)}
+                      >
+                        see less
+                      </span>
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* comments */}
-            <div className="block xl:hidden py-12 sm:mx-48 items-center content-center justify-around text-sm">
-              <div className="md:col-span-2">
-                <ReviewsList reviews={coursereview} />
+            {/* Lectures */}
+            <div className="flex xl:hidden flex-col">
+              <p className=" font-semibold">
+                Lectures({props?.data?.courseCurriculum.length})
+              </p>
+              <div className=" w-[100%] bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide">
+                {props?.data?.courseCurriculum
+                  ?.slice()
+                  .reverse()
+                  .map((item: any, i: any) => {
+                    const accessUrl =
+                      accessUrls[props.data.courseCurriculum.length - 1 - i];
+                    return (
+                      <div
+                        key={i}
+                        className="flex w-full items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => {
+                          if (window.innerWidth < 1024)
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          handleVideoClick(accessUrl, item.name);
+                        }}
+                      >
+                        <div className="w-8 flex-shrink-0">
+                          <p className="font-bold text-[#5801a9]">{i + 1}</p>
+                        </div>
+                        <div
+                          className="w-[150px] h-[97px] rounded-xl border-4 border flex-shrink-0"
+                          onContextMenu={(e) => e.preventDefault()}
+                        >
+                          {accessUrl ? (
+                            <ReactPlayer
+                              url={accessUrl}
+                              controls={false}
+                              playing={false}
+                              width="100%"
+                              height="100%"
+                              playIcon={<></>}
+                              onDuration={(duration) =>
+                                handleDuration(i, duration)
+                              }
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-full">
+                              <LoadingSpinner
+                                size="sm"
+                                colorVariant="primary"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-grow ml-6">
+                          <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
+                            {item.name}
+                          </p>
+                          <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
+                            <p className="text-xs px-7 py-1">
+                              {durations[i]
+                                ? formatDuration(durations[i])
+                                : "0:00:00"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
               </div>
-
-              <div className="border-[1px] border-[#B8B9BA] h-28 hidden xl:block"></div>
             </div>
 
-            {!hasReviewed && isTakingCourse && (
-              <div className="flex xl:hidden flex-col">
-                <p className="mt-3 font-semibold">Leave a review</p>
-                <div className=" w-[100%] gap-6 bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide p-4 flex flex-col ">
-                  <div className="flex items-center w-full space-x-3">
-                    <Image src={profile_pic} alt="pic" width={48} />
-                    <div className="space-y-1">
-                      <h4 className="text-[16px] text-[#333333] leading-[22px] font-semibold">
-                        {username}
-                      </h4>
-                      <p className="text-[#9b51e0] text-[12px] font-medium leading-[14px]">
-                        {!!address &&
-                        typeof address === "string" &&
-                        address.trim() !== ""
-                          ? shortHex(address)
-                          : "Login"}
-                      </p>
+            {/* Comments */}
+            <div className="space-y-4 hidden xl:flex flex-col">
+              <h1 className="text-[16px] font-bold text-[#2D3A4B] leading-[22px]">
+                Leave a review
+              </h1>
+              <div className="h-auto pb-10 w-full rounded-xl bg-[#FFFFFF] border-[1px] border-[#D9D9D9]">
+                <div className="flex justify-between items-center h-[100px] w-full border-b-[1px] border-b-[#EBECEE] px-10">
+                  <div className="h-full w-[30%] flex items-center justify-center border-r-[1px] border-r-[#EBECEE]">
+                    <div className="flex items-center w-full space-x-3">
+                      <Image src={profile_pic} alt="pic" width={60} />
+                      <div className="space-y-1">
+                        <h4 className="text-[16px] text-[#333333] leading-[22px] font-semibold">
+                          {username}
+                        </h4>
+                        <p className="text-[#9b51e0] text-[12px] font-medium leading-[14px]">
+                          {!!address &&
+                          typeof address === "string" &&
+                          address.trim() !== ""
+                            ? shortHex(address)
+                            : "Login"}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                  <div>
+                  <div className="h-full w-[30%] space-x-3 flex items-center border-r-[1px] border-r-[#EBECEE]">
+                    <h1 className="text-[14px] text-[#333333] leading-[16px] font-medium">
+                      {courseaveragerate?.count} students reviewed this course
+                    </h1>
+                  </div>
+                  <div className="h-full w-[30%] flex items-center space-x-3">
+                    <RatingDisplay rating={courseaveragerate} size="sm" />
+                  </div>
+                </div>
+                {/* <div className="px-10 mt-8 flex items-center space-x-4">
+                  <input
+                    type="text"
+                    placeholder="What do you think about this course?"
+                    className="w-[75%] h-[45px] border shadow-dm p-6 rounded-xl text-[14px] font-medium leading-[16px]"
+                  />
+
+                  <button className="hidden sm:block bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold">
+                    Send review
+                  </button>
+                </div>   */}
+                <div>
+                  {!hasReviewed && isTakingCourse && (
                     <ReviewForm
                       videoId={
                         props?.data?.courseName?.toString() + ultimate_id
@@ -1384,29 +1606,180 @@ const LecturePage = (props: any) => {
                         setHasReviewed(true);
                       }}
                     />
+                  )}
+                </div>
+
+                <div className="px-10 mt-10 space-y-10 h-[380px] overflow-y-scroll pb-10 ">
+                  {/* <div className="space-y-6">
+                    <div className="flex space-x-3 items-center">
+                      <div className="h-[64px] w-[64px] bg-[#9B51E01A] text-[20px] text-[#101928] leading-[24px] rounded-full flex items-center justify-center">
+                        OM
+                      </div>
+                      <div className="space-y-1">
+                        <h1 className="text-[14px] text-[#333333] font-semibold leading-[22px]">
+                          Olivia
+                        </h1>
+                        <StarRating totalStars={5} starnumber={4} />
+                      </div>
+                    </div>
+                    <p className="w-[730px] text-[14px] text-[#333333] font-medium leading-[22px]">
+                      Halfway through the course and lots of information given in
+                      every chapter. Concise and easy to understand, very useful
+                      to apply to any Web design journey!
+                    </p>
+                  </div>
+
+                  <div className="space-y-6 w-full">
+                    <div className="flex space-x-3 items-center">
+                      <div className="h-[64px] w-[64px] bg-[#9B51E01A] text-[20px] text-[#101928] leading-[24px] rounded-full flex items-center justify-center">
+                        OM
+                      </div>
+                      <div className="space-y-1">
+                        <h1 className="text-[14px] text-[#333333] font-semibold leading-[22px]">
+                          Olivia
+                        </h1>
+                        <StarRating totalStars={5} starnumber={4} />
+                      </div>
+                    </div>
+                    <p className="w-[730px] text-[14px] text-[#333333] font-medium leading-[22px]">
+                      Halfway through the course and lots of information given in
+                      every chapter. Concise and easy to understand, very useful
+                      to apply to any Web design journey!
+                    </p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="flex space-x-3 items-center">
+                      <div className="h-[64px] w-[64px] bg-[#9B51E01A] text-[20px] text-[#101928] leading-[24px] rounded-full flex items-center justify-center">
+                        OM
+                      </div>
+                      <div className="space-y-1">
+                        <h1 className="text-[14px] text-[#333333] font-semibold leading-[22px]">
+                          Olivia
+                        </h1>
+                        <StarRating totalStars={5} starnumber={4} />
+                      </div>
+                    </div>
+                    <p className="w-[730px] text-[14px] text-[#333333] font-medium leading-[22px]">
+                      Halfway through the course and lots of information given in
+                      every chapter. Concise and easy to understand, very useful
+                      to apply to any Web design journey!
+                    </p>
+                  </div>
+                 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div className="md:col-span-2">
+                      <ReviewsList reviews={coursereview} />
+                    </div>
                   </div>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* Courses you might like - Desktop */}
-        <div className="hidden xl:block w-[30%] h-[1020px]">
-          <h1>Courses you might like</h1>
-          <div className="space-y-10 overflow-x-auto max-h-[1020px] overflow-y-auto">
-            {courseData.map((item: any, id: any) => {
-              console.log("courseData[id]", courseData[id]);
-              return (
-                <div key={id}>
-                  <CardWithLink
-                    wallet={account}
-                    data={item}
-                    rating={averageRatings}
-                  />
+            {/* Courses you might like - Mobile */}
+            <div className="block xl:hidden mt-0 sm:mt-8">
+              <h1 className="text-[16px] font-semibold mb-4">
+                Courses you might like
+              </h1>
+              <div className="space-y-4 overflow-x-auto">
+                {courseData
+                  .sort(() => Math.random() - 0.5)
+                  .slice(0, 2)
+                  .map((item: any, id: any) => {
+                    console.log("courseData[id]", courseData[id]);
+                    return (
+                      <div key={id}>
+                        <CardWithLink
+                          wallet={account}
+                          data={item}
+                          rating={averageRatings}
+                        />
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+
+            <div className="block xl:hidden">
+              <div className="border-b-[1px] border-b-[#949494] justify-center xl:mx-48 flex space-x-2 items-center h-[50px]">
+                <div className="h-full w-[100%] flex items-center space-x-3">
+                  <RatingDisplay rating={courseaveragerate} size="sm" />
                 </div>
-              );
-            })}
+              </div>
+
+              {/* comments */}
+              <div className="block xl:hidden py-12 sm:mx-48 items-center content-center justify-around text-sm">
+                <div className="md:col-span-2">
+                  <ReviewsList reviews={coursereview} />
+                </div>
+
+                <div className="border-[1px] border-[#B8B9BA] h-28 hidden xl:block"></div>
+              </div>
+
+              {!hasReviewed && isTakingCourse && (
+                <div className="flex xl:hidden flex-col">
+                  <p className="mt-3 font-semibold">Leave a review</p>
+                  <div className=" w-[100%] gap-6 bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide p-4 flex flex-col ">
+                    <div className="flex items-center w-full space-x-3">
+                      <Image src={profile_pic} alt="pic" width={48} />
+                      <div className="space-y-1">
+                        <h4 className="text-[16px] text-[#333333] leading-[22px] font-semibold">
+                          {username}
+                        </h4>
+                        <p className="text-[#9b51e0] text-[12px] font-medium leading-[14px]">
+                          {!!address &&
+                          typeof address === "string" &&
+                          address.trim() !== ""
+                            ? shortHex(address)
+                            : "Login"}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <ReviewForm
+                        videoId={
+                          props?.data?.courseName?.toString() + ultimate_id
+                        }
+                        userId={address?.toString() || ""}
+                        onSubmit={async (review) => {
+                          let user = getCurrentUser();
+                          if (!user) {
+                            user = await signInUser();
+                          }
+                          await submitReview({
+                            ...review,
+                            userId: auth.currentUser!.uid,
+                            videoId: `${props?.data?.courseName?.toString() ?? ""}${ultimate_id ?? ""}`,
+                          });
+                          handleRatingSubmit();
+                          fetchReviewsAndRating();
+                          setHasReviewed(true);
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Courses you might like - Desktop */}
+          <div className="hidden xl:block w-[30%] h-[1020px]">
+            <h1>Courses you might like</h1>
+            <div className="space-y-10 overflow-x-auto max-h-[1020px] overflow-y-auto">
+              {courseData.map((item: any, id: any) => {
+                console.log("courseData[id]", courseData[id]);
+                return (
+                  <div key={id}>
+                    <CardWithLink
+                      wallet={account}
+                      data={item}
+                      rating={averageRatings}
+                    />
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
@@ -1459,7 +1832,15 @@ const LecturePage = (props: any) => {
           </div>
         </div>
       </Dialog>
-    </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={handleShareModalClose}
+        shareData={shareData}
+        onShare={handleShareSuccess}
+      />
+    </>
   );
 };
 

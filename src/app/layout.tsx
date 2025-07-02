@@ -29,6 +29,7 @@ import {
   attensysCourseAddress,
   attensysOrgAddress,
 } from "@/deployments/contracts";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -213,27 +214,25 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <Suspense fallback={<Loading />}>
-        <body className={inter.className}>
-          {connector && (
-            <StarknetConfig
-              autoConnect
-              chains={[mainnet, sepolia]}
-              provider={provider}
-              connectors={[connector]}
-              explorer={voyager}
-            >
-              <JotaiProvider>
-                <QueryClientProvider client={queryClient}>
-                  {/* <Header /> */}
-                  {children}
-                  {/* <Footer /> */}
-                </QueryClientProvider>
-              </JotaiProvider>
-            </StarknetConfig>
-          )}
-        </body>
-      </Suspense>
+      <body className={inter.className}>
+        <AuthProvider>
+          <JotaiProvider>
+            <QueryClientProvider client={queryClient}>
+              <StarknetConfig
+                chains={[devnet, sepolia, mainnet]}
+                provider={publicProvider()}
+                connectors={[argent(), braavos()]}
+                explorer={voyager}
+              >
+                <AutoConnect />
+                <Providers>
+                  <Suspense fallback={<Loading />}>{children}</Suspense>
+                </Providers>
+              </StarknetConfig>
+            </QueryClientProvider>
+          </JotaiProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

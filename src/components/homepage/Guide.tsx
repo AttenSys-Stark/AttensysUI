@@ -57,10 +57,10 @@ const Guide = () => {
               <div className="text-left mt-14">
                 <h1 className="text-white font-bold leading-[37px]">Sign Up</h1>
                 <p className="text-white text-[14px] font-light">
-                  Create an account using Cartridge. Log in instantly or get a
-                  wallet auto-created if none exists. Whether you&apos;re a
-                  learner, or course creator, we have the courses & tools for
-                  you.
+                  Create an account using google account or email/password. Log
+                  in instantly or get a wallet auto-created if none exists.
+                  Whether you&apos;re a learner, or course creator, we have the
+                  courses & tools for you.
                 </p>
               </div>
 
@@ -111,10 +111,10 @@ const Guide = () => {
               <div className="text-left">
                 <h1 className="text-white font-bold leading-[24px]">Sign Up</h1>
                 <p className="text-white text-[16px] font-light">
-                  Create an account using Cartridge. Log in instantly or get a
-                  wallet auto-created if none exists. Whether you&apos;re a
-                  learner, or course creator, we have the courses & tools for
-                  you.
+                  Create an account using google account or email/password. Log
+                  in instantly or get a wallet auto-created if none exists.
+                  Whether you&apos;re a learner, or course creator, we have the
+                  courses & tools for you.
                 </p>
               </div>
 
@@ -165,10 +165,10 @@ const Guide = () => {
                   Sign Up
                 </h1>
                 <p className="text-white text-[16px] font-light max-w-[450px]">
-                  Create an account using Cartridge. Log in instantly or get a
-                  wallet auto-created if none exists. Whether you&apos;re a
-                  learner, or course creator, we have the courses & tools for
-                  you.
+                  Create an account using google account or email/password. Log
+                  in instantly or get a wallet auto-created if none exists.
+                  Whether you&apos;re a learner, or course creator, we have the
+                  courses & tools for you.
                 </p>
               </div>
 

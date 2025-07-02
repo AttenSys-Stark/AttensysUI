@@ -47,13 +47,13 @@ import { courseQuestions } from "@/constants/data";
 import { useWallet } from "@/hooks/useWallet";
 import { NetworkSwitchButton } from "./connect/NetworkSwitchButton";
 import { connectWallet } from "@/utils/connectWallet";
-import { Userlogin, useFirebaseFirstName } from "./connect/Userlogin";
+import { Userlogin } from "./connect/Userlogin";
 import { useAccount, useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 import debounce from "lodash.debounce";
 import { courseSearchTerms as wordList } from "@/utils/searchterms";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, setAuthTokenCookie } from "@/lib/firebase/client";
+import { setAuthTokenCookie } from "@/lib/firebase/client";
+import { useAuth } from "@/context/AuthContext";
 import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKey } from "@/helpers/encrypt";
 import { Account } from "starknet";
@@ -85,14 +85,13 @@ const Header = () => {
     wallet: hookWallet,
     isConnecting,
   } = useWallet();
-  // const { account, address } = useAccount();
   const [account, setAccount] = useState<any>();
   const [address, setAddress] = useState<string>("");
-  const [firebaseUserId, setFirebaseUserId] = useState<string>("");
+  const { user } = useAuth();
+  const firebaseUserId = user?.uid || "";
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
   const [username, setUsername] = useState<string>();
-  // const [networkCorrect, setNetworkCorrect] = useState(isCorrectNetwork)
   const [isBootcampsOpen, setIsBootcampsOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -102,7 +101,14 @@ const Header = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  const firstName = useFirebaseFirstName();
+  let firstName = null;
+  if (user) {
+    if (user.displayName) {
+      firstName = user.displayName.split(" ")[0];
+    } else if (user.email) {
+      firstName = user.email.split("@")[0];
+    }
+  }
   const truncatedFirstName =
     firstName && firstName.length > 8
       ? firstName.slice(0, 10) + "..."
@@ -111,43 +117,10 @@ const Header = () => {
   const handleAccountCenterClick = (e: React.MouseEvent) => {
     e.preventDefault();
 
-    if (!firebaseUserId) {
-      console.log("No firebaseUserId available, user not authenticated");
+    if (!user) {
       alert("Please log in to access your Account Center");
       return;
     }
-
-    // Check if auth token cookie exists
-    const cookies = document.cookie.split(";");
-    const authTokenCookie = cookies.find((cookie) =>
-      cookie.trim().startsWith("firebase-auth-token="),
-    );
-
-    if (!authTokenCookie) {
-      console.log("No auth token cookie found");
-      // Try to refresh the token
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        console.log("Attempting to refresh auth token...");
-        setAuthTokenCookie(currentUser)
-          .then(() => {
-            console.log("Auth token refreshed, navigating to Account Center");
-            router.push(`/mycoursepage/${firebaseUserId}`);
-          })
-          .catch((error) => {
-            console.error("Failed to refresh auth token:", error);
-            alert("Please log in to access your Account Center");
-          });
-      } else {
-        alert("Please log in to access your Account Center");
-      }
-      return;
-    }
-
-    console.log(
-      "Navigating to Account Center with firebaseUserId:",
-      firebaseUserId,
-    );
     router.push(`/mycoursepage/${firebaseUserId}`);
   };
 
@@ -293,21 +266,9 @@ const Header = () => {
     setIsBootcampsOpen(false);
   };
 
-  // useEffect(() => {
-  //   if (!address) return;
-  //   controller.username()?.then((n) => setUsername(n));
-  // }, [address, controller]);
-
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log("Header: Firebase auth state changed", {
-        user: user ? { uid: user.uid, email: user.email } : null,
-        firebaseUserId: firebaseUserId,
-      });
-
+    const fetchProfile = async () => {
       if (user && user.uid) {
-        setFirebaseUserId(user.uid);
-        console.log("Header: Setting firebaseUserId to", user.uid);
         try {
           const profile = await getUserProfile(user.uid);
           const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
@@ -337,13 +298,12 @@ const Header = () => {
           setAccount(undefined);
         }
       } else {
-        console.log("No authenticated user found.");
         setAccount(undefined);
-        setFirebaseUserId("");
+        setAddress("");
       }
-    });
-    return () => unsubscribe();
-  }, []);
+    };
+    fetchProfile();
+  }, [user]);
 
   return (
     <>

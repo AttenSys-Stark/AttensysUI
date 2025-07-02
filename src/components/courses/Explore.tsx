@@ -590,7 +590,10 @@ const Explore = ({
                         );
                       }}
                     >
-                      <div className="w-[150px] h-[90px] rounded-xl border-4 border flex-shrink-0 overflow-hidden">
+                      <div
+                        className="w-[150px] h-[90px] rounded-xl border-4 border flex-shrink-0 overflow-hidden"
+                        onContextMenu={(e) => e.preventDefault()}
+                      >
                         {videoUrls[item.video] && (
                           <ReactPlayer
                             url={videoUrls[item.video]}

@@ -19,7 +19,6 @@ const Index = () => {
   const [bootcampdropstat, setbootcampdropstat] = useAtom(
     bootcampdropdownstatus,
   );
-  const [loading, setLoading] = useState(true);
   const params = useParams();
   const details = params.details;
 
@@ -27,14 +26,6 @@ const Index = () => {
     setbootcampdropstat(false);
     setstatus(false);
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1000); // 1 seconds fake delay or until data is fetched.
-
-    return () => clearTimeout(timer);
-  }, []);
 
   return (
     <>
@@ -54,20 +45,7 @@ const Index = () => {
           <Bootcampdropdown />
         </div>
 
-        {loading ? (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "90vh", // Full page height
-            }}
-          >
-            <MoonLoader color="#9B51E0" size={30} />
-          </div>
-        ) : (
-          <CourseLanding course={details} />
-        )}
+        <CourseLanding course={details} />
       </div>
       <Footer />
     </>
