@@ -18,10 +18,150 @@ export const getAllCoursesInfo = async () => {
   const callCourseContract = await courseContract?.get_all_courses_info();
   return callCourseContract;
 };
+
 export const getUserCoursesInfo = async (user: string) => {
   const callCourseContract =
     await courseContract?.get_all_creator_courses(user);
   return callCourseContract;
+};
+
+// Helper function to convert BigInt values to regular numbers/strings for JSON serialization
+const convertBigInts = (obj: any): any => {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+
+  if (typeof obj === "bigint") {
+    return Number(obj);
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(convertBigInts);
+  }
+
+  if (typeof obj === "object") {
+    const converted: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      converted[key] = convertBigInts(value);
+    }
+    return converted;
+  }
+
+  return obj;
+};
+
+// New helper function to fetch course data by ID
+export const getCourseDataById = async (
+  courseId: string | number,
+  fetchCIDContent: any,
+) => {
+  try {
+    // Get course info from blockchain
+    const courseInfos = await courseContract?.get_course_infos([
+      Number(courseId),
+    ]);
+
+    if (!courseInfos || courseInfos.length === 0) {
+      console.warn(`No course found with ID: ${courseId}`);
+      return null;
+    }
+
+    const course = courseInfos[0];
+
+    if (!course.course_ipfs_uri) {
+      console.warn(`No IPFS URI found for course ID: ${courseId}`);
+      return null;
+    }
+
+    // Fetch content from IPFS
+    const content = await fetchCIDContent(course.course_ipfs_uri);
+
+    if (!content) {
+      console.warn(`Failed to fetch IPFS content for course ID: ${courseId}`);
+      return null;
+    }
+
+    // Parse the content if it's a string
+    let parsedContent = content;
+    if (typeof content === "string") {
+      try {
+        parsedContent = JSON.parse(content);
+      } catch (parseError) {
+        console.error("Failed to parse IPFS content:", parseError);
+        return null;
+      }
+    }
+
+    // Extract the data property from the IPFS content
+    const courseData = parsedContent.data || parsedContent;
+
+    if (!courseData) {
+      console.warn(
+        `No course data found in IPFS content for course ID: ${courseId}`,
+      );
+      return null;
+    }
+
+    // Convert all BigInt values to regular numbers for JSON serialization
+    const serializedContent = convertBigInts(courseData);
+
+    // Ensure courseCurriculum exists
+    if (!serializedContent.courseCurriculum) {
+      console.warn(
+        "No courseCurriculum found in course data, setting empty array",
+      );
+      serializedContent.courseCurriculum = [];
+    }
+
+    // Ensure other required properties exist with default values
+    if (!serializedContent.courseName) {
+      console.warn("No courseName found in course data, setting default");
+      serializedContent.courseName = "Untitled Course";
+    }
+
+    if (!serializedContent.courseDescription) {
+      console.warn(
+        "No courseDescription found in course data, setting default",
+      );
+      serializedContent.courseDescription = "No description available";
+    }
+
+    if (!serializedContent.targetAudienceDesc) {
+      console.warn(
+        "No targetAudienceDesc found in course data, setting default",
+      );
+      serializedContent.targetAudienceDesc =
+        "This course is suitable for all learners.";
+    }
+
+    if (!serializedContent.studentRequirements) {
+      console.warn(
+        "No studentRequirements found in course data, setting default",
+      );
+      serializedContent.studentRequirements = "No specific requirements.";
+    }
+
+    if (!serializedContent.difficultyLevel) {
+      console.warn("No difficultyLevel found in course data, setting default");
+      serializedContent.difficultyLevel = "Beginner";
+    }
+
+    if (!serializedContent.courseCreator) {
+      console.warn("No courseCreator found in course data, setting default");
+      serializedContent.courseCreator = "Unknown Creator";
+    }
+
+    if (!serializedContent.courseImage) {
+      console.warn("No courseImage found in course data, setting default");
+      serializedContent.courseImage = "";
+    }
+
+    // Return the complete course data structure
+    return serializedContent;
+  } catch (error) {
+    console.error(`Error fetching course data for ID ${courseId}:`, error);
+    return null;
+  }
 };
 
 export function shortHex(input?: any) {

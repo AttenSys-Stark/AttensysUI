@@ -13,6 +13,7 @@ import CourseNews from "@/components/courses/CourseNews";
 import { MoonLoader } from "react-spinners";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const Index = () => {
   const [status, setstatus] = useAtom(coursestatusAtom);
@@ -28,7 +29,7 @@ const Index = () => {
   };
 
   return (
-    <>
+    <ErrorBoundary>
       <Header />
 
       <div onClick={handlePageClick}>
@@ -48,7 +49,7 @@ const Index = () => {
         <CourseLanding course={details} />
       </div>
       <Footer />
-    </>
+    </ErrorBoundary>
   );
 };
 

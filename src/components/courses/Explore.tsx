@@ -190,7 +190,10 @@ const Explore = ({
           <h3
             className="font-bold text-lg mb-2 cursor-pointer hover:text-[#5801A9]"
             onClick={(e) => {
-              localStorage.setItem("courseData", JSON.stringify(course?.data));
+              localStorage.setItem(
+                `courseData_${course?.course_identifier}`,
+                JSON.stringify(course?.data),
+              );
               handleCourse(
                 e,
                 e.currentTarget.textContent,
@@ -216,7 +219,10 @@ const Explore = ({
         <div className="p-4 border-t">
           <button
             onClick={(e) => {
-              localStorage.setItem("courseData", JSON.stringify(course?.data));
+              localStorage.setItem(
+                `courseData_${course?.course_identifier}`,
+                JSON.stringify(course?.data),
+              );
               handleCourse(
                 e,
                 e.currentTarget.textContent,
@@ -437,7 +443,7 @@ const Explore = ({
                 <div
                   onClick={(e) => {
                     localStorage.setItem(
-                      "courseData",
+                      `courseData_${unfilteredData[unfilteredData.length - 1]?.course_identifier}`,
                       JSON.stringify(
                         unfilteredData[unfilteredData.length - 1]?.data,
                       ),
@@ -467,7 +473,7 @@ const Explore = ({
                 <button
                   onClick={(e) => {
                     localStorage.setItem(
-                      "courseData",
+                      `courseData_${unfilteredData[unfilteredData.length - 1]?.course_identifier}`,
                       JSON.stringify(
                         unfilteredData[unfilteredData.length - 1]?.data,
                       ),
@@ -576,7 +582,7 @@ const Explore = ({
                       className="flex content-center text-sm my-3 cursor-pointer space-x-4"
                       onClick={(e) => {
                         localStorage.setItem(
-                          "courseData",
+                          `courseData_${unfilteredData[unfilteredData.length - 1]?.course_identifier}`,
                           JSON.stringify(
                             unfilteredData[unfilteredData.length - 1]?.data,
                           ),

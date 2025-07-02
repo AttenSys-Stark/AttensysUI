@@ -323,16 +323,40 @@ li.carousel-item-custom {
 .background-element {
   animation: waterFlow 8s ease-in-out infinite;
   transition: all 0.3s ease-out;
+  /* Firefox compatibility */
+  -moz-transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Ensure proper rendering in Firefox */
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .background-circle {
   animation: waterFlowCircle 10s ease-in-out infinite;
   transition: all 0.3s ease-out;
+  /* Firefox compatibility */
+  -moz-transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Ensure proper rendering in Firefox */
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Hide background elements in Firefox */
+@-moz-document url-prefix() {
+  .background-element,
+  .background-circle {
+    display: none !important;
+  }
 }
 
 .background-element:hover,
 .background-circle:hover {
-  filter: blur(100px) brightness(5);
+  opacity: 0.6 !important;
   animation-duration: 0.5s;
   --scale: 1.1 !important;
 }
