@@ -29,7 +29,12 @@ const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
             <div
               className="absolute inset-0 transition-all duration-300"
               style={{
-                background: "",
+                background:
+                  "linear-gradient(135deg, rgba(155, 81, 224, 0.1) 0%, rgba(88, 1, 169, 0.15) 50%, rgba(74, 144, 226, 0.1) 100%)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+                border: "1px solid rgba(255, 255, 255, 0.2)",
+                boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
               }}
             />
           </div>
