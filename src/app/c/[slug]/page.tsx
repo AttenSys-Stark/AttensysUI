@@ -1,19 +1,34 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface CourseSlugPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default function CourseSlugPage({ params }: CourseSlugPageProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { slug } = params;
+  const [slug, setSlug] = useState<string>("");
   const courseId = searchParams.get("id");
+
+  // Handle async params
+  useEffect(() => {
+    const getParams = async () => {
+      try {
+        const resolvedParams = await params;
+        setSlug(resolvedParams.slug);
+      } catch (error) {
+        console.error("Error resolving params:", error);
+        router.replace("/Home");
+      }
+    };
+
+    getParams();
+  }, [params, router]);
 
   useEffect(() => {
     // If we have a course ID, redirect to the full course page
