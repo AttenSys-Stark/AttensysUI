@@ -14,6 +14,7 @@ import {
   reload,
   sendPasswordResetEmail,
   signOut,
+  setPersistence,
 } from "firebase/auth";
 import { createUserProfile, getUserProfile } from "../userutils";
 import { AccountHandler } from "@/helpers/accounthandler";
@@ -30,7 +31,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -75,7 +76,7 @@ const signInWithGoogle = async (
   onAccountProgress?: (status: string) => void,
 ) => {
   try {
-    await auth.setPersistence(browserLocalPersistence);
+    await setPersistence(auth, browserLocalPersistence);
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
@@ -142,9 +143,6 @@ const signUpWithEmail = async (
       password,
     );
     const user = userCredential.user;
-
-    // Set auth token in cookie
-    await setAuthTokenCookie(user);
 
     // Create user profile in Firestore
     await createUserProfile(
@@ -439,6 +437,7 @@ const initializeAuthListener = () => {
 // Initialize the auth listener only in browser
 if (typeof window !== "undefined") {
   initializeAuthListener();
+  setPersistence(auth, browserLocalPersistence);
 }
 
 export {

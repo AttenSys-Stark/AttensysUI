@@ -11,6 +11,7 @@ import { auth } from "@/lib/firebase/client";
 import { decryptPrivateKey } from "@/helpers/encrypt";
 import { Account } from "starknet";
 import { provider } from "@/constants";
+import { useAuth } from "@/context/AuthContext";
 
 const Coursedropdown = () => {
   const [status, setcourseStatus] = useAtom(coursestatusAtom);
@@ -18,7 +19,7 @@ const Coursedropdown = () => {
   const [wallet] = useAtom(walletStarknetkit);
   const [account, setAccount] = useState<any>();
   const [address, setAddress] = useState<string>("");
-  // const { account, address } = useAccount();
+  const { user } = useAuth();
 
   const handleNavigation = (path: string) => {
     setcourseStatus(false);
@@ -39,7 +40,6 @@ const Coursedropdown = () => {
   useEffect(() => {
     const logStarknetCredentials = async () => {
       try {
-        const user = auth.currentUser;
         if (user && user.uid) {
           const profile = await getUserProfile(user.uid);
           const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
@@ -48,28 +48,30 @@ const Coursedropdown = () => {
               profile.starknetPrivateKey,
               encryptionSecret,
             );
-            // console.log("starknetAddress:", profile.starknetAddress);
-            // console.log("starknetPrivateKey:", decryptedPrivateKey);
             const userAccount = new Account(
               provider,
               profile.starknetAddress,
               decryptedPrivateKey,
             );
-            // console.log("userAccount:", userAccount);
             setAccount(userAccount);
             setAddress(profile.starknetAddress);
           } else {
+            setAccount(undefined);
+            setAddress("");
             console.log("No user profile found in Firestore.");
           }
         } else {
-          console.log("No authenticated user found.");
+          setAccount(undefined);
+          setAddress("");
         }
       } catch (err) {
+        setAccount(undefined);
+        setAddress("");
         console.error("Error fetching user profile:", err);
       }
     };
     logStarknetCredentials();
-  }, []); // Only on mount
+  }, [user]);
 
   return (
     <>
@@ -109,12 +111,11 @@ const Coursedropdown = () => {
               <a
                 //@todo replace sample profile with user profile id
                 onClick={() => {
-                  if (!account) {
+                  if (!user) {
                     alert("Login");
                   } else {
                     handleNavigation(`/mycoursepage/${address}`);
                   }
-                  // handleNavigation(`/mycoursepage/${address}`);
                 }}
                 className=" cursor-pointer"
               >

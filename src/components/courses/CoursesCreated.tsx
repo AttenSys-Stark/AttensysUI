@@ -32,6 +32,7 @@ import { auth } from "@/lib/firebase/client";
 import { decryptPrivateKey } from "@/helpers/encrypt";
 import { executeCalls } from "@avnu/gasless-sdk";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
+import { useAuth } from "@/context/AuthContext";
 
 interface ItemProps {
   courses: Course[];
@@ -100,30 +101,10 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     {},
   );
 
-  useEffect(() => {
-    // Fetch average ratings for all currentItems when courseData or currentPage changes
-    const fetchAllRatings = async () => {
-      const ratings: { [key: string]: any } = {};
-      if (Array.isArray(courseData)) {
-        await Promise.all(
-          courseData.map(async (course: any) => {
-            const identifier = course?.course_identifier;
-            if (identifier && !(identifier in ratings)) {
-              const avg = await getAverageRatingForVideo(
-                (course?.data?.courseName?.toString() ?? "") + identifier,
-              );
-              ratings[identifier] = avg;
-            }
-          }),
-        );
-      }
-      setAverageRatings(ratings);
-    };
-    fetchAllRatings();
-  }, [courseData, currentPage]);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const fetchProfile = async () => {
       if (user && user.uid) {
         try {
           const profile = await getUserProfile(user.uid);
@@ -153,12 +134,33 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
           setAccount(undefined);
         }
       } else {
-        console.log("No authenticated user found.");
         setAccount(undefined);
       }
-    });
-    return () => unsubscribe();
-  }, []);
+    };
+    fetchProfile();
+  }, [user]);
+
+  useEffect(() => {
+    // Fetch average ratings for all currentItems when courseData or currentPage changes
+    const fetchAllRatings = async () => {
+      const ratings: { [key: string]: any } = {};
+      if (Array.isArray(courseData)) {
+        await Promise.all(
+          courseData.map(async (course: any) => {
+            const identifier = course?.course_identifier;
+            if (identifier && !(identifier in ratings)) {
+              const avg = await getAverageRatingForVideo(
+                (course?.data?.courseName?.toString() ?? "") + identifier,
+              );
+              ratings[identifier] = avg;
+            }
+          }),
+        );
+      }
+      setAverageRatings(ratings);
+    };
+    fetchAllRatings();
+  }, [courseData, currentPage]);
 
   const generatePageNumbers = () => {
     const pageNumbers = [];
@@ -438,6 +440,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                                 router,
                                 item?.course_identifier,
                               );
+                              console.log("item.is_approved", item);
                             }}
                             className="cursor-pointer"
                           >
@@ -563,8 +566,9 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                             router,
                             item?.course_identifier,
                           );
+                          console.log(item.is_approved);
                         }}
-                        className="cursor-pointer mt-3"
+                        className={`mt-3 ${item.is_approved ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
                       >
                         <p className="text-[14px] text-[#2D3A4B] font-medium leading-[21px] line-clamp-2 hover:text-[#A01B9B] transition-colors">
                           {item.data.courseDescription}

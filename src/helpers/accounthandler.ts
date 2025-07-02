@@ -69,15 +69,17 @@ export const AccountHandler = async (
       { version: 3 },
     );
 
-  const toTransferTk: Uint256 = cairo.uint256(0.01 * 10 ** 18);
+  const toTransferTk: Uint256 = cairo.uint256(0.1 * 10 ** 18);
   const transferCall: Call = erc20Contract.populate("transfer", {
     recipient: AXcontractAddress,
     amount: toTransferTk,
   });
 
   progressCallback?.("Initializing user account...");
-  const { transaction_hash: transferTxHash } =
-    await account0.execute(transferCall);
+  const { transaction_hash: transferTxHash } = await account0.execute(
+    transferCall,
+    { version: 3 },
+  );
   await provider.waitForTransaction(transferTxHash, {
     retryInterval: 2000,
     successStates: ["ACCEPTED_ON_L2"],

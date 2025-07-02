@@ -5,8 +5,8 @@ import ControllerConnector from "@cartridge/connector/controller";
 import { Button } from "@cartridge/ui-next";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth, signOutAll, signInWithGoogle } from "@/lib/firebase/client";
+import { signOutAll, signInWithGoogle } from "@/lib/firebase/client";
+import { useAuth } from "@/context/AuthContext";
 
 export function Userlogin({
   onUserChange,
@@ -17,7 +17,7 @@ export function Userlogin({
   const controller = connectors[0] as ControllerConnector;
   const [username, setUsername] = useState<string>();
   const [iswalletconnecting, setiswalletconnecting] = useState(false);
-  const [firebaseUser, setFirebaseUser] = useState<any>(null);
+  const { user } = useAuth();
   const [firstName, setFirstName] = useState<string | null>(null);
   const router = useRouter();
 
@@ -26,30 +26,24 @@ export function Userlogin({
     controller?.username()?.then((n) => setUsername(n));
   }, [address, controller]);
 
-  // Listen for Firebase user changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setFirebaseUser(user);
-      let name = null;
-      if (user) {
-        if (user.displayName) {
-          name = user.displayName.split(" ")[0];
-        } else if (user.email) {
-          name = user.email.split("@")[0];
-        }
+    let name = null;
+    if (user) {
+      if (user.displayName) {
+        name = user.displayName.split(" ")[0];
+      } else if (user.email) {
+        name = user.email.split("@")[0];
       }
-      setFirstName(name);
-      if (onUserChange) onUserChange(name);
-    });
-    return () => unsubscribe();
-  }, [onUserChange]);
+    }
+    setFirstName(name);
+    if (onUserChange) onUserChange(name);
+  }, [user, onUserChange]);
 
   const handleConnect = async () => {
-    if (firebaseUser) {
+    if (user) {
       // Logout all auths and disconnect wallet
       await signOutAll();
       disconnect();
-      setFirebaseUser(null);
       setFirstName(null);
       router.push("/");
     } else {
@@ -98,7 +92,7 @@ export function Userlogin({
                   size="sm"
                   colorVariant="white"
                 />
-              ) : firebaseUser ? (
+              ) : user ? (
                 <div>Logout</div>
               ) : (
                 <div>Login</div>
@@ -109,24 +103,4 @@ export function Userlogin({
       </Button>
     </div>
   );
-}
-
-// Export a hook to get the current user's first name
-export function useFirebaseFirstName() {
-  const [firstName, setFirstName] = useState<string | null>(null);
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      let name = null;
-      if (user) {
-        if (user.displayName) {
-          name = user.displayName.split(" ")[0];
-        } else if (user.email) {
-          name = user.email.split("@")[0];
-        }
-      }
-      setFirstName(name);
-    });
-    return () => unsubscribe();
-  }, []);
-  return firstName;
 }

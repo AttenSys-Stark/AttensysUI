@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +26,15 @@ import { useSetAtom } from "jotai";
 import { loginUserWithEmail, resetUserPassword } from "@/lib/userutils";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 
-export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
+export function LoginForm({
+  onSignupClick,
+  redirectPath,
+  className = "",
+}: {
+  onSignupClick?: () => void;
+  redirectPath?: string;
+  className?: string;
+}) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isloaderLoading, setIsloaderLoading] = useState(false);
@@ -34,6 +43,9 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
   const [resetSent, setResetSent] = useState(false);
   const [accountStatus, setAccountStatus] = useState<string | null>(null);
   const [accountloadProgress, setAccountloadProgress] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
   const setLoginorsignup = useSetAtom(loginorsignup);
@@ -45,7 +57,7 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
       const user = await signInUser(setAccountStatus);
       if (user) {
         setAccountStatus("Sign in complete! Redirecting...");
-        router.push("/Home");
+        router.push(redirectPath || "/Home");
         console.log("Signed in user:", user);
         // Redirect or update UI
       } else {
@@ -70,13 +82,30 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
     }
   };
 
+  function validateEmail(email: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    let valid = true;
+    setEmailError("");
+    setPasswordError("");
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      valid = false;
+    }
+    if (!password) {
+      setPasswordError("Password cannot be empty.");
+      valid = false;
+    }
+    if (!valid) return;
     setIsloaderLoading(true);
     try {
       const user = await loginUserWithEmail(email, password);
       if (user) {
-        router.push("/Home");
+        // Force reload to propagate auth state globally
+        window.location.reload();
         toast.success("Login successful", {
           position: "top-right",
           autoClose: 5000,
@@ -90,7 +119,6 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
         });
       }
     } catch (error: any) {
-      // toast.error(error.message);
       toast.error("Invalid email or password", {
         position: "top-right",
         autoClose: 5000,
@@ -124,7 +152,7 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
 
   if (showReset) {
     return (
-      <Card className="w-[40%]">
+      <Card className={`w-full max-w-md ${className}`}>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Reset Password</CardTitle>
           <CardDescription>
@@ -184,7 +212,7 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
   }
 
   return (
-    <Card className="w-[100%] lg:w-[40%]">
+    <Card className={`w-full max-w-md ${className}`}>
       <ToastContainer
         position="top-right"
         autoClose={5000}
@@ -254,7 +282,11 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  aria-invalid={!!emailError}
                 />
+                {emailError && (
+                  <span className="text-red-500 text-xs">{emailError}</span>
+                )}
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
@@ -266,14 +298,33 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
                     Forgot your password?
                   </Button>
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  name="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    aria-invalid={!!passwordError}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
+                {passwordError && (
+                  <span className="text-red-500 text-xs">{passwordError}</span>
+                )}
                 <div className="text-center h-6">
                   {accountStatus && <p>{accountStatus}</p>}
                 </div>
@@ -281,7 +332,13 @@ export function LoginForm({ onSignupClick }: { onSignupClick?: () => void }) {
               <Button
                 type="submit"
                 onClick={handleLogin}
-                disabled={isloaderLoading}
+                disabled={
+                  isloaderLoading ||
+                  !email ||
+                  !password ||
+                  !!emailError ||
+                  !!passwordError
+                }
                 className="w-full bg-[#9B51E0]"
               >
                 {isloaderLoading ? (

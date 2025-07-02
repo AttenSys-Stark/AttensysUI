@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,12 +27,22 @@ import {
   checkEmailVerification,
   createUserProfile,
   signUpUserWithEmail,
+  getUserProfile,
 } from "@/lib/userutils";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 import { toast, ToastContainer } from "react-toastify";
+import { setAuthTokenCookie } from "@/lib/firebase/client";
 
-export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
+export function SignupForm({
+  onLoginClick,
+  redirectPath,
+  className = "",
+}: {
+  onLoginClick?: () => void;
+  redirectPath?: string;
+  className?: string;
+}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,6 +51,13 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
   const [verificationMessage, setVerificationMessage] = useState("");
   const [currentUser, setCurrentUser] = useState<any | null>(null);
   const [accountStatus, setAccountStatus] = useState<string | null>(null);
+  const [nameError, setNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [repeatPasswordError, setRepeatPasswordError] = useState("");
+  const [hasReloaded, setHasReloaded] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
   const router = useRouter();
   const setLoginorsignup = useSetAtom(loginorsignup);
@@ -48,9 +66,9 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
     try {
       const user = await signInUser();
       if (user) {
-        router.push("/Home");
+        // Don't route immediately - let the account creation process complete
         console.log("Signed in user:", user);
-        // Redirect or update UI
+        // The auth state listener will handle routing after account setup
       } else {
         console.log("error in Signed in user:", user);
         // Redirect or update UI
@@ -62,27 +80,62 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
+    if (nameError) setNameError("");
   };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
+    if (emailError) setEmailError("");
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
+    if (passwordError) setPasswordError("");
   };
 
   const handleRepeatPasswordChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setRepeatPassword(e.target.value);
+    if (repeatPasswordError) setRepeatPasswordError("");
   };
 
-  const handlesignupclick = async () => {
-    if (password !== repeatPassword) {
-      console.log("Passwords do not match");
-      return;
+  function validateEmail(email: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+  function validatePassword(password: string) {
+    // Min 8 chars, 1 upper, 1 lower, 1 number, 1 special
+    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/.test(
+      password,
+    );
+  }
+
+  const handlesignupclick = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    let valid = true;
+    setNameError("");
+    setEmailError("");
+    setPasswordError("");
+    setRepeatPasswordError("");
+    if (!name.trim()) {
+      setNameError("Name is required.");
+      valid = false;
     }
+    if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      valid = false;
+    }
+    if (!validatePassword(password)) {
+      setPasswordError(
+        "Password must be at least 8 characters, include upper and lower case letters, a number, and a special character.",
+      );
+      valid = false;
+    }
+    if (password !== repeatPassword) {
+      setRepeatPasswordError("Passwords do not match.");
+      valid = false;
+    }
+    if (!valid) return;
     try {
       setStatus("waiting");
       setAccountStatus("Creating user profile...");
@@ -95,15 +148,11 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
       setVerificationMessage(user.message);
       setCurrentUser(user?.user);
 
-      checkEmailVerification(user?.user)
-        .then(() => {
-          setStatus("verified");
-          router.push("/Home");
-        })
-        .catch((error) => {
-          setStatus("form");
-          console.error("Verification error:", error);
-        });
+      // Set status to waiting and let the auth state listener handle email verification
+      setStatus("waiting");
+      setVerificationMessage(
+        "Please check your email to verify your account before continuing.",
+      );
     } catch (error: any) {
       if (error?.code === "auth/email-already-in-use") {
         setStatus("form");
@@ -119,21 +168,193 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
     if (status === "waiting" && currentUser) {
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
         if (user && user.uid === currentUser.uid) {
-          const isVerified = await checkEmailVerification(user);
+          console.log(
+            "Auth state changed for user:",
+            user.uid,
+            "Email verified:",
+            user.emailVerified,
+          );
+
+          // Reload user to get latest verification status
+          try {
+            await user.reload();
+          } catch (error) {
+            console.error("Error reloading user:", error);
+          }
+
+          // Check if email is verified
+          const isVerified = user.emailVerified;
+          console.log("Email verification status after reload:", isVerified);
+
           if (isVerified) {
-            setStatus("verified");
-            router.push("/Home");
+            // Email is verified, now check for Starknet address
+            try {
+              const userProfile = await getUserProfile(user.uid);
+              if (userProfile && userProfile.starknetAddress) {
+                setStatus("verified");
+                // Set auth token cookie only after complete account creation
+                await setAuthTokenCookie(user);
+                // Reload the redirectPath if it exists and we haven't reloaded yet
+                if (redirectPath && !hasReloaded) {
+                  setHasReloaded(true);
+                  window.location.href = redirectPath;
+                  return true;
+                }
+                router.push(redirectPath || "/Home");
+              } else {
+                // Email verified but no Starknet address yet
+                setStatus("verified");
+                setVerificationMessage(
+                  "Email verified! Setting up your wallet...",
+                );
+                // Start polling for Starknet address creation
+                const checkStarknetAddress = async () => {
+                  try {
+                    const profile = await getUserProfile(user.uid);
+                    if (profile && profile.starknetAddress) {
+                      // Set auth token cookie only after complete account creation
+                      await setAuthTokenCookie(user);
+                      router.push(redirectPath || "/Home");
+                      return true;
+                    }
+                    return false;
+                  } catch (error) {
+                    console.error(
+                      "Error checking for Starknet address:",
+                      error,
+                    );
+                    return false;
+                  }
+                };
+
+                // Poll every 2 seconds for up to 30 seconds
+                const pollInterval = setInterval(async () => {
+                  const hasAddress = await checkStarknetAddress();
+                  if (hasAddress) {
+                    clearInterval(pollInterval);
+                  }
+                }, 2000);
+
+                // Stop polling after 30 seconds
+                setTimeout(() => {
+                  clearInterval(pollInterval);
+                }, 30000);
+              }
+            } catch (error) {
+              console.error("Error checking user profile:", error);
+              setStatus("verified");
+              setVerificationMessage(
+                "Email verified! Setting up your wallet...",
+              );
+            }
+          } else {
+            // Email not verified yet, keep waiting
+            setStatus("waiting");
+            setVerificationMessage(
+              "Please check your email to verify your account before continuing.",
+            );
           }
         }
       });
-      return () => unsubscribe();
+
+      // Also add periodic check for email verification in case auth state doesn't change
+      const checkInterval = setInterval(async () => {
+        try {
+          const currentUser = auth.currentUser;
+          if (currentUser && currentUser.uid === currentUser.uid) {
+            await currentUser.reload();
+            console.log(
+              "Periodic check - Email verified:",
+              currentUser.emailVerified,
+            );
+
+            if (currentUser.emailVerified) {
+              clearInterval(checkInterval);
+              // Email is verified, now check for Starknet address and route
+              try {
+                const userProfile = await getUserProfile(currentUser.uid);
+                if (userProfile && userProfile.starknetAddress) {
+                  setStatus("verified");
+                  // Set auth token cookie only after complete account creation
+                  await setAuthTokenCookie(currentUser);
+                  // Reload the redirectPath if it exists and we haven't reloaded yet
+                  if (redirectPath && !hasReloaded) {
+                    setHasReloaded(true);
+                    window.location.href = redirectPath;
+                    return;
+                  }
+                  router.push(redirectPath || "/Home");
+                } else {
+                  // Email verified but no Starknet address yet
+                  setStatus("verified");
+                  setVerificationMessage(
+                    "Email verified! Setting up your wallet...",
+                  );
+                  // Start polling for Starknet address creation
+                  const checkStarknetAddress = async () => {
+                    try {
+                      const profile = await getUserProfile(currentUser.uid);
+                      if (profile && profile.starknetAddress) {
+                        // Set auth token cookie only after complete account creation
+                        await setAuthTokenCookie(currentUser);
+                        // Reload the redirectPath if it exists and we haven't reloaded yet
+                        if (redirectPath && !hasReloaded) {
+                          setHasReloaded(true);
+                          window.location.href = redirectPath;
+                          return true;
+                        }
+                        router.push(redirectPath || "/Home");
+                        return true;
+                      }
+                      return false;
+                    } catch (error) {
+                      console.error(
+                        "Error checking for Starknet address:",
+                        error,
+                      );
+                      return false;
+                    }
+                  };
+
+                  // Poll every 2 seconds for up to 30 seconds
+                  const pollInterval = setInterval(async () => {
+                    const hasAddress = await checkStarknetAddress();
+                    if (hasAddress) {
+                      clearInterval(pollInterval);
+                    }
+                  }, 2000);
+
+                  // Stop polling after 30 seconds
+                  setTimeout(() => {
+                    clearInterval(pollInterval);
+                  }, 30000);
+                }
+              } catch (error) {
+                console.error("Error checking user profile:", error);
+                setStatus("verified");
+                setVerificationMessage(
+                  "Email verified! Setting up your wallet...",
+                );
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error in periodic email verification check:", error);
+        }
+      }, 3000); // Check every 3 seconds
+
+      // Cleanup interval on unmount
+      return () => {
+        clearInterval(checkInterval);
+        unsubscribe();
+      };
     }
-  }, [status, currentUser, router]);
+  }, [status, currentUser, router, redirectPath]);
 
   const isWaiting = status === "waiting";
 
   return (
-    <Card className="w-[100%] lg:w-[40%]">
+    <Card className={`w-full max-w-md ${className}`}>
       <ToastContainer />
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Create an account</CardTitle>
@@ -181,7 +402,11 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
                   value={name}
                   onChange={handleNameChange}
                   required
+                  aria-invalid={!!nameError}
                 />
+                {nameError && (
+                  <span className="text-red-500 text-xs">{nameError}</span>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -192,29 +417,73 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
                   value={email}
                   onChange={handleEmailChange}
                   required
+                  aria-invalid={!!emailError}
                 />
+                {emailError && (
+                  <span className="text-red-500 text-xs">{emailError}</span>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={handlePasswordChange}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={handlePasswordChange}
+                    required
+                    aria-invalid={!!passwordError}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
+                {passwordError && (
+                  <span className="text-red-500 text-xs">{passwordError}</span>
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="repeatPassword">Repeat Password</Label>
-                <Input
-                  id="repeatPassword"
-                  type="password"
-                  placeholder="Repeat your password"
-                  value={repeatPassword}
-                  onChange={handleRepeatPasswordChange}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="repeatPassword"
+                    type={showRepeatPassword ? "text" : "password"}
+                    placeholder="Repeat your password"
+                    value={repeatPassword}
+                    onChange={handleRepeatPasswordChange}
+                    required
+                    aria-invalid={!!repeatPasswordError}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                  >
+                    {showRepeatPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500" />
+                    )}
+                  </Button>
+                </div>
+                {repeatPasswordError && (
+                  <span className="text-red-500 text-xs">
+                    {repeatPasswordError}
+                  </span>
+                )}
               </div>
               <div className="text-center h-6">
                 {accountStatus && (
@@ -222,7 +491,9 @@ export function SignupForm({ onLoginClick }: { onLoginClick?: () => void }) {
                 )}
               </div>
               <Button
-                disabled={isWaiting}
+                disabled={
+                  isWaiting || !name || !email || !password || !repeatPassword
+                }
                 onClick={handlesignupclick}
                 className="w-full bg-[#9B51E0]"
               >
