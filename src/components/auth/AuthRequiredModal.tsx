@@ -23,8 +23,8 @@ const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
     <Dialog open={open} onClose={() => {}} className="relative z-50">
       <DialogBackdrop className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm transition-opacity" />
       {/* Modal content above background */}
-      <div className="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center p-4">
-        <DialogPanel className="relative w-full sm:max-w-xl md:max-w-2xl mx-auto my-4 sm:my-8 border border-gray-200 rounded-3xl shadow-3xl px-0 py-0 flex flex-col items-center gap-0 overflow-hidden">
+      <div className="fixed inset-0 z-10 overflow-y-auto flex items-center justify-center p-1 sm:p-2 md:p-4">
+        <DialogPanel className="relative w-full sm:max-w-xl md:max-w-2xl mx-auto my-1 sm:my-2 md:my-4 lg:my-8 border border-gray-200 rounded-2xl sm:rounded-3xl shadow-3xl px-0 py-0 flex flex-col items-center gap-0 overflow-hidden">
           <div className="absolute inset-0 z-0">
             <div
               className="absolute inset-0 transition-all duration-300"
@@ -39,23 +39,23 @@ const AuthRequiredModal: React.FC<AuthRequiredModalProps> = ({
             />
           </div>
           {/* Modal content above background */}
-          <div className="relative z-10 w-full px-6 sm:px-10 py-6 sm:py-8 flex flex-col items-center gap-4 sm:gap-6 text-white">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-center mb-1 tracking-tight text-white drop-shadow-lg">
+          <div className="relative z-10 w-full px-3 sm:px-4 md:px-6 lg:px-10 py-3 sm:py-4 md:py-6 lg:py-8 flex flex-col items-center gap-1 sm:gap-2 md:gap-4 lg:gap-6 text-white">
+            <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold text-center mb-0 tracking-tight text-white drop-shadow-lg">
               Sign in to continue
             </h2>
-            <p className="text-center mb-3 sm:mb-4 text-sm sm:text-base text-gray-200">
+            <p className="text-center mb-1 sm:mb-2 md:mb-3 lg:mb-4 text-xs sm:text-sm md:text-base text-gray-200">
               You must be signed in to view this course.
             </p>
-            <div className="w-full sm:w-[50%] flex justify-center mb-4 sm:mb-6 bg-white bg-opacity-10 rounded-full p-1 gap-2">
+            <div className="w-[80%] sm:w-[60%] md:w-[50%] flex justify-center mb-2 sm:mb-3 md:mb-4 lg:mb-6 bg-white bg-opacity-10 rounded-full p-0.5 sm:p-1 gap-1 sm:gap-2">
               <button
-                className={`px-6 py-2 rounded-full font-semibold border transition-colors text-base ${mode === "login" ? "bg-[#9B51E0] text-white shadow" : "bg-transparent text-white border-white"}`}
+                className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full font-semibold border transition-colors text-xs sm:text-sm md:text-base ${mode === "login" ? "bg-[#9B51E0] text-white shadow" : "bg-transparent text-white border-white"}`}
                 onClick={() => setMode("login")}
                 disabled={mode === "login"}
               >
                 Login
               </button>
               <button
-                className={`px-6 py-2 rounded-full font-semibold border transition-colors text-base ${mode === "signup" ? "bg-[#9B51E0] text-white shadow" : "bg-transparent text-white border-white"}`}
+                className={`px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full font-semibold border transition-colors text-xs sm:text-sm md:text-base ${mode === "signup" ? "bg-[#9B51E0] text-white shadow" : "bg-transparent text-white border-white"}`}
                 onClick={() => setMode("signup")}
                 disabled={mode === "signup"}
               >
