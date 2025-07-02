@@ -21,9 +21,9 @@ export async function middleware(request: NextRequest) {
     const firebaseToken = request.cookies.get("firebase-auth-token")?.value;
 
     if (firebaseToken) {
-      // User is authenticated, redirect to Home
-      const homeUrl = new URL("/Home", request.url);
-      return NextResponse.redirect(homeUrl);
+      // User is authenticated, but let client-side logic handle account completion
+      // Don't redirect immediately - let the signup process complete
+      return NextResponse.next();
     }
 
     // User is not authenticated, allow access to login page
