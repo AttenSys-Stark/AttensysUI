@@ -17,6 +17,8 @@ export interface ShareData {
 
 // Helper function to generate URL-friendly slugs from course names
 export const generateSlug = (courseName: string): string => {
+  if (!courseName) return "";
+
   return courseName
     .toLowerCase()
     .trim()
@@ -29,14 +31,24 @@ export const generateSlug = (courseName: string): string => {
 export const generateShareableUrl = (
   courseId: string,
   courseName?: string,
-  baseUrl: string = "http://attensys.xyz",
+  baseUrl: string = "https://attensys.xyz",
 ): string => {
-  if (courseName) {
-    // Create a professional URL with course slug
-    const slug = generateSlug(courseName);
-    return `${baseUrl}/c/${slug}?id=${courseId}`;
-  } else {
-    // Fallback to clean ID-based URL
+  if (!courseId) {
+    console.warn("No course ID provided for shareable URL generation");
+    return baseUrl;
+  }
+
+  try {
+    if (courseName) {
+      // Create a professional URL with course slug
+      const slug = generateSlug(courseName);
+      return `${baseUrl}/c/${slug}?id=${courseId}`;
+    } else {
+      // Fallback to clean ID-based URL
+      return `${baseUrl}/c/${courseId}`;
+    }
+  } catch (error) {
+    console.error("Error generating shareable URL:", error);
     return `${baseUrl}/c/${courseId}`;
   }
 };
@@ -44,6 +56,34 @@ export const generateShareableUrl = (
 export const copyToClipboard = (text: string): Promise<boolean> => {
   return new Promise((resolve) => {
     try {
+      if (!text) {
+        console.warn("No text provided to copy");
+        resolve(false);
+        return;
+      }
+
+      // Check if copy-to-clipboard is available
+      if (typeof copy !== "function") {
+        console.warn(
+          "copy-to-clipboard not available, falling back to navigator.clipboard",
+        );
+
+        // Fallback to native clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(text)
+            .then(() => resolve(true))
+            .catch((err) => {
+              console.error("Native clipboard API failed:", err);
+              resolve(false);
+            });
+          return;
+        }
+
+        resolve(false);
+        return;
+      }
+
       const success = copy(text, {
         format: "text/plain",
         onCopy: () => resolve(true),
@@ -70,27 +110,42 @@ export const getSocialShareUrls = (shareData: ShareData) => {
 };
 
 export const openShareWindow = (url: string, platform: string) => {
-  const width = 600;
-  const height = 400;
-  const left = window.screen.width / 2 - width / 2;
-  const top = window.screen.height / 2 - height / 2;
+  try {
+    const width = 600;
+    const height = 400;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
 
-  window.open(
-    url,
-    `share-${platform}`,
-    `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`,
-  );
+    const shareWindow = window.open(
+      url,
+      `share-${platform}`,
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`,
+    );
+
+    if (!shareWindow) {
+      console.warn("Popup blocked by browser, opening in new tab");
+      window.open(url, "_blank");
+    }
+  } catch (error) {
+    console.error("Error opening share window:", error);
+    // Fallback to opening in new tab
+    window.open(url, "_blank");
+  }
 };
 
 export const trackShareEvent = (platform: string, courseId: string) => {
-  // Analytics tracking for share events
-  if (typeof window !== "undefined" && window.gtag) {
-    window.gtag("event", "share", {
-      method: platform,
-      content_type: "course",
-      item_id: courseId,
-    });
-  }
+  try {
+    // Analytics tracking for share events
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("event", "share", {
+        method: platform,
+        content_type: "course",
+        item_id: courseId,
+      });
+    }
 
-  console.log(`Shared course ${courseId} on ${platform}`);
+    console.log(`Shared course ${courseId} on ${platform}`);
+  } catch (error) {
+    console.error("Error tracking share event:", error);
+  }
 };

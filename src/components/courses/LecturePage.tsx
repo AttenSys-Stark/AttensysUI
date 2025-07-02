@@ -600,13 +600,13 @@ const LecturePage = (props: any) => {
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex < props?.data.courseCurriculum.length - 1 ? prevIndex + 1 : 0,
+      prevIndex < props?.data?.courseCurriculum?.length - 1 ? prevIndex + 1 : 0,
     );
   };
 
   const handlePrevious = () => {
     setCurrentIndex((prevIndex) =>
-      prevIndex > 0 ? prevIndex - 1 : props?.data.courseCurriculum.length - 1,
+      prevIndex > 0 ? prevIndex - 1 : props?.data?.courseCurriculum?.length - 1,
     );
   };
 
@@ -673,16 +673,16 @@ const LecturePage = (props: any) => {
       fetchReviewsAndRating();
     }
     let isMounted = true;
-    createAccess(
-      props?.data.courseCurriculum[props?.data.courseCurriculum.length - 1]
-        .video,
-    ).then((url) => {
-      if (isMounted) setSelectedVideo(url ?? "");
-    });
-    if (props?.data.courseCurriculum?.length > 0) {
+    if (props?.data?.courseCurriculum?.length > 0) {
+      createAccess(
+        props?.data?.courseCurriculum[props?.data?.courseCurriculum?.length - 1]
+          ?.video,
+      ).then((url) => {
+        if (isMounted) setSelectedVideo(url ?? "");
+      });
       setSelectedLectureName(
-        props?.data.courseCurriculum[props?.data.courseCurriculum.length - 1]
-          .name,
+        props?.data?.courseCurriculum[props?.data?.courseCurriculum?.length - 1]
+          ?.name,
       );
     }
     return () => {
@@ -1053,7 +1053,7 @@ const LecturePage = (props: any) => {
     async function fetchAccessUrls() {
       if (!props?.data?.courseCurriculum) return;
       const urls = await Promise.all(
-        props.data.courseCurriculum.map((lecture: any) =>
+        props?.data?.courseCurriculum?.map((lecture: any) =>
           createAccess(lecture.video),
         ),
       );
@@ -1061,6 +1061,27 @@ const LecturePage = (props: any) => {
     }
     fetchAccessUrls();
   }, [props?.data?.courseCurriculum]);
+
+  // Add debugging for props.data structure
+  useEffect(() => {
+    console.log("LecturePage - props.data:", props?.data);
+    console.log(
+      "LecturePage - courseCurriculum exists:",
+      !!props?.data?.courseCurriculum,
+    );
+    console.log(
+      "LecturePage - courseCurriculum type:",
+      typeof props?.data?.courseCurriculum,
+    );
+    console.log(
+      "LecturePage - courseCurriculum length:",
+      props?.data?.courseCurriculum?.length,
+    );
+    console.log(
+      "LecturePage - courseCurriculum content:",
+      props?.data?.courseCurriculum,
+    );
+  }, [props?.data]);
 
   if (authLoading) {
     return (
@@ -1084,6 +1105,31 @@ const LecturePage = (props: any) => {
             <p className="text-[#2D3A4B] mb-6">
               This course is currently pending approval and is not available for
               viewing.
+            </p>
+            <button
+              onClick={() => router?.push("/Home")}
+              className="bg-[#9b51e0] px-7 py-2 rounded text-[#fff] font-bold hover:bg-[#8a4ad0] transition-colors"
+            >
+              Return to Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if course data is available
+  if (!props?.data) {
+    return (
+      <div className="pt-6 pb-36 w-full">
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-[#2D3A4B] mb-4">
+              Course Data Not Available
+            </h2>
+            <p className="text-[#2D3A4B] mb-6">
+              Unable to load course information. Please try accessing the course
+              from the main page.
             </p>
             <button
               onClick={() => router?.push("/Home")}
@@ -1209,70 +1255,82 @@ const LecturePage = (props: any) => {
               <p>Attensys Certified Course</p>
             </div>
             <h1 className="text-[16px] text-[#2D3A4B] leading-[22px] font-semibold">
-              Lecture ({props?.data?.courseCurriculum.length})
+              Lecture ({props?.data?.courseCurriculum?.length || 0})
             </h1>
 
             <div className="h-[440px] w-[100%] bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide">
-              {props?.data?.courseCurriculum
-                ?.slice()
-                .reverse()
-                .map((item: any, i: any) => {
-                  // Calculate the correct index for accessUrls (since we reversed the array)
-                  const accessUrl =
-                    accessUrls[props.data.courseCurriculum.length - 1 - i];
-                  return (
-                    <div
-                      key={i}
-                      className="flex w-full items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => {
-                        if (window.innerWidth < 1024)
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        handleVideoClick(accessUrl, item.name);
-                      }}
-                    >
-                      <div className="w-8 flex-shrink-0">
-                        <p className="font-bold text-[#5801a9]">{i + 1}</p>
-                      </div>
+              {props?.data?.courseCurriculum &&
+              props?.data?.courseCurriculum?.length > 0 ? (
+                props?.data?.courseCurriculum
+                  ?.slice()
+                  .reverse()
+                  .map((item: any, i: any) => {
+                    // Calculate the correct index for accessUrls (since we reversed the array)
+                    const accessUrl =
+                      accessUrls[props?.data?.courseCurriculum?.length - 1 - i];
+                    return (
                       <div
-                        className="w-[145px] h-[94px] rounded-xl border-4 border flex-shrink-0 overflow-hidden"
-                        onContextMenu={(e) => e.preventDefault()}
+                        key={i}
+                        className="flex w-full items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => {
+                          if (window.innerWidth < 1024)
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          handleVideoClick(accessUrl, item.name);
+                        }}
                       >
-                        {accessUrl ? (
-                          <ReactPlayer
-                            url={accessUrl}
-                            controls={false}
-                            playing={false}
-                            width="100%"
-                            height="100%"
-                            playIcon={<></>}
-                            onDuration={(duration) =>
-                              handleDuration(i, duration)
-                            }
-                          />
-                        ) : (
-                          <div className="flex items-center justify-center w-full h-full">
-                            <LoadingSpinner size="sm" colorVariant="primary" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-grow ml-6">
-                        <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
-                          {item.name}
-                        </p>
-                        <h1 className="text-[8px] text-[#333333] leading-[14px] font-medium">
-                          Creator address
-                        </h1>
-                        <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
-                          <p className="text-xs px-7 py-1">
-                            {durations[i]
-                              ? formatDuration(durations[i])
-                              : "0:00:00"}
+                        <div className="w-8 flex-shrink-0">
+                          <p className="font-bold text-[#5801a9]">{i + 1}</p>
+                        </div>
+                        <div
+                          className="w-[145px] h-[94px] rounded-xl border-4 border flex-shrink-0 overflow-hidden"
+                          onContextMenu={(e) => e.preventDefault()}
+                        >
+                          {accessUrl ? (
+                            <ReactPlayer
+                              url={accessUrl}
+                              controls={false}
+                              playing={false}
+                              width="100%"
+                              height="100%"
+                              playIcon={<></>}
+                              onDuration={(duration) =>
+                                handleDuration(i, duration)
+                              }
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-full">
+                              <LoadingSpinner
+                                size="sm"
+                                colorVariant="primary"
+                              />
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-grow ml-6">
+                          <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
+                            {item.name}
                           </p>
+                          <h1 className="text-[8px] text-[#333333] leading-[14px] font-medium">
+                            Creator address
+                          </h1>
+                          <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
+                            <p className="text-xs px-7 py-1">
+                              {durations[i]
+                                ? formatDuration(durations[i])
+                                : "0:00:00"}
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500 text-center">
+                    No lectures available
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1475,68 +1533,79 @@ const LecturePage = (props: any) => {
             {/* Lectures */}
             <div className="flex xl:hidden flex-col">
               <p className=" font-semibold">
-                Lectures({props?.data?.courseCurriculum.length})
+                Lectures({props?.data?.courseCurriculum?.length || 0})
               </p>
               <div className=" w-[100%] bg-[#FFFFFF] border-[1px] border-[#D9D9D9] rounded-xl overflow-scroll scrollbar-hide">
-                {props?.data?.courseCurriculum
-                  ?.slice()
-                  .reverse()
-                  .map((item: any, i: any) => {
-                    const accessUrl =
-                      accessUrls[props.data.courseCurriculum.length - 1 - i];
-                    return (
-                      <div
-                        key={i}
-                        className="flex w-full items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => {
-                          if (window.innerWidth < 1024)
-                            window.scrollTo({ top: 0, behavior: "smooth" });
-                          handleVideoClick(accessUrl, item.name);
-                        }}
-                      >
-                        <div className="w-8 flex-shrink-0">
-                          <p className="font-bold text-[#5801a9]">{i + 1}</p>
-                        </div>
+                {props?.data?.courseCurriculum &&
+                props?.data?.courseCurriculum?.length > 0 ? (
+                  props?.data?.courseCurriculum
+                    ?.slice()
+                    .reverse()
+                    .map((item: any, i: any) => {
+                      const accessUrl =
+                        accessUrls[
+                          props?.data?.courseCurriculum?.length - 1 - i
+                        ];
+                      return (
                         <div
-                          className="w-[150px] h-[97px] rounded-xl border-4 border flex-shrink-0"
-                          onContextMenu={(e) => e.preventDefault()}
+                          key={i}
+                          className="flex w-full items-center p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                          onClick={() => {
+                            if (window.innerWidth < 1024)
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            handleVideoClick(accessUrl, item.name);
+                          }}
                         >
-                          {accessUrl ? (
-                            <ReactPlayer
-                              url={accessUrl}
-                              controls={false}
-                              playing={false}
-                              width="100%"
-                              height="100%"
-                              playIcon={<></>}
-                              onDuration={(duration) =>
-                                handleDuration(i, duration)
-                              }
-                            />
-                          ) : (
-                            <div className="flex items-center justify-center w-full h-full">
-                              <LoadingSpinner
-                                size="sm"
-                                colorVariant="primary"
+                          <div className="w-8 flex-shrink-0">
+                            <p className="font-bold text-[#5801a9]">{i + 1}</p>
+                          </div>
+                          <div
+                            className="w-[150px] h-[97px] rounded-xl border-4 border flex-shrink-0"
+                            onContextMenu={(e) => e.preventDefault()}
+                          >
+                            {accessUrl ? (
+                              <ReactPlayer
+                                url={accessUrl}
+                                controls={false}
+                                playing={false}
+                                width="100%"
+                                height="100%"
+                                playIcon={<></>}
+                                onDuration={(duration) =>
+                                  handleDuration(i, duration)
+                                }
                               />
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-grow ml-6">
-                          <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
-                            {item.name}
-                          </p>
-                          <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
-                            <p className="text-xs px-7 py-1">
-                              {durations[i]
-                                ? formatDuration(durations[i])
-                                : "0:00:00"}
+                            ) : (
+                              <div className="flex items-center justify-center w-full h-full">
+                                <LoadingSpinner
+                                  size="sm"
+                                  colorVariant="primary"
+                                />
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-grow ml-6">
+                            <p className="text-[14px] font-semibold leading-[30px] text-[#333333]">
+                              {item.name}
                             </p>
+                            <div className="rounded-lg bg-[#9B51E052] w-[60%] flex items-center justify-center">
+                              <p className="text-xs px-7 py-1">
+                                {durations[i]
+                                  ? formatDuration(durations[i])
+                                  : "0:00:00"}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                ) : (
+                  <div className="flex items-center justify-center h-full p-4">
+                    <p className="text-gray-500 text-center">
+                      No lectures available
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
