@@ -1,6 +1,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import AddLecture from "./AddLecture";
 import Previous from "./previous";
 
@@ -30,6 +31,18 @@ const CourseSetup: React.FC<CourseSetupProps> = ({
 
   return (
     <div className="relative mx-10 md:mx-auto w-auto md:w-3/4 lg:w-5/12 pt-16">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="hidden lg:block">
         <Previous />
       </div>

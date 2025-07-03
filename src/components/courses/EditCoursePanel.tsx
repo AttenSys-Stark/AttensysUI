@@ -8,7 +8,8 @@ import { usePinataAccess } from "@/hooks/usePinataAccess";
 import ReactPlayer from "react-player/lazy";
 import { PinataSDK } from "pinata";
 import AddLecture from "./course-form/AddLecture";
-import { Bounce, toast } from "react-toastify";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useExplorer } from "@starknet-react/core";
 import { pinata as pinataclone } from "../../../utils/config";
 import { onAuthStateChanged } from "firebase/auth";
@@ -420,6 +421,18 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
   }, []);
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       {/* Backdrop */}
       <div
         className={`fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300 ${
