@@ -34,10 +34,6 @@ const Outline = () => {
   const id = searchParams.get("id");
   const org = searchParams.get("org");
 
-  console.log("this is ID", id);
-  console.log("this is org", org);
-  // console.log("new new id",bootcampid )
-  // console.log("ownerAddress",ownerAddress )
   const handleAddclass = () => {
     setAddclass({ modalstatus: true, idnumber: Number(id) });
   };
@@ -47,7 +43,6 @@ const Outline = () => {
       org,
       id,
     );
-    console.log("video data here", video_data);
 
     if (video_data?.length === 0) {
       setDataStat(true);
@@ -68,9 +63,6 @@ const Outline = () => {
 
   const getIPfsVideodata = async (CID: string) => {
     const data = await fetchCIDContent(CID);
-    console.log(data);
-    //@ts-ignore
-    console.log("url", data?.data?.courseData?.videoUrl);
     return data;
   };
 

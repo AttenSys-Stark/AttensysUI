@@ -36,7 +36,6 @@ const CourseOutline = () => {
     );
 
     let classes_id_array = await orgContract.get_all_bootcamp_classes(org, id);
-    console.log("class ids here", classes_id_array);
 
     if (video_data?.length === 0) {
       setDataStat(true);
@@ -58,9 +57,6 @@ const CourseOutline = () => {
 
   const getIPfsVideodata = async (CID: string) => {
     const data = await fetchCIDContent(CID);
-    console.log(data);
-    //@ts-ignore
-    console.log("url", data?.data?.courseData?.videoUrl);
     return data;
   };
 

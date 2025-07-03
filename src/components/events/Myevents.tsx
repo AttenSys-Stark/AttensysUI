@@ -112,7 +112,6 @@ const Myevents = (props: any) => {
     ) {
       setSelectedFile(file);
       setErrors((prev) => ({ ...prev, file: "" }));
-      console.log("Selected file:", file);
     } else {
       setSelectedFile(null);
       setErrors((prev) => ({
@@ -153,7 +152,6 @@ const Myevents = (props: any) => {
   };
 
   const handleCreateEventButton = async () => {
-    console.log("clicked");
     const newErrors = {
       eventName: !eventName.trim() ? "Event name is required" : "",
       startDate: !startDate ? "Start date is required" : "",
@@ -173,7 +171,6 @@ const Myevents = (props: any) => {
     }
 
     setErrors(newErrors);
-    console.log(newErrors);
 
     if (Object.values(newErrors).some((error) => error)) return;
 
@@ -224,11 +221,8 @@ const Myevents = (props: any) => {
       connectorDataAccount?.provider
         .waitForTransaction(result.transaction_hash)
         .then(() => {})
-        .catch((e: any) => {
-          console.log("Error: ", e);
-        })
+        .catch((e: any) => {})
         .finally(() => {
-          console.log("FINALYY BLOCK RUNNING");
           //Resets all event data input
           setEventName("");
           setStartDate(null);

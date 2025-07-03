@@ -49,7 +49,6 @@ const QrScannerComponent = ({ eventId }: QrScannerComponentProps) => {
     if (detectedCodes.length > 0 && ws && sessionId) {
       const scannedData = detectedCodes[0].rawValue; // Get the first detected code
       console.info("Scanned QR Code:", scannedData);
-      console.log("session id", sessionId);
 
       // Send scanned data to the WebSocket server
       ws.send(JSON.stringify({ type: "scan", sessionId, scannedData }));

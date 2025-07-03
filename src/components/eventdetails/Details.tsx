@@ -82,7 +82,6 @@ const Details = (props: any) => {
     try {
       //@ts-ignore
       const data = await fetchCIDContent(CID);
-      console.log("fetched CID event details", data);
       //@ts-ignore
       const logoData: GetCIDResponse = await fetchCIDContent(
         //@ts-ignore
@@ -112,7 +111,6 @@ const Details = (props: any) => {
       if (res) {
         seteventData(res);
         setEventName(res?.event_name);
-        console.log("reponse here", res);
         obtainCIDdata(res.event_uri);
       }
     } catch (error) {
@@ -191,7 +189,6 @@ const Details = (props: any) => {
               },
             );
 
-            console.log(response);
             if (response.ok) {
               setifsuccess(true);
             } else {

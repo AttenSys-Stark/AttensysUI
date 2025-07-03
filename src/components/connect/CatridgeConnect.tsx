@@ -21,7 +21,6 @@ export function CatridgeConnect() {
   }, [address, controller]);
 
   const handleConnect = async () => {
-    console.log("clicked");
     setiswalletconnecting(true);
     if (address) {
       router.push("/");

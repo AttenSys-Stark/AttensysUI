@@ -58,13 +58,9 @@ export function LoginForm({
       if (user) {
         setAccountStatus("Sign in complete! Redirecting...");
         router.push(redirectPath || "/Home");
-        console.log("Signed in user:", user);
-        // Redirect or update UI
       } else {
         setAccountStatus("Error during sign in");
         setAccountloadProgress(false);
-        console.log("error in Signed in user:", user);
-        // Redirect or update UI
       }
     } catch (error) {
       toast.error("Sign in failed", {
@@ -130,7 +126,6 @@ export function LoginForm({
         theme: "light",
         transition: Bounce,
       });
-      console.log("error in login:", error);
     } finally {
       setTimeout(() => {
         setIsloaderLoading(false);
@@ -143,10 +138,8 @@ export function LoginForm({
       await resetUserPassword(resetEmail);
       setResetSent(true);
       // toast.success("Password reset email sent!");
-      console.log("Password reset email sent!");
     } catch (error: any) {
       // toast.error(error.message);
-      console.log("error in reset password:", error);
     }
   };
 

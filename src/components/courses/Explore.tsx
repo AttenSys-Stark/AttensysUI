@@ -617,7 +617,9 @@ const Explore = ({
                           {item.name}
                           {/* <span className="text-[#5801A9]">({item.time})</span> */}
                         </h6>
-                        <p className="font-light mt-2">{item.description}</p>
+                        <p className="font-light mt-2">
+                          {item.description.slice(0, 75)}...
+                        </p>
                       </div>
                     </div>
                   );

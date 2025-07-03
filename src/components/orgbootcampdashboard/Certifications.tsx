@@ -28,7 +28,6 @@ const Certifications = () => {
   useEffect(() => {
     if (!address) return;
     controller.username()?.then((n) => setOrgname(n));
-    console.log(address, "address");
   }, [address, controller]);
 
   const organizationContract = new Contract(

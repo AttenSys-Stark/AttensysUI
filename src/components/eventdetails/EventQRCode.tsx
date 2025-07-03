@@ -31,7 +31,6 @@ const EventQRCode = ({ eventId }: { eventId: string }) => {
         "https://attensys-1a184d8bebe7.herokuapp.com/api/generate-master-qr",
       );
       const data = await response.json();
-      console.log("check data here", data);
       setQrUrl(data.qrCodeDataUrl);
 
       // Connect to the WebSocket server
@@ -51,10 +50,7 @@ const EventQRCode = ({ eventId }: { eventId: string }) => {
         const message = JSON.parse(event.data);
         if (message.type === "action") {
           // Trigger action based on scanned data
-          console.log("Scanned data:", message.data);
           const data = JSON.parse(message.data);
-          console.log(Number(data.eventId));
-          console.log(data.attendeeaddress);
           setattendanceOverlayStat(true);
           const eventContract = new Contract(
             attensysEventAbi,
@@ -74,7 +70,6 @@ const EventQRCode = ({ eventId }: { eventId: string }) => {
             .waitForTransaction(result.transaction_hash)
             .then(() => {})
             .catch((e: any) => {
-              console.log("Error: ", e);
               setattendanceOverlayStat(false);
             })
             .finally(() => {

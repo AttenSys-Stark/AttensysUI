@@ -33,7 +33,6 @@ const MobileStudentApprovalCard = (props: any) => {
   useEffect(() => {
     if (!address) return;
     controller.username()?.then((n) => setOrgname(n));
-    console.log(address, "address");
   }, [address, controller]);
 
   const organizationContract = new Contract(
@@ -45,13 +44,12 @@ const MobileStudentApprovalCard = (props: any) => {
   const getIpfsData = async () => {
     try {
       const data = await fetchCIDContent(props?.info?.student_details_uri);
-      console.log("student data", data);
       //@ts-ignore
       setEmail(data?.data?.student_email);
       //@ts-ignore
       setName(data?.data?.student_name);
     } catch (error) {
-      console.log(error);
+      // Handle error silently
     }
   };
 

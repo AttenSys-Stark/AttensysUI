@@ -67,10 +67,10 @@ export function SignupForm({
       const user = await signInUser();
       if (user) {
         // Don't route immediately - let the account creation process complete
-        console.log("Signed in user:", user);
+        setAccountStatus("Creating user profile...");
         // The auth state listener will handle routing after account setup
       } else {
-        console.log("error in Signed in user:", user);
+        setAccountStatus("error in Signed in user:");
         // Redirect or update UI
       }
     } catch (error) {
@@ -158,7 +158,6 @@ export function SignupForm({
         setStatus("form");
         setAccountStatus("Email already in use");
         toast.error("Email already in use");
-        console.log("Email already in use");
       }
     }
   };
@@ -168,13 +167,6 @@ export function SignupForm({
     if (status === "waiting" && currentUser) {
       const unsubscribe = onAuthStateChanged(auth, async (user) => {
         if (user && user.uid === currentUser.uid) {
-          console.log(
-            "Auth state changed for user:",
-            user.uid,
-            "Email verified:",
-            user.emailVerified,
-          );
-
           // Reload user to get latest verification status
           try {
             await user.reload();
@@ -184,7 +176,7 @@ export function SignupForm({
 
           // Check if email is verified
           const isVerified = user.emailVerified;
-          console.log("Email verification status after reload:", isVerified);
+          // console.log("Email verification status after reload:", isVerified);
 
           if (isVerified) {
             // Email is verified, now check for Starknet address
@@ -263,10 +255,10 @@ export function SignupForm({
           const currentUser = auth.currentUser;
           if (currentUser && currentUser.uid === currentUser.uid) {
             await currentUser.reload();
-            console.log(
-              "Periodic check - Email verified:",
-              currentUser.emailVerified,
-            );
+            // console.log(
+            //   "Periodic check - Email verified:",
+            //   currentUser.emailVerified,
+            // );
 
             if (currentUser.emailVerified) {
               clearInterval(checkInterval);

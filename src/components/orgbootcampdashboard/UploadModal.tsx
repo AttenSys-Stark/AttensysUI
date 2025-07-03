@@ -86,7 +86,6 @@ export default function UploadModal(prop: any) {
   useEffect(() => {
     if (!address) return;
     controller.username()?.then((n) => setOrgname(n));
-    console.log(address, "address");
   }, [address, controller]);
 
   const handleInputChange = (

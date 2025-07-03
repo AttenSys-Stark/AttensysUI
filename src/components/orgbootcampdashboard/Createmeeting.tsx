@@ -54,7 +54,6 @@ export default function Createmeeting(prop: any) {
   useEffect(() => {
     if (!address) return;
     controller.username()?.then((n) => setOrgname(n));
-    console.log(address, "address");
   }, [address, controller]);
 
   useEffect(() => {

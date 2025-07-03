@@ -72,9 +72,6 @@ const Tophero = () => {
         data?.data?.BootcampNftImage,
       );
 
-      console.log("ip data here", data);
-      //@ts-ignore
-      // setBootcampDescription(data?.data?.BootcampDescription);
       let formatedDate = formatBootcampDates(data?.data);
       //@ts-ignore
       setDate(formatedDate);
