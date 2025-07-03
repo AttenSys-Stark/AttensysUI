@@ -114,8 +114,6 @@ const Explorebootcampdetails = () => {
 
       // Update state once with all data
       setRegBootcampdataInfo(bootcampInfoArray);
-
-      console.log("Bootcamp info fetched:", bootcampInfoArray);
     } catch (error) {
       console.error("Error fetching specific org info:", error);
     }

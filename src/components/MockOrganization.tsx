@@ -61,7 +61,6 @@ const MockOrganization = () => {
   useEffect(() => {
     if (!address) return;
     controller.username()?.then((n) => setOrgname(n));
-    console.log(address, "address");
   }, [address, controller]);
 
   // core write and read functions

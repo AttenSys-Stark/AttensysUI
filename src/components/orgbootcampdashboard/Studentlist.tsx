@@ -17,13 +17,12 @@ const Studentlist = (props: any) => {
   const getIpfsData = async () => {
     try {
       const data = await fetchCIDContent(props?.info?.student_details_uri);
-      console.log("student data", data);
       //@ts-ignore
       setEmail(data?.data?.student_email);
       //@ts-ignore
       setName(data?.data?.student_name);
     } catch (error) {
-      console.log(error);
+      // Handle error silently
     }
   };
   useEffect(() => {

@@ -580,21 +580,21 @@ const Explore = ({
                     <div
                       key={i}
                       className="flex content-center text-sm my-3 cursor-pointer space-x-4"
-                      onClick={(e) => {
-                        localStorage.setItem(
-                          `courseData_${unfilteredData[unfilteredData.length - 1]?.course_identifier}`,
-                          JSON.stringify(
-                            unfilteredData[unfilteredData.length - 1]?.data,
-                          ),
-                        );
-                        handleCourse(
-                          e,
-                          e.currentTarget.textContent,
-                          router,
-                          unfilteredData[unfilteredData.length - 1]
-                            ?.course_identifier,
-                        );
-                      }}
+                      // onClick={(e) => {
+                      //   localStorage.setItem(
+                      //     `courseData_${unfilteredData[unfilteredData.length - 1]?.course_identifier}`,
+                      //     JSON.stringify(
+                      //       unfilteredData[unfilteredData.length - 1]?.data,
+                      //     ),
+                      //   );
+                      //   handleCourse(
+                      //     e,
+                      //     e.currentTarget.textContent,
+                      //     router,
+                      //     unfilteredData[unfilteredData.length - 1]
+                      //       ?.course_identifier,
+                      //   );
+                      // }}
                     >
                       <div
                         className="w-[150px] h-[90px] rounded-xl border-4 border flex-shrink-0 overflow-hidden"
@@ -617,7 +617,9 @@ const Explore = ({
                           {item.name}
                           {/* <span className="text-[#5801A9]">({item.time})</span> */}
                         </h6>
-                        <p className="font-light mt-2">{item.description}</p>
+                        <p className="font-light mt-2">
+                          {item.description.slice(0, 75)}...
+                        </p>
                       </div>
                     </div>
                   );

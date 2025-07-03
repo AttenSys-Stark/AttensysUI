@@ -103,7 +103,6 @@ const Adminpanel = (props: any) => {
 
           //   try {
           let cidContent = await pinata.gateways.get(course.course_ipfs_uri);
-          console.log("cidContent here", cidContent);
           if (cidContent) {
             try {
               if (typeof cidContent === "string") {
@@ -193,7 +192,6 @@ const Adminpanel = (props: any) => {
       toast.error("Wallet/account not loaded. Please wait or re-login.", {
         /* ... */
       });
-      console.log("account:", account);
       return;
     }
     setApproving(true);
@@ -294,7 +292,6 @@ const Adminpanel = (props: any) => {
       }
     } catch (err) {
       setApproving(false);
-      console.log("Error populating calldata (gasless):", err);
       toast.error("Course approval failed", {
         position: "top-right",
         autoClose: 5000,
@@ -318,7 +315,6 @@ const Adminpanel = (props: any) => {
       toast.error("Wallet/account not loaded. Please wait or re-login.", {
         /* ... */
       });
-      console.log("account:", account);
       return;
     }
     setDispproving(true);
@@ -421,7 +417,6 @@ const Adminpanel = (props: any) => {
       }
     } catch (err) {
       setDispproving(false);
-      console.log("Error populating calldata (gasless):", err);
       toast.error("Course disapproval failed", {
         position: "top-right",
         autoClose: 5000,
@@ -459,7 +454,6 @@ const Adminpanel = (props: any) => {
             );
             setAccount(userAccount);
           } else {
-            console.log("No user profile found in Firestore.");
             setAccount(undefined);
           }
         } catch (err) {
@@ -467,7 +461,6 @@ const Adminpanel = (props: any) => {
           setAccount(undefined);
         }
       } else {
-        console.log("No authenticated user found.");
         setAccount(undefined);
       }
     });
