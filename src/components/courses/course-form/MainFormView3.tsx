@@ -9,6 +9,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@headlessui/react";
 import Stepper from "@/components/Stepper";
 import AddLecture from "./AddLecture";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Lecture {
   id: string;
@@ -69,15 +71,67 @@ const MainFormView3: React.FC<ChildComponentProps> = ({
     setLectureTitleError("");
 
     let hasError = false;
+    let errorMessages: string[] = [];
 
-    // Validate lecture title only
-    if (courseData.courseCurriculum.length == 0) {
-      setLectureTitleError("Lecture title is required");
+    // Validate course image
+    if (!courseData.courseImage?.url) {
+      errorMessages.push("Course image is required");
       hasError = true;
     }
 
-    if (hasError) return;
-    // console.log("error");
+    // Validate course curriculum
+    if (
+      !courseData.courseCurriculum ||
+      courseData.courseCurriculum.length === 0
+    ) {
+      errorMessages.push("At least one lecture is required");
+      hasError = true;
+    } else {
+      // Validate each lecture in the curriculum
+      courseData.courseCurriculum.forEach((lecture: any, index: number) => {
+        const lectureNumber = index + 1;
+
+        // Validate lecture title
+        if (!lecture.name || lecture.name.trim() === "") {
+          errorMessages.push(`Lecture ${lectureNumber}: Title is required`);
+          hasError = true;
+        }
+
+        // Validate lecture description
+        // if (!lecture.description || lecture.description.trim() === "") {
+        //   errorMessages.push(`Lecture ${lectureNumber}: Description is required`);
+        //   hasError = true;
+        // }
+
+        // Validate video upload
+        if (!lecture.video || lecture.video.trim() === "") {
+          errorMessages.push(
+            `Lecture ${lectureNumber}: Video upload is required`,
+          );
+          hasError = true;
+        }
+      });
+    }
+
+    if (hasError) {
+      // Show all validation errors in a single toast
+      const errorMessage =
+        errorMessages.length > 1
+          ? `Please fix the following issues:\n• ${errorMessages.join("\n• ")}`
+          : errorMessages[0];
+
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 8000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      return;
+    }
 
     // Proceed to next step
     handleCreateCourse(e, "courseSetup4", router);
@@ -88,6 +142,18 @@ const MainFormView3: React.FC<ChildComponentProps> = ({
 
   return (
     <div className="flex items-stretch">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
       <div className="hidden lg:block">
         <CourseSideBar courseData={courseData} />
       </div>
@@ -187,7 +253,7 @@ You want to make sure your creative is very catchy.`}
                     <p className="font-semibold sm:hidden lg:hidden text-[18px] leading-[31px] text-[#333333] mt-[38px] mb-[18px]">
                       Upload thumbnail
                     </p>
-                    <div className="bg-white w-full md:w-[450px] flex items-center justify-center p-8 text-center border-dotted rounded-xl border-2 border-[#D0D5DD] flex flex-col justify-center content-center">
+                    <div className="bg-white w-[50%] md:w-[450px] flex items-center justify-center p-8 text-center border-dotted rounded-xl border-2 border-[#D0D5DD] flex flex-col justify-center content-center">
                       {!courseData.courseImage?.url ? (
                         <div className="w-[200px] h-[200px] flex items-center justify-center">
                           <p className="text-center">Preview Thumbnail Here</p>
@@ -204,33 +270,38 @@ You want to make sure your creative is very catchy.`}
                         </div>
                       )}
                     </div>
-                    <div className="hidden lg:block py-5 w-full sm:w-1/2 lg:w-[450px]">
-                      <p className="font-semibold text-[18px] leading-[31px] text-[#333333] py-3">
-                        Upload thumbnail
-                      </p>
-                      <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
-                        Upload your course image here. It must meet our course
-                        image quality standards to be accepted. Important
-                        guidelines: 750x422 pixels; .jpg, .jpeg,. gif, or .png.
-                        no text on the image.
-                      </p>
-                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="my-12">
-                <p className="font-semibold text-[18px] leading-[31px] text-[#333333] my-3">
-                  Course Curriculum
-                </p>
-                <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px] w-full max-w-[800px]">
-                  AttenSys allows you to structure your course with multiple
-                  videos under one course. Each section can include several
-                  videos, helping you break down complex topics into easily
-                  digestible lessons. This makes it simple for students to
-                  follow along, step by step, as they progress through your
-                  course.
-                </p>
+              <div className="my-6">
+                <div className="flex flex-col md:flex-row space-x-14">
+                  <div>
+                    <p className="font-semibold text-[18px] leading-[31px] text-[#333333] my-3">
+                      Course Curriculum
+                    </p>
+                    <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px] w-full max-w-[800px]">
+                      AttenSys allows you to structure your course with multiple
+                      videos under one course. Each section can include several
+                      videos, helping you break down complex topics into easily
+                      digestible lessons. This makes it simple for students to
+                      follow along, step by step, as they progress through your
+                      course.
+                    </p>
+                  </div>
+                  <div className="hidden lg:block py-5 w-full sm:w-1/2 lg:w-[450px]">
+                    <p className="font-semibold text-[18px] leading-[31px] text-[#333333] py-3">
+                      Upload thumbnail
+                    </p>
+                    <p className="font-normal text-[14px] text-[#2D3A4B] leading-[21px]">
+                      Upload your course image here. It must meet our course
+                      image quality standards to be accepted. Important
+                      guidelines: 750x422 pixels; .jpg, .jpeg,. gif, or .png. no
+                      text on the image.
+                    </p>
+                  </div>
+                </div>
+
                 <div className="my-12">
                   <p className="font-semibold text-[18px] leading-[31px] text-[#333333] my-3">
                     Tips
