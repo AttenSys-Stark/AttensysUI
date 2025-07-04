@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import ProgressBar from "@ramonak/react-progress-bar";
 import Image from "next/image";
 import play from "@/assets/play.svg";
@@ -80,11 +80,13 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
   // Calculate total pages
   const totalPages = Math.ceil(takenCoursesData.length / itemsPerPage);
 
-  // Get current page items
-  const currentItems = takenCoursesData?.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  // Get current page items - memoized to prevent unnecessary recalculations
+  const currentItems = useMemo(() => {
+    return takenCoursesData?.slice(
+      (currentPage - 1) * itemsPerPage,
+      currentPage * itemsPerPage,
+    );
+  }, [takenCoursesData, currentPage, itemsPerPage]);
 
   const generatePageNumbers = () => {
     const pageNumbers = [];
@@ -135,7 +137,7 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
       watched[courseId] = getWatchedLectures(courseId);
     });
     setWatchedLectures(watched);
-  }, [currentItems]);
+  }, [takenCoursesData]); // Only depend on the actual data, not the paginated items
 
   // Function to calculate completion stats for a course
   const getCourseCompletionStats = (item: any) => {

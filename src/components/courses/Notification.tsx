@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 import { api, Course } from "@/services/api";
+import { useNotifications } from "@/context/NotificationContext";
 
 interface NotificationItem {
   id: string;
@@ -16,6 +17,7 @@ interface NotificationItem {
   candidate?: string;
   newAdmin?: string;
   name?: string;
+  isRead?: boolean;
 }
 
 interface CourseDetails {
@@ -47,6 +49,21 @@ const Notification = ({ wallet, address }: NotificationProps) => {
   const effectiveAddress =
     address || wallet?.address || wallet?.selectedAddress;
   const normalizedAddress = normalizeAddress(effectiveAddress);
+
+  // Use notification context
+  const {
+    notifications: contextNotifications,
+    markAllAsRead,
+    isLoading: contextLoading,
+    isError: contextError,
+  } = useNotifications();
+
+  // Mark notifications as read when component mounts
+  useEffect(() => {
+    if (contextNotifications.length > 0) {
+      markAllAsRead();
+    }
+  }, [contextNotifications, markAllAsRead]);
 
   // Function to fetch course details by identifier
   const fetchCourseDetails = async (
@@ -86,11 +103,12 @@ const Notification = ({ wallet, address }: NotificationProps) => {
     return await fetchCourseDetails(courseIdentifier);
   };
 
+  // Use context notifications if available, otherwise fall back to API
   const {
     data: eventsData,
-    isLoading,
+    isLoading: apiLoading,
     error,
-    isError,
+    isError: apiError,
   } = useQuery({
     queryKey: ["userEvents", normalizedAddress],
     queryFn: async () => {
@@ -177,10 +195,16 @@ const Notification = ({ wallet, address }: NotificationProps) => {
       }
     },
     refetchInterval: 10000, // Refetch every 10 seconds
-    enabled: !!normalizedAddress, // Only run query if address is available
+    enabled: !!normalizedAddress && contextNotifications.length === 0, // Only run if no context notifications
     retry: 1, // Only retry once
     retryDelay: 1000, // Wait 1 second before retry
   });
+
+  // Use context notifications if available, otherwise use API data
+  const finalNotifications =
+    contextNotifications.length > 0 ? contextNotifications : notifications;
+  const isLoading = contextLoading || apiLoading;
+  const isError = contextError || apiError;
 
   React.useEffect(() => {
     if (!eventsData || !Array.isArray(eventsData)) {
@@ -321,7 +345,7 @@ const Notification = ({ wallet, address }: NotificationProps) => {
       {/* header */}
       <div className="px-12 py-5">
         <h1 className="font-bold text-lg text-[#A01B9B]">
-          Notifications ({notifications.length})
+          Notifications ({finalNotifications.length})
         </h1>
       </div>
 
@@ -336,12 +360,12 @@ const Notification = ({ wallet, address }: NotificationProps) => {
             <p className="text-red-500 text-center py-8">
               Error loading notifications. Please try again later.
             </p>
-          ) : notifications.length === 0 ? (
+          ) : finalNotifications.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400 text-center py-8">
               No notifications yet
             </p>
           ) : (
-            notifications.map((item, i) => (
+            finalNotifications.map((item, i) => (
               <div
                 key={`notification-${i}-${item.blockNumber}`}
                 className="group transition-all duration-200 ease-in-out"
@@ -349,7 +373,9 @@ const Notification = ({ wallet, address }: NotificationProps) => {
                 <div
                   className={`py-4 px-6 lg:px-8 min-h-[80px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 ${
                     i % 2 === 0 ? "bg-gray-50" : "bg-white"
-                  } group-hover:bg-blue-50 border-b border-gray-100 last:border-b-0`}
+                  } group-hover:bg-blue-50 border-b border-gray-100 last:border-b-0 ${
+                    !item.isRead ? "border-l-4 border-l-blue-500" : ""
+                  }`}
                 >
                   <div className="flex items-start space-x-3">
                     <div
