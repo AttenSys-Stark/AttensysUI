@@ -192,8 +192,8 @@ export const handleCourse = (
 ) => {
   event.preventDefault();
   if (courseName.trim()) {
-    // Redirect to the dynamic page with the user's input
-    router.push(`/coursepage/${courseName}/?id=${Number(courseid)}`);
+    const cleanedCourseName = courseName.replace(/\//g, "");
+    router.push(`/coursepage/${cleanedCourseName}/?id=${Number(courseid)}`);
   }
 };
 
