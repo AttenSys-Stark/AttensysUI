@@ -21,6 +21,7 @@ import { auth } from "@/lib/firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
+import CourseNews from "@/components/courses/CourseNews";
 
 const orgquery = gql`
   {
@@ -247,6 +248,9 @@ const Index = () => {
         </div>
         <div onClick={(e) => e.stopPropagation()}>
           <Bootcampdropdown />
+        </div>
+        <div className="mb-0">
+          <CourseNews />
         </div>
         <HydrationBoundary state={dehydrate(eventqueryClient)}>
           <HydrationBoundary state={dehydrate(queryClient)}>

@@ -372,12 +372,12 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
       </div>
 
       <div className="flex-1 w-full">
-        <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
+        {/* <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
           <p className="text-sm text-white text-center py-2">
             Your course creation progress saves automatically, but feel free to
             also save your progress manually
           </p>
-        </div>
+        </div> */}
 
         <div className="p-4 lg:p-0 lg:px-4 xl:px-0">
           <div className="block lg:flex justify-between py-2 my-5 border-t border-b border-[#d1d1d1] lg:px-5 items-center">
