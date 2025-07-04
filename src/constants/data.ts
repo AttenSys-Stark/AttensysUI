@@ -225,10 +225,6 @@ export const coursesProgress = [
     title: "Completed courses",
   },
   {
-    no: 1,
-    title: "Ongoing",
-  },
-  {
     no: 14,
     title: "Created",
   },

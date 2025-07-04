@@ -19,6 +19,27 @@ import { split } from "lodash-es";
 import { getAverageRatingForVideo } from "@/lib/services/reviewService";
 import { RatingDisplay } from "@/components/RatingDisplay";
 
+// Helper function to format duration
+function formatDuration(seconds: number) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  return (
+    [h > 0 ? `${h}h` : null, m > 0 ? `${m}m` : null, s > 0 ? `${s}s` : null]
+      .filter(Boolean)
+      .join(" ") || "0s"
+  );
+}
+
+// Helper function to estimate video duration from file size
+function estimateVideoDuration(fileSize: number): number {
+  // Estimate based on average video bitrate (assuming 1 Mbps for compressed video)
+  // This is a rough estimate - actual duration may vary
+  const estimatedBitrate = 1000000; // 1 Mbps in bits per second
+  const fileSizeInBits = fileSize * 8; // Convert bytes to bits
+  return Math.floor(fileSizeInBits / estimatedBitrate);
+}
+
 interface ChildComponentProps {
   wallet: any;
   courseData: any;
@@ -534,7 +555,19 @@ const Explore = ({
                   <span className="flex gap-2 items-center">
                     <FaPlay className="text-[#5801A9]" />
                     <p className="text-[11px] text-[#2D3A4B] font-medium">
-                      Total play time: 2 hrs 35 mins
+                      Total play time:{" "}
+                      {(() => {
+                        const totalPlayTime =
+                          unfilteredData[
+                            unfilteredData.length - 1
+                          ]?.data?.courseCurriculum?.reduce(
+                            (sum: number, lecture: any) =>
+                              sum +
+                              estimateVideoDuration(lecture.fileSize || 0),
+                            0,
+                          ) || 0;
+                        return formatDuration(totalPlayTime);
+                      })()}
                     </p>
                   </span>
                   <span className="flex gap-2 items-center">

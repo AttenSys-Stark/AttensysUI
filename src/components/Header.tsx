@@ -101,6 +101,14 @@ const Header = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+  // Demo notifications
+  const unreadNotifications = [
+    { id: 1, message: "Welcome to Attensys!" },
+    { id: 2, message: "Your course has been approved." },
+    { id: 3, message: "You have a new certificate." },
+  ];
+
   let firstName = null;
   if (user) {
     if (user.displayName) {
@@ -440,11 +448,63 @@ const Header = () => {
                     </div>
                   </div>
                   <div className="absolute inset-y-0 right-0 items-center hidden md:hidden lg:flex sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                    {firstName && (
-                      <span className="mr-6 text-gray-700 font-light italic text-sm">
-                        <span>Welcome, {truncatedFirstName}</span>
-                      </span>
-                    )}
+                    <div>
+                      {firstName && (
+                        <span className="mr-6 text-gray-700 font-light italic text-sm">
+                          <span>Welcome, {truncatedFirstName}</span>
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      {/* Bell icon with notification dot (demo) */}
+                      <div className="relative mr-4 flex items-center">
+                        <button
+                          onClick={() => setIsNotifOpen(true)}
+                          className="focus:outline-none"
+                          aria-label="Show notifications"
+                        >
+                          <BellIcon className="w-6 h-6 text-gray-500" />
+                          <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
+                        </button>
+                        {/* Notification Dialog */}
+                        {isNotifOpen && (
+                          <div className="absolute top-10 right-0 mt-2 w-80 min-h-[120px] bg-white border border-gray-200 rounded-xl shadow-lg z-50 p-4 flex flex-col animate-fadeIn">
+                            <div className="flex items-center justify-between mb-2 border-b pb-2">
+                              <span className="font-semibold text-gray-700">
+                                Notifications
+                              </span>
+                              <button
+                                onClick={() => setIsNotifOpen(false)}
+                                className="text-black bg-white border border-gray-300 hover:text-red-500 focus:outline-none p-1 rounded-full hover:bg-gray-100 transition-colors z-50"
+                                aria-label="Close notifications"
+                                style={{
+                                  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                                }}
+                              >
+                                <XMarkIcon className="w-6 h-6" />
+                              </button>
+                            </div>
+                            <ul className="flex-1 max-h-48 overflow-y-auto">
+                              {unreadNotifications.length === 0 ? (
+                                <li className="py-3 text-gray-500 text-sm">
+                                  No unread notifications.
+                                </li>
+                              ) : (
+                                unreadNotifications.map((notif) => (
+                                  <li
+                                    key={notif.id}
+                                    className="py-3 border-b last:border-b-0 text-gray-700 text-sm"
+                                  >
+                                    {notif.message}
+                                  </li>
+                                ))
+                              )}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     <Userlogin />
                   </div>
                 </div>

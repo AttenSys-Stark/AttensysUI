@@ -610,9 +610,28 @@ const LecturePage = (props: any) => {
     );
   };
 
+  // Helper function to mark a lecture as watched
+  const markLectureAsWatched = (courseId: string, lectureName: string) => {
+    if (typeof window === "undefined") return;
+    const watched = JSON.parse(
+      localStorage.getItem(`watched_lectures_${courseId}`) || "[]",
+    );
+    if (!watched.includes(lectureName)) {
+      watched.push(lectureName);
+      localStorage.setItem(
+        `watched_lectures_${courseId}`,
+        JSON.stringify(watched),
+      );
+    }
+  };
+
   const handleVideoClick = (item: any, name: any) => {
     setSelectedVideo(item);
     setSelectedLectureName(name);
+
+    // Mark lecture as watched when user clicks on it
+    const courseId = props?.data?.courseName || ultimate_id?.toString() || "";
+    markLectureAsWatched(courseId, name);
   };
 
   const pinata = new PinataSDK({
@@ -1212,6 +1231,14 @@ const LecturePage = (props: any) => {
                     className="rounded-xl"
                     controls
                     playing={!showOverlay}
+                    onPlay={() => {
+                      // Mark lecture as watched when video starts playing
+                      const courseId =
+                        props?.data?.courseName ||
+                        ultimate_id?.toString() ||
+                        "";
+                      markLectureAsWatched(courseId, selectedLectureName);
+                    }}
                     config={{
                       file: {
                         attributes: {

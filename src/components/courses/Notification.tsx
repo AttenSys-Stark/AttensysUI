@@ -237,6 +237,13 @@ const Notification = ({ wallet, address }: NotificationProps) => {
             message = `"${unapprovedCourseName}" was unapproved`;
             break;
           }
+          case "COURSE_REMOVED": {
+            const removedCourseName = await getCourseName(
+              event.courseIdentifier,
+            );
+            message = `"${removedCourseName}" was removed`;
+            break;
+          }
           default: {
             message = `${event.type || "Unknown"} event`;
           }
@@ -356,6 +363,7 @@ const Notification = ({ wallet, address }: NotificationProps) => {
                             COURSE_ACQUIRED: "bg-blue-500",
                             COURSE_APPROVED: "bg-green-500",
                             COURSE_UNAPPROVED: "bg-orange-500",
+                            COURSE_REMOVED: "bg-red-500",
                           } as Record<string, string>
                         )[item.type] || "bg-gray-400"
                       }`}
