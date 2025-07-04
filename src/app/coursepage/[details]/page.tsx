@@ -31,7 +31,7 @@ const Index = () => {
   return (
     <ErrorBoundary>
       <Header />
-
+      <CourseNews />
       <div onClick={handlePageClick}>
         {status && (
           <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>

@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
 import { useAtom } from "jotai";
 import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
-
+import CourseNews from "@/components/courses/CourseNews";
 const HomePage = () => {
   const router = useRouter();
   const { user, loading } = useAuth();
@@ -37,6 +37,7 @@ const HomePage = () => {
   return (
     <div className="animate-fade-in">
       <Header />
+      <CourseNews />
       <Landing />
       <Footer />
     </div>

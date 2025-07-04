@@ -18,6 +18,8 @@ import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
 import { useAtom } from "jotai";
 import { AccountHandler } from "@/helpers/accounthandler";
 import { Button } from "@headlessui/react";
+import CourseNews from "@/components/courses/CourseNews";
+
 const HomePage = () => {
   const [grid, setGrid] = useState({
     cols: 0,
@@ -147,6 +149,7 @@ const HomePage = () => {
 
   return (
     <div className="fixed inset-0 overflow-hidden">
+      <CourseNews />
       <div
         ref={backgroundRef}
         className="absolute inset-0 z-0 transition-all duration-300"

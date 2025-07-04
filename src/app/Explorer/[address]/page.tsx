@@ -11,7 +11,7 @@ import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import ExploreResult from "@/components/explorer/result/ExploreResult";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
+import CourseNews from "@/components/courses/CourseNews";
 const Index = () => {
   const [status, setStatus] = useAtom(coursestatusAtom);
   const [bootcampdropstat, setbootcampdropstat] = useAtom(
@@ -28,6 +28,7 @@ const Index = () => {
   return (
     <>
       <Header />
+      <CourseNews />
       <div onClick={handlePageClick}>
         {status && (
           <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>

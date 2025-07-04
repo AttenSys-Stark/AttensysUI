@@ -194,12 +194,12 @@ const MainFormView: React.FC<ChildComponentProps> = ({
       </div>
 
       <div className="mb-10 flex-1 w-full">
-        <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
+        {/* <div className="bg-gradient-to-r from-[#4A90E2] to-[#9B51E0]">
           <p className="text-xs sm:text-sm text-white text-center py-2">
             Your course creation progress saves automatically, but feel free to
             also save your progress manually
           </p>
-        </div>
+        </div> */}
         <div className="lg:hidden w-full flex justify-center mt-[58px] mb-[79px]">
           <Stepper currentStep={1} />
         </div>

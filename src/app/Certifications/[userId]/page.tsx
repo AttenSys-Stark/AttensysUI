@@ -25,6 +25,7 @@ import Footer from "@/components/Footer";
 import { auth } from "@/lib/firebase/client";
 import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKey } from "@/helpers/encrypt";
+import CourseNews from "@/components/courses/CourseNews";
 
 interface CourseType {
   data: any;
@@ -198,6 +199,7 @@ const Index = () => {
   return (
     <>
       <Header />
+      <CourseNews />
       <div className="bg-[#f5f7fa]" onClick={handlePageClick}>
         {status && (
           <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>

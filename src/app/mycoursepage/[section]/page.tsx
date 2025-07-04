@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { Loader2 } from "lucide-react";
+import CourseNews from "@/components/courses/CourseNews";
 
 // file setup
 const emptyData: FileObject = {
@@ -131,6 +132,7 @@ const Index = () => {
   return (
     <>
       <Header />
+      <CourseNews />
       <div onClick={handlePageClick}>
         {status && (
           <div className="fixed inset-0 bg-black opacity-5 backdrop-blur-sm"></div>
