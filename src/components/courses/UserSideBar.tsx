@@ -24,8 +24,9 @@ import createIcon from "@/assets/create.svg";
 import ControllerConnector from "@cartridge/connector/controller";
 import { useAccount, useConnect } from "@starknet-react/core";
 
-import { Check, Copy } from "lucide-react";
+import { Check, Copy, Key, Shield } from "lucide-react";
 import BalanceModal from "./BalanceModal";
+import PrivateKeyModal from "./PrivateKeyModal";
 
 interface UserSideBarProps {
   wallet: any;
@@ -88,6 +89,7 @@ const UserSideBar = ({
   const [copied, setCopied] = useState(false);
 
   const [isFilterModalOpen, setFilterModalOpen] = useState(false); // State for filter modal
+  const [isPrivateKeyModalOpen, setIsPrivateKeyModalOpen] = useState(false); // State for private key modal
 
   const [certificateEarned, setCertificateEarned] = useState([
     {
@@ -258,19 +260,19 @@ const UserSideBar = ({
 
   return (
     <>
-      <div className="bg-gradient-to-r block lg:hidden from-[#4A90E2] to-[#9B51E0] py-4 px-8 xl:w-[400px]">
+      {/* <div className="bg-gradient-to-r block lg:hidden from-[#4A90E2] to-[#9B51E0] py-4 px-8 xl:w-[400px]">
         <p className="text-white text-center text-sm">
           Your course creation progress saves automatically, but feel free to
           also save your progress manually
         </p>
-      </div>
+      </div> */}
       <div className="pt-12 px-4">
         {/* User info */}
 
         <div className="bg-white py-4 px-8 rounded-xl border-[1px] border-[#BCBCBC] lg:w-[293px] xl:w-[400px] mb-6">
           <div>
             <div className="flex justify-between items-center mt-4">
-              <div className="flex space-x-4">
+              <div className="flex space-x-4 w-full">
                 <div className="w-[54px] h-[54px]">
                   <Image
                     src={profilePic}
@@ -278,11 +280,11 @@ const UserSideBar = ({
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <div className="xl:w-[200px]">
+                <div className="xl:w-full w-full">
                   <p className="text-[13px] text-[#2D3A4B] font-bold leading-[22px]">
                     {username}
                   </p>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 w-full">
                     <p
                       onClick={handleCopy}
                       className="text-[#A01B9B] cursor-pointer text-[12px] font-normal leading-[24px]"
@@ -297,29 +299,37 @@ const UserSideBar = ({
                           )
                         : "Login"}
                     </p>
-                    {!!address && typeof address === "string" && (
-                      <span onClick={handleCopy} className="cursor-pointer">
-                        {copied ? (
-                          <Check className="w-3 h-3" />
-                        ) : (
-                          <Copy className="w-3 h-3" />
+                    <div className="flex justify-between w-full">
+                      <div>
+                        {!!address && typeof address === "string" && (
+                          <span onClick={handleCopy} className="cursor-pointer">
+                            {copied ? (
+                              <Check className="w-3 h-3" />
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </span>
                         )}
-                      </span>
-                    )}
+                      </div>
+                      <div className="flex items-center justify-center">
+                        {/* Private Key Security Button */}
+                        {!!address &&
+                          typeof address === "string" &&
+                          address.trim() !== "" && (
+                            <div className="">
+                              <button
+                                onClick={() => setIsPrivateKeyModalOpen(true)}
+                                className="flex items-center space-x-2 text-[11px] text-purple-600 hover:text-purple-700 font-medium transition-colors duration-200"
+                              >
+                                <Shield size={12} />
+                                <span>View Private Key</span>
+                              </button>
+                            </div>
+                          )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-              <div>
-                {page != "myCertificate" ? (
-                  <IoMdArrowDropdown
-                    onClick={toggleDropdown}
-                    size={27}
-                    className={`cursor-pointer transition-transform duration-200 ${
-                      isDropdownOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                ) : null}
               </div>
             </div>
             <div
@@ -579,6 +589,13 @@ const UserSideBar = ({
           </div>
         )}
       </div>
+
+      {/* Private Key Modal */}
+      <PrivateKeyModal
+        isOpen={isPrivateKeyModalOpen}
+        onClose={() => setIsPrivateKeyModalOpen(false)}
+        address={address}
+      />
     </>
   );
 };
