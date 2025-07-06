@@ -7,14 +7,27 @@ import { attensysOrgAddress } from "@/deployments/contracts";
 import { useFetchCID } from "@/hooks/useFetchCID";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import ControllerConnector from "@cartridge/connector/controller";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
+import { useConnect } from "@starknet-react/core";
 import { useAtom } from "jotai";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Contract } from "starknet";
 
-const MobileStudentApprovalCard = (props: any) => {
+interface MobileStudentApprovalCardProps {
+  student: {
+    student_details_uri: string;
+    address_of_student: string;
+    status: "pending" | "approved" | "declined";
+  };
+  arg: "both" | "check" | "cancel";
+}
+
+const MobileStudentApprovalCard = ({
+  student,
+  arg,
+}: MobileStudentApprovalCardProps) => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -26,14 +39,14 @@ const MobileStudentApprovalCard = (props: any) => {
   } = useFetchCID();
   const id = searchParams.get("id");
   const [orgname, setOrgname] = useState<string>();
-  const { account, address } = useAccount();
-  const { connect, connectors } = useConnect();
-  const controller = connectors[0] as ControllerConnector;
+  const { account, address } = useFirebaseAuth();
+  // const { connect, connectors } = useConnect();
+  // const controller = connectors[0] as ControllerConnector;
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setOrgname(n));
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setOrgname(n));
+  // }, [address, controller]);
 
   const organizationContract = new Contract(
     attensysOrgAbi,
@@ -43,7 +56,7 @@ const MobileStudentApprovalCard = (props: any) => {
 
   const getIpfsData = async () => {
     try {
-      const data = await fetchCIDContent(props?.info?.student_details_uri);
+      const data = await fetchCIDContent(student?.student_details_uri);
       //@ts-ignore
       setEmail(data?.data?.student_email);
       //@ts-ignore
@@ -61,7 +74,7 @@ const MobileStudentApprovalCard = (props: any) => {
     try {
       const approve_calldata = organizationContract.populate(
         "approve_registration",
-        [props?.info?.address_of_student, id],
+        [student?.address_of_student, id || ""],
       );
       const callContract = await account?.execute([
         {
@@ -133,14 +146,14 @@ const MobileStudentApprovalCard = (props: any) => {
     getIpfsData();
   }, [wallet]);
 
-  const renderStatus = (arg: any) => {
-    if (arg == "both") {
+  const renderStatus = (status: string) => {
+    if (status === "pending") {
       return (
         <>
           <h1 className="text-[#115E2C]">Pending</h1>
         </>
       );
-    } else if (arg == "check") {
+    } else if (status === "approved") {
       return (
         <>
           <h1 className="text-[#115E2C]">Approved</h1>
@@ -160,7 +173,7 @@ const MobileStudentApprovalCard = (props: any) => {
       <div className="flex items-center justify-between ">
         <p> {email}</p>
         <div className="bg-[#C5D3228C] rounded-[5px] px-[10px] py-[5px] text-[#115E2C] font-normal text-xs">
-          {renderStatus(props.arg)}
+          {renderStatus(student?.status)}
         </div>
       </div>
       <h4 className="text-[14px] leading-[17px] text-[#9B51E0] font-medium">
@@ -170,9 +183,9 @@ const MobileStudentApprovalCard = (props: any) => {
         11 Oct, 2024 | 10:25 PM
       </p>
       <div
-        className={`absolute top-1/2 transform -translate-y-1/2 ${props.arg == "both" ? "right-5" : "right-16 md:right-5"} flex items-center  gap-[6px]`}
+        className={`absolute top-1/2 transform -translate-y-1/2 ${arg === "both" ? "right-5" : "right-16 md:right-5"} flex items-center  gap-[6px]`}
       >
-        {renderButton(props.arg)}
+        {renderButton(arg)}
       </div>
     </div>
   );

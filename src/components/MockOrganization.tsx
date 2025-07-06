@@ -26,6 +26,7 @@ import { RpcProvider, Contract, Account, ec, json } from "starknet";
 import { useWallet } from "@/hooks/useWallet";
 import { NetworkSwitchButton } from "./connect/NetworkSwitchButton";
 import ControllerConnector from "@cartridge/connector/controller";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 
 const MockOrganization = () => {
   const [wallet] = useAtom(walletStarknetkit);
@@ -47,7 +48,7 @@ const MockOrganization = () => {
   });
   const [isSuccess, setIsSuccess] = useState(false);
   const [orgname, setOrgname] = useState<string>();
-  const { account, address } = useAccount();
+  const { account, address } = useFirebaseAuth();
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
 

@@ -21,7 +21,8 @@ import { attensysOrgAddress } from "@/deployments/contracts";
 import { useAtom } from "jotai";
 import { useSearchParams } from "next/navigation";
 import { ThreeDots } from "react-loader-spinner";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
+import { useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 
 const CourseOutlinecard = (props: any) => {
@@ -33,15 +34,15 @@ const CourseOutlinecard = (props: any) => {
   const [spinner, setSpinner] = useState(false);
   const [class_attendance_status, setclass_attendance_status] = useState(false);
   const [username, setUsername] = useState<string>();
-  const { account, address } = useAccount();
-  const { connect, connectors } = useConnect();
-  const controller = connectors[0] as ControllerConnector;
+  const { account, address } = useFirebaseAuth();
+  // const { connect, connectors } = useConnect();
+  // const controller = connectors[0] as ControllerConnector;
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setUsername(n));
-    console.log(address, "address");
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setUsername(n));
+  //   console.log(address, "address");
+  // }, [address, controller]);
 
   const TruncatedText = ({
     text,
