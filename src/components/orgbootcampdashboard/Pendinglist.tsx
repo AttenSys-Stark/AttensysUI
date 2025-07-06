@@ -7,6 +7,7 @@ import { attensysOrgAddress } from "@/deployments/contracts";
 import { useFetchCID } from "@/hooks/useFetchCID";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import ControllerConnector from "@cartridge/connector/controller";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import { useAccount, useConnect } from "@starknet-react/core";
 import { useAtom } from "jotai";
 import Image from "next/image";
@@ -28,7 +29,7 @@ const Pendinglist = (props: any) => {
     isLoading: isCIDFetchLoading,
   } = useFetchCID();
   const [orgname, setOrgname] = useState<string>();
-  const { account, address } = useAccount();
+  const { account, address } = useFirebaseAuth();
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
 

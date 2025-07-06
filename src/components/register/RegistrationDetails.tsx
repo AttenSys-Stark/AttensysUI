@@ -24,7 +24,7 @@ import { pinata } from "../../../utils/config";
 import { attensysOrgAbi } from "@/deployments/abi";
 import { attensysOrgAddress } from "@/deployments/contracts";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import ControllerConnector from "@cartridge/connector/controller";
 
 const RegistrationDetails = (props: any) => {
@@ -41,15 +41,15 @@ const RegistrationDetails = (props: any) => {
   const [uploading, setUploading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [orgname, setOrgname] = useState<string>();
-  const { account, address } = useAccount();
-  const { connect, connectors } = useConnect();
-  const controller = connectors[0] as ControllerConnector;
+  const { account, address } = useFirebaseAuth();
+  // const { connect, connectors } = useConnect();
+  // const controller = connectors[0] as ControllerConnector;
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setOrgname(n));
-    console.log(address, "address");
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setOrgname(n));
+  //   console.log(address, "address");
+  // }, [address, controller]);
 
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;

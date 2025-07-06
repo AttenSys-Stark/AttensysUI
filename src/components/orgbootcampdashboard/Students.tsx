@@ -125,9 +125,9 @@ const Students = () => {
                             ? "both"
                             : Number(data.status) === 1
                               ? "check"
-                              : "decline"
+                              : "cancel"
                         }
-                        info={data}
+                        student={data}
                       />
                     ) : null,
                   )
@@ -179,7 +179,7 @@ const Students = () => {
                                 ? "both"
                                 : Number(data.status) === 1
                                   ? "check"
-                                  : "decline"
+                                  : "cancel"
                             }
                             info={data}
                           />
@@ -236,7 +236,7 @@ const Students = () => {
                 (Number(data.status) === 1 || Number(data.status) === 2) && (
                   <MobileStudentRegisteredCard
                     key={index}
-                    arg={Number(data.status) === 1 ? "check" : "decline"}
+                    arg={Number(data.status) === 1 ? "check" : "cancel"}
                     info={data}
                   />
                 ),
@@ -329,7 +329,7 @@ const Students = () => {
                         Number(data.status) === 2) && (
                         <Studentlist
                           key={index}
-                          arg={Number(data.status) === 1 ? "check" : "decline"}
+                          arg={Number(data.status) === 1 ? "check" : "cancel"}
                           info={data}
                         />
                       ),

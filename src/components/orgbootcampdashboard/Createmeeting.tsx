@@ -34,6 +34,7 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { useSearchParams } from "next/navigation";
 import { pinata } from "../../../utils/config";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import { useAccount, useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 
@@ -44,17 +45,17 @@ export default function Createmeeting(prop: any) {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [link, setLink] = useState("");
   const [orgname, setOrgname] = useState<string>();
-  const { account, address } = useAccount();
-  const { connect, connectors } = useConnect();
-  const controller = connectors[0] as ControllerConnector;
+  const { account, address } = useFirebaseAuth();
+  // const { connect, connectors } = useConnect();
+  // const controller = connectors[0] as ControllerConnector;
   const searchParams = useSearchParams();
   const org = searchParams.get("org");
   const id = searchParams.get("id");
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setOrgname(n));
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setOrgname(n));
+  // }, [address, controller]);
 
   useEffect(() => {
     if (open) {

@@ -39,7 +39,8 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { Contract } from "starknet";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
+import { useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 
 const format = "h:mm a";
@@ -105,15 +106,15 @@ const Create = (props: any) => {
     number | any
   >(1);
   const [orgname, setOrgname] = useState<string>();
-  const { account, address } = useAccount();
-  const { connect: starknetReactConnect, connectors } = useConnect();
-  const controller = connectors[0] as ControllerConnector;
+  const { account, address } = useFirebaseAuth();
+  // const { connect: starknetReactConnect, connectors } = useConnect();
+  // const controller = connectors[0] as ControllerConnector;
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setOrgname(n));
-    console.log(address, "address");
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setOrgname(n));
+  //   console.log(address, "address");
+  // }, [address, controller]);
 
   useEffect(() => {
     const autoConnect = async () => {
