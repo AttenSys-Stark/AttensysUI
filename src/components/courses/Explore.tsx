@@ -18,6 +18,13 @@ import { PinataSDK } from "pinata";
 import { split } from "lodash-es";
 import { getAverageRatingForVideo } from "@/lib/services/reviewService";
 import { RatingDisplay } from "@/components/RatingDisplay";
+import {
+  getCoursesLastUpdated,
+  formatLastUpdated,
+  getLastUpdateDescription,
+  getFallbackDate,
+  CourseLastUpdated,
+} from "@/utils/courseLastUpdated";
 
 // Helper function to format duration
 function formatDuration(seconds: number) {
@@ -158,6 +165,12 @@ const Explore = ({
     {},
   );
 
+  // Store last updated timestamps for each course
+  const [coursesLastUpdated, setCoursesLastUpdated] = useState<{
+    [key: number]: CourseLastUpdated;
+  }>({});
+  const [isLoadingLastUpdated, setIsLoadingLastUpdated] = useState(false);
+
   useEffect(() => {
     // Fetch average ratings for all currentItems when courseData or currentPage changes
     const fetchAllRatings = async () => {
@@ -179,6 +192,38 @@ const Explore = ({
     };
     fetchAllRatings();
   }, [courseData, currentPage]);
+
+  // Fetch last updated timestamps for courses
+  useEffect(() => {
+    const fetchLastUpdated = async () => {
+      if (wallet?.address && courseData && courseData.length > 0) {
+        try {
+          setIsLoadingLastUpdated(true);
+          const courseIdentifiers = courseData.map(
+            (course: any) => course.course_identifier,
+          );
+          const lastUpdatedData = await getCoursesLastUpdated(
+            courseIdentifiers,
+            wallet.address,
+          );
+
+          // Convert array to object for easier lookup
+          const lastUpdatedMap: { [key: number]: CourseLastUpdated } = {};
+          lastUpdatedData.forEach((item) => {
+            lastUpdatedMap[item.courseIdentifier] = item;
+          });
+
+          setCoursesLastUpdated(lastUpdatedMap);
+        } catch (error) {
+          console.error("Error fetching course last updated data:", error);
+        } finally {
+          setIsLoadingLastUpdated(false);
+        }
+      }
+    };
+
+    fetchLastUpdated();
+  }, [wallet?.address, courseData]);
   // console.log("Average Ratings:", averageRatings);
 
   const renderCourseCard = (course: any, index: any) => {
@@ -549,7 +594,26 @@ const Explore = ({
                   <span className="flex gap-2 items-center">
                     <GiBackwardTime />
                     <p className="text-[11px] text-[#2D3A4B] font-medium">
-                      Last updated 10|10|24
+                      {(() => {
+                        if (isLoadingLastUpdated) {
+                          return "Loading...";
+                        }
+                        const featuredCourseId =
+                          unfilteredData[unfilteredData.length - 1]
+                            ?.course_identifier;
+                        const lastUpdated =
+                          coursesLastUpdated[featuredCourseId];
+                        if (lastUpdated) {
+                          const formattedDate = formatLastUpdated(
+                            lastUpdated.lastUpdated,
+                          );
+                          const description = getLastUpdateDescription(
+                            lastUpdated.eventType,
+                          );
+                          return `${description} ${formattedDate}`;
+                        }
+                        return `Last updated ${getFallbackDate()}`; // Fallback
+                      })()}
                     </p>
                   </span>
                   <span className="flex gap-2 items-center">

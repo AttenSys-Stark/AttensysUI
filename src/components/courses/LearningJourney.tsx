@@ -75,6 +75,8 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
     [courseId: string]: string[];
   }>({});
 
+  console.log("watchedLectures", watchedLectures);
+
   const itemsPerPage = 5;
 
   // Calculate total pages
@@ -135,6 +137,7 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
       const courseId =
         item.course_identifier?.toString() || item.data?.courseName || "";
       watched[courseId] = getWatchedLectures(courseId);
+      console.log("watched", watched);
     });
     setWatchedLectures(watched);
   }, [takenCoursesData]); // Only depend on the actual data, not the paginated items
@@ -185,13 +188,31 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
   return (
     <div className="bg-white sm:my-12 rounded-xl border-[1px] border-[#BCBCBC] h-auto pb-8">
       <div>
-        <div className="flex justify-between border-b-[1px] border-b-[#CACBCB] my-3 px-16">
-          <div className="flex items-center text-[#A01B9B] my-5 space-x-3">
-            <h4 className="font-bold text-lg text-[#A01B9B]">
-              Learning Journey
-            </h4>
+        {item.no == 1 ? (
+          <div className="flex justify-between  border-b-[1px] border-b-[#CACBCB] my-3 px-10">
+            <div className="flex text-gradient-to-r from-purple-400 via-purple-30 mx-8 my-5">
+              <h4 className="font-bold text-lg text-[#A01B9B]">{selected}</h4>
+            </div>
+            {/* <div className="hidden sm:flex mx-8 my-5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 13.5V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 9.75V10.5"
+                />
+              </svg>
+
+              <p className="underline">All</p>
+            </div> */}
           </div>
-        </div>
+        ) : null}
 
         <div>
           <div className="block justify-top">
@@ -230,6 +251,25 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
                           </h3>
                           <p className="text-sm text-[#6B7280] mb-3 line-clamp-2">
                             {item.data.courseDescription}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap xl:flex-nowrap gap-y-2 gap-4 xl:gap-0 items-center my-3 ">
+                        <div className="flex items-center gap-2">
+                          <Image src={play} alt="" height={12} width={12} />
+                          <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                            Total play time:{" "}
+                            {formatDuration(stats.totalCourseTime)}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <p className="hidden sm:block">|</p>
+                          <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0">
+                            Created by:{" "}
+                            <span className="underline">
+                              {item.data.courseCreator}
+                            </span>
                           </p>
                         </div>
                       </div>

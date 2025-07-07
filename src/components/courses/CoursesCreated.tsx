@@ -33,6 +33,13 @@ import { decryptPrivateKey } from "@/helpers/encrypt";
 import { executeCalls } from "@avnu/gasless-sdk";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 import { useAuth } from "@/context/AuthContext";
+import {
+  getCoursesLastUpdated,
+  formatLastUpdated,
+  getLastUpdateDescription,
+  getFallbackDate,
+  CourseLastUpdated,
+} from "@/utils/courseLastUpdated";
 
 // Helper function to format duration
 function formatDuration(seconds: number) {
@@ -122,6 +129,12 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     {},
   );
 
+  // Store last updated timestamps for each course
+  const [coursesLastUpdated, setCoursesLastUpdated] = useState<{
+    [key: number]: CourseLastUpdated;
+  }>({});
+  const [isLoadingLastUpdated, setIsLoadingLastUpdated] = useState(false);
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -160,6 +173,38 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     };
     fetchProfile();
   }, [user]);
+
+  // Fetch last updated timestamps for courses
+  useEffect(() => {
+    const fetchLastUpdated = async () => {
+      if (account?.address && courseData && courseData.length > 0) {
+        try {
+          setIsLoadingLastUpdated(true);
+          const courseIdentifiers = courseData.map(
+            (course: any) => course.course_identifier,
+          );
+          const lastUpdatedData = await getCoursesLastUpdated(
+            courseIdentifiers,
+            account.address,
+          );
+
+          // Convert array to object for easier lookup
+          const lastUpdatedMap: { [key: number]: CourseLastUpdated } = {};
+          lastUpdatedData.forEach((item) => {
+            lastUpdatedMap[item.courseIdentifier] = item;
+          });
+
+          setCoursesLastUpdated(lastUpdatedMap);
+        } catch (error) {
+          console.error("Error fetching course last updated data:", error);
+        } finally {
+          setIsLoadingLastUpdated(false);
+        }
+      }
+    };
+
+    fetchLastUpdated();
+  }, [account?.address, courseData]);
 
   useEffect(() => {
     // Fetch average ratings for all currentItems when courseData or currentPage changes
@@ -278,6 +323,36 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
         setDeleteSuccess(true);
         await refreshCourses();
 
+        // Refresh last updated data after course deletion
+        if (account?.address && courseData && courseData.length > 0) {
+          try {
+            const courseIdentifiers = courseData
+              .filter(
+                (course: any) => course.course_identifier !== courseToDelete,
+              )
+              .map((course: any) => course.course_identifier);
+
+            if (courseIdentifiers.length > 0) {
+              const lastUpdatedData = await getCoursesLastUpdated(
+                courseIdentifiers,
+                account.address,
+              );
+
+              const lastUpdatedMap: { [key: number]: CourseLastUpdated } = {};
+              lastUpdatedData.forEach((item) => {
+                lastUpdatedMap[item.courseIdentifier] = item;
+              });
+
+              setCoursesLastUpdated(lastUpdatedMap);
+            }
+          } catch (error) {
+            console.error(
+              "Error refreshing last updated data after deletion:",
+              error,
+            );
+          }
+        }
+
         // Close modal after 2 seconds
         setTimeout(() => {
           setIsDeleteModalOpen(false);
@@ -384,6 +459,24 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
         return course;
       });
       setLocalCourseData(updatedCourseData);
+
+      // Refresh last updated data for the edited course
+      if (account?.address) {
+        try {
+          const lastUpdatedData = await getCoursesLastUpdated(
+            [matchingCourse.course_identifier],
+            account.address,
+          );
+          if (lastUpdatedData.length > 0) {
+            setCoursesLastUpdated((prev) => ({
+              ...prev,
+              [matchingCourse.course_identifier]: lastUpdatedData[0],
+            }));
+          }
+        } catch (error) {
+          console.error("Error refreshing last updated data:", error);
+        }
+      }
 
       // Close panel after 2 seconds
       setTimeout(() => {
@@ -528,7 +621,26 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                                   height={16}
                                 />
                                 <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                                  Last updated 10|10|2024
+                                  {(() => {
+                                    if (isLoadingLastUpdated) {
+                                      return "Loading...";
+                                    }
+                                    const lastUpdated =
+                                      coursesLastUpdated[
+                                        item?.course_identifier
+                                      ];
+                                    if (lastUpdated) {
+                                      const formattedDate = formatLastUpdated(
+                                        lastUpdated.lastUpdated,
+                                      );
+                                      const description =
+                                        getLastUpdateDescription(
+                                          lastUpdated.eventType,
+                                        );
+                                      return `${description} ${formattedDate}`;
+                                    }
+                                    return `Last updated ${getFallbackDate()}`; // Fallback
+                                  })()}
                                 </p>
                               </div>
                               <div className="flex items-center gap-x-2">
