@@ -8,12 +8,12 @@ import { ARGENT_WEBWALLET_URL, CHAIN_ID, provider } from "@/constants";
 import { BlockNumber, Contract, RpcProvider, Account } from "starknet";
 import { useAtom } from "jotai";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
-import { useAccount } from "@starknet-react/core";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 
 const MybootcampLanding = () => {
   const [wallet, setWallet] = useAtom(walletStarknetkit);
   const [mybootcampDataInfo, setMyBootcampdataInfo] = useState<any[]>([]);
-  const { account, address } = useAccount();
+  const { account, address } = useFirebaseAuth();
 
   const orgContract = new Contract(
     attensysOrgAbi,

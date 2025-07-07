@@ -19,7 +19,8 @@ import { specificOrgRoute } from "@/state/connectedWalletStarknetkitNext";
 
 import { FileObject } from "pinata";
 import LoadingSpinner from "../ui/LoadingSpinner";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
+import { useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 const emptyData: FileObject = {
   name: "",
@@ -51,16 +52,16 @@ const Addinstructor = (props: any) => {
   const [specificOrg, setSpecificOrg] = useAtom(specificOrgRoute);
   const [uploading, setUploading] = useState(false);
   const [orgname, setOrgname] = useState<string>();
-  const { account, address } = useAccount();
-  const { connect, connectors } = useConnect();
-  const controller = connectors[0] as ControllerConnector;
+  const { account, address } = useFirebaseAuth();
+  // const { connect, connectors } = useConnect();
+  // const controller = connectors[0] as ControllerConnector;
   // const [cidToContract, setCidToContract] = useState<string>("")
 
-  useEffect(() => {
-    if (!address) return;
-    controller.username()?.then((n) => setOrgname(n));
-    console.log(address, "address");
-  }, [address, controller]);
+  // useEffect(() => {
+  //   if (!address) return;
+  //   controller.username()?.then((n) => setOrgname(n));
+  //   console.log(address, "address");
+  // }, [address, controller]);
 
   const handleEmailsChange = (emails: string[]) => {
     setEmailList(emails);

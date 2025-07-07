@@ -32,6 +32,7 @@ import { attensysOrgAddress } from "@/deployments/contracts";
 import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { pinata } from "../../../utils/config";
 import LoadingSpinner from "../ui/LoadingSpinner";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 import { useAccount, useConnect } from "@starknet-react/core";
 import ControllerConnector from "@cartridge/connector/controller";
 interface FormData {
@@ -79,7 +80,7 @@ export default function UploadModal(prop: any) {
   const thumbnailInputRef = useRef<HTMLInputElement>(null);
   const [uploadhash, setUploadHash] = useState("");
   const [orgname, setOrgname] = useState<string>();
-  const { account, address } = useAccount();
+  const { account, address } = useFirebaseAuth();
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
 

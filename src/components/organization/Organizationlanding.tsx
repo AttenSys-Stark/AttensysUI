@@ -16,7 +16,7 @@ import Create from "./Create";
 import Heading from "./Heading";
 import Organizationtabs from "./Organizationtabs";
 import Panel from "./Panel";
-import { useAccount } from "@starknet-react/core";
+import { useFirebaseAuth } from "@/hooks/useFirebaseAuth";
 
 const Organizationlanding = (prop: any) => {
   const [createOverlayStat] = useAtom(createbootcampoverlay);
@@ -38,7 +38,7 @@ const Organizationlanding = (prop: any) => {
   const [isLoadingIPFS, setIsLoadingIPFS] = useState(false);
   const [isLoadingOrgInfo, setIsLoadingOrgInfo] = useState(false);
   const [isLoadingBootcamps, setIsLoadingBootcamps] = useState(false);
-  const { account, address } = useAccount();
+  const { account, address } = useFirebaseAuth();
   const {
     fetchCIDContent,
     getError,
