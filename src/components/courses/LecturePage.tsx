@@ -1466,28 +1466,31 @@ const LecturePage = (props: any) => {
                   About this course
                 </p>
                 <div className="relative">
-                  <p className="text-[14px] text-[#333333] leading-[22px] font-light">
-                    {isExpanded
-                      ? props?.data?.courseDescription
-                      : props?.data?.courseDescription?.slice(0, 200) +
-                        (showSeeMore ? "..." : "")}
-                    {showSeeMore && !isExpanded && (
-                      <span
-                        className="text-blue-600 cursor-pointer hover:underline ml-1"
-                        onClick={() => setIsExpanded(true)}
-                      >
-                        see more
-                      </span>
-                    )}
-                    {showSeeMore && isExpanded && (
-                      <span
-                        className="text-blue-600 cursor-pointer hover:underline ml-1"
-                        onClick={() => setIsExpanded(false)}
-                      >
-                        see less
-                      </span>
-                    )}
-                  </p>
+                  <div
+                    className="text-[14px] text-[#333333] leading-[22px] font-light"
+                    dangerouslySetInnerHTML={{
+                      __html: isExpanded
+                        ? props?.data?.courseDescription
+                        : props?.data?.courseDescription?.slice(0, 200) +
+                          (showSeeMore ? "..." : ""),
+                    }}
+                  />
+                  {showSeeMore && !isExpanded && (
+                    <span
+                      className="text-blue-600 cursor-pointer hover:underline ml-1"
+                      onClick={() => setIsExpanded(true)}
+                    >
+                      see more
+                    </span>
+                  )}
+                  {showSeeMore && isExpanded && (
+                    <span
+                      className="text-blue-600 cursor-pointer hover:underline ml-1"
+                      onClick={() => setIsExpanded(false)}
+                    >
+                      see less
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="py-4">

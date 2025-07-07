@@ -39,6 +39,7 @@ const MainFormView3: React.FC<ChildComponentProps> = ({
   const router = useRouter();
   const [lectureTitle, setLectureTitle] = useState("");
   const [lectureTitleError, setLectureTitleError] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,6 +63,68 @@ const MainFormView3: React.FC<ChildComponentProps> = ({
       reader.readAsDataURL(file);
     }
     handleCourseImageChange(event);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      // Check if file is an image
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+          setCourseData((prev: any) => ({
+            ...prev,
+            courseImage: {
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              lastModified: file.lastModified,
+              url: e.target?.result as string,
+            },
+          }));
+        };
+
+        reader.readAsDataURL(file);
+
+        // Create a proper event object for the parent handler
+        const event = {
+          target: { files: [file] },
+        } as unknown as React.ChangeEvent<HTMLInputElement>;
+        handleCourseImageChange(event);
+      } else {
+        toast.error("Please upload an image file (JPEG, PNG, JPG, or GIF)", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -203,7 +266,17 @@ You want to make sure your creative is very catchy.`}
                 </p>
                 <div className="flex-col items-start block my-4 sm:flex lg:flex-row justify-center">
                   <div className="bg-[#DCDCDC] flex-1 p-4 sm:p-16 rounded-xl max-w-[1000px]">
-                    <div className="bg-white p-2 sm:p-14 text-center border-dotted rounded border-2 border-[#D0D5DD]  content-center text-xs ">
+                    <div
+                      className={`bg-white p-2 sm:p-14 text-center border-dotted rounded border-2 content-center text-xs transition-all duration-200 ${
+                        isDragOver
+                          ? "border-[#4A90E2] bg-blue-50"
+                          : "border-[#D0D5DD]"
+                      }`}
+                      onDragOver={handleDragOver}
+                      onDragEnter={handleDragEnter}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                    >
                       <div className="mx-auto w-[15%]">
                         <Image src={upload} alt="uplaod" />
                       </div>
