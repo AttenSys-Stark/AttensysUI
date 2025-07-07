@@ -24,6 +24,7 @@ import { auth } from "@/lib/firebase/client";
 import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKey } from "@/helpers/encrypt";
 import { Account } from "starknet";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface ChildComponentProps {
   courseData: any;
@@ -32,7 +33,7 @@ interface ChildComponentProps {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => void;
   handleCourseDescriptionChange: (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement> | string,
   ) => void;
   handleCourseCategoryChange: (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -65,6 +66,22 @@ const MainFormView: React.FC<ChildComponentProps> = ({
   const controller = connectors[0] as ControllerConnector;
   const [controllerUsername, setControllerUsername] = useState<string>("");
   const setCourseData = useSetAtom(courseInitState);
+
+  // Helper function to check if HTML content is actually empty
+  const isContentEmpty = (htmlContent: string): boolean => {
+    if (!htmlContent || htmlContent.trim() === "") return true;
+
+    // Remove HTML tags and check if there's actual text content
+    const textContent = htmlContent.replace(/<[^>]*>/g, "").trim();
+    return textContent === "";
+  };
+
+  // Helper function to get text content length for validation
+  const getTextContentLength = (htmlContent: string): number => {
+    if (!htmlContent) return 0;
+    const textContent = htmlContent.replace(/<[^>]*>/g, "").trim();
+    return textContent.length;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -144,7 +161,7 @@ const MainFormView: React.FC<ChildComponentProps> = ({
       hasError = true;
     }
 
-    if (!courseData.courseDescription.trim()) {
+    if (isContentEmpty(courseData.courseDescription)) {
       setCourseDescriptionError("Course Description is required.");
       hasError = true;
     }
@@ -308,21 +325,22 @@ const MainFormView: React.FC<ChildComponentProps> = ({
                   Let your students know a little bit about your course
                 </p>
                 <div className="flex items-start my-4 space-x-4">
-                  <textarea
-                    id="message"
-                    className="block px-2.5 py-3 w-[100%] sm:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-[6px] border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 min-h-[400px] resize-y overflow-y-auto"
-                    placeholder="a little bit about your course......"
-                    value={courseData.courseDescription}
-                    onChange={(e) => {
-                      handleCourseDescriptionChange(e);
-                      setCourseDescriptionError("");
-                    }}
-                    maxLength={2000}
-                  ></textarea>
+                  <div className="w-[100%] sm:w-[80%]">
+                    <RichTextEditor
+                      value={courseData.courseDescription}
+                      onChange={(value) => {
+                        handleCourseDescriptionChange(value);
+                        setCourseDescriptionError("");
+                      }}
+                      placeholder="a little bit about your course......"
+                      maxLength={2000}
+                      className="w-full"
+                    />
+                  </div>
                   <input
                     type="checkbox"
                     className="appearance-none w-[23px] h-[23px] hidden md:block rounded-full border-[1px] border-[#C5D322] checked:bg-[#C5D322] checked:border-[#C5D322] required:border-red-500 checked:before:content-['✔'] checked:before:absolute checked:before:top-[3px] checked:before:left-[6px] checked:before:text-white checked:before:text-[10px] relative"
-                    checked={courseData.courseDescription.trim().length > 0}
+                    checked={!isContentEmpty(courseData.courseDescription)}
                     readOnly
                   />
                 </div>

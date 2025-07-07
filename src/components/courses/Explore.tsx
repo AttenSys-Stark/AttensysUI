@@ -207,9 +207,13 @@ const Explore = ({
               "Course Title"}
           </h3>
 
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-            {course?.data?.courseDescription || "No description available"}
-          </p>
+          <div
+            className="text-gray-600 text-sm mb-3 line-clamp-2"
+            dangerouslySetInnerHTML={{
+              __html:
+                course?.data?.courseDescription || "No description available",
+            }}
+          />
 
           <div className="flex items-center text-xs text-gray-500">
             <GrDiamond className="mr-1" />

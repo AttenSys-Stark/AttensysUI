@@ -65,11 +65,12 @@ const CourseFormLanding = (prop: any) => {
     }));
   };
   const handleCourseDescriptionChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement> | string,
   ) => {
+    const value = typeof event === "string" ? event : event.target.value;
     setCourseData((prevData) => ({
       ...prevData, // Spread existing data to retain untouched fields
-      courseDescription: event.target.value, // Dynamically update the specific field
+      courseDescription: value, // Dynamically update the specific field
     }));
   };
   const handleCourseCategoryChange = (

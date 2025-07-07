@@ -570,9 +570,12 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                         }}
                         className={`mt-3 ${item.is_approved ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
                       >
-                        <p className="text-[14px] text-[#2D3A4B] font-medium leading-[21px] line-clamp-2 hover:text-[#A01B9B] transition-colors">
-                          {item.data.courseDescription}
-                        </p>
+                        <div
+                          className="text-[14px] text-[#2D3A4B] font-medium leading-[21px] line-clamp-2 hover:text-[#A01B9B] transition-colors"
+                          dangerouslySetInnerHTML={{
+                            __html: item.data.courseDescription,
+                          }}
+                        />
                       </div>
                     </div>
                   </div>
