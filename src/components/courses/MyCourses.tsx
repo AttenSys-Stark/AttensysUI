@@ -168,8 +168,6 @@ const MyCourses = (props: any) => {
               profile.starknetPrivateKey,
               encryptionSecret,
             );
-            // console.log("starknetAddress:", profile.starknetAddress);
-            // console.log("starknetPrivateKey:", decryptedPrivateKey);
             const userAccount = new Account(
               provider,
               profile.starknetAddress,

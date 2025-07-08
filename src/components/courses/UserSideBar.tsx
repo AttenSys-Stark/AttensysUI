@@ -155,12 +155,6 @@ const UserSideBar = ({
           {arg.no > 1 ? "(s)" : ""}
         </div>
       );
-    } else if (arg.title == "Ongoing") {
-      return (
-        <div className="text-[12px] ">
-          <span>{arg.no}</span> Ongoing course{arg.no > 1 ? "(s)" : ""}
-        </div>
-      );
     } else if (arg.title == "Created") {
       return (
         <div className="text-[12px] ">

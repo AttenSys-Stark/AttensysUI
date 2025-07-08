@@ -31,6 +31,7 @@ import {
   attensysOrgAddress,
 } from "@/deployments/contracts";
 import { AuthProvider } from "@/context/AuthContext";
+import NotificationWrapper from "@/components/NotificationWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -226,9 +227,11 @@ export default function RootLayout({
                 explorer={voyager}
               >
                 <AutoConnect />
-                <Providers>
-                  <Suspense fallback={<Loading />}>{children}</Suspense>
-                </Providers>
+                <NotificationWrapper>
+                  <Providers>
+                    <Suspense fallback={<Loading />}>{children}</Suspense>
+                  </Providers>
+                </NotificationWrapper>
               </StarknetConfig>
             </QueryClientProvider>
           </JotaiProvider>

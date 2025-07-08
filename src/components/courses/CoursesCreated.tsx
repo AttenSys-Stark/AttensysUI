@@ -33,6 +33,34 @@ import { decryptPrivateKey } from "@/helpers/encrypt";
 import { executeCalls } from "@avnu/gasless-sdk";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 import { useAuth } from "@/context/AuthContext";
+import {
+  getCoursesLastUpdated,
+  formatLastUpdated,
+  getLastUpdateDescription,
+  getFallbackDate,
+  CourseLastUpdated,
+} from "@/utils/courseLastUpdated";
+
+// Helper function to format duration
+function formatDuration(seconds: number) {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+  return (
+    [h > 0 ? `${h}h` : null, m > 0 ? `${m}m` : null, s > 0 ? `${s}s` : null]
+      .filter(Boolean)
+      .join(" ") || "0s"
+  );
+}
+
+// Helper function to estimate video duration from file size
+function estimateVideoDuration(fileSize: number): number {
+  // Estimate based on average video bitrate (assuming 1 Mbps for compressed video)
+  // This is a rough estimate - actual duration may vary
+  const estimatedBitrate = 1000000; // 1 Mbps in bits per second
+  const fileSizeInBits = fileSize * 8; // Convert bytes to bits
+  return Math.floor(fileSizeInBits / estimatedBitrate);
+}
 
 interface ItemProps {
   courses: Course[];
@@ -101,6 +129,12 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     {},
   );
 
+  // Store last updated timestamps for each course
+  const [coursesLastUpdated, setCoursesLastUpdated] = useState<{
+    [key: number]: CourseLastUpdated;
+  }>({});
+  const [isLoadingLastUpdated, setIsLoadingLastUpdated] = useState(false);
+
   const { user } = useAuth();
 
   useEffect(() => {
@@ -139,6 +173,38 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     };
     fetchProfile();
   }, [user]);
+
+  // Fetch last updated timestamps for courses
+  useEffect(() => {
+    const fetchLastUpdated = async () => {
+      if (account?.address && courseData && courseData.length > 0) {
+        try {
+          setIsLoadingLastUpdated(true);
+          const courseIdentifiers = courseData.map(
+            (course: any) => course.course_identifier,
+          );
+          const lastUpdatedData = await getCoursesLastUpdated(
+            courseIdentifiers,
+            account.address,
+          );
+
+          // Convert array to object for easier lookup
+          const lastUpdatedMap: { [key: number]: CourseLastUpdated } = {};
+          lastUpdatedData.forEach((item) => {
+            lastUpdatedMap[item.courseIdentifier] = item;
+          });
+
+          setCoursesLastUpdated(lastUpdatedMap);
+        } catch (error) {
+          console.error("Error fetching course last updated data:", error);
+        } finally {
+          setIsLoadingLastUpdated(false);
+        }
+      }
+    };
+
+    fetchLastUpdated();
+  }, [account?.address, courseData]);
 
   useEffect(() => {
     // Fetch average ratings for all currentItems when courseData or currentPage changes
@@ -257,6 +323,36 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
         setDeleteSuccess(true);
         await refreshCourses();
 
+        // Refresh last updated data after course deletion
+        if (account?.address && courseData && courseData.length > 0) {
+          try {
+            const courseIdentifiers = courseData
+              .filter(
+                (course: any) => course.course_identifier !== courseToDelete,
+              )
+              .map((course: any) => course.course_identifier);
+
+            if (courseIdentifiers.length > 0) {
+              const lastUpdatedData = await getCoursesLastUpdated(
+                courseIdentifiers,
+                account.address,
+              );
+
+              const lastUpdatedMap: { [key: number]: CourseLastUpdated } = {};
+              lastUpdatedData.forEach((item) => {
+                lastUpdatedMap[item.courseIdentifier] = item;
+              });
+
+              setCoursesLastUpdated(lastUpdatedMap);
+            }
+          } catch (error) {
+            console.error(
+              "Error refreshing last updated data after deletion:",
+              error,
+            );
+          }
+        }
+
         // Close modal after 2 seconds
         setTimeout(() => {
           setIsDeleteModalOpen(false);
@@ -364,6 +460,24 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
       });
       setLocalCourseData(updatedCourseData);
 
+      // Refresh last updated data for the edited course
+      if (account?.address) {
+        try {
+          const lastUpdatedData = await getCoursesLastUpdated(
+            [matchingCourse.course_identifier],
+            account.address,
+          );
+          if (lastUpdatedData.length > 0) {
+            setCoursesLastUpdated((prev) => ({
+              ...prev,
+              [matchingCourse.course_identifier]: lastUpdatedData[0],
+            }));
+          }
+        } catch (error) {
+          console.error("Error refreshing last updated data:", error);
+        }
+      }
+
       // Close panel after 2 seconds
       setTimeout(() => {
         setIsEditPanelOpen(false);
@@ -404,117 +518,162 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
               {currentItems
                 ?.slice()
                 .reverse()
-                .map((item: any, index: any) => (
-                  <div
-                    key={index}
-                    className="px-5 xl:px-12 flex border-top py-6 border-2 gap-6 xl:gap-0 flex-col w-full xl:flex-row xl:space-x-8 items-start"
-                  >
-                    {/* Course Image */}
-                    <div className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
-                      <Image
-                        src={
-                          item.data.courseImage
-                            ? `https://ipfs.io/ipfs/${item.data.courseImage}`
-                            : tdesign_video
-                        }
-                        width={200}
-                        height={200}
-                        alt={item.data.courseName}
-                        className="object-cover h-full w-full rounded-xl"
-                      />
-                    </div>
+                .map((item: any, index: any) => {
+                  // Calculate total play time from curriculum
+                  const totalPlayTime =
+                    item.data.courseCurriculum?.reduce(
+                      (sum: number, lecture: any) =>
+                        sum + estimateVideoDuration(lecture.fileSize || 0),
+                      0,
+                    ) || 0;
 
-                    {/* Course Details */}
-                    <div className="flex-1 w-full lg:mx-6 sm:mx-0">
-                      <div className="flex justify-between items-start cursor-pointer">
-                        <div>
-                          <div
-                            onClick={(e) => {
-                              localStorage.setItem(
-                                "courseData",
-                                JSON.stringify(item?.data),
-                              );
-                              handleCourse(
-                                e,
-                                e.currentTarget.textContent,
-                                router,
-                                item?.course_identifier,
-                              );
-                              console.log("item.is_approved", item);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <h4 className="text-[20px] font-medium leading-[22px] text-[#2D3A4B] hover:text-[#A01B9B] transition-colors">
-                              {item.data.courseName}
-                            </h4>
-                          </div>
+                  return (
+                    <div
+                      key={index}
+                      className="px-5 xl:px-12 flex border-top py-6 border-2 gap-6 xl:gap-0 flex-col w-full xl:flex-row xl:space-x-8 items-start"
+                    >
+                      {/* Course Image */}
+                      <div className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
+                        <Image
+                          src={
+                            item.data.courseImage
+                              ? `https://ipfs.io/ipfs/${item.data.courseImage}`
+                              : tdesign_video
+                          }
+                          width={200}
+                          height={200}
+                          alt={item.data.courseName}
+                          className="object-cover h-full w-full rounded-xl"
+                        />
+                      </div>
 
-                          {/* First row of metadata */}
-                          <div className="flex flex-wrap items-center gap-3 my-2">
-                            <div className="flex items-center gap-x-2">
-                              <Image src={play} alt="" height={12} width={12} />
-                              <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                                Total play time: {item.playTime}
-                              </p>
+                      {/* Course Details */}
+                      <div className="flex-1 w-full lg:mx-6 sm:mx-0">
+                        <div className="flex justify-between items-start cursor-pointer">
+                          <div>
+                            <div
+                              onClick={(e) => {
+                                localStorage.setItem(
+                                  "courseData",
+                                  JSON.stringify(item?.data),
+                                );
+                                handleCourse(
+                                  e,
+                                  e.currentTarget.textContent,
+                                  router,
+                                  item?.course_identifier,
+                                );
+                                console.log("item.is_approved", item);
+                              }}
+                              className="cursor-pointer"
+                            >
+                              <h4 className="text-[20px] font-medium leading-[22px] text-[#2D3A4B] hover:text-[#A01B9B] transition-colors">
+                                {item.data.courseName}
+                              </h4>
                             </div>
-                            <div className="flex items-center gap-x-2">
-                              <p className="hidden sm:block text-gray-300">|</p>
-                              <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                                Created by:{" "}
-                                <span className="text-[#A01B9B]">you</span>
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-x-2">
-                              <Image src={bdot} alt="" height={12} width={12} />
-                              <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                                <span className="text-[#A01B9B]">
-                                  {item.data.courseCurriculum.length}
-                                </span>{" "}
-                                Lectures
-                              </p>
-                            </div>
-                          </div>
 
-                          {/* Second row of metadata */}
-                          <div className="flex flex-wrap items-center gap-3 my-2">
-                            <div className="flex items-center gap-x-2">
-                              <Image
-                                src={replay}
-                                alt="time"
-                                width={16}
-                                height={16}
-                              />
-                              <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                                Last updated 10|10|2024
-                              </p>
+                            {/* First row of metadata */}
+                            <div className="flex flex-wrap items-center gap-3 my-2">
+                              <div className="flex items-center gap-x-2">
+                                <Image
+                                  src={play}
+                                  alt=""
+                                  height={12}
+                                  width={12}
+                                />
+                                <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                                  Total play time:{" "}
+                                  {formatDuration(totalPlayTime)}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-x-2">
+                                <p className="hidden sm:block text-gray-300">
+                                  |
+                                </p>
+                                <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                                  Created by:{" "}
+                                  <span className="text-[#A01B9B]">you</span>
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-x-2">
+                                <Image
+                                  src={bdot}
+                                  alt=""
+                                  height={12}
+                                  width={12}
+                                />
+                                <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                                  <span className="text-[#A01B9B]">
+                                    {item.data.courseCurriculum.length}
+                                  </span>{" "}
+                                  Lectures
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-x-2">
-                              <p className="hidden sm:block text-gray-300">|</p>
-                              <Image
-                                src={diamond}
-                                alt=""
-                                height={18}
-                                width={18}
-                              />
-                              <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                                Difficulty: {item.data.difficultyLevel}
-                              </p>
-                            </div>
-                          </div>
 
-                          {/* Third row of metadata */}
-                          <div className="flex flex-wrap items-center gap-3 my-2">
-                            <div className="flex items-center gap-x-2">
-                              {/* <StarRating totalStars={5} starnumber={4} />
+                            {/* Second row of metadata */}
+                            <div className="flex flex-wrap items-center gap-3 my-2">
+                              <div className="flex items-center gap-x-2">
+                                <Image
+                                  src={replay}
+                                  alt="time"
+                                  width={16}
+                                  height={16}
+                                />
+                                <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                                  {(() => {
+                                    if (isLoadingLastUpdated) {
+                                      return "Loading...";
+                                    }
+                                    const lastUpdated =
+                                      coursesLastUpdated[
+                                        item?.course_identifier
+                                      ];
+                                    if (lastUpdated) {
+                                      const formattedDate = formatLastUpdated(
+                                        lastUpdated.lastUpdated,
+                                      );
+                                      const description =
+                                        getLastUpdateDescription(
+                                          lastUpdated.eventType,
+                                        );
+                                      return `${description} ${formattedDate}`;
+                                    }
+                                    return `Last updated ${getFallbackDate()}`; // Fallback
+                                  })()}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-x-2">
+                                <p className="hidden sm:block text-gray-300">
+                                  |
+                                </p>
+                                <Image
+                                  src={diamond}
+                                  alt=""
+                                  height={18}
+                                  width={18}
+                                />
+                                <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                                  Difficulty: {item.data.difficultyLevel}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* Third row of metadata */}
+                            <div className="flex flex-wrap items-center gap-3 my-2">
+                              <div className="flex items-center gap-x-2">
+                                {/* <StarRating totalStars={5} starnumber={4} />
                               <p className="font-medium text-[13px] text-[#2D3A4B] leading-[16px]">
                                 {item.stars} students
                               </p> */}
-                              <RatingDisplay
-                                rating={averageRatings[item?.course_identifier]}
-                                size="xs"
-                              />
-                            </div>
-                            {/* <div className="flex items-center gap-x-2">
+                                <RatingDisplay
+                                  rating={
+                                    averageRatings[item?.course_identifier]
+                                  }
+                                  size="xs"
+                                />
+                              </div>
+                              {/* <div className="flex items-center gap-x-2">
                               <p className="hidden sm:block text-gray-300">|</p>
                               <Image
                                 src={certificationBadge}
@@ -529,57 +688,58 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                                 </span>
                               </p>
                             </div> */}
+                            </div>
+                          </div>
+
+                          {/* Edit/Delete Icons - moved to top right */}
+                          <div className="flex items-center gap-3 ml-4">
+                            <button
+                              onClick={() => handleEditClick(item)}
+                              className="p-1 text-[#4A90E2] hover:bg-[#4A90E2]/10 rounded-md transition-colors"
+                              aria-label="Edit course"
+                            >
+                              <BsPencil size={18} />
+                            </button>
+                            <button
+                              onClick={() =>
+                                handleDeleteClick(item?.course_identifier)
+                              }
+                              className="p-1 text-red-500 hover:bg-red-500/10 rounded-md transition-colors"
+                              aria-label="Delete course"
+                            >
+                              <BsTrash size={18} />
+                            </button>
                           </div>
                         </div>
 
-                        {/* Edit/Delete Icons - moved to top right */}
-                        <div className="flex items-center gap-3 ml-4">
-                          <button
-                            onClick={() => handleEditClick(item)}
-                            className="p-1 text-[#4A90E2] hover:bg-[#4A90E2]/10 rounded-md transition-colors"
-                            aria-label="Edit course"
-                          >
-                            <BsPencil size={18} />
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleDeleteClick(item?.course_identifier)
-                            }
-                            className="p-1 text-red-500 hover:bg-red-500/10 rounded-md transition-colors"
-                            aria-label="Delete course"
-                          >
-                            <BsTrash size={18} />
-                          </button>
+                        {/* Course Description */}
+                        <div
+                          onClick={(e) => {
+                            localStorage.setItem(
+                              "courseData",
+                              JSON.stringify(item?.data),
+                            );
+                            handleCourse(
+                              e,
+                              e.currentTarget.textContent,
+                              router,
+                              item?.course_identifier,
+                            );
+                            console.log(item.is_approved);
+                          }}
+                          className={`mt-3 ${item.is_approved ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
+                        >
+                          <div
+                            className="text-[14px] text-[#2D3A4B] font-medium leading-[21px] line-clamp-2 hover:text-[#A01B9B] transition-colors"
+                            dangerouslySetInnerHTML={{
+                              __html: item.data.courseDescription,
+                            }}
+                          />
                         </div>
                       </div>
-
-                      {/* Course Description */}
-                      <div
-                        onClick={(e) => {
-                          localStorage.setItem(
-                            "courseData",
-                            JSON.stringify(item?.data),
-                          );
-                          handleCourse(
-                            e,
-                            e.currentTarget.textContent,
-                            router,
-                            item?.course_identifier,
-                          );
-                          console.log(item.is_approved);
-                        }}
-                        className={`mt-3 ${item.is_approved ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
-                      >
-                        <div
-                          className="text-[14px] text-[#2D3A4B] font-medium leading-[21px] line-clamp-2 hover:text-[#A01B9B] transition-colors"
-                          dangerouslySetInnerHTML={{
-                            __html: item.data.courseDescription,
-                          }}
-                        />
-                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
             </div>
           </div>
           {/* Pagination Controls */}

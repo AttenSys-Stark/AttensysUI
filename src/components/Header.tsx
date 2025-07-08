@@ -58,6 +58,8 @@ import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKey } from "@/helpers/encrypt";
 import { Account } from "starknet";
 import { provider } from "@/constants";
+import { useNotifications } from "@/context/NotificationContext";
+import { format, parseISO } from "date-fns";
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
@@ -100,6 +102,26 @@ const Header = () => {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  // Get effective address for notifications
+  const effectiveAddress = address || wallet?.selectedAddress;
+
+  // Use notification context
+  const {
+    unreadNotifications,
+    unreadCount,
+    markAsRead,
+    isLoading: notificationsLoading,
+  } = useNotifications();
+
+  // Debug logging
+  useEffect(() => {
+    console.log("Header: unreadCount:", unreadCount);
+    console.log("Header: unreadNotifications:", unreadNotifications);
+    console.log("Header: notificationsLoading:", notificationsLoading);
+  }, [unreadCount, unreadNotifications, notificationsLoading]);
 
   let firstName = null;
   if (user) {
@@ -305,6 +327,30 @@ const Header = () => {
     fetchProfile();
   }, [user]);
 
+  const handleNotificationClick = async () => {
+    setIsNotifOpen(true);
+    // Mark all unread notifications as read when opening the dialog
+    if (unreadCount > 0) {
+      await markAsRead();
+    }
+  };
+
+  const handleViewAllNotifications = () => {
+    setIsNotifOpen(false);
+    // Navigate to the full notifications page
+    router.push(`/mycoursepage/${firebaseUserId}?tab=Notification`);
+  };
+
+  const formatNotificationTime = (timestamp: string) => {
+    try {
+      const date = parseISO(timestamp);
+      if (isNaN(date.getTime())) return "";
+      return format(date, "h:mm a").toUpperCase();
+    } catch (error) {
+      return "";
+    }
+  };
+
   return (
     <>
       <Disclosure
@@ -440,11 +486,93 @@ const Header = () => {
                     </div>
                   </div>
                   <div className="absolute inset-y-0 right-0 items-center hidden md:hidden lg:flex sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-                    {firstName && (
-                      <span className="mr-6 text-gray-700 font-light italic text-sm">
-                        <span>Welcome, {truncatedFirstName}</span>
-                      </span>
-                    )}
+                    <div>
+                      {firstName && (
+                        <span className="mr-6 text-gray-700 font-light italic text-sm">
+                          <span>Welcome, {truncatedFirstName}</span>
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      {/* Bell icon with notification dot (demo) */}
+                      <div className="relative mr-4 flex items-center">
+                        <button
+                          onClick={handleNotificationClick}
+                          className="focus:outline-none"
+                          aria-label="Show notifications"
+                        >
+                          <BellIcon className="w-6 h-6 text-gray-500" />
+                          {unreadCount > 0 && (
+                            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
+                          )}
+                        </button>
+                        {/* Notification Dialog */}
+                        {isNotifOpen && (
+                          <div className="absolute top-10 right-0 mt-2 w-80 min-h-[120px] bg-white border border-gray-200 rounded-xl shadow-lg z-50 p-4 flex flex-col animate-fadeIn">
+                            <div className="flex items-center justify-between mb-2 border-b pb-2">
+                              <span className="font-semibold text-gray-700">
+                                Notifications ({unreadCount})
+                              </span>
+                              <button
+                                onClick={() => setIsNotifOpen(false)}
+                                className="text-black bg-white border border-gray-300 hover:text-red-500 focus:outline-none p-1 rounded-full hover:bg-gray-100 transition-colors z-50"
+                                aria-label="Close notifications"
+                                style={{
+                                  boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
+                                }}
+                              >
+                                <XMarkIcon className="w-6 h-6" />
+                              </button>
+                            </div>
+                            <ul className="flex-1 max-h-48 overflow-y-auto">
+                              {notificationsLoading ? (
+                                <li className="py-3 text-gray-500 text-sm">
+                                  Loading notifications...
+                                </li>
+                              ) : unreadNotifications.length === 0 ? (
+                                <li className="py-3 text-gray-500 text-sm">
+                                  No unread notifications.
+                                </li>
+                              ) : (
+                                unreadNotifications.slice(0, 5).map((notif) => (
+                                  <li
+                                    key={notif.id}
+                                    className="py-3 border-b last:border-b-0 text-gray-700 text-sm hover:bg-gray-50 transition-colors"
+                                  >
+                                    <div className="flex items-start space-x-2">
+                                      <div className="flex-shrink-0 h-2 w-2 rounded-full bg-red-500 mt-2"></div>
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium text-gray-900 truncate">
+                                          {notif.message}
+                                        </p>
+                                        <p className="text-xs text-gray-500 mt-1">
+                                          {formatNotificationTime(
+                                            notif.timestamp,
+                                          )}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </li>
+                                ))
+                              )}
+                            </ul>
+                            {(unreadCount > 5 || unreadCount > 0) && (
+                              <div className="mt-2 pt-2 border-t border-gray-200">
+                                <button
+                                  onClick={handleViewAllNotifications}
+                                  className="w-full text-center text-sm text-blue-600 hover:text-blue-800 font-medium py-2 hover:bg-blue-50 rounded transition-colors"
+                                >
+                                  {unreadCount > 5
+                                    ? `View all ${unreadCount} notifications`
+                                    : "View all notifications"}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     <Userlogin />
                   </div>
                 </div>

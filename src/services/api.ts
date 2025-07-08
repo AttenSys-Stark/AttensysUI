@@ -1,4 +1,8 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://attensys-1a184d8bebe7.herokuapp.com/api";
+
+console.log("API_BASE_URL:", API_BASE_URL);
 
 export interface Course {
   id: number;
@@ -74,6 +78,14 @@ const handleResponse = async (response: Response): Promise<any> => {
 const addEventType = (courses: Course[], type: Course["type"]): Course[] => {
   return courses.map((course) => ({ ...course, type }));
 };
+
+// Utility to canonicalize Starknet addresses to 0x + 64 hex chars
+export function toCanonicalAddress(address: string): string {
+  if (!address) return address;
+  if (!address.startsWith("0x")) return address;
+  const hex = address.slice(2).padStart(64, "0");
+  return "0x" + hex;
+}
 
 export const api = {
   // Get all acquired courses
@@ -168,8 +180,111 @@ export const api = {
 
   // Get all events for a specific address (personalized notifications)
   getEventsByAddress: async (address: string): Promise<Course[]> => {
-    const response = await fetch(`${API_BASE_URL}/events/address/${address}`);
-    const events = await handleResponse(response);
-    return events;
+    try {
+      console.log("API: Fetching events for address:", address);
+      console.log("API: Using base URL:", API_BASE_URL);
+
+      const canonicalAddress = toCanonicalAddress(address);
+      const response = await fetch(
+        `${API_BASE_URL}/events/address/${canonicalAddress}`,
+      );
+      console.log("API: Response status:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("API: Error response:", errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
+      const events = await handleResponse(response);
+      console.log("API: Fetched events:", events);
+      return events;
+    } catch (error) {
+      console.error("API: Error fetching events:", error);
+      // Return empty array instead of throwing
+      return [];
+    }
+  },
+
+  // Get unread notifications for a specific address
+  getUnreadNotifications: async (address: string): Promise<Course[]> => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/events/address/${address}/unread`,
+      );
+      const events = await handleResponse(response);
+      return events;
+    } catch (error) {
+      // Fallback: return all notifications as unread for testing
+      console.log("Using fallback for unread notifications");
+      const allEvents = await api.getEventsByAddress(address);
+      return allEvents;
+    }
+  },
+
+  // Mark notifications as read for a specific address
+  markNotificationsAsRead: async (
+    address: string,
+    notificationIds?: string[],
+  ): Promise<void> => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/events/address/${address}/mark-read`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ notificationIds }),
+        },
+      );
+      return handleResponse(response);
+    } catch (error) {
+      // Fallback: store read status in localStorage for testing
+      console.log("Using fallback for marking notifications as read");
+      const readStatusKey = `notifications_read_${address}`;
+      const currentReadStatus = JSON.parse(
+        localStorage.getItem(readStatusKey) || "{}",
+      );
+
+      if (notificationIds) {
+        notificationIds.forEach((id) => {
+          currentReadStatus[id] = true;
+        });
+      } else {
+        // Mark all notifications as read
+        const allEvents = await api.getEventsByAddress(address);
+        allEvents.forEach((event) => {
+          const id = `${event.type || "unknown"}-${event.id}`;
+          currentReadStatus[id] = true;
+        });
+      }
+
+      localStorage.setItem(readStatusKey, JSON.stringify(currentReadStatus));
+    }
+  },
+
+  // Get notification read status for a specific address
+  getNotificationReadStatus: async (
+    address: string,
+  ): Promise<{ [key: string]: boolean }> => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/events/address/${address}/read-status`,
+      );
+      return handleResponse(response);
+    } catch (error) {
+      // Fallback: get read status from localStorage for testing
+      console.log("Using fallback for notification read status");
+      const readStatusKey = `notifications_read_${address}`;
+      return JSON.parse(localStorage.getItem(readStatusKey) || "{}");
+    }
+  },
+
+  // Get all courses info (from blockchain)
+  getAllCoursesInfo: async (): Promise<any> => {
+    // Import the helper dynamically to avoid circular deps
+    const { getAllCoursesInfo } = await import("@/utils/helpers");
+    return getAllCoursesInfo();
   },
 };

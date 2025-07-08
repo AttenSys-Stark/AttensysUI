@@ -50,6 +50,7 @@ import { ShareButton, ShareModal, ShareData } from "@/components/sharing";
 import AuthRequiredModal from "../auth/AuthRequiredModal";
 import { useRouter } from "next/navigation";
 import { generateShareableUrl } from "@/utils/sharing";
+import { markLectureAsWatched, generateCourseId } from "@/utils/courseProgress";
 
 interface CourseType {
   data: any;
@@ -613,7 +614,15 @@ const LecturePage = (props: any) => {
   const handleVideoClick = (item: any, name: any) => {
     setSelectedVideo(item);
     setSelectedLectureName(name);
+
+    // Always use the accurate course_identifier from props.course
+    const dataWithId = {
+      ...props.data,
+      course_identifier: props.course?.course_identifier,
+    };
+    markLectureAsWatched(dataWithId, name);
   };
+  console.log("props?.data to watch", props?.data);
 
   const pinata = new PinataSDK({
     pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
@@ -1212,6 +1221,14 @@ const LecturePage = (props: any) => {
                     className="rounded-xl"
                     controls
                     playing={!showOverlay}
+                    onPlay={() => {
+                      // Always use the accurate course_identifier from props.course
+                      const dataWithId = {
+                        ...props.data,
+                        course_identifier: props.course?.course_identifier,
+                      };
+                      markLectureAsWatched(dataWithId, selectedLectureName);
+                    }}
                     config={{
                       file: {
                         attributes: {
