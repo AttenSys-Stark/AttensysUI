@@ -79,6 +79,14 @@ const addEventType = (courses: Course[], type: Course["type"]): Course[] => {
   return courses.map((course) => ({ ...course, type }));
 };
 
+// Utility to canonicalize Starknet addresses to 0x + 64 hex chars
+export function toCanonicalAddress(address: string): string {
+  if (!address) return address;
+  if (!address.startsWith("0x")) return address;
+  const hex = address.slice(2).padStart(64, "0");
+  return "0x" + hex;
+}
+
 export const api = {
   // Get all acquired courses
   getAcquiredCourses: async (): Promise<Course[]> => {
@@ -176,7 +184,10 @@ export const api = {
       console.log("API: Fetching events for address:", address);
       console.log("API: Using base URL:", API_BASE_URL);
 
-      const response = await fetch(`${API_BASE_URL}/events/address/${address}`);
+      const canonicalAddress = toCanonicalAddress(address);
+      const response = await fetch(
+        `${API_BASE_URL}/events/address/${canonicalAddress}`,
+      );
       console.log("API: Response status:", response.status);
 
       if (!response.ok) {

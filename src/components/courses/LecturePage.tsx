@@ -50,6 +50,7 @@ import { ShareButton, ShareModal, ShareData } from "@/components/sharing";
 import AuthRequiredModal from "../auth/AuthRequiredModal";
 import { useRouter } from "next/navigation";
 import { generateShareableUrl } from "@/utils/sharing";
+import { markLectureAsWatched, generateCourseId } from "@/utils/courseProgress";
 
 interface CourseType {
   data: any;
@@ -610,29 +611,18 @@ const LecturePage = (props: any) => {
     );
   };
 
-  // Helper function to mark a lecture as watched
-  const markLectureAsWatched = (courseId: string, lectureName: string) => {
-    if (typeof window === "undefined") return;
-    const watched = JSON.parse(
-      localStorage.getItem(`watched_lectures_${courseId}`) || "[]",
-    );
-    if (!watched.includes(lectureName)) {
-      watched.push(lectureName);
-      localStorage.setItem(
-        `watched_lectures_${courseId}`,
-        JSON.stringify(watched),
-      );
-    }
-  };
-
   const handleVideoClick = (item: any, name: any) => {
     setSelectedVideo(item);
     setSelectedLectureName(name);
 
-    // Mark lecture as watched when user clicks on it
-    const courseId = props?.data?.courseName || ultimate_id?.toString() || "";
-    markLectureAsWatched(courseId, name);
+    // Always use the accurate course_identifier from props.course
+    const dataWithId = {
+      ...props.data,
+      course_identifier: props.course?.course_identifier,
+    };
+    markLectureAsWatched(dataWithId, name);
   };
+  console.log("props?.data to watch", props?.data);
 
   const pinata = new PinataSDK({
     pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
@@ -1232,12 +1222,12 @@ const LecturePage = (props: any) => {
                     controls
                     playing={!showOverlay}
                     onPlay={() => {
-                      // Mark lecture as watched when video starts playing
-                      const courseId =
-                        props?.data?.courseName ||
-                        ultimate_id?.toString() ||
-                        "";
-                      markLectureAsWatched(courseId, selectedLectureName);
+                      // Always use the accurate course_identifier from props.course
+                      const dataWithId = {
+                        ...props.data,
+                        course_identifier: props.course?.course_identifier,
+                      };
+                      markLectureAsWatched(dataWithId, selectedLectureName);
                     }}
                     config={{
                       file: {

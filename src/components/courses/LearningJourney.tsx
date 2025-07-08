@@ -5,6 +5,12 @@ import play from "@/assets/play.svg";
 import tdesign_video from "@/assets/tdesign_video.svg";
 import { useRouter } from "next/navigation";
 import { handleCourse } from "@/utils/helpers";
+import {
+  getWatchedLectures,
+  calculateCourseStats,
+  generateCourseId,
+  debugCourseProgress,
+} from "@/utils/courseProgress";
 
 interface ItemProps {
   no: number;
@@ -42,26 +48,6 @@ function estimateVideoDuration(fileSize: number): number {
   const estimatedBitrate = 1000000; // 1 Mbps in bits per second
   const estimatedDurationSeconds = (fileSize * 8) / estimatedBitrate;
   return Math.round(estimatedDurationSeconds);
-}
-
-// Helper function to get user's watched lectures from localStorage
-function getWatchedLectures(courseId: string): string[] {
-  if (typeof window === "undefined") return [];
-  const watched = localStorage.getItem(`watched_lectures_${courseId}`);
-  return watched ? JSON.parse(watched) : [];
-}
-
-// Helper function to mark a lecture as watched
-function markLectureAsWatched(courseId: string, lectureName: string) {
-  if (typeof window === "undefined") return;
-  const watched = getWatchedLectures(courseId);
-  if (!watched.includes(lectureName)) {
-    watched.push(lectureName);
-    localStorage.setItem(
-      `watched_lectures_${courseId}`,
-      JSON.stringify(watched),
-    );
-  }
 }
 
 const LearningJourney: React.FC<LearningJourneyProps> = ({
@@ -130,55 +116,84 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
     setCurrentPage(page);
   };
 
-  // Load watched lectures from localStorage on component mount
+  // Load watched lectures from localStorage on component mount and when window gains focus
   useEffect(() => {
-    const watched: { [courseId: string]: string[] } = {};
-    currentItems.forEach((item: any) => {
-      const courseId =
-        item.course_identifier?.toString() || item.data?.courseName || "";
-      watched[courseId] = getWatchedLectures(courseId);
-      console.log("watched", watched);
-    });
-    setWatchedLectures(watched);
+    const loadWatchedLectures = () => {
+      console.log(
+        "[LearningJourney] loadWatchedLectures - currentItems:",
+        currentItems,
+      );
+      const watched: { [courseId: string]: string[] } = {};
+      currentItems.forEach((item: any) => {
+        console.log("[LearningJourney] Processing item:", item);
+        const courseId =
+          item.course_identifier?.toString() || item.data?.courseName || "";
+        console.log("[LearningJourney] Generated courseId:", courseId);
+        watched[courseId] = getWatchedLectures(item);
+        console.log(
+          "[LearningJourney] Watched lectures for this course:",
+          watched[courseId],
+        );
+      });
+      setWatchedLectures(watched);
+      console.log("Loaded watched lectures:", watched);
+    };
+
+    // Load on mount
+    console.log("[LearningJourney] Loading watched lectures on mount");
+    loadWatchedLectures();
+
+    // Listen for window focus events to refresh data when user returns from watching videos
+    const handleFocus = () => {
+      console.log("Window focused, refreshing watched lectures");
+      loadWatchedLectures();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [takenCoursesData]); // Only depend on the actual data, not the paginated items
 
   // Function to calculate completion stats for a course
   const getCourseCompletionStats = (item: any) => {
-    const courseId =
-      item.course_identifier?.toString() || item.data?.courseName || "";
-    const curriculum = item.data?.courseCurriculum || [];
-    const totalLectures = curriculum.length;
-    const watched = watchedLectures[courseId] || [];
-    const completedLectures = watched.length;
-
-    // Calculate total watched time
-    const totalWatchedTime = curriculum
-      .filter((lecture: any) => watched.includes(lecture.name))
-      .reduce(
-        (sum: number, lecture: any) =>
-          sum + estimateVideoDuration(lecture.fileSize || 0),
-        0,
-      );
-
-    // Calculate total course time
-    const totalCourseTime = curriculum.reduce(
-      (sum: number, lecture: any) =>
-        sum + estimateVideoDuration(lecture.fileSize || 0),
-      0,
+    console.log("[LearningJourney] getCourseCompletionStats - item:", item);
+    console.log(
+      "[LearningJourney] getCourseCompletionStats - item type:",
+      typeof item,
+    );
+    console.log(
+      "[LearningJourney] getCourseCompletionStats - item keys:",
+      Object.keys(item || {}),
     );
 
-    const progressPercentage =
-      totalLectures > 0
-        ? Math.round((completedLectures / totalLectures) * 100)
-        : 0;
+    // Debug: Check what's in localStorage for this course
+    const testCourseId =
+      item.course_identifier?.toString() || item.data?.courseName || "";
+    console.log(
+      "[LearningJourney] Testing localStorage for courseId:",
+      testCourseId,
+    );
+    const testWatched = localStorage.getItem(
+      `watched_lectures_${testCourseId}`,
+    );
+    console.log("[LearningJourney] localStorage content:", testWatched);
 
-    return {
-      totalLectures,
-      completedLectures,
-      progressPercentage,
-      totalWatchedTime,
-      totalCourseTime,
-    };
+    const courseId =
+      item.course_identifier?.toString() || item.data?.courseName || "";
+    console.log(
+      "[LearningJourney] getCourseCompletionStats - courseId:",
+      courseId,
+    );
+    const watched = watchedLectures[courseId] || [];
+    console.log(
+      "[LearningJourney] getCourseCompletionStats - watched:",
+      watched,
+    );
+    const stats = calculateCourseStats(item, watched);
+    console.log("[LearningJourney] getCourseCompletionStats - stats:", stats);
+    return stats;
   };
 
   if (takenCoursesData.length == 0) {
@@ -193,24 +208,6 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
             <div className="flex text-gradient-to-r from-purple-400 via-purple-30 mx-8 my-5">
               <h4 className="font-bold text-lg text-[#A01B9B]">{selected}</h4>
             </div>
-            {/* <div className="hidden sm:flex mx-8 my-5">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                className="size-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 13.5V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m12-3V3.75m0 9.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 3.75V16.5m-6-9V3.75m0 3.75a1.5 1.5 0 0 1 0 3m0-3a1.5 1.5 0 0 0 0 3m0 9.75V10.5"
-                />
-              </svg>
-
-              <p className="underline">All</p>
-            </div> */}
           </div>
         ) : null}
 

@@ -133,7 +133,7 @@ const CourseLanding = (props: any) => {
 
   return (
     <div className="h-auto w-full bg-[#F5F7FA]">
-      <LecturePage course={props.course} data={courseData} wallet={wallet} />
+      <LecturePage course={props.course} data={{ ...courseData, course_identifier: props.course?.course_identifier }} wallet={wallet} />
     </div>
   );
 };

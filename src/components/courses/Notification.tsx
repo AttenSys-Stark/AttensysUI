@@ -58,12 +58,18 @@ const Notification = ({ wallet, address }: NotificationProps) => {
     isError: contextError,
   } = useNotifications();
 
-  // Mark notifications as read when component mounts
+  // Only call markAllAsRead once per mount if there are unread notifications
+  const [markedAllRead, setMarkedAllRead] = useState(false);
   useEffect(() => {
-    if (contextNotifications.length > 0) {
+    if (
+      !markedAllRead &&
+      contextNotifications.length > 0 &&
+      contextNotifications.some((n) => !n.isRead)
+    ) {
       markAllAsRead();
+      setMarkedAllRead(true);
     }
-  }, [contextNotifications, markAllAsRead]);
+  }, [contextNotifications, markAllAsRead, markedAllRead]);
 
   // Function to fetch course details by identifier
   const fetchCourseDetails = async (

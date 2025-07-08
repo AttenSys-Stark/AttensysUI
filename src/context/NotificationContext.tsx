@@ -106,75 +106,87 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
   // Process notifications with read status
   useEffect(() => {
-    if (allNotificationsData && Array.isArray(allNotificationsData)) {
-      console.log("Processing notifications:", allNotificationsData.length);
-
-      const processedNotifications = allNotificationsData.map((event: any) => {
-        const id = `${event.type || "unknown"}-${event.id || event.courseIdentifier || event.blockNumber}`;
-        const isRead = readStatusData?.[id] || false;
-
-        // Generate message based on event type
-        let message = "";
-        switch (event.type) {
-          case "COURSE_CREATED":
-            message = `You created '${event.name || "Unnamed Course"}'`;
-            break;
-          case "COURSE_ACQUIRED":
-            message = `You acquired course #${event.courseIdentifier}`;
-            break;
-          case "CERT_CLAIMED":
-            message = `You claimed certificate for course #${event.courseIdentifier}`;
-            break;
-          case "COURSE_REPLACED":
-            message = `You updated course #${event.courseIdentifier}`;
-            break;
-          case "ADMIN_TRANSFERRED":
-            message = `You became an admin`;
-            break;
-          case "COURSE_APPROVED":
-            message = `Course #${event.courseIdentifier} was approved`;
-            break;
-          case "COURSE_UNAPPROVED":
-            message = `Course #${event.courseIdentifier} was unapproved`;
-            break;
-          case "COURSE_REMOVED":
-            message = `Course #${event.courseIdentifier} was removed`;
-            break;
-          default:
-            message = `${event.type || "Unknown"} event`;
+    async function processNotifications() {
+      if (allNotificationsData && Array.isArray(allNotificationsData)) {
+        // Fetch all courses once and build a mapping from courseIdentifier to name
+        let allCourses: any[] = [];
+        try {
+          allCourses = await api.getAllCoursesInfo();
+        } catch (e) {
+          allCourses = [];
         }
+        const courseIdToName: { [key: string]: string } = {};
+        allCourses.forEach((course) => {
+          // Try both .course_identifier and .courseIdentifier for compatibility
+          const id = course.course_identifier || course.courseIdentifier;
+          if (id && course.data && course.data.courseName) {
+            courseIdToName[id.toString()] = course.data.courseName;
+          } else if (id && course.name) {
+            courseIdToName[id.toString()] = course.name;
+          }
+        });
 
-        return {
-          id,
-          type: event.type || "unknown",
-          eventType: event.eventType || event.type || "unknown",
-          message,
-          timestamp: event.timestamp,
-          blockNumber: event.blockNumber,
-          courseIdentifier: event.courseIdentifier,
-          courseCreator: event.courseCreator,
-          owner: event.owner,
-          candidate: event.candidate,
-          newAdmin: event.newAdmin,
-          name: event.name,
-          isRead,
-        };
-      });
+        const processedNotifications = allNotificationsData.map(
+          (event: any) => {
+            const id = `${event.type || "unknown"}-${event.id || event.courseIdentifier || event.blockNumber}`;
+            const isRead = readStatusData?.[id] || false;
+            // Use event.name, or map from courseIdentifier, or fallback
+            let courseName = event.name;
+            if (!courseName && event.courseIdentifier) {
+              courseName = courseIdToName[event.courseIdentifier.toString()];
+            }
+            if (!courseName) {
+              courseName = `Course #${event.courseIdentifier}`;
+            }
 
-      // Sort by block number (newest first)
-      processedNotifications.sort((a, b) => b.blockNumber - a.blockNumber);
+            // Generate message based on event type
+            let message = "";
+            switch (event.type) {
+              case "COURSE_CREATED":
+                message = `You have created '${courseName || "Unnamed Course"}'`;
+                break;
+              case "COURSE_ACQUIRED":
+                message = `You have acquired '${courseName}'`;
+                break;
+              case "CERT_CLAIMED":
+                message = `You have claimed certificate for '${courseName}'`;
+                break;
+              case "COURSE_REPLACED":
+                message = `You have updated '${courseName}'`;
+                break;
+              case "COURSE_REMOVED":
+                message = `You have removed '${courseName}'`;
+                break;
+              case "ADMIN_TRANSFERRED":
+                message = `You became an admin`;
+                break;
+              case "COURSE_APPROVED":
+                message = `Course '${courseName}' was approved`;
+                break;
+              case "COURSE_UNAPPROVED":
+                message = `Course '${courseName}' was unapproved`;
+                break;
+              default:
+                message = `${event.type || "Unknown"} event`;
+            }
 
-      setNotifications(processedNotifications);
+            return {
+              ...event,
+              id,
+              isRead,
+              name: courseName,
+              message,
+            };
+          },
+        );
 
-      // Filter unread notifications
-      const unread = processedNotifications.filter(
-        (notification) => !notification.isRead,
-      );
-      setUnreadNotifications(unread);
-
-      console.log("Processed notifications:", processedNotifications.length);
-      console.log("Unread notifications:", unread.length);
+        // Sort by block number (newest first)
+        processedNotifications.sort((a, b) => b.blockNumber - a.blockNumber);
+        setNotifications(processedNotifications);
+        setUnreadNotifications(processedNotifications.filter((n) => !n.isRead));
+      }
     }
+    processNotifications();
   }, [allNotificationsData, readStatusData]);
 
   const markAsRead = async (notificationIds?: string[]) => {
