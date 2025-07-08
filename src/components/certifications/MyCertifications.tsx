@@ -230,11 +230,12 @@ const MyCertifications = (props: any) => {
       />
 
       <div className="w-full sm:mx-auto px-4 my-12">
-        <h1 className="text-[#A01B9B] font-bold text-2xl mb-6">
-          {selected} Certifications ({filteredCertificates.length})
-        </h1>
-
-        {renderCertificates()}
+        <div className="bg-white rounded-xl border-[1px] border-[#BCBCBC] min-h-[600px] py-4 px-8">
+          <h1 className="text-[#A01B9B] font-bold text-2xl mb-6">
+            {selected} Certifications ({filteredCertificates.length})
+          </h1>
+          {renderCertificates()}
+        </div>
       </div>
     </div>
   );
