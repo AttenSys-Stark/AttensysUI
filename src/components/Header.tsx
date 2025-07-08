@@ -10,7 +10,12 @@ import {
   MenuItems,
   Input,
 } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import {
+  Bars3Icon,
+  BellIcon,
+  XMarkIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 import Logo from "@/assets/Logo.svg";
 import Image from "next/image";
 import { ConnectButton } from "./connect/ConnectButton";
@@ -63,7 +68,7 @@ import { format, parseISO } from "date-fns";
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
-  { name: "Events", href: "#", current: false },
+
   { name: "Bootcamps", href: "#", current: false },
 ];
 
@@ -341,6 +346,14 @@ const Header = () => {
     router.push(`/mycoursepage/${firebaseUserId}?tab=Notification`);
   };
 
+  const handleAccountCenterIconClick = () => {
+    if (!user) {
+      alert("Please log in to access your Account Center");
+      return;
+    }
+    router.push(`/mycoursepage/${address}`);
+  };
+
   const formatNotificationTime = (timestamp: string) => {
     try {
       const date = parseISO(timestamp);
@@ -493,17 +506,19 @@ const Header = () => {
                         </span>
                       )}
                     </div>
-                    <div>
-                      {/* Bell icon with notification dot (demo) */}
-                      <div className="relative mr-4 flex items-center">
+
+                    {/* Icons Container Box */}
+                    <div className="flex items-center bg-white border border-gray-200 rounded-xl shadow-sm px-3 py-2 mr-4 hover:shadow-md transition-all duration-200">
+                      {/* Bell icon with notification dot */}
+                      <div className="relative flex items-center mr-3">
                         <button
                           onClick={handleNotificationClick}
-                          className="focus:outline-none"
+                          className="focus:outline-none p-1 rounded-lg hover:bg-gray-100 transition-colors"
                           aria-label="Show notifications"
                         >
-                          <BellIcon className="w-6 h-6 text-gray-500" />
+                          <BellIcon className="w-6 h-6 text-gray-600 hover:text-[#9747FF]" />
                           {unreadCount > 0 && (
-                            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-white bg-red-500"></span>
+                            <span className="absolute -top-1 -right-1 block h-3 w-3 rounded-full ring-2 ring-white bg-red-500"></span>
                           )}
                         </button>
                         {/* Notification Dialog */}
@@ -570,6 +585,20 @@ const Header = () => {
                             )}
                           </div>
                         )}
+                      </div>
+
+                      {/* Divider */}
+                      <div className="w-px h-6 bg-gray-300 mx-1"></div>
+
+                      {/* Account Center Icon */}
+                      <div className="flex items-center ml-3">
+                        <button
+                          onClick={handleAccountCenterIconClick}
+                          className="focus:outline-none p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                          aria-label="Account Center"
+                        >
+                          <UserIcon className="w-6 h-6 text-gray-600 hover:text-[#9747FF]" />
+                        </button>
                       </div>
                     </div>
 
@@ -769,6 +798,21 @@ const Header = () => {
                     )}
                   </div>
 
+                  {/* Account Center Icon for Mobile */}
+                  <div className="px-4 py-2 border-b">
+                    <button
+                      onClick={() => {
+                        handleAccountCenterIconClick();
+                        close();
+                      }}
+                      className="flex items-center w-full px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                      aria-label="Account Center"
+                    >
+                      <UserIcon className="w-5 h-5 mr-3 text-[#9747FF]" />
+                      <span className="font-medium">Account Center</span>
+                    </button>
+                  </div>
+
                   {/* 🟢 Navigation */}
 
                   <nav className="px-4 space-y-2">
@@ -875,7 +919,7 @@ const Header = () => {
                       )}
                     </div>
                     {/* 📌 Events - Enlace directo */}
-                    {showComingSoon && (
+                    {/* {showComingSoon && (
                       <div className="fixed top-0 left-0 right-0 bg-blue-500 text-white text-center py-2 z-50 animate-fadeInOut">
                         Feature is coming soon!
                       </div>
@@ -888,7 +932,7 @@ const Header = () => {
                       onClick={handleComingSoonClick}
                     >
                       Events
-                    </Link>
+                    </Link> */}
                   </nav>
 
                   {/* 📌 Events - Direct link */}

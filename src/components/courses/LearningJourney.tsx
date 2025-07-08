@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import ProgressBar from "@ramonak/react-progress-bar";
 import Image from "next/image";
 import play from "@/assets/play.svg";
@@ -68,13 +68,11 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
   // Calculate total pages
   const totalPages = Math.ceil(takenCoursesData.length / itemsPerPage);
 
-  // Get current page items - memoized to prevent unnecessary recalculations
-  const currentItems = useMemo(() => {
-    return takenCoursesData?.slice(
-      (currentPage - 1) * itemsPerPage,
-      currentPage * itemsPerPage,
-    );
-  }, [takenCoursesData, currentPage, itemsPerPage]);
+  // Get current page items
+  const currentItems = takenCoursesData
+    ?.slice()
+    .reverse()
+    ?.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const generatePageNumbers = () => {
     const pageNumbers = [];
@@ -213,85 +211,114 @@ const LearningJourney: React.FC<LearningJourneyProps> = ({
 
         <div>
           <div className="block justify-top">
-            {currentItems
-              ?.slice()
-              .reverse()
-              .map((item: any, index: number) => {
-                const stats = getCourseCompletionStats(item);
+            {currentItems?.map((item: any, index: number) => {
+              const stats = getCourseCompletionStats(item);
 
-                return (
-                  <div
-                    key={index}
-                    className="px-5 xl:px-12 flex border-top py-6 border-2 gap-6 xl:gap-0 flex-col w-full xl:flex-row xl:space-x-8 items-start"
-                  >
-                    {/* Course Image */}
-                    <div className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
-                      <Image
-                        src={
-                          item.data.courseImage
-                            ? `https://ipfs.io/ipfs/${item.data.courseImage}`
-                            : tdesign_video
-                        }
-                        width={200}
-                        height={200}
-                        alt={item.data.courseName}
-                        className="w-full h-full object-cover rounded-xl"
-                      />
-                    </div>
+              return (
+                <div
+                  key={index}
+                  className="px-5 xl:px-12 flex border-top py-6 border-2 gap-6 xl:gap-0 flex-col w-full xl:flex-row xl:space-x-8 items-start"
+                >
+                  {/* Course Image */}
+                  <div className="xl:h-[164px] xl:w-[254px] w-full h-auto rounded-xl">
+                    <Image
+                      src={
+                        item.data.courseImage
+                          ? `https://ipfs.io/ipfs/${item.data.courseImage}`
+                          : tdesign_video
+                      }
+                      width={200}
+                      height={200}
+                      alt={item.data.courseName}
+                      className="w-full h-full object-cover rounded-xl"
+                    />
+                  </div>
 
-                    {/* Course Details */}
-                    <div className="flex-1 space-y-4">
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-[#2D3A4B] mb-2">
+                  {/* Course Details */}
+                  <div className="flex-1 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1">
+                        <div
+                          onClick={(e) => {
+                            localStorage.setItem(
+                              "courseData",
+                              JSON.stringify(item?.data),
+                            );
+                            handleCourse(
+                              e,
+                              e.currentTarget.textContent,
+                              router,
+                              item?.course_identifier,
+                            );
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <h3 className="text-lg font-semibold text-[#2D3A4B] mb-2 hover:text-[#A01B9B] transition-colors">
                             {item.data.courseName}
                           </h3>
-                          <p className="text-sm text-[#6B7280] mb-3 line-clamp-2">
+                        </div>
+                        <div
+                          onClick={(e) => {
+                            localStorage.setItem(
+                              "courseData",
+                              JSON.stringify(item?.data),
+                            );
+                            handleCourse(
+                              e,
+                              e.currentTarget.textContent,
+                              router,
+                              item?.course_identifier,
+                            );
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <p className="text-sm text-[#6B7280] mb-3 line-clamp-2 hover:text-[#A01B9B] transition-colors">
                             {item.data.courseDescription}
                           </p>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="flex flex-wrap xl:flex-nowrap gap-y-2 gap-4 xl:gap-0 items-center my-3 ">
-                        <div className="flex items-center gap-2">
-                          <Image src={play} alt="" height={12} width={12} />
-                          <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                            Total play time:{" "}
-                            {formatDuration(stats.totalCourseTime)}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <p className="hidden sm:block">|</p>
-                          <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0">
-                            Created by:{" "}
-                            <span className="underline">
-                              {item.data.courseCreator}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="my-3">
-                        <ProgressBar
-                          completed={stats.progressPercentage.toString()}
-                          height="13px"
-                          bgColor="#9B51E0"
-                        />
-                      </div>
-
-                      <div className="my-3 flex justify-between">
+                    <div className="flex flex-wrap xl:flex-nowrap gap-y-2 gap-4 xl:gap-0 items-center my-3 ">
+                      <div className="flex items-center gap-2">
+                        <Image src={play} alt="" height={12} width={12} />
                         <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                          {stats.completedLectures}/{stats.totalLectures}{" "}
-                          Lectures completed
+                          Total play time:{" "}
+                          {formatDuration(stats.totalCourseTime)}
                         </p>
-                        <p className="underline text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
-                          ({formatDuration(stats.totalWatchedTime)})
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <p className="hidden sm:block ml-2">|</p>
+                        <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px] mx-0">
+                          Created by:{" "}
+                          <span className="underline">
+                            {item.data.courseCreator}
+                          </span>
                         </p>
                       </div>
                     </div>
+
+                    <div className="my-3">
+                      <ProgressBar
+                        completed={stats.progressPercentage.toString()}
+                        height="13px"
+                        bgColor="#9B51E0"
+                      />
+                    </div>
+
+                    <div className="my-3 flex justify-between">
+                      <p className="text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                        {stats.completedLectures}/{stats.totalLectures} Lectures
+                        completed
+                      </p>
+                      <p className="underline text-[13px] text-[#2D3A4B] font-medium leading-[21px]">
+                        ({formatDuration(stats.totalWatchedTime)})
+                      </p>
+                    </div>
                   </div>
-                );
-              })}
+                </div>
+              );
+            })}
           </div>
         </div>
         {/* Pagination Controls */}

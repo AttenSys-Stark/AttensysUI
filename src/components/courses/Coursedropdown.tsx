@@ -82,12 +82,12 @@ const Coursedropdown = () => {
           }`}
         >
           <div className="flex justify-between mx-auto w-[80%] h-[90%] items-center">
-            <div className="space-y-4 w-[337px] text-[16px] font-bold">
+            <div className="space-y-4 w-[337px] text-[16px]">
               <a
                 onClick={() => handleNavigation("/Course")}
                 className=" cursor-pointer"
               >
-                <div className="flex space-x-3  my-3">
+                <div className="flex space-x-3 mb-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -107,8 +107,12 @@ const Coursedropdown = () => {
                     Explore Courses
                   </h1>
                 </div>
+                <p className="text-[13px] ml-8 text-[#2D3A4B] cursor-pointer ">
+                  Access and manage all your course completion certificates in
+                  one place.
+                </p>
               </a>
-              <a
+              {/* <a
                 //@todo replace sample profile with user profile id
                 onClick={() => {
                   if (!user) {
@@ -135,7 +139,7 @@ const Coursedropdown = () => {
                     Account Center
                   </h1>
                 </div>
-              </a>
+              </a> */}
             </div>
             <div className="w-[1px] h-[80%] bg-[#B8B9BA]"></div>
             <div className="space-y-2 w-[337px]">
