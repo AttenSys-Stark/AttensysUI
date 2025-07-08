@@ -862,7 +862,7 @@ const Header = () => {
                             Explore Courses
                           </Link>
 
-                          <Link
+                          {/* <Link
                             href={`/mycoursepage/${firebaseUserId}`}
                             className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
                             onClick={handleAccountCenterClick}
@@ -884,7 +884,7 @@ const Header = () => {
                                 (Login required)
                               </span>
                             )}
-                          </Link>
+                          </Link> */}
 
                           <Link
                             href={`/Certifications/${address}`}
@@ -918,12 +918,13 @@ const Header = () => {
                         </div>
                       )}
                     </div>
-                    {/* 📌 Events - Enlace directo */}
-                    {/* {showComingSoon && (
+                    {showComingSoon && (
                       <div className="fixed top-0 left-0 right-0 bg-blue-500 text-white text-center py-2 z-50 animate-fadeInOut">
                         Feature is coming soon!
                       </div>
                     )}
+                    {/* 📌 Events - Enlace directo */}
+                    {/* 
                     <Link
                       href=""
                       // href="/Discoverevent"
