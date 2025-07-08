@@ -41,8 +41,6 @@ const NotificationWrapper: React.FC<NotificationWrapperProps> = ({
     getAddress();
   }, [user]);
 
-  console.log("NotificationWrapper: Current userAddress:", userAddress);
-
   return (
     <NotificationProvider address={userAddress}>
       {children}

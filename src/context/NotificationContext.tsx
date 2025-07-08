@@ -194,7 +194,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   };
 
   const markAllAsRead = async () => {
-    await markAsReadMutation.mutateAsync();
+    await markAsReadMutation.mutateAsync(undefined);
   };
 
   const value: NotificationContextType = {

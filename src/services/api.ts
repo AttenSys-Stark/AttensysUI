@@ -280,4 +280,11 @@ export const api = {
       return JSON.parse(localStorage.getItem(readStatusKey) || "{}");
     }
   },
+
+  // Get all courses info (from blockchain)
+  getAllCoursesInfo: async (): Promise<any> => {
+    // Import the helper dynamically to avoid circular deps
+    const { getAllCoursesInfo } = await import("@/utils/helpers");
+    return getAllCoursesInfo();
+  },
 };
