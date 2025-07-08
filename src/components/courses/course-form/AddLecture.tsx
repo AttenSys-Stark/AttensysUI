@@ -377,6 +377,17 @@ const AddLecture: React.FC<LectureProps> = ({
       }));
     }
 
+    // Clear the edit form fields when upload starts
+    if (editingIndex !== null) {
+      setEditLecture({
+        name: "",
+        description: "",
+        video: "",
+        fileName: "",
+        fileSize: 0,
+      });
+    }
+
     toast.info(`Starting upload of ${file.name}...`);
 
     try {
@@ -713,10 +724,8 @@ const AddLecture: React.FC<LectureProps> = ({
   };
 
   const handleEditLecture = (index: number) => {
-    // Calculate the actual index in the original array
-    const actualIndex = courseData.courseCurriculum.length - 1 - index;
-    setEditingIndex(actualIndex);
-    setEditLecture(courseData.courseCurriculum[actualIndex]);
+    setEditingIndex(index);
+    setEditLecture(courseData.courseCurriculum[index]);
   };
 
   const handleSaveEdit = (index: number) => {
@@ -731,10 +740,8 @@ const AddLecture: React.FC<LectureProps> = ({
       return;
     }
 
-    // Calculate the actual index in the original array
-    const actualIndex = courseData.courseCurriculum.length - 1 - index;
     const updatedCurriculum = [...courseData.courseCurriculum];
-    updatedCurriculum[actualIndex] = editLecture;
+    updatedCurriculum[index] = editLecture;
     setCourseData((prev: any) => ({
       ...prev,
       courseCurriculum: updatedCurriculum,
@@ -1081,7 +1088,7 @@ const AddLecture: React.FC<LectureProps> = ({
             </p>
           </div>
 
-          <div className="flex bg-white p-5 rounded-xl my-3">
+          {/* <div className="flex bg-white p-5 rounded-xl my-3">
             <p className="font-medium mr-3 text-[16px]">
               Lecture Title: <span className="text-red-500">*</span>
             </p>
@@ -1093,9 +1100,9 @@ const AddLecture: React.FC<LectureProps> = ({
               className="w-[90%]"
               maxLength={70}
             />
-          </div>
+          </div> */}
 
-          <div className="flex bg-white p-5 rounded-xl my-3">
+          {/* <div className="flex bg-white p-5 rounded-xl my-3">
             <p className="font-medium mr-3 text-[16px]">Description:</p>
             <textarea
               name="description"
@@ -1105,9 +1112,9 @@ const AddLecture: React.FC<LectureProps> = ({
               className="w-[100%]"
               maxLength={500}
             ></textarea>
-          </div>
+          </div> */}
 
-          <div className="bg-white p-5 rounded-xl my-3 text-center content-center w-[100%] flex flex-col justify-center">
+          <div className="bg-white p-5 rounded-xl my-3 text-center content-center w-[100%] h-[400px] flex flex-col justify-center">
             <div className="w-[15%] mx-auto flex justify-center">
               <Image src={upload_other} alt="upload" />
             </div>
@@ -1224,12 +1231,12 @@ const AddLecture: React.FC<LectureProps> = ({
                     </p>
                   </div>
                   <div className="flex space-x-4">
-                    <button
+                    <Button
                       onClick={() => handleEditLecture(index)}
                       className="text-[#4A90E2]"
                     >
                       Edit
-                    </button>
+                    </Button>
                     <div className="bg-green">
                       <Image src={tick_circle} alt="tick" />
                     </div>

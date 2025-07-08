@@ -181,17 +181,32 @@ const MainFormView2: React.FC<ChildComponentProps> = ({
                   gain by completing your course.
                 </p>
                 <div className="flex items-start my-4">
-                  <textarea
-                    id="message"
-                    className="block px-6 pb-64 py-3 w-full md:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder={`E.g When this course is done, students will :`}
-                    value={courseData.learningObjectives}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      handleLearningObjChange(e);
-                      setLearningObjectives(e.target.value);
-                      setLearningObjectivesError("");
-                    }}
-                  ></textarea>
+                  <div className="w-full md:w-[80%]">
+                    <textarea
+                      id="message"
+                      className="block px-6 pb-64 py-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"
+                      placeholder={`E.g When this course is done, students will :`}
+                      value={courseData.learningObjectives}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                        handleLearningObjChange(e);
+                        setLearningObjectives(e.target.value);
+                        setLearningObjectivesError("");
+                      }}
+                      maxLength={1000}
+                    ></textarea>
+                    <div className="mt-2 text-right">
+                      <span
+                        className={`text-xs ${
+                          courseData.learningObjectives.length >= 900
+                            ? "text-red-500"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {1000 - courseData.learningObjectives.length} characters
+                        remaining
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 {learningObjectivesError && (
                   <p className="text-red-500 text-xs mt-1">
@@ -208,17 +223,32 @@ const MainFormView2: React.FC<ChildComponentProps> = ({
                   In this section, describe who your course is intended for.
                 </p>
                 <div className="flex items-start my-4">
-                  <textarea
-                    id="message"
-                    className="block px-6 pb-64 py-3 w-full md:w-[80%] text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    placeholder={`Example:`}
-                    value={courseData.targetAudienceDesc}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      handleTADescriptionChange(e);
-                      setTargetAudience(e.target.value);
-                      setTargetAudienceError("");
-                    }}
-                  ></textarea>
+                  <div className="w-full md:w-[80%]">
+                    <textarea
+                      id="message"
+                      className="block px-6 pb-64 py-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 resize-none"
+                      placeholder={`Example:`}
+                      value={courseData.targetAudienceDesc}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                        handleTADescriptionChange(e);
+                        setTargetAudience(e.target.value);
+                        setTargetAudienceError("");
+                      }}
+                      maxLength={1000}
+                    ></textarea>
+                    <div className="mt-2 text-right">
+                      <span
+                        className={`text-xs ${
+                          courseData.targetAudienceDesc.length >= 900
+                            ? "text-red-500"
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {1000 - courseData.targetAudienceDesc.length} characters
+                        remaining
+                      </span>
+                    </div>
+                  </div>
                 </div>
                 {targetAudienceError && (
                   <p className="text-red-500 text-xs mt-1">

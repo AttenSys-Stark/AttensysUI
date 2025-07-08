@@ -712,31 +712,33 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
                           </div>
                         </div>
 
-                        {/* Course Description */}
+                      {/* Course Description */}
+                      <div
+                        onClick={(e) => {
+                          localStorage.setItem(
+                            "courseData",
+                            JSON.stringify(item?.data),
+                          );
+                          handleCourse(
+                            e,
+                            e.currentTarget.textContent,
+                            router,
+                            item?.course_identifier,
+                          );
+                          console.log(item.is_approved);
+                        }}
+                        className={`mt-3 ${item.is_approved ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
+                      >
                         <div
-                          onClick={(e) => {
-                            localStorage.setItem(
-                              "courseData",
-                              JSON.stringify(item?.data),
-                            );
-                            handleCourse(
-                              e,
-                              e.currentTarget.textContent,
-                              router,
-                              item?.course_identifier,
-                            );
-                            console.log(item.is_approved);
+                          className="text-[14px] text-[#2D3A4B] font-medium leading-[21px] line-clamp-2 hover:text-[#A01B9B] transition-colors"
+                          dangerouslySetInnerHTML={{
+                            __html: item.data.courseDescription,
                           }}
-                          className={`mt-3 ${item.is_approved ? "cursor-pointer" : "cursor-not-allowed opacity-50"}`}
-                        >
-                          <p className="text-[14px] text-[#2D3A4B] font-medium leading-[21px] line-clamp-2 hover:text-[#A01B9B] transition-colors">
-                            {item.data.courseDescription}
-                          </p>
-                        </div>
+                        />
                       </div>
                     </div>
-                  );
-                })}
+                  </div>
+                ))}
             </div>
           </div>
           {/* Pagination Controls */}

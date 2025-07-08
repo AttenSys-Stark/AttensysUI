@@ -475,11 +475,15 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
                     {courseData.courseName}
                   </h4>
                   <div className="my-3">
-                    <p className="text-[#333333] text-[14px] font-light leading-[22px]">
-                      {courseData.courseDescription?.length > 300
-                        ? `${courseData.courseDescription.slice(0, 300)}...`
-                        : courseData.courseDescription}
-                    </p>
+                    <div
+                      className="text-[#333333] text-[14px] font-light leading-[22px]"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          courseData.courseDescription?.length > 300
+                            ? `${courseData.courseDescription.slice(0, 300)}...`
+                            : courseData.courseDescription,
+                      }}
+                    />
                     <div className="bg-[#5801A9] py-2 text-white text-center mt-4 mb-3 sm:w-[95%] lg:w-[50%] rounded-lg">
                       <p className="text-[14px] font-extrabold leading-[22px]">
                         {courseData.courseCreator}

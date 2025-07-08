@@ -56,9 +56,12 @@ export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
             </button>
           </div>
         </div>
-        <p className="text-gray-600 text-[11px] mb-3 px-4 line-clamp-2 ">
-          {data?.data?.courseDescription || "No description available"}
-        </p>
+        <div
+          className="text-gray-600 text-[11px] mb-3 px-4 line-clamp-2"
+          dangerouslySetInnerHTML={{
+            __html: data?.data?.courseDescription || "No description available",
+          }}
+        />
       </div>
 
       <div className="px-5 mt-2">

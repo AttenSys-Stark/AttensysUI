@@ -1,5 +1,6 @@
 "use client";
 import "./globals.css";
+import "@/styles/tiptap.css";
 import { Inter } from "next/font/google";
 import { Providers } from "./providers";
 import { Suspense, useEffect, useState, ReactNode } from "react";
