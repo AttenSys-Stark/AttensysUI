@@ -380,7 +380,7 @@ const Notification = ({ wallet, address }: NotificationProps) => {
                   className={`py-4 px-6 lg:px-8 min-h-[80px] flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 ${
                     i % 2 === 0 ? "bg-gray-50" : "bg-white"
                   } group-hover:bg-blue-50 border-b border-gray-100 last:border-b-0 ${
-                    !item.isRead ? "border-l-4 border-l-blue-500" : ""
+                    !item.isRead ? "border-l-4" : ""
                   }`}
                 >
                   <div className="flex items-start space-x-3">
