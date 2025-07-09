@@ -194,7 +194,11 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   };
 
   const markAllAsRead = async () => {
-    await markAsReadMutation.mutateAsync(undefined);
+    // Pass all unread notification IDs to mark as read
+    const allUnreadIds = unreadNotifications.map((n) => n.id);
+    if (allUnreadIds.length > 0) {
+      await markAsReadMutation.mutateAsync(allUnreadIds);
+    }
   };
 
   const value: NotificationContextType = {

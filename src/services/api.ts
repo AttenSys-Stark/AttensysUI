@@ -227,9 +227,11 @@ export const api = {
     address: string,
     notificationIds?: string[],
   ): Promise<void> => {
+    // Always use canonicalized address
+    const canonicalAddress = toCanonicalAddress(address);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/events/address/${address}/mark-read`,
+        `${API_BASE_URL}/events/address/${canonicalAddress}/mark-read`,
         {
           method: "POST",
           headers: {
@@ -242,7 +244,7 @@ export const api = {
     } catch (error) {
       // Fallback: store read status in localStorage for testing
       console.log("Using fallback for marking notifications as read");
-      const readStatusKey = `notifications_read_${address}`;
+      const readStatusKey = `notifications_read_${canonicalAddress}`;
       const currentReadStatus = JSON.parse(
         localStorage.getItem(readStatusKey) || "{}",
       );
@@ -253,7 +255,7 @@ export const api = {
         });
       } else {
         // Mark all notifications as read
-        const allEvents = await api.getEventsByAddress(address);
+        const allEvents = await api.getEventsByAddress(canonicalAddress);
         allEvents.forEach((event) => {
           const id = `${event.type || "unknown"}-${event.id}`;
           currentReadStatus[id] = true;
