@@ -323,8 +323,8 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                 </div>
               </>
             ) : (
-              <div className="h-full w-full flex items-center justify-center">
-                <h1 className="text-[15px] text-[#817676] font-medium leading-[18px]">
+              <div className="h-full w-full flex items-center justify-center min-h-[200px]">
+                <h1 className="text-[15px] text-[#817676] font-medium leading-[18px] text-center">
                   This address has no event data
                 </h1>
               </div>
