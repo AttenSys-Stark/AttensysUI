@@ -10,9 +10,9 @@ function toCanonicalAddress(address: string): string {
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { address: string } },
+  { params }: { params: Promise<{ address: string }> },
 ) {
-  const { address } = params;
+  const { address } = await params;
   const { notificationIds } = await req.json();
 
   // Canonicalize the Starknet address
