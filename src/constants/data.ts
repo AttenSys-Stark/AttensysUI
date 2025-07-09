@@ -1469,25 +1469,6 @@ export const eventsData = [
 
 export const gridsData = [
   {
-    img: event,
-    name: "Events",
-    subProp: [
-      "Key",
-      "Status",
-      "Registered events",
-      "Marked attendance",
-      "Certifications",
-    ],
-    viewPartName: "All Events",
-    heading: [
-      "Event Name",
-      "Attendance status",
-      "Certifications",
-      "Date registered",
-    ],
-    eventsData: [],
-  },
-  {
     img: graduate,
     name: "Courses",
     subProp: ["Key", "Status", "Courses"],

@@ -118,6 +118,7 @@ const Header = () => {
     unreadNotifications,
     unreadCount,
     markAsRead,
+    markAllAsRead,
     isLoading: notificationsLoading,
   } = useNotifications();
 
@@ -334,9 +335,9 @@ const Header = () => {
 
   const handleNotificationClick = async () => {
     setIsNotifOpen(true);
-    // Mark all unread notifications as read when opening the dialog
+    // Mark all notifications as read when opening the dialog
     if (unreadCount > 0) {
-      await markAsRead();
+      await markAllAsRead();
     }
   };
 
