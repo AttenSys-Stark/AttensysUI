@@ -432,7 +432,6 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                       >
                         {[
                           "All",
-
                           "Organizations",
                           "Certifications",
                           "Courses",
