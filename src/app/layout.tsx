@@ -32,6 +32,8 @@ import {
 } from "@/deployments/contracts";
 import { AuthProvider } from "@/context/AuthContext";
 import NotificationWrapper from "@/components/NotificationWrapper";
+import { ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -232,6 +234,19 @@ export default function RootLayout({
                     <Suspense fallback={<Loading />}>{children}</Suspense>
                   </Providers>
                 </NotificationWrapper>
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="light"
+                  transition={Bounce}
+                />
               </StarknetConfig>
             </QueryClientProvider>
           </JotaiProvider>

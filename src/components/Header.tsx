@@ -65,6 +65,7 @@ import { Account } from "starknet";
 import { provider } from "@/constants";
 import { useNotifications } from "@/context/NotificationContext";
 import { format, parseISO } from "date-fns";
+import { toast, Bounce } from "react-toastify";
 
 const navigation = [
   { name: "Courses", href: "#", current: false },
@@ -94,7 +95,7 @@ const Header = () => {
   } = useWallet();
   const [account, setAccount] = useState<any>();
   const [address, setAddress] = useState<string>("");
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
   const firebaseUserId = user?.uid || "";
   const { connect, connectors } = useConnect();
   const controller = connectors[0] as ControllerConnector;
@@ -136,6 +137,8 @@ const Header = () => {
     } else if (user.email) {
       firstName = user.email.split("@")[0];
     }
+  } else if (isGuest) {
+    firstName = "Guest";
   }
   const truncatedFirstName =
     firstName && firstName.length > 8
@@ -348,11 +351,52 @@ const Header = () => {
   };
 
   const handleAccountCenterIconClick = () => {
-    if (!user) {
-      alert("Please log in to access your Account Center");
+    if (isGuest) {
+      toast.error(
+        "Please exit guest mode and login to access your Account Center",
+        {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        },
+      );
       return;
     }
+    // if (!user) {
+    //   alert("Please log in to access your Account Center");
+    //   return;
+    // }
     router.push(`/mycoursepage/${address}`);
+  };
+
+  // Restriction handler for mobile nav (My Certifications, Create a Course)
+  const handleGuestRestrictedMobileNav = (
+    action: string,
+    path: string,
+    close: () => void,
+  ) => {
+    if (isGuest) {
+      toast.error(`Please exit guest mode and login to access ${action}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
+    close();
+    router.push(path);
   };
 
   const formatNotificationTime = (timestamp: string) => {
@@ -502,8 +546,18 @@ const Header = () => {
                   <div className="absolute inset-y-0 right-0 items-center hidden md:hidden lg:flex sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                     <div>
                       {firstName && (
-                        <span className="mr-6 text-gray-700 font-light italic text-sm">
-                          <span>Welcome, {truncatedFirstName}</span>
+                        <span
+                          className={`mr-6 font-light italic text-sm ${
+                            isGuest
+                              ? "text-orange-600 font-medium"
+                              : "text-gray-700"
+                          }`}
+                        >
+                          <span>
+                            {isGuest
+                              ? "Browsing as Guest"
+                              : `Welcome, ${truncatedFirstName}`}
+                          </span>
                         </span>
                       )}
                     </div>
@@ -803,8 +857,25 @@ const Header = () => {
                   <div className="px-4 py-2 border-b">
                     <button
                       onClick={() => {
-                        handleAccountCenterIconClick();
+                        if (isGuest) {
+                          toast.error(
+                            "Please exit guest mode and login to access your Account Center",
+                            {
+                              position: "top-right",
+                              autoClose: 3000,
+                              hideProgressBar: false,
+                              closeOnClick: false,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                              theme: "light",
+                              transition: Bounce,
+                            },
+                          );
+                          return;
+                        }
                         close();
+                        router.push(`/mycoursepage/${address}`);
                       }}
                       className="flex items-center w-full px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
                       aria-label="Account Center"
@@ -888,9 +959,16 @@ const Header = () => {
                           </Link> */}
 
                           <Link
-                            href={`/Certifications/${address}`}
+                            href={"#"}
                             className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
-                            onClick={() => close()}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleGuestRestrictedMobileNav(
+                                "My Certifications",
+                                `/Certifications/${address}`,
+                                close,
+                              );
+                            }}
                           >
                             <Image
                               src={ImagenCourses3}
@@ -903,9 +981,16 @@ const Header = () => {
                           </Link>
 
                           <Link
-                            href={`/Course/CreateACourse/${courseQuestions[0]}`}
+                            href={"#"}
                             className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
-                            onClick={() => close()}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleGuestRestrictedMobileNav(
+                                "Create a Course",
+                                `/Course/CreateACourse/${courseQuestions[0]}`,
+                                close,
+                              );
+                            }}
                           >
                             <Image
                               src={ImagenCourses3}

@@ -15,10 +15,37 @@ import LoadingSpinner from "./ui/LoadingSpinner";
 import { LoginForm } from "./login-form";
 import { SignupForm } from "./signup-form";
 import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import { AccountHandler } from "@/helpers/accounthandler";
 import { Button } from "@headlessui/react";
 import CourseNews from "@/components/courses/CourseNews";
+import { isGuestMode } from "@/state/connectedWalletStarknetkitNext";
+import { useAuth } from "@/context/AuthContext";
+
+const GuestContinueHandler = ({ onDone }: { onDone?: () => void }) => {
+  const { setIsGuest } = useAuth();
+  const router = useRouter();
+  React.useEffect(() => {
+    setIsGuest(true);
+    import("react-toastify").then(({ toast, Bounce }) => {
+      toast.success("Welcome! You're now browsing as a guest", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      router.push("/Home");
+      if (onDone) onDone();
+    });
+    // eslint-disable-next-line
+  }, []);
+  return null;
+};
 
 const HomePage = () => {
   const [grid, setGrid] = useState({
@@ -38,9 +65,9 @@ const HomePage = () => {
   const [iswalletconnecting, setiswalletconnecting] = useState(false);
   const router = useRouter();
   const [loginorsignupstat, setLoginorsignupstat] = useAtom(loginorsignup);
-  const [mobileView, setMobileView] = useState<"welcome" | "login" | "signup">(
-    "welcome",
-  );
+  const [mobileView, setMobileView] = useState<
+    "welcome" | "login" | "signup" | "guest-continue"
+  >("welcome");
 
   useEffect(() => {
     // if (!address) return;
@@ -460,9 +487,35 @@ const HomePage = () => {
                 >
                   Signup
                 </button>
+                <div className="flex items-center my-2">
+                  <div className="flex-grow h-px bg-gray-300" />
+                  <span className="mx-2 text-xs text-white">or</span>
+                  <div className="flex-grow h-px bg-gray-300" />
+                </div>
+                <button
+                  onClick={() => setMobileView("guest-continue")}
+                  className="w-full py-2 rounded-lg border border-gray-300 text-white font-semibold text-lg shadow hover:bg-gray-50 transition flex items-center justify-center gap-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    className="size-5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                    <polyline points="10,17 15,12 10,7" />
+                    <line x1="15" y1="12" x2="3" y2="12" />
+                  </svg>
+                  Continue as Guest
+                </button>
               </div>
             </div>
           )}
+          {mobileView === "guest-continue" && <GuestContinueHandler />}
           {mobileView === "login" && (
             <div className="relative">
               <button

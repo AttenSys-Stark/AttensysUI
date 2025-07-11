@@ -167,6 +167,7 @@ export const orgowneraddress = atom(null);
 
 export const isRegisteredatom = atom(false);
 export const loginorsignup = atom(false);
+export const isGuestMode = atom(false);
 export const orgnameatom = atom("none");
 export const mybootcampDescription = atom("");
 

@@ -22,6 +22,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
 import CourseNews from "@/components/courses/CourseNews";
+import { useAuth } from "@/context/AuthContext";
 
 const orgquery = gql`
   {
@@ -151,6 +152,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginorsignupstat, setLoginorsignupstat] = useAtom(loginorsignup);
+  const { user, isGuest } = useAuth();
 
   const handlesub = async () => {
     await queryClient.prefetchQuery({
@@ -192,18 +194,18 @@ const Index = () => {
     // Use a local variable to track the mounted state
     let isMounted = true;
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (!isMounted) return;
 
-      if (!user) {
+      if (!firebaseUser && !isGuest) {
         router.push("/");
       } else {
         setIsAuthenticated(true);
         setLoading(false);
         setLoginorsignupstat(false);
       }
-      if (user) {
-        console.log("user Data", user);
+      if (firebaseUser) {
+        console.log("user Data", firebaseUser);
       }
     });
 
@@ -219,7 +221,7 @@ const Index = () => {
       clearTimeout(timeout);
       unsubscribe();
     };
-  }, [router]);
+  }, [router, isGuest]);
 
   if (loading) {
     return (
@@ -229,7 +231,7 @@ const Index = () => {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isGuest) {
     return null; // or a redirect message
   }
 

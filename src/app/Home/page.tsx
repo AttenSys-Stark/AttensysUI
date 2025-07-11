@@ -9,18 +9,19 @@ import { Loader2 } from "lucide-react";
 import { useAtom } from "jotai";
 import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
 import CourseNews from "@/components/courses/CourseNews";
+
 const HomePage = () => {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, isGuest } = useAuth();
   const [loginorsignupstat, setLoginorsignupstat] = useAtom(loginorsignup);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && !isGuest) {
       router.push("/");
     } else if (user) {
       setLoginorsignupstat(false);
     }
-  }, [user, loading, router, setLoginorsignupstat]);
+  }, [user, loading, isGuest, router, setLoginorsignupstat]);
 
   if (loading) {
     return (
@@ -30,7 +31,7 @@ const HomePage = () => {
     );
   }
 
-  if (!user) {
+  if (!user && !isGuest) {
     return null; // or a redirect message
   }
 
