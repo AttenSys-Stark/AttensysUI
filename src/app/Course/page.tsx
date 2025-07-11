@@ -5,6 +5,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAtom } from "jotai";
 import { MoonLoader } from "react-spinners";
+import { ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import Bootcampdropdown from "@/components/bootcamp/Bootcampdropdown";
 import Coursedropdown from "@/components/courses/Coursedropdown";
@@ -205,6 +207,19 @@ const Index = () => {
           </>
         ) : null}
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        transition={Bounce}
+      />
     </>
   );
 };

@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 
 // Define protected routes
 const protectedRoutes = [
-  "/Home",
   "/Mybootcamps",
   "/adminconsole",
   "/Course",
@@ -19,9 +18,10 @@ export async function middleware(request: NextRequest) {
   // Check if user is trying to access the root path while authenticated
   if (pathname === "/") {
     const firebaseToken = request.cookies.get("firebase-auth-token")?.value;
+    const guestToken = request.cookies.get("guest-mode")?.value;
 
-    if (firebaseToken) {
-      // User is authenticated, but let client-side logic handle account completion
+    if (firebaseToken || guestToken) {
+      // User is authenticated or in guest mode, but let client-side logic handle account completion
       // Don't redirect immediately - let the signup process complete
       return NextResponse.next();
     }

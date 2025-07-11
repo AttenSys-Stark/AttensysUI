@@ -25,6 +25,7 @@ import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
 import { useSetAtom } from "jotai";
 import { loginUserWithEmail, resetUserPassword } from "@/lib/userutils";
 import { Bounce, toast, ToastContainer } from "react-toastify";
+import { useAuth } from "@/context/AuthContext";
 
 export function LoginForm({
   onSignupClick,
@@ -49,6 +50,23 @@ export function LoginForm({
 
   const router = useRouter();
   const setLoginorsignup = useSetAtom(loginorsignup);
+  const { setIsGuest } = useAuth();
+
+  const handleContinueAsGuest = () => {
+    setIsGuest(true);
+    toast.success("Welcome! You're now browsing as a guest", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+    router.push(redirectPath || "/Home");
+  };
 
   const handleLoginWithGoogle = async () => {
     setAccountloadProgress(true);
@@ -256,6 +274,30 @@ export function LoginForm({
                     Continue with Google
                   </div>
                 )}
+              </Button>
+
+              {/* Continue as Guest Button */}
+              <Button
+                variant="outline"
+                type="button"
+                className="w-full flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                onClick={handleContinueAsGuest}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  className="size-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                  <polyline points="10,17 15,12 10,7" />
+                  <line x1="15" y1="12" x2="3" y2="12" />
+                </svg>
+                Continue as Guest
               </Button>
             </div>
             <div className="relative text-center text-sm">

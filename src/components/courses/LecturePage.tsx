@@ -51,6 +51,7 @@ import AuthRequiredModal from "../auth/AuthRequiredModal";
 import { useRouter } from "next/navigation";
 import { generateShareableUrl } from "@/utils/sharing";
 import { markLectureAsWatched, generateCourseId } from "@/utils/courseProgress";
+import { useAuth } from "@/context/AuthContext";
 
 interface CourseType {
   data: any;
@@ -140,6 +141,7 @@ const LecturePage = (props: any) => {
   const [authLoading, setAuthLoading] = useState(true);
   const [courseApproved, setCourseApproved] = useState<boolean | null>(null);
   const router = useRouter ? useRouter() : null;
+  const { isGuest } = useAuth();
 
   // Fetch reviews and average rating in parallel, sends empty string if undefined
   const fetchReviewsAndRating = async () => {
@@ -313,6 +315,20 @@ const LecturePage = (props: any) => {
   };
 
   const handleconfirmation = () => {
+    if (isGuest) {
+      toast.error("Please exit guest mode and login to purchase courses", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
     setisConfirmModalOpen(true);
   };
   const handleconfirmationcancel = () => {
@@ -1163,7 +1179,7 @@ const LecturePage = (props: any) => {
 
   return (
     <>
-      {!authLoading && authChecked && showAuthModal && (
+      {!authLoading && authChecked && showAuthModal && !isGuest && (
         <AuthRequiredModal
           open={showAuthModal}
           coursePath={

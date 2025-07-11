@@ -12,6 +12,7 @@ import { decryptPrivateKey } from "@/helpers/encrypt";
 import { Account } from "starknet";
 import { provider } from "@/constants";
 import { useAuth } from "@/context/AuthContext";
+import { toast, Bounce } from "react-toastify";
 
 const Coursedropdown = () => {
   const [status, setcourseStatus] = useAtom(coursestatusAtom);
@@ -19,11 +20,29 @@ const Coursedropdown = () => {
   const [wallet] = useAtom(walletStarknetkit);
   const [account, setAccount] = useState<any>();
   const [address, setAddress] = useState<string>("");
-  const { user } = useAuth();
+  const { user, isGuest } = useAuth();
 
   const handleNavigation = (path: string) => {
     setcourseStatus(false);
     router.push(path);
+  };
+
+  const handleGuestRestrictedAction = (actionName: string) => {
+    if (isGuest) {
+      toast.error(`Please exit guest mode and login to ${actionName}`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      return false;
+    }
+    return true;
   };
 
   const [visible, setVisible] = useState(false);
@@ -82,12 +101,12 @@ const Coursedropdown = () => {
           }`}
         >
           <div className="flex justify-between mx-auto w-[80%] h-[90%] items-center">
-            <div className="space-y-4 w-[337px] text-[16px]">
+            <div className="w-[337px] text-[16px]">
               <a
                 onClick={() => handleNavigation("/Course")}
-                className=" cursor-pointer"
+                className=" cursor-pointer space-y-1"
               >
-                <div className="flex space-x-3 mb-2">
+                <div className="flex space-x-3">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -142,10 +161,14 @@ const Coursedropdown = () => {
               </a> */}
             </div>
             <div className="w-[1px] h-[80%] bg-[#B8B9BA]"></div>
-            <div className="space-y-2 w-[337px]">
+            <div className="w-[337px]">
               <a
-                onClick={() => handleNavigation(`/Certifications/${address}`)}
-                className="cursor-pointer"
+                onClick={() => {
+                  if (handleGuestRestrictedAction("view certifications")) {
+                    handleNavigation(`/Certifications/${address}`);
+                  }
+                }}
+                className="cursor-pointer space-y-1"
               >
                 <div className="flex space-x-3">
                   <svg
@@ -164,21 +187,24 @@ const Coursedropdown = () => {
                     My Certifications
                   </h1>
                 </div>
+                <p className="text-[13px] ml-8 text-[#2D3A4B] cursor-pointer ">
+                  Access and manage all your course completion certificates in
+                  one place.
+                </p>
               </a>
-              <p className="text-[13px] ml-8 text-[#2D3A4B] cursor-pointer ">
-                Access and manage all your course completion certificates in one
-                place.
-              </p>
             </div>
             <div className="w-[1px] h-[80%] bg-[#B8B9BA]"></div>
 
             <div className="space-y-2 w-[350px]">
               <a
-                onClick={() =>
-                  handleNavigation(
-                    `/Course/CreateACourse/${courseQuestions[0]}`,
-                  )
-                }
+                onClick={() => {
+                  if (handleGuestRestrictedAction("create courses")) {
+                    handleNavigation(
+                      `/Course/CreateACourse/${courseQuestions[0]}`,
+                    );
+                  }
+                }}
+                className="cursor-pointer space-y-1"
               >
                 <div className="flex space-x-3">
                   <VscNewFile className="size-6 text-[#9747FF] w-[20px] h-[20px] my-auto" />
