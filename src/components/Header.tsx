@@ -356,7 +356,7 @@ const Header = () => {
         "Please exit guest mode and login to access your Account Center",
         {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: false,
           pauseOnHover: true,
@@ -373,6 +373,30 @@ const Header = () => {
     //   return;
     // }
     router.push(`/mycoursepage/${address}`);
+  };
+
+  // Restriction handler for mobile nav (My Certifications, Create a Course)
+  const handleGuestRestrictedMobileNav = (
+    action: string,
+    path: string,
+    close: () => void,
+  ) => {
+    if (isGuest) {
+      toast.error(`Please exit guest mode and login to access ${action}`, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
+    close();
+    router.push(path);
   };
 
   const formatNotificationTime = (timestamp: string) => {
@@ -833,8 +857,25 @@ const Header = () => {
                   <div className="px-4 py-2 border-b">
                     <button
                       onClick={() => {
-                        handleAccountCenterIconClick();
+                        if (isGuest) {
+                          toast.error(
+                            "Please exit guest mode and login to access your Account Center",
+                            {
+                              position: "top-right",
+                              autoClose: 3000,
+                              hideProgressBar: false,
+                              closeOnClick: false,
+                              pauseOnHover: true,
+                              draggable: true,
+                              progress: undefined,
+                              theme: "light",
+                              transition: Bounce,
+                            },
+                          );
+                          return;
+                        }
                         close();
+                        router.push(`/mycoursepage/${address}`);
                       }}
                       className="flex items-center w-full px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
                       aria-label="Account Center"
@@ -918,9 +959,16 @@ const Header = () => {
                           </Link> */}
 
                           <Link
-                            href={`/Certifications/${address}`}
+                            href={"#"}
                             className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
-                            onClick={() => close()}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleGuestRestrictedMobileNav(
+                                "My Certifications",
+                                `/Certifications/${address}`,
+                                close,
+                              );
+                            }}
                           >
                             <Image
                               src={ImagenCourses3}
@@ -933,9 +981,16 @@ const Header = () => {
                           </Link>
 
                           <Link
-                            href={`/Course/CreateACourse/${courseQuestions[0]}`}
+                            href={"#"}
                             className="flex items-center px-3 py-2 text-gray-700 rounded-md hover:bg-gray-200"
-                            onClick={() => close()}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleGuestRestrictedMobileNav(
+                                "Create a Course",
+                                `/Course/CreateACourse/${courseQuestions[0]}`,
+                                close,
+                              );
+                            }}
                           >
                             <Image
                               src={ImagenCourses3}
