@@ -432,7 +432,6 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                       >
                         {[
                           "All",
-                          "Events",
                           "Organizations",
                           "Certifications",
                           "Courses",
@@ -463,7 +462,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
 
         {/* Categories */}
         <div className="flex flex-wrap lg:flex-nowrap gap-3 my-5">
-          {["All", "Events", "Organizations", "Certifications", "Courses"].map(
+          {["All", "Courses", "Certifications", "Organizations"].map(
             (category, index) => (
               <Button
                 key={index}

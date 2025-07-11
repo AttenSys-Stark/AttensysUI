@@ -171,7 +171,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
         </div>
 
         {/* Right Column - Events Table */}
-        <div className="row-span-2 bg-white rounded-lg mb-6 py-5 border border-[#b9b9ba]">
+        <div className="row-span-2 bg-white rounded-lg mb-6 py-5 border border-[#b9b9ba] overflow-hidden">
           <div className="border-b-2 border-[#b9b9ba]">
             <div className="flex justify-between items-center content-center px-8 py-3">
               <div className="border-[1px] border-[#6B6D6E] px-4 mb-3 rounded-xl">
@@ -185,87 +185,89 @@ const ResultGrid: React.FC<ResultGridProps> = ({
             </div>
           </div>
 
-          <div className="min-h-[308px] w-full">
+          <div className="min-h-[308px] w-full overflow-x-auto">
             {item.eventsData.length > 0 ? (
               <>
                 {/* Desktop Table */}
                 <div className="hidden lg:block">
-                  <table className="w-full table-fixed border-collapse">
-                    <thead>
-                      <tr className="w-full h-[42px] border-b-2 border-black font-normal text-[#2d3a4b] leading-[19.79px]">
-                        {item.heading.map((heading, index) => (
-                          <th
-                            key={index}
-                            className={`py-3 px-6 border-b-2 border-[#b9b9ba] text-[12px] h-[42px] ${
-                              index === 0
-                                ? "text-left w-[40%]"
-                                : "text-center w-[20%]"
-                            }`}
-                          >
-                            {heading}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {item.eventsData
-                        .slice((currentPage - 1) * 6, currentPage * 6)
-                        .map((data, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-gray-50 h-[60px] border-b-2 border-[#b9b9ba]"
-                          >
-                            <td className="py-3 px-6  truncate h-[60px]">
-                              <span className="text-[14px] text-[#333333]">
-                                {data.eventName}
-                              </span>
-                            </td>
-                            <td className="py-3 px-6 whitespace-nowrap h-[60px]">
-                              <div
-                                className={`inline-flex p-2 rounded-lg text-xs items-center justify-center ${
-                                  data.status === "Course Complete"
-                                    ? "bg-[#C4FFA2] text-[#115E2C]"
-                                    : "bg-[#F6A61C2B] text-[#730404]"
-                                }`}
-                              >
-                                {data.status}
-                              </div>
-                            </td>
-                            <td className="py-3 px-6 whitespace-nowrap h-[60px]">
-                              <div className="flex items-center justify-center h-full">
-                                <div className="flex items-center gap-2">
-                                  <span
-                                    className="text-[#5801A9] cursor-pointer"
-                                    onClick={() =>
-                                      handleImageClick(data.nftImg)
-                                    }
-                                  >
-                                    {data.certification}
-                                  </span>
-                                  {data.nftImg && (
-                                    <Image
-                                      src={data.nftImg}
-                                      alt="nftImg"
-                                      width={24}
-                                      height={24}
-                                      className="object-contain cursor-pointer"
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse min-w-full">
+                      <thead>
+                        <tr className="w-full h-[42px] border-b-2 border-black font-normal text-[#2d3a4b] leading-[19.79px]">
+                          {item.heading.map((heading, index) => (
+                            <th
+                              key={index}
+                              className={`py-3 px-4 sm:px-6 border-b-2 border-[#b9b9ba] text-[12px] h-[42px] min-w-0 ${
+                                index === 0
+                                  ? "text-left w-[35%] sm:w-[40%]"
+                                  : "text-center w-[21.67%] sm:w-[20%]"
+                              }`}
+                            >
+                              {heading}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {item.eventsData
+                          .slice((currentPage - 1) * 6, currentPage * 6)
+                          .map((data, index) => (
+                            <tr
+                              key={index}
+                              className="hover:bg-gray-50 h-[60px] border-b-2 border-[#b9b9ba]"
+                            >
+                              <td className="py-3 px-4 sm:px-6 truncate h-[60px] min-w-0">
+                                <span className="text-[14px] text-[#333333]">
+                                  {data.eventName}
+                                </span>
+                              </td>
+                              <td className="py-3 px-4 sm:px-6 whitespace-nowrap h-[60px] min-w-0">
+                                <div
+                                  className={`inline-flex p-2 rounded-lg text-xs items-center justify-center ${
+                                    data.status === "Course Complete"
+                                      ? "bg-[#C4FFA2] text-[#115E2C]"
+                                      : "bg-[#F6A61C2B] text-[#730404]"
+                                  }`}
+                                >
+                                  {data.status}
+                                </div>
+                              </td>
+                              <td className="py-3 px-4 sm:px-6 whitespace-nowrap h-[60px] min-w-0">
+                                <div className="flex items-center justify-center h-full">
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className="text-[#5801A9] cursor-pointer"
                                       onClick={() =>
                                         handleImageClick(data.nftImg)
                                       }
-                                    />
-                                  )}
+                                    >
+                                      {data.certification}
+                                    </span>
+                                    {data.nftImg && (
+                                      <Image
+                                        src={data.nftImg}
+                                        alt="nftImg"
+                                        width={24}
+                                        height={24}
+                                        className="object-contain cursor-pointer"
+                                        onClick={() =>
+                                          handleImageClick(data.nftImg)
+                                        }
+                                      />
+                                    )}
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="py-3 px-6 text-center truncate h-[60px]">
-                              <span className="text-[14px] text-[#333333]">
-                                {data.date}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
+                              </td>
+                              <td className="py-3 px-4 sm:px-6 text-center truncate h-[60px] min-w-0">
+                                <span className="text-[14px] text-[#333333]">
+                                  {data.date}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
                 {/* Mobile Cards */}
@@ -323,8 +325,8 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                 </div>
               </>
             ) : (
-              <div className="h-full w-full flex items-center justify-center">
-                <h1 className="text-[15px] text-[#817676] font-medium leading-[18px]">
+              <div className="h-full w-full flex items-center justify-center min-h-[200px]">
+                <h1 className="text-[15px] text-[#817676] font-medium leading-[18px] text-center">
                   This address has no event data
                 </h1>
               </div>
