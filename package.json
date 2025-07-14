@@ -2,6 +2,9 @@
   "name": "attensys",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:https": "NODE_EXTRA_CA_CERTS=$(mkcert -CAROOT)/rootCA.pem next dev --experimental-https",
