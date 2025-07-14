@@ -263,10 +263,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(redirectUrl.toString());
   } catch (error) {
     console.error("Google callback error:", error);
-    console.error(
-      "Error stack:",
-      error instanceof Error ? error.stack : "No stack trace",
-    );
     const baseUrl = getBaseUrl(request);
     return NextResponse.redirect(`${baseUrl}/?error=callback_failed`);
   }
