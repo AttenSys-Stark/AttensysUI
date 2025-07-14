@@ -9,7 +9,6 @@ import { useEffect } from "react";
 import { ConnectorData, StarknetWindowObject } from "starknetkit-next";
 import { Connector } from "starknetkit";
 import { FileObject } from "pinata";
-import { number } from "starknet";
 
 const emptyData: FileObject = {
   name: "",

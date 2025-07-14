@@ -36,7 +36,7 @@ export const parseUnits = (value: string, decimals: number): BigDecimal => {
   };
 };
 
-export const getUint256CalldataFromBN = (bn: num.BigNumberish) =>
+export const getUint256CalldataFromBN = (bn: bigint | string | number) =>
   uint256.bnToUint256(bn);
 
 export const parseInputAmountToUint256 = (
