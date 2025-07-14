@@ -1,5 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Helper function to determine the correct base URL
+const getBaseUrl = (request: NextRequest): string => {
+  // First, try to get the origin from headers
+  const origin = request.headers.get("origin");
+  const host = request.headers.get("host");
+  const xForwardedHost = request.headers.get("x-forwarded-host");
+  const xForwardedProto = request.headers.get("x-forwarded-proto");
+
+  // Check if we're in a localhost environment
+  const isLocalhost =
+    origin?.includes("localhost") ||
+    origin?.includes("127.0.0.1") ||
+    host?.includes("localhost") ||
+    host?.includes("127.0.0.1");
+
+  if (isLocalhost) {
+    // For localhost, construct the URL from host
+    const protocol = origin?.startsWith("https") ? "https" : "http";
+    return `${protocol}://${host || origin?.replace(/^https?:\/\//, "")}`;
+  }
+
+  // For production, use the environment variable or construct from headers
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+
+  // Fallback: construct from forwarded headers or host
+  if (xForwardedHost && xForwardedProto) {
+    return `${xForwardedProto}://${xForwardedHost}`;
+  }
+
+  if (host) {
+    // Assume HTTPS for production
+    return `https://${host}`;
+  }
+
+  // Final fallback
+  return "https://www.attensys.xyz";
+};
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -10,13 +50,9 @@ export async function GET(request: NextRequest) {
       "base64",
     );
 
-    // Determine the base URL dynamically
-    const origin = request.headers.get("origin") || request.headers.get("host");
-    const isLocalhost =
-      origin?.includes("localhost") || origin?.includes("127.0.0.1");
-    const baseUrl = isLocalhost
-      ? `http://${origin}`
-      : process.env.NEXT_PUBLIC_APP_URL || "https://www.attensys.xyz";
+    // Get the correct base URL
+    const baseUrl = getBaseUrl(request);
+    console.log("Initiation base URL:", baseUrl);
 
     // Construct Google OAuth URL
     const googleAuthUrl = new URL(
@@ -33,11 +69,11 @@ export async function GET(request: NextRequest) {
     googleAuthUrl.searchParams.set("access_type", "offline");
     googleAuthUrl.searchParams.set("prompt", "select_account");
 
+    console.log("Redirecting to Google OAuth:", googleAuthUrl.toString());
     return NextResponse.redirect(googleAuthUrl.toString());
   } catch (error) {
     console.error("Google auth initiation error:", error);
-    return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL || "https://www.attensys.xyz"}/?error=initiation_failed`,
-    );
+    const baseUrl = getBaseUrl(request);
+    return NextResponse.redirect(`${baseUrl}/?error=initiation_failed`);
   }
 }

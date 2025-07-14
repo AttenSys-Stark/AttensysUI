@@ -21,9 +21,32 @@ export const AuthHandler = () => {
         console.error("Authentication error:", error);
         // Reset loading state on error
         setAccountloadProgress(false);
+
+        // Provide specific error messages based on error type
+        let errorMessage = error;
+        switch (error) {
+          case "redirect_uri_mismatch":
+            errorMessage = "redirect_uri_mismatch";
+            break;
+          case "config_error":
+            errorMessage = "config_error";
+            break;
+          case "token_exchange_failed":
+            errorMessage = "token_exchange_failed";
+            break;
+          case "user_info_failed":
+            errorMessage = "user_info_failed";
+            break;
+          case "callback_failed":
+            errorMessage = "callback_failed";
+            break;
+          default:
+            errorMessage = error;
+        }
+
         // Redirect to login with error using current origin
         const currentOrigin = window.location.origin;
-        router.replace(`${currentOrigin}/?error=${error}`);
+        router.replace(`${currentOrigin}/?error=${errorMessage}`);
         return;
       }
 
