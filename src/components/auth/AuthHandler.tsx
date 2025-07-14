@@ -18,7 +18,6 @@ export const AuthHandler = () => {
       const error = searchParams.get("error");
 
       if (error) {
-        console.error("Authentication error:", error);
         // Reset loading state on error
         setAccountloadProgress(false);
 
@@ -92,10 +91,9 @@ export const AuthHandler = () => {
 
             if (!response.ok) {
               const errorText = await response.text();
-              console.warn("Login notification could not be sent:", errorText);
             }
           } catch (notificationError) {
-            console.warn(
+            console.error(
               "Error sending login notification:",
               notificationError,
             );
@@ -109,7 +107,6 @@ export const AuthHandler = () => {
           const finalRedirectPath = redirectPath || "/Home";
           router.replace(finalRedirectPath);
         } catch (error) {
-          console.error("Custom token authentication failed:", error);
           // Reset loading state on error
           setAccountloadProgress(false);
           const currentOrigin = window.location.origin;

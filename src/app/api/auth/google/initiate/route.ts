@@ -52,7 +52,6 @@ export async function GET(request: NextRequest) {
 
     // Get the correct base URL
     const baseUrl = getBaseUrl(request);
-    console.log("Initiation base URL:", baseUrl);
 
     // Construct Google OAuth URL
     const googleAuthUrl = new URL(
@@ -69,10 +68,8 @@ export async function GET(request: NextRequest) {
     googleAuthUrl.searchParams.set("access_type", "offline");
     googleAuthUrl.searchParams.set("prompt", "select_account");
 
-    console.log("Redirecting to Google OAuth:", googleAuthUrl.toString());
     return NextResponse.redirect(googleAuthUrl.toString());
   } catch (error) {
-    console.error("Google auth initiation error:", error);
     const baseUrl = getBaseUrl(request);
     return NextResponse.redirect(`${baseUrl}/?error=initiation_failed`);
   }
