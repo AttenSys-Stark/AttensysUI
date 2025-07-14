@@ -21,6 +21,8 @@ import { Button } from "@headlessui/react";
 import CourseNews from "@/components/courses/CourseNews";
 import { isGuestMode } from "@/state/connectedWalletStarknetkitNext";
 import { useAuth } from "@/context/AuthContext";
+import { accountloadstate } from "@/state/connectedWalletStarknetkitNext";
+import { Loader2 } from "lucide-react";
 
 const GuestContinueHandler = ({ onDone }: { onDone?: () => void }) => {
   const { setIsGuest } = useAuth();
@@ -68,6 +70,8 @@ const HomePage = () => {
   const [mobileView, setMobileView] = useState<
     "welcome" | "login" | "signup" | "guest-continue"
   >("welcome");
+  const [accountloadProgress, setAccountloadProgress] =
+    useAtom(accountloadstate);
 
   useEffect(() => {
     // if (!address) return;
@@ -479,12 +483,16 @@ const HomePage = () => {
                 STRK-powered course purchases, secure access, and learning.
               </p>
               <div className="flex flex-col gap-3 w-full">
-                <button
-                  onClick={() => setMobileView("login")}
-                  className="w-full py-2 rounded-lg bg-white text-indigo-700 font-semibold text-lg shadow hover:bg-indigo-50 transition"
-                >
-                  Login
-                </button>
+                {accountloadProgress ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <button
+                    onClick={() => setMobileView("login")}
+                    className="w-full py-2 rounded-lg bg-white text-indigo-700 font-semibold text-lg shadow hover:bg-indigo-50 transition"
+                  >
+                    Login
+                  </button>
+                )}
                 <button
                   onClick={() => setMobileView("signup")}
                   className="w-full py-2 rounded-lg bg-[#9B51E0] text-white font-semibold text-lg shadow hover:bg-[#7E3AC2] transition"
