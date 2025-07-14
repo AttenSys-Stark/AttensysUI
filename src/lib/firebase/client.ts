@@ -15,6 +15,7 @@ import {
   sendPasswordResetEmail,
   signOut,
   setPersistence,
+  signInWithCustomToken as firebaseSignInWithCustomToken,
 } from "firebase/auth";
 import { createUserProfile, getUserProfile } from "../userutils";
 import { AccountHandler } from "@/helpers/accounthandler";
@@ -22,6 +23,8 @@ import { Account } from "starknet";
 import { encryptPrivateKey, decryptPrivateKey } from "@/helpers/encrypt";
 import { provider } from "@/constants";
 
+// Use a minimal Firebase config for client-side operations
+// The API key will be restricted to only allow authentication from the domain
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -71,7 +74,54 @@ const clearAuthTokenCookie = () => {
     "firebase-auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 };
 
-// Function to handle Google Sign-In
+// New server-side Google Sign-In function
+const signInWithGoogleServerSide = async (
+  onAccountProgress?: (status: string) => void,
+) => {
+  try {
+    // Use the current window location to determine the redirect URL
+    const currentOrigin = window.location.origin;
+    const redirectUrl = encodeURIComponent(currentOrigin + "/Home");
+    window.location.href = `/api/auth/google/initiate?redirectTo=${redirectUrl}`;
+  } catch (error) {
+    console.error("Google Sign-In Error:", error);
+    throw error;
+  }
+};
+
+// Function to handle custom token authentication
+const authenticateWithCustomToken = async (customToken: string) => {
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    const userCredential = await firebaseSignInWithCustomToken(
+      auth,
+      customToken,
+    );
+    const user = userCredential.user;
+
+    // Set auth token in cookie
+    await setAuthTokenCookie(user);
+
+    // Create/update user profile in Firestore
+    await createUserProfile(
+      {
+        uid: user.uid,
+        email: user.email || "",
+        displayName: user.displayName || "",
+        photoURL: user.photoURL || null,
+        emailVerified: user.emailVerified,
+      },
+      undefined, // No progress callback for this flow
+    );
+
+    return user;
+  } catch (error) {
+    console.error("Custom token sign-in error:", error);
+    throw error;
+  }
+};
+
+// Legacy client-side Google Sign-In function (kept for backward compatibility)
 const signInWithGoogle = async (
   onAccountProgress?: (status: string) => void,
 ) => {
@@ -446,6 +496,8 @@ export {
   app,
   googleProvider,
   signInWithGoogle,
+  signInWithGoogleServerSide,
+  authenticateWithCustomToken,
   signUpWithEmail,
   signInWithEmail,
   waitForEmailVerification,

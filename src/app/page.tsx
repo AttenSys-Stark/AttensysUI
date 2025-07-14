@@ -8,6 +8,7 @@ import { useWallet } from "@/hooks/useWallet";
 import {
   walletStarknetkitNextAtom,
   universalloadingstatus,
+  accountloadstate,
 } from "@/state/connectedWalletStarknetkitNext";
 import HomePage from "@/components/Home";
 import RootLayout from "@/app/layout";
@@ -15,12 +16,17 @@ import { auth } from "@/lib/firebase/client";
 import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { getUserProfile } from "@/lib/userutils";
+import { AuthHandler } from "@/components/auth/AuthHandler";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
   const [wallet, setWallet] = useAtom(walletStarknetkitNextAtom);
   const { autoConnectWallet } = useWallet();
   const [universalLoad, setuniversalLoad] = useAtom(universalloadingstatus);
+  const [accountloadProgress, setAccountloadProgress] =
+    useAtom(accountloadstate);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (wallet) return;
@@ -39,6 +45,15 @@ export default function Home() {
     setuniversalLoad(false);
   });
 
+  // Check for authentication errors and reset loading state
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      console.error("Authentication error detected:", error);
+      setAccountloadProgress(false);
+    }
+  }, [searchParams, setAccountloadProgress]);
+
   // Check if user is authenticated and redirect to Home
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -47,7 +62,6 @@ export default function Home() {
         try {
           const userProfile = await getUserProfile(user.uid);
           if (userProfile && userProfile.starknetAddress) {
-            // User is authenticated and has Starknet address, redirect to Home
             router.push("/Home");
           }
           // If no Starknet address, don't redirect - let the account creation process complete
@@ -63,6 +77,7 @@ export default function Home() {
 
   return (
     <div>
+      <AuthHandler />
       <HomePage />
     </div>
   );
