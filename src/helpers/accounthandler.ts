@@ -21,7 +21,7 @@ import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 const NODE_URL =
   process.env.NEXT_PUBLIC_CHAIN_ID === constants.NetworkName.SN_MAIN
     ? "https://starknet-mainnet.public.blastapi.io"
-    : "https://starknet-sepolia.public.blastapi.io/rpc/v0_7";
+    : "https://starknet-sepolia.public.blastapi.io/rpc/v0_8";
 
 const privateKey = process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY;
 const accountAddress = process.env.NEXT_PUBLIC_MASTER_ADDRESS ?? "";
@@ -75,25 +75,24 @@ export const AccountHandler = async (
     amount: toTransferTk,
   });
 
-  progressCallback?.("Initializing user account...");
-  const { transaction_hash: transferTxHash } = await account0.execute(
-    transferCall,
-    { version: 3 },
-  );
+  const estimateFees = await account0.estimateInvokeFee(transferCall, {
+    version: "0x03",
+  });
+
+  // console.log(estimateFees);
+  const resourceBounds = {
+    ...estimateFees.resourceBounds,
+  };
+  const tx = await account0.execute(transferCall, {
+    version: "0x03",
+    resourceBounds,
+  });
+  const transferTxHash = tx.transaction_hash;
   await provider.waitForTransaction(transferTxHash, {
     retryInterval: 2000,
     successStates: ["ACCEPTED_ON_L2"],
   });
-
-  const balanceofnewaccountTransfer =
-    await erc20Contract.balance_of(AXcontractAddress);
-  // console.log('new account has a balance of:', balanceofnewaccountTransfer);
-
-  if (BigInt(balanceofnewaccountTransfer) < BigInt(estimatedFee1)) {
-    throw new Error(
-      "New account does not have enough balance to cover the deployment fee.",
-    );
-  }
+  // console.log(tx);
 
   const accountAX = new Account(provider, AXcontractAddress, privateKeyAX);
 
@@ -105,8 +104,12 @@ export const AccountHandler = async (
   };
 
   progressCallback?.("Almost there...");
+
   const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } =
-    await accountAX.deployAccount(deployAccountPayload, { version: 3 });
+    await accountAX.deployAccount(deployAccountPayload, {
+      version: "0x03",
+      resourceBounds,
+    });
   await provider.waitForTransaction(AXdAth, {
     retryInterval: 2000,
     successStates: ["ACCEPTED_ON_L2"],

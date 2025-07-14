@@ -125,7 +125,7 @@
     "screenfull": "^6.0.2",
     "sharp": "^0.33.5",
     "sonner": "^2.0.3",
-    "starknet": "^6.15.0",
+    "starknet": "7.6.2",
     "starknetkit": "^1.1.9",
     "starknetkit-next": "npm:starknetkit@^2.3.3",
     "stream-browserify": "^3.0.0",
