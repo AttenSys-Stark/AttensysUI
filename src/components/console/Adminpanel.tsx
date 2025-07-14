@@ -79,7 +79,7 @@ const Adminpanel = (props: any) => {
         return null;
       }
     } catch (err) {
-      console.error("Error creating access link:", err);
+      // console.error("Error creating access link:", err);
     }
   };
 
@@ -111,10 +111,10 @@ const Adminpanel = (props: any) => {
                 cidContent = JSON.parse(await cidContent.text());
               }
             } catch (parseErr) {
-              console.error(
-                `Failed to parse CID content for course ${course.course_identifier}:`,
-                parseErr,
-              );
+              // console.error(
+              //   `Failed to parse CID content for course ${course.course_identifier}:`,
+              //   parseErr,
+              // );
               data[course.course_identifier] = null;
               return;
             }
@@ -255,10 +255,10 @@ const Adminpanel = (props: any) => {
             },
           );
         } catch (notificationError) {
-          console.warn(
-            "Error sending approval notification:",
-            notificationError,
-          );
+          // console.warn(
+          //   "Error sending approval notification:",
+          //   notificationError,
+          // );
           // Don't fail the approval process if notification fails
         }
 
@@ -380,10 +380,10 @@ const Adminpanel = (props: any) => {
             },
           );
         } catch (notificationError) {
-          console.warn(
-            "Error sending disapproval notification:",
-            notificationError,
-          );
+          // console.warn(
+          //   "Error sending disapproval notification:",
+          //   notificationError,
+          // );
           // Don't fail the disapproval process if notification fails
         }
 
@@ -443,7 +443,7 @@ const Adminpanel = (props: any) => {
               encryptionSecret,
             );
             if (!decryptedPrivateKey) {
-              console.error("Failed to decrypt private key");
+              // console.error("Failed to decrypt private key");
               setAccount(undefined);
               return;
             }
@@ -457,7 +457,7 @@ const Adminpanel = (props: any) => {
             setAccount(undefined);
           }
         } catch (err) {
-          console.error("Error fetching user profile:", err);
+          // console.error("Error fetching user profile:", err);
           setAccount(undefined);
         }
       } else {

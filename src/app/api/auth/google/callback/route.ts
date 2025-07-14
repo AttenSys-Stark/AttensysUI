@@ -4,43 +4,22 @@ import { getAuth } from "firebase-admin/auth";
 
 // Initialize Firebase Admin
 const initializeFirebaseAdmin = () => {
-  try {
-    if (!getApps().length) {
-      const projectId = process.env.FIREBASE_PROJECT_ID;
-      const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-      const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(
-        /\\n/g,
-        "\n",
+  if (!getApps().length) {
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\n/g, "\n");
+    if (!projectId || !clientEmail || !privateKey) {
+      throw new Error(
+        "Firebase Admin environment variables are not properly configured",
       );
-
-      console.log(
-        "Firebase Admin initialization - checking environment variables:",
-      );
-      console.log("Project ID:", projectId ? "SET" : "NOT_SET");
-      console.log("Client Email:", clientEmail ? "SET" : "NOT_SET");
-      console.log("Private Key:", privateKey ? "SET" : "NOT_SET");
-
-      if (!projectId || !clientEmail || !privateKey) {
-        throw new Error(
-          "Firebase Admin environment variables are not properly configured",
-        );
-      }
-
-      initializeApp({
-        credential: cert({
-          projectId,
-          clientEmail,
-          privateKey,
-        }),
-      });
-
-      console.log("Firebase Admin initialized successfully");
-    } else {
-      console.log("Firebase Admin already initialized");
     }
-  } catch (error) {
-    console.error("Firebase Admin initialization error:", error);
-    throw error;
+    initializeApp({
+      credential: cert({
+        projectId,
+        clientEmail,
+        privateKey,
+      }),
+    });
   }
 };
 
@@ -93,23 +72,14 @@ export async function GET(request: NextRequest) {
 
     // Get the correct base URL
     const baseUrl = getBaseUrl(request);
-    console.log("Callback base URL:", baseUrl);
-    console.log(
-      "Request headers:",
-      Object.fromEntries(request.headers.entries()),
-    );
 
     if (error) {
-      console.error("OAuth error received:", error);
       return NextResponse.redirect(`${baseUrl}/?error=auth_failed`);
     }
 
     if (!code) {
-      console.error("No authorization code received");
       return NextResponse.redirect(`${baseUrl}/?error=no_code`);
     }
-
-    console.log("Authorization code received, proceeding with token exchange");
 
     // Decode the state parameter to get the original redirect path
     let originalRedirectPath = "/Home";
@@ -117,9 +87,7 @@ export async function GET(request: NextRequest) {
       try {
         const stateData = JSON.parse(Buffer.from(state, "base64").toString());
         originalRedirectPath = stateData.redirectTo || "/Home";
-        console.log("Decoded redirect path:", originalRedirectPath);
       } catch (error) {
-        console.error("Error decoding state parameter:", error);
         // Fallback to default redirect
         originalRedirectPath = "/Home";
       }
@@ -127,11 +95,9 @@ export async function GET(request: NextRequest) {
 
     // Exchange code for tokens using Google OAuth API
     const redirectUri = `${baseUrl}/api/auth/google/callback`;
-    console.log("Using redirect URI:", redirectUri);
 
     // Validate that we have the required environment variables
     if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-      console.error("Missing Google OAuth environment variables");
       return NextResponse.redirect(`${baseUrl}/?error=config_error`);
     }
 
@@ -151,21 +117,11 @@ export async function GET(request: NextRequest) {
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
-      console.error("Token exchange failed:", errorText);
-      console.error("Token exchange status:", tokenResponse.status);
-      console.error(
-        "Token exchange headers:",
-        Object.fromEntries(tokenResponse.headers.entries()),
-      );
 
       // Check for specific OAuth errors
       try {
         const errorData = JSON.parse(errorText);
         if (errorData.error === "redirect_uri_mismatch") {
-          console.error(
-            "Redirect URI mismatch. Expected:",
-            errorData.error_description,
-          );
           return NextResponse.redirect(
             `${baseUrl}/?error=redirect_uri_mismatch`,
           );
@@ -179,7 +135,6 @@ export async function GET(request: NextRequest) {
 
     const tokenData = await tokenResponse.json();
     const { access_token, id_token } = tokenData;
-    console.log("Token exchange successful");
 
     // Get user info from Google
     const userInfoResponse = await fetch(
@@ -192,16 +147,10 @@ export async function GET(request: NextRequest) {
     );
 
     if (!userInfoResponse.ok) {
-      console.error("Failed to get user info from Google");
-      console.error("User info status:", userInfoResponse.status);
       return NextResponse.redirect(`${baseUrl}/?error=user_info_failed`);
     }
 
     const userInfo = await userInfoResponse.json();
-    console.log("User info retrieved:", {
-      email: userInfo.email,
-      name: userInfo.name,
-    });
 
     // Initialize Firebase Admin
     initializeFirebaseAdmin();
@@ -211,7 +160,6 @@ export async function GET(request: NextRequest) {
     try {
       // Try to get existing user by email
       firebaseUser = await getAuth().getUserByEmail(userInfo.email);
-      console.log("Existing Firebase user found:", firebaseUser.uid);
     } catch (error: any) {
       // Check if the error is because user doesn't exist
       if (error.code === "auth/user-not-found") {
@@ -223,35 +171,22 @@ export async function GET(request: NextRequest) {
             photoURL: userInfo.picture,
             emailVerified: userInfo.verified_email,
           });
-          console.log("New Firebase user created:", firebaseUser.uid);
         } catch (createError: any) {
-          console.error("Failed to create Firebase user:", createError);
           if (createError.code === "auth/email-already-exists") {
             // User was created by another process, try to get them again
             firebaseUser = await getAuth().getUserByEmail(userInfo.email);
-            console.log(
-              "Retrieved existing Firebase user after creation conflict:",
-              firebaseUser.uid,
-            );
           } else {
             throw createError;
           }
         }
       } else {
-        console.error("Failed to get Firebase user:", error);
         throw error;
       }
     }
 
     // Create custom token
     let customToken;
-    try {
-      customToken = await getAuth().createCustomToken(firebaseUser.uid);
-      console.log("Custom token created for user:", firebaseUser.uid);
-    } catch (tokenError) {
-      console.error("Failed to create custom token:", tokenError);
-      throw tokenError;
-    }
+    customToken = await getAuth().createCustomToken(firebaseUser.uid);
 
     // Redirect to frontend with custom token and original redirect path
     const redirectUrl = new URL(baseUrl);
@@ -259,14 +194,8 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set("authType", "google");
     redirectUrl.searchParams.set("redirectPath", originalRedirectPath);
 
-    console.log("Redirecting to:", redirectUrl.toString());
     return NextResponse.redirect(redirectUrl.toString());
   } catch (error) {
-    console.error("Google callback error:", error);
-    console.error(
-      "Error stack:",
-      error instanceof Error ? error.stack : "No stack trace",
-    );
     const baseUrl = getBaseUrl(request);
     return NextResponse.redirect(`${baseUrl}/?error=callback_failed`);
   }

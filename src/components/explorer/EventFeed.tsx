@@ -44,10 +44,8 @@ const EventFeed = () => {
       queryFn: async () => {
         try {
           const data = await fetcher.fn();
-          console.log(`Fetched ${fetcher.type}:`, data);
           return data;
         } catch (error) {
-          console.error(`Error fetching ${fetcher.type}:`, error);
           return [];
         }
       },
@@ -77,10 +75,6 @@ const EventFeed = () => {
 
       return courseName;
     } catch (error) {
-      console.error(
-        `Error fetching course details for ${courseIdentifier}:`,
-        error,
-      );
       return `Course #${courseIdentifier}`;
     }
   };
@@ -104,7 +98,6 @@ const EventFeed = () => {
         const q = queries[idx];
         if (q.data && Array.isArray(q.data)) {
           const type = eventFetchers[idx].type;
-          console.log(`Processing ${type} events:`, q.data);
 
           for (const item of q.data) {
             // Compose a message based on event type
@@ -201,12 +194,8 @@ const EventFeed = () => {
         }
       }
 
-      console.log("All processed events:", processedEvents);
-
       // Sort by blockNumber descending (newest first)
       processedEvents.sort((a, b) => b.blockNumber - a.blockNumber);
-
-      console.log("Sorted events by block number:", processedEvents);
       setEvents(processedEvents);
     };
 
@@ -284,7 +273,6 @@ const EventFeed = () => {
       if (isNaN(date.getTime())) return "Invalid date";
       return format(date, "MMM dd, yyyy HH:mm:ss");
     } catch (error) {
-      console.error("Error formatting timestamp:", error);
       return "Invalid date";
     }
   }
@@ -295,7 +283,6 @@ const EventFeed = () => {
       if (isNaN(date.getTime())) return "";
       return format(date, "h:mm a").toUpperCase();
     } catch (error) {
-      console.error("Error formatting time:", error);
       return "";
     }
   }
@@ -303,12 +290,6 @@ const EventFeed = () => {
   // Loading state
   const isLoading = queries.some((q) => q.isLoading);
   const isError = queries.some((q) => q.isError);
-
-  console.log("Render state:", {
-    isLoading,
-    isError,
-    eventsCount: events.length,
-  });
 
   return (
     <div className=" mx-auto mt-4">

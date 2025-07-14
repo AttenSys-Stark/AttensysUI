@@ -9,7 +9,6 @@ import {
   getWatchedLectures,
   calculateCourseStats,
   generateCourseId,
-  debugCourseProgress,
 } from "@/utils/courseProgress";
 
 interface ItemProps {
