@@ -48,6 +48,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${baseUrl}/?error=no_code`);
     }
 
+    // Decode the state parameter to get the original redirect path
+    let originalRedirectPath = "/Home";
+    if (state) {
+      try {
+        const stateData = JSON.parse(Buffer.from(state, "base64").toString());
+        originalRedirectPath = stateData.redirectTo || "/Home";
+      } catch (error) {
+        console.error("Error decoding state parameter:", error);
+        // Fallback to default redirect
+        originalRedirectPath = "/Home";
+      }
+    }
+
     // Exchange code for tokens using Google OAuth API
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -108,10 +121,11 @@ export async function GET(request: NextRequest) {
     // Create custom token
     const customToken = await getAuth().createCustomToken(firebaseUser.uid);
 
-    // Redirect to frontend with custom token
+    // Redirect to frontend with custom token and original redirect path
     const redirectUrl = new URL(baseUrl);
     redirectUrl.searchParams.set("customToken", customToken);
     redirectUrl.searchParams.set("authType", "google");
+    redirectUrl.searchParams.set("redirectPath", originalRedirectPath);
 
     return NextResponse.redirect(redirectUrl.toString());
   } catch (error) {

@@ -58,11 +58,24 @@ export default function Home() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // Check if there's a redirectPath in the URL (from OAuth flow)
+        const redirectPath = searchParams.get("redirectPath");
+        const customToken = searchParams.get("customToken");
+        const authType = searchParams.get("authType");
+
+        // If we're in the middle of an OAuth flow, don't redirect - let AuthHandler handle it
+        if (customToken && authType === "google") {
+          return;
+        }
+
         // Check if user has a Starknet address before redirecting
         try {
           const userProfile = await getUserProfile(user.uid);
           if (userProfile && userProfile.starknetAddress) {
-            router.push("/Home");
+            // Only redirect to /Home if there's no specific redirect path
+            if (!redirectPath) {
+              router.push("/Home");
+            }
           }
           // If no Starknet address, don't redirect - let the account creation process complete
         } catch (error) {
@@ -73,7 +86,7 @@ export default function Home() {
     });
 
     return () => unsubscribe();
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div>

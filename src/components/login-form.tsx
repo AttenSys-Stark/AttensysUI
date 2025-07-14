@@ -95,7 +95,7 @@ export function LoginForm({
     setAccountStatus("Redirecting to Google...");
     try {
       // Use the new server-side authentication approach
-      await signInWithGoogleServerSide(setAccountStatus);
+      await signInWithGoogleServerSide(setAccountStatus, redirectPath);
 
       // Keep accountloadProgress true - it will be reset by the Home page when fully loaded
       // Don't reset here even if the function completes, as the OAuth flow will redirect

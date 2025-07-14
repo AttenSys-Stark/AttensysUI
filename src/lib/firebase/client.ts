@@ -77,11 +77,28 @@ const clearAuthTokenCookie = () => {
 // New server-side Google Sign-In function
 const signInWithGoogleServerSide = async (
   onAccountProgress?: (status: string) => void,
+  redirectPath?: string,
 ) => {
   try {
     // Use the current window location to determine the redirect URL
     const currentOrigin = window.location.origin;
-    const redirectUrl = encodeURIComponent(currentOrigin + "/Home");
+
+    // Use the provided redirectPath if available, otherwise use current path
+    let finalRedirectPath = "/Home"; // Default redirect
+
+    if (redirectPath) {
+      // If redirectPath is provided, use it
+      finalRedirectPath = redirectPath;
+    } else {
+      // Fallback to current path detection logic
+      const currentPath = window.location.pathname;
+      if (currentPath.includes("/coursepage")) {
+        finalRedirectPath = currentPath;
+      }
+    }
+
+    const redirectUrl = encodeURIComponent(currentOrigin + finalRedirectPath);
+    console.log("this is redirect", redirectUrl);
     window.location.href = `/api/auth/google/initiate?redirectTo=${redirectUrl}`;
   } catch (error) {
     console.error("Google Sign-In Error:", error);

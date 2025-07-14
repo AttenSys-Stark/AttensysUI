@@ -14,6 +14,7 @@ export const AuthHandler = () => {
     const handleCustomTokenAuth = async () => {
       const customToken = searchParams.get("customToken");
       const authType = searchParams.get("authType");
+      const redirectPath = searchParams.get("redirectPath");
       const error = searchParams.get("error");
 
       if (error) {
@@ -28,6 +29,9 @@ export const AuthHandler = () => {
 
       if (customToken && authType === "google") {
         try {
+          // Add a small delay to ensure auth state is properly set
+          await new Promise((resolve) => setTimeout(resolve, 100));
+
           // Authenticate with the custom token
           const user = await authenticateWithCustomToken(customToken);
 
@@ -78,8 +82,9 @@ export const AuthHandler = () => {
           const cleanUrl = window.location.pathname;
           window.history.replaceState({}, document.title, cleanUrl);
 
-          // Redirect to home
-          router.replace("/Home");
+          // Redirect to the original path or default to /Home
+          const finalRedirectPath = redirectPath || "/Home";
+          router.replace(finalRedirectPath);
         } catch (error) {
           console.error("Custom token authentication failed:", error);
           // Reset loading state on error
