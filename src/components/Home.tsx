@@ -457,7 +457,11 @@ const HomePage = () => {
               STRK-powered course purchases, secure access, and learning.
             </p>
           </div>
-          {loginorsignupstat ? <SignupForm /> : <LoginForm />}
+          {loginorsignupstat ? (
+            <SignupForm />
+          ) : (
+            <LoginForm onSignupClick={() => setLoginorsignupstat(true)} />
+          )}
         </div>
 
         {/* Mobile layout: stacked, flow-based */}

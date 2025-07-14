@@ -123,6 +123,7 @@ export const createEventClickAtom = atom(false);
 export const createorexplore = atom(false);
 
 export const insightClick = atom(true);
+export const accountloadstate = atomWithStorage("accountloadstate", false);
 export const guestlistclick = atom(false);
 export const attendanceclick = atom(false);
 export const sponsorshipclick = atom(false);

@@ -1,12 +1,9 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
-
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -14,18 +11,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  authStateListener,
-  getCurrentUser,
-  signInUser,
-} from "@/lib/services/authService";
-import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
-import { useSetAtom } from "jotai";
+import { signInWithGoogleServerSide } from "@/lib/firebase/client";
 import { loginUserWithEmail, resetUserPassword } from "@/lib/userutils";
-import { Bounce, toast, ToastContainer } from "react-toastify";
-import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { toast, ToastContainer, Bounce } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Loader2, Eye, EyeOff } from "lucide-react";
+import Link from "next/link";
+import { accountloadstate } from "@/state/connectedWalletStarknetkitNext";
+import { useAtom } from "jotai";
 
 export function LoginForm({
   onSignupClick,
@@ -38,25 +32,51 @@ export function LoginForm({
 }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [isloaderLoading, setIsloaderLoading] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
-  const [accountStatus, setAccountStatus] = useState<string | null>(null);
-  const [accountloadProgress, setAccountloadProgress] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [accountloadProgress, setAccountloadProgress] =
+    useAtom(accountloadstate);
+  const [accountStatus, setAccountStatus] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const router = useRouter();
-  const setLoginorsignup = useSetAtom(loginorsignup);
-  const { setIsGuest } = useAuth();
+
+  // Cleanup effect to reset loading state on unmount
+  useEffect(() => {
+    return () => {
+      // Only reset loading state if there's no ongoing OAuth flow
+      const searchParams = new URLSearchParams(window.location.search);
+      const customToken = searchParams.get("customToken");
+      const authType = searchParams.get("authType");
+
+      if (!customToken || authType !== "google") {
+        setAccountloadProgress(false);
+      }
+    };
+  }, [setAccountloadProgress]);
+
+  // Check for ongoing OAuth flow when component mounts
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const customToken = searchParams.get("customToken");
+    const authType = searchParams.get("authType");
+
+    // If we have OAuth parameters, keep the loading state active
+    if (customToken && authType === "google") {
+      setAccountloadProgress(true);
+    }
+  }, [setAccountloadProgress]);
 
   const handleContinueAsGuest = () => {
-    setIsGuest(true);
-    toast.success("Welcome! You're now browsing as a guest", {
+    // Set guest mode cookie
+    document.cookie =
+      "guest-mode=true; path=/; max-age=3600; secure; samesite=strict";
+    toast.success("Continuing as guest", {
       position: "top-right",
-      autoClose: 3000,
+      autoClose: 5000,
       hideProgressBar: false,
       closeOnClick: false,
       pauseOnHover: true,
@@ -65,22 +85,24 @@ export function LoginForm({
       theme: "light",
       transition: Bounce,
     });
+    // Reset account loading progress before routing
+    setAccountloadProgress(false);
     router.push(redirectPath || "/Home");
   };
 
   const handleLoginWithGoogle = async () => {
     setAccountloadProgress(true);
-    setAccountStatus("Signing in with Google...");
+    setAccountStatus("Redirecting to Google...");
     try {
-      const user = await signInUser(setAccountStatus);
-      if (user) {
-        setAccountStatus("Sign in complete! Redirecting...");
-        router.push(redirectPath || "/Home");
-      } else {
-        setAccountStatus("Error during sign in");
-        setAccountloadProgress(false);
-      }
+      // Use the new server-side authentication approach
+      await signInWithGoogleServerSide(setAccountStatus, redirectPath);
+
+      // Keep accountloadProgress true - it will be reset by the Home page when fully loaded
+      // Don't reset here even if the function completes, as the OAuth flow will redirect
     } catch (error) {
+      // Only reset loading state if there's an actual error before the redirect
+      setAccountStatus("Error during sign in");
+      setAccountloadProgress(false);
       toast.error("Sign in failed", {
         position: "top-right",
         autoClose: 5000,
@@ -254,8 +276,11 @@ export function LoginForm({
               <Button
                 variant="outline"
                 type="button"
-                className="w-full flex items-center gap-2 bg-[#9B51E0]"
+                className={`w-full flex items-center gap-2 bg-[#9B51E0] ${
+                  accountloadProgress ? "opacity-50 cursor-not-allowed" : ""
+                }`}
                 onClick={handleLoginWithGoogle}
+                disabled={accountloadProgress}
               >
                 {accountloadProgress ? (
                   <Loader2 className="size-4 animate-spin" />
@@ -390,7 +415,6 @@ export function LoginForm({
                 onClick={(e) => {
                   e.preventDefault();
                   if (onSignupClick) onSignupClick();
-                  else setLoginorsignup(true);
                 }}
                 className="underline underline-offset-4"
               >
