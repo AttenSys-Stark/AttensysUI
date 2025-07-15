@@ -2,6 +2,9 @@
   "name": "attensys",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "dev:https": "NODE_EXTRA_CA_CERTS=$(mkcert -CAROOT)/rootCA.pem next dev --experimental-https",
@@ -125,7 +128,7 @@
     "screenfull": "^6.0.2",
     "sharp": "^0.33.5",
     "sonner": "^2.0.3",
-    "starknet": "^6.15.0",
+    "starknet": "7.6.2",
     "starknetkit": "^1.1.9",
     "starknetkit-next": "npm:starknetkit@^2.3.3",
     "stream-browserify": "^3.0.0",

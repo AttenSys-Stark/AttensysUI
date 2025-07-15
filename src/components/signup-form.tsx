@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Mail, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -514,10 +514,58 @@ export function SignupForm({
         ) : (
           <div className="flex flex-col items-center justify-center gap-4 p-8">
             <Loader2 className="size-8 animate-spin" />
-            <p className="text-center">
-              {verificationMessage ||
-                "Initializing account, this will only take a moment..."}
-            </p>
+
+            {/* Enhanced email verification message */}
+            {verificationMessage?.includes("check your email") ? (
+              <div className="w-full max-w-sm">
+                <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                  <Mail className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-blue-900 font-medium text-sm">
+                      Check your email inbox
+                    </p>
+                    <p className="text-blue-700 text-xs mt-1">
+                      We&apos;ve sent a verification link to{" "}
+                      <strong>{email}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                      <p className="text-amber-900 font-medium text-sm mb-1">
+                        Action Required
+                      </p>
+                      <p className="text-amber-800 text-xs leading-relaxed">
+                        Click the verification link in your email to complete
+                        your account setup. Check your spam folder if you
+                        don&apos;t see it.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Didn&apos;t receive the email?
+                  </p>
+                  <button 
+                    onClick={handlesignupclick}
+                    className="text-sm text-blue-600 hover:text-blue-800 underline underline-offset-2 transition-colors"
+                  >
+                    Resend verification email
+                  </button>
+                </div> */}
+              </div>
+            ) : (
+              <p className="text-center">
+                {verificationMessage ||
+                  "Initializing account, this will only take a moment..."}
+              </p>
+            )}
+
             <p className="text-sm text-muted-foreground">
               You&apos;ll be automatically redirected once verified.
             </p>

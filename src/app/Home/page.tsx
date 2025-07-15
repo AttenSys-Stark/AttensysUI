@@ -7,20 +7,51 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2 } from "lucide-react";
 import { useAtom } from "jotai";
-import { loginorsignup } from "@/state/connectedWalletStarknetkitNext";
+import {
+  loginorsignup,
+  accountloadstate,
+} from "@/state/connectedWalletStarknetkitNext";
 import CourseNews from "@/components/courses/CourseNews";
+
 const HomePage = () => {
   const router = useRouter();
-  const { user, loading } = useAuth();
+  const { user, loading, isGuest } = useAuth();
   const [loginorsignupstat, setLoginorsignupstat] = useAtom(loginorsignup);
+  const [, setAccountloadProgress] = useAtom(accountloadstate);
+  const [pageLoaded, setPageLoaded] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && !isGuest) {
       router.push("/");
     } else if (user) {
       setLoginorsignupstat(false);
+      // Only reset the account loading progress when user is authenticated AND page has loaded
+      if (user && !loading) {
+        setAccountloadProgress(false);
+      }
     }
-  }, [user, loading, router, setLoginorsignupstat]);
+  }, [
+    user,
+    loading,
+    isGuest,
+    router,
+    setLoginorsignupstat,
+    setAccountloadProgress,
+  ]);
+
+  // Mark page as loaded after initial render
+  useEffect(() => {
+    if (!loading && (user || isGuest)) {
+      setPageLoaded(true);
+    }
+  }, [loading, user, isGuest]);
+
+  // Reset loading state only after page is fully loaded and user is authenticated
+  useEffect(() => {
+    if (pageLoaded && user && !loading) {
+      setAccountloadProgress(false);
+    }
+  }, [pageLoaded, user, loading, setAccountloadProgress]);
 
   if (loading) {
     return (
@@ -30,7 +61,7 @@ const HomePage = () => {
     );
   }
 
-  if (!user) {
+  if (!user && !isGuest) {
     return null; // or a redirect message
   }
 

@@ -9,7 +9,6 @@ import { useEffect } from "react";
 import { ConnectorData, StarknetWindowObject } from "starknetkit-next";
 import { Connector } from "starknetkit";
 import { FileObject } from "pinata";
-import { number } from "starknet";
 
 const emptyData: FileObject = {
   name: "",
@@ -124,6 +123,7 @@ export const createEventClickAtom = atom(false);
 export const createorexplore = atom(false);
 
 export const insightClick = atom(true);
+export const accountloadstate = atomWithStorage("accountloadstate", false);
 export const guestlistclick = atom(false);
 export const attendanceclick = atom(false);
 export const sponsorshipclick = atom(false);
@@ -167,6 +167,7 @@ export const orgowneraddress = atom(null);
 
 export const isRegisteredatom = atom(false);
 export const loginorsignup = atom(false);
+export const isGuestMode = atom(false);
 export const orgnameatom = atom("none");
 export const mybootcampDescription = atom("");
 
