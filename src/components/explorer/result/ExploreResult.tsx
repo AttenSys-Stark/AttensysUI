@@ -141,11 +141,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                 date: formatTimestamp(
                   course.block_timestamp || Date.now() / 1000,
                 ),
-                certification: "Certificate Available",
 
-                nftImg: courseData.data.courseImage
-                  ? `https://ipfs.io/ipfs/${courseData.data.courseImage}`
-                  : "",
                 data: {
                   ...courseData.data,
                   course_identifier: course.course_identifier,
@@ -217,7 +213,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                 return {
                   type: "CERT_CLAIMED",
                   eventName: "Certificate Claimed",
-                  status: "Certificate Claimed",
+
                   date: formatTimestamp(
                     course.block_timestamp || Date.now() / 1000,
                   ),
