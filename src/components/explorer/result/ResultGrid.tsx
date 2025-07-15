@@ -9,6 +9,7 @@ import show_arrow from "@/assets/show_arrow.svg";
 import { IoClose } from "react-icons/io5";
 import { shortenAddress } from "@/utils/helpers";
 import { api } from "@/services/api";
+import { format } from "date-fns";
 
 interface Events {
   type: string;
@@ -80,20 +81,9 @@ const ResultGrid: React.FC<ResultGridProps> = ({
       try {
         // Get all events for this address
         const events = await api.getEventsByAddress(address);
-        console.log("API Events received:", events);
-        console.log(
-          "API Events structure:",
-          events.map((event: any) => ({
-            type: event.type,
-            courseIdentifier: event.courseIdentifier,
-            timestamp: event.timestamp,
-            eventName: event.eventName,
-          })),
-        );
 
         // Get all courses info from blockchain
         const allCoursesInfo = await api.getAllCoursesInfo();
-        console.log("All courses info from blockchain:", allCoursesInfo);
 
         // Create a mapping of course events to their timestamps
         const eventDates: { [key: number]: string } = {};
@@ -106,27 +96,11 @@ const ResultGrid: React.FC<ResultGridProps> = ({
             if (event.type === "COURSE_ACQUIRED") {
               // Course acquisition date
               const date = new Date(event.timestamp);
-              formattedDate = date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              });
-              console.log(
-                `Course ${event.courseIdentifier} acquired on:`,
-                formattedDate,
-              );
+              formattedDate = format(date, "MMM dd, yyyy HH:mm:ss");
             } else if (event.type === "CERT_CLAIMED") {
               // Certification date
               const date = new Date(event.timestamp);
-              formattedDate = date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              });
-              console.log(
-                `Course ${event.courseIdentifier} certified on:`,
-                formattedDate,
-              );
+              formattedDate = format(date, "MMM dd, yyyy HH:mm:ss");
             }
 
             if (formattedDate) {
@@ -137,35 +111,14 @@ const ResultGrid: React.FC<ResultGridProps> = ({
 
         // If we don't have enough dates from API events, use blockchain data directly
         if (Object.keys(eventDates).length === 0 && allCoursesInfo.length > 0) {
-          console.log("Using blockchain data directly for dates");
           allCoursesInfo.forEach((course: any) => {
             if (course.course_identifier && course.block_timestamp) {
               const date = new Date(course.block_timestamp * 1000);
-              const formattedDate = date.toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              });
+              const formattedDate = format(date, "MMM dd, yyyy HH:mm:ss");
               eventDates[Number(course.course_identifier)] = formattedDate;
-              console.log(
-                `Blockchain course ${course.course_identifier} on:`,
-                formattedDate,
-              );
             }
           });
         }
-
-        console.log("Final event dates mapping:", eventDates);
-        console.log("Table events data:", item.eventsData);
-        console.log(
-          "Table events structure:",
-          item.eventsData.map((event: any) => ({
-            type: event.type,
-            eventName: event.eventName,
-            data: event.data,
-            course_identifier: event.data?.course_identifier,
-          })),
-        );
 
         setCertificationDates(eventDates);
       } catch (error) {
@@ -188,8 +141,6 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     (event) => event.certification && event.certification.trim() !== "",
   );
 
-  console.log("the result:", item.eventsData);
-  // console.log("the result:", item);
   const renderContent = (arg: string) => {
     const certCount = item.eventsData.filter(
       (event) => event.type === "COURSE",
@@ -403,17 +354,6 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                         Number,
                                       );
 
-                                    console.log(
-                                      "Available course IDs from blockchain:",
-                                      availableCourseIds,
-                                    );
-                                    console.log("Current row data:", data);
-                                    console.log("Data.data:", data.data);
-                                    console.log(
-                                      "Data.data.course_identifier:",
-                                      data.data?.course_identifier,
-                                    );
-
                                     // Try to match based on course data
                                     let tableCourseId = null;
 
@@ -440,15 +380,6 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                       );
                                     }
 
-                                    console.log(
-                                      "Table course ID:",
-                                      tableCourseId,
-                                    );
-                                    console.log(
-                                      "Available course IDs:",
-                                      availableCourseIds,
-                                    );
-
                                     if (
                                       tableCourseId &&
                                       !isNaN(tableCourseId)
@@ -462,50 +393,37 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                         matchedCourseId = tableCourseId;
                                         matchedDate =
                                           certificationDates[tableCourseId];
-                                        console.log(
-                                          `✅ Matched course ${matchedCourseId} with date: ${matchedDate}`,
-                                        );
-                                      } else {
-                                        console.log(
-                                          `❌ Course ${tableCourseId} not found in blockchain data`,
-                                        );
                                       }
                                     } else {
-                                      console.log(
-                                        "❌ No valid course ID found in data",
-                                      );
-                                    }
+                                      // If no direct match, try to find by other criteria
+                                      if (
+                                        !matchedDate &&
+                                        data.type === "CERT_CLAIMED"
+                                      ) {
+                                        // For certification events, try to find the most recent certification
+                                        const certEvents = Object.entries(
+                                          certificationDates,
+                                        )
+                                          .filter(([courseId, date]) => {
+                                            // You might need to add more sophisticated matching logic here
+                                            // based on your specific data structure
+                                            return true; // For now, return all certification dates
+                                          })
+                                          .sort(
+                                            (a, b) =>
+                                              new Date(b[1]).getTime() -
+                                              new Date(a[1]).getTime(),
+                                          );
 
-                                    // If no direct match, try to find by other criteria
-                                    if (
-                                      !matchedDate &&
-                                      data.type === "CERT_CLAIMED"
-                                    ) {
-                                      // For certification events, try to find the most recent certification
-                                      const certEvents = Object.entries(
-                                        certificationDates,
-                                      )
-                                        .filter(([courseId, date]) => {
-                                          // You might need to add more sophisticated matching logic here
-                                          // based on your specific data structure
-                                          return true; // For now, return all certification dates
-                                        })
-                                        .sort(
-                                          (a, b) =>
-                                            new Date(b[1]).getTime() -
-                                            new Date(a[1]).getTime(),
-                                        );
-
-                                      if (certEvents.length > 0) {
-                                        const [courseId, date] = certEvents[0];
-                                        matchedCourseId = parseInt(
-                                          courseId,
-                                          10,
-                                        );
-                                        matchedDate = date;
-                                        console.log(
-                                          `🔄 Using fallback course ${matchedCourseId} with date: ${matchedDate}`,
-                                        );
+                                        if (certEvents.length > 0) {
+                                          const [courseId, date] =
+                                            certEvents[0];
+                                          matchedCourseId = parseInt(
+                                            courseId,
+                                            10,
+                                          );
+                                          matchedDate = date;
+                                        }
                                       }
                                     }
 
@@ -514,10 +432,6 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                     }
 
                                     // Fallback to original date
-                                    console.log(
-                                      `❌ No blockchain date found, using fallback:`,
-                                      data.date,
-                                    );
                                     return data.date;
                                   })()}
                                 </span>

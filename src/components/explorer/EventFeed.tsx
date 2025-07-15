@@ -133,7 +133,7 @@ const EventFeed = () => {
                 const acquiredCourseName = await getCourseName(
                   item.courseIdentifier,
                 );
-                message = `${truncateAddress(item.owner || "")} acquired "${acquiredCourseName}"`;
+                message = `${truncateAddress(item.candidate || "")} acquired "${acquiredCourseName}"`;
                 break;
               }
               case "CourseSuspended": {

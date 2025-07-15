@@ -2,7 +2,6 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://attensys-1a184d8bebe7.herokuapp.com/api";
 
-console.log("API_BASE_URL:", API_BASE_URL);
 
 export interface Course {
   id: number;
