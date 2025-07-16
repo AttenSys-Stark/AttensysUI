@@ -166,7 +166,7 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                 type: "COURSE",
                 eventName: courseData.data.courseName || "Unnamed Course",
                 status: isCertified ? "Certified" : "Not certified",
-                date: certificationDate || "Not claimed",
+                date: certificationDate || isCertified ? "-" : "Not claimed",
                 data: {
                   ...courseData.data,
                   course_identifier: course.course_identifier,
@@ -285,13 +285,10 @@ const ExploreResult: React.FC<{ params: Params }> = ({
           }),
         );
 
-       
         // Combine and filter out null values
-        const allData = [
-          ...createdCoursesData,
-          ...takenCoursesData,
-        
-        ].filter(Boolean);
+        const allData = [...createdCoursesData, ...takenCoursesData].filter(
+          Boolean,
+        );
         setResultData(allData as ResultDataItem[]);
       } catch (error) {
         console.error("Error fetching user data:", error);

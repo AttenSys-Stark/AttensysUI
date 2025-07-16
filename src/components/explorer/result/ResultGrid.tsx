@@ -370,7 +370,7 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                       );
                                     } else if (data.courseIdentifier) {
                                       tableCourseId = parseInt(
-                                        data.courseIdentifier,
+                                        String(data.courseIdentifier),
                                         10,
                                       );
                                     } else if (data.data?.id) {
