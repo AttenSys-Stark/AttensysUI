@@ -255,7 +255,8 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                 }
                 return {
                   type: "CERT_CLAIMED",
-                  eventName: "Certificate Claimed",
+                  eventName:
+                    courseData.data.courseName || "Certificate Claimed",
                   date: certificationDate,
                   certification: "View certifications",
                   nftImg: courseData.data.courseImage
