@@ -16,6 +16,7 @@ import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
 import { provider } from "@/constants";
 import { useFetchCID } from "@/hooks/useFetchCID";
+import { api } from "@/services/api";
 
 type Params = {
   address?: string;
@@ -113,8 +114,13 @@ const ExploreResult: React.FC<{ params: Params }> = ({
         const takenCourses: CourseType[] =
           await courseContract?.get_all_taken_courses(address);
 
-        console.log("createdCourses", createdCourses);
-        console.log("takenCourses", takenCourses);
+        // Fetch all certification events for this user
+        const allCertClaimed = await api.getCertClaimedCourses();
+        console.log("allCertClaimed", allCertClaimed);
+        // Filter to only those for this user
+        const userCertClaimed = allCertClaimed.filter(
+          (event) => event.candidate?.toLowerCase() === address.toLowerCase(),
+        );
 
         // Combine created and taken courses
         const allCourses = [...createdCourses, ...takenCourses];
@@ -134,18 +140,33 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                   course.course_identifier,
                 );
 
+              // Find the certification event for this course
+              let certificationDate: string | null = null;
+              if (isCertified) {
+                const certEvent = userCertClaimed.find((e) => {
+                  console.log("e", e);
+                  console.log(
+                    "course.course_identifier",
+                    course.course_identifier,
+                  );
+                  return (
+                    Number(e.courseIdentifier) ===
+                    Number(course.course_identifier)
+                  );
+                });
+                if (certEvent) {
+                  // Use the timestamp from the event
+                  certificationDate = formatTimestamp(
+                    Math.floor(new Date(certEvent.timestamp).getTime() / 1000),
+                  );
+                }
+              }
+
               return {
                 type: "COURSE",
                 eventName: courseData.data.courseName || "Unnamed Course",
-                status: course.is_approved ? "Approved" : "Pending",
-                date: formatTimestamp(
-                  course.block_timestamp || Date.now() / 1000,
-                ),
-                certification: "Certificate Available",
-
-                nftImg: courseData.data.courseImage
-                  ? `https://ipfs.io/ipfs/${courseData.data.courseImage}`
-                  : "",
+                status: isCertified ? "Certified" : "Not certified",
+                date: certificationDate || isCertified ? "-" : "Not claimed",
                 data: {
                   ...courseData.data,
                   course_identifier: course.course_identifier,
@@ -214,13 +235,28 @@ const ExploreResult: React.FC<{ params: Params }> = ({
                 );
 
               if (isCertified) {
+                console.log(
+                  "User is certified for this course",
+                  userCertClaimed,
+                );
+                // Find the certification event for this course
+                const certEvent = userCertClaimed.find(
+                  (e) =>
+                    Number(e.courseIdentifier) ===
+                    Number(course.course_identifier),
+                );
+                console.log("certEvent", certEvent);
+                let certificationDate = "-";
+                if (certEvent) {
+                  certificationDate = formatTimestamp(
+                    Math.floor(new Date(certEvent.timestamp).getTime() / 1000),
+                  );
+                  console.log("certificationDate", certificationDate);
+                }
                 return {
                   type: "CERT_CLAIMED",
                   eventName: "Certificate Claimed",
-                  status: "Certificate Claimed",
-                  date: formatTimestamp(
-                    course.block_timestamp || Date.now() / 1000,
-                  ),
+                  date: certificationDate,
                   certification: "View certifications",
                   nftImg: courseData.data.courseImage
                     ? `https://ipfs.io/ipfs/${courseData.data.courseImage}`
@@ -253,7 +289,6 @@ const ExploreResult: React.FC<{ params: Params }> = ({
         const allData = [...createdCoursesData, ...takenCoursesData].filter(
           Boolean,
         );
-        console.log("allData", allData);
         setResultData(allData as ResultDataItem[]);
       } catch (error) {
         console.error("Error fetching user data:", error);

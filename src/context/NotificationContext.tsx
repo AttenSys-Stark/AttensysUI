@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services/api";
+import { toCanonicalAddress } from "@/services/api";
 
 interface NotificationItem {
   id: string;
@@ -47,6 +48,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   children,
   address,
 }) => {
+  const canonicalAddress = address ? toCanonicalAddress(address) : undefined;
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadNotifications, setUnreadNotifications] = useState<
     NotificationItem[]
@@ -59,15 +61,15 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
     isLoading: isLoadingAll,
     isError: isErrorAll,
   } = useQuery({
-    queryKey: ["notifications", address],
+    queryKey: ["notifications", canonicalAddress],
     queryFn: async () => {
-      if (!address) return [];
-      console.log("Fetching notifications for address:", address);
-      const events = await api.getEventsByAddress(address);
+      if (!canonicalAddress) return [];
+      console.log("Fetching notifications for address:", canonicalAddress);
+      const events = await api.getEventsByAddress(canonicalAddress);
       console.log("Fetched events:", events);
       return events;
     },
-    enabled: !!address,
+    enabled: !!canonicalAddress,
     refetchInterval: 10000, // Refetch every 10 seconds
     retry: 3,
     retryDelay: 1000,
@@ -75,31 +77,39 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
 
   // Fetch read status
   const { data: readStatusData, isLoading: isLoadingReadStatus } = useQuery({
-    queryKey: ["notificationReadStatus", address],
+    queryKey: ["notificationReadStatus", canonicalAddress],
     queryFn: async () => {
-      if (!address) return {};
+      if (!canonicalAddress) return {};
       try {
-        return await api.getNotificationReadStatus(address);
+        return await api.getNotificationReadStatus(canonicalAddress);
       } catch (error) {
-        console.log("Using fallback read status for address:", address);
+        console.log(
+          "Using fallback read status for address:",
+          canonicalAddress,
+        );
         return {};
       }
     },
-    enabled: !!address,
+    enabled: !!canonicalAddress,
     retry: 2,
   });
 
   // Mark notifications as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationIds?: string[]) => {
-      if (!address) return;
-      return await api.markNotificationsAsRead(address, notificationIds);
+      if (!canonicalAddress) return;
+      return await api.markNotificationsAsRead(
+        canonicalAddress,
+        notificationIds,
+      );
     },
     onSuccess: () => {
       // Invalidate and refetch notifications
-      queryClient.invalidateQueries({ queryKey: ["notifications", address] });
       queryClient.invalidateQueries({
-        queryKey: ["notificationReadStatus", address],
+        queryKey: ["notifications", canonicalAddress],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["notificationReadStatus", canonicalAddress],
       });
     },
   });
@@ -194,11 +204,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   };
 
   const markAllAsRead = async () => {
-    // Pass all unread notification IDs to mark as read
-    const allUnreadIds = unreadNotifications.map((n) => n.id);
-    if (allUnreadIds.length > 0) {
-      await markAsReadMutation.mutateAsync(allUnreadIds);
-    }
+    await markAsReadMutation.mutateAsync(undefined);
   };
 
   const value: NotificationContextType = {

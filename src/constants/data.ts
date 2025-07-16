@@ -1473,7 +1473,7 @@ export const gridsData = [
     name: "Courses",
     subProp: ["Key", "Status", "Courses"],
     viewPartName: "All Courses",
-    heading: ["Course Name", "Completion status", "Certifications", "Date"],
+    heading: ["Course Name", "Completion status", "Date"],
     eventsData: [],
   },
   {
@@ -1487,12 +1487,7 @@ export const gridsData = [
       "Total",
     ],
     viewPartName: "All Certifications",
-    heading: [
-      "Activity type",
-      "Completion status",
-      "Certifications",
-      "Date certified",
-    ],
+    heading: ["Activity type", "Certifications", "Date certified"],
     eventsData: [],
   },
 ];

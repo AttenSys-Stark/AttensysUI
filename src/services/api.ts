@@ -2,7 +2,6 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://attensys-1a184d8bebe7.herokuapp.com/api";
 
-console.log("API_BASE_URL:", API_BASE_URL);
 
 export interface Course {
   id: number;
@@ -181,9 +180,6 @@ export const api = {
   // Get all events for a specific address (personalized notifications)
   getEventsByAddress: async (address: string): Promise<Course[]> => {
     try {
-      console.log("API: Fetching events for address:", address);
-      console.log("API: Using base URL:", API_BASE_URL);
-
       const canonicalAddress = toCanonicalAddress(address);
       const response = await fetch(
         `${API_BASE_URL}/events/address/${canonicalAddress}`,
@@ -192,15 +188,12 @@ export const api = {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("API: Error response:", errorText);
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
 
       const events = await handleResponse(response);
-      console.log("API: Fetched events:", events);
       return events;
     } catch (error) {
-      console.error("API: Error fetching events:", error);
       // Return empty array instead of throwing
       return [];
     }
@@ -208,16 +201,18 @@ export const api = {
 
   // Get unread notifications for a specific address
   getUnreadNotifications: async (address: string): Promise<Course[]> => {
+    // Always use canonicalized address
+    const canonicalAddress = toCanonicalAddress(address);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/events/address/${address}/unread`,
+        `${API_BASE_URL}/events/address/${canonicalAddress}/unread`,
       );
       const events = await handleResponse(response);
       return events;
     } catch (error) {
       // Fallback: return all notifications as unread for testing
       console.log("Using fallback for unread notifications");
-      const allEvents = await api.getEventsByAddress(address);
+      const allEvents = await api.getEventsByAddress(canonicalAddress);
       return allEvents;
     }
   },
@@ -270,15 +265,17 @@ export const api = {
   getNotificationReadStatus: async (
     address: string,
   ): Promise<{ [key: string]: boolean }> => {
+    const canonicalAddress = toCanonicalAddress(address);
+
     try {
       const response = await fetch(
-        `${API_BASE_URL}/events/address/${address}/read-status`,
+        `${API_BASE_URL}/events/address/${canonicalAddress}/read-status`,
       );
       return handleResponse(response);
     } catch (error) {
       // Fallback: get read status from localStorage for testing
       console.log("Using fallback for notification read status");
-      const readStatusKey = `notifications_read_${address}`;
+      const readStatusKey = `notifications_read_${canonicalAddress}`;
       return JSON.parse(localStorage.getItem(readStatusKey) || "{}");
     }
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { SlExclamation } from "react-icons/sl";
 import up from "@/assets/up.svg";
@@ -8,6 +8,8 @@ import down from "@/assets/down.svg";
 import show_arrow from "@/assets/show_arrow.svg";
 import { IoClose } from "react-icons/io5";
 import { shortenAddress } from "@/utils/helpers";
+import { api } from "@/services/api";
+import { format } from "date-fns";
 
 interface Events {
   type: string;
@@ -16,6 +18,10 @@ interface Events {
   certification: string;
   nftImg: string;
   date: string;
+  courseIdentifier?: number;
+  timestamp?: string;
+  data?: any;
+  id?: number;
 }
 
 interface GridItem {
@@ -31,6 +37,10 @@ interface GridItem {
     certification: string;
     nftImg: string;
     date: string;
+    courseIdentifier?: number;
+    timestamp?: string;
+    data?: any;
+    id?: number;
   }>;
 }
 
@@ -52,6 +62,9 @@ const ResultGrid: React.FC<ResultGridProps> = ({
   currentPage,
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [certificationDates, setCertificationDates] = useState<{
+    [key: number]: string;
+  }>({});
 
   const handleImageClick = (imageSrc: string) => {
     setSelectedImage(imageSrc);
@@ -61,8 +74,73 @@ const ResultGrid: React.FC<ResultGridProps> = ({
     e.stopPropagation();
     setSelectedImage(null);
   };
-  console.log("the result:", item.eventsData);
-  // console.log("the result:", item);
+
+  // Fetch certification dates from API
+  useEffect(() => {
+    const fetchCertificationDates = async () => {
+      try {
+        // Get all events for this address
+        const events = await api.getEventsByAddress(address);
+
+        // Get all courses info from blockchain
+        const allCoursesInfo = await api.getAllCoursesInfo();
+
+        // Create a mapping of course events to their timestamps
+        const eventDates: { [key: number]: string } = {};
+
+        // First, try to get dates from API events
+        events.forEach((event: any) => {
+          if (event.courseIdentifier) {
+            let formattedDate = "";
+
+            if (event.type === "COURSE_ACQUIRED") {
+              // Course acquisition date
+              const date = new Date(event.timestamp);
+              formattedDate = format(date, "MMM dd, yyyy HH:mm:ss");
+            } else if (event.type === "CERT_CLAIMED") {
+              // Certification date
+              const date = new Date(event.timestamp);
+              formattedDate = format(date, "MMM dd, yyyy HH:mm:ss");
+            }
+
+            if (formattedDate) {
+              eventDates[event.courseIdentifier] = formattedDate;
+            }
+          }
+        });
+
+        // If we don't have enough dates from API events, use blockchain data directly
+        if (Object.keys(eventDates).length === 0 && allCoursesInfo.length > 0) {
+          allCoursesInfo.forEach((course: any) => {
+            if (course.course_identifier && course.block_timestamp) {
+              const date = new Date(course.block_timestamp * 1000);
+              const formattedDate = format(date, "MMM dd, yyyy HH:mm:ss");
+              eventDates[Number(course.course_identifier)] = formattedDate;
+            }
+          });
+        }
+
+        setCertificationDates(eventDates);
+      } catch (error) {
+        console.error("Error fetching certification dates:", error);
+      }
+    };
+
+    if (address && item.eventsData.length > 0) {
+      fetchCertificationDates();
+    }
+  }, [address, item.eventsData]);
+
+  // Check if any events have status data
+  const hasStatusData = item.eventsData.some(
+    (event) => event.status && event.status.trim() !== "",
+  );
+
+  // Check if any events have certification data
+  const hasCertificationData = item.eventsData.some(
+    (event) => event.certification && event.certification.trim() !== "",
+  );
+
   const renderContent = (arg: string) => {
     const certCount = item.eventsData.filter(
       (event) => event.type === "COURSE",
@@ -221,46 +299,141 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                                   {data.eventName}
                                 </span>
                               </td>
-                              <td className="py-3 px-4 sm:px-6 whitespace-nowrap h-[60px] min-w-0">
-                                <div
-                                  className={`inline-flex p-2 rounded-lg text-xs items-center justify-center ${
-                                    data.status === "Course Complete"
-                                      ? "bg-[#C4FFA2] text-[#115E2C]"
-                                      : "bg-[#F6A61C2B] text-[#730404]"
-                                  }`}
-                                >
-                                  {data.status}
-                                </div>
-                              </td>
-                              <td className="py-3 px-4 sm:px-6 whitespace-nowrap h-[60px] min-w-0">
-                                <div className="flex items-center justify-center h-full">
-                                  <div className="flex items-center gap-2">
-                                    <span
-                                      className="text-[#5801A9] cursor-pointer"
-                                      onClick={() =>
-                                        handleImageClick(data.nftImg)
-                                      }
-                                    >
-                                      {data.certification}
-                                    </span>
-                                    {data.nftImg && (
-                                      <Image
-                                        src={data.nftImg}
-                                        alt="nftImg"
-                                        width={24}
-                                        height={24}
-                                        className="object-contain cursor-pointer"
+                              {hasStatusData && (
+                                <td className="py-3 px-4 sm:px-6 whitespace-nowrap h-[60px] min-w-0">
+                                  <div
+                                    className={`inline-flex p-2 rounded-lg text-xs items-center justify-center ${
+                                      data.status === "Course Complete"
+                                        ? "bg-[#C4FFA2] text-[#115E2C]"
+                                        : "bg-[#F6A61C2B] text-[#730404]"
+                                    }`}
+                                  >
+                                    {data.status}
+                                  </div>
+                                </td>
+                              )}
+                              {hasCertificationData && (
+                                <td className="py-3 px-4 sm:px-6 whitespace-nowrap h-[60px] min-w-0">
+                                  <div className="flex items-center justify-center h-full">
+                                    <div className="flex items-center gap-2">
+                                      <span
+                                        className="text-[#5801A9] cursor-pointer"
                                         onClick={() =>
                                           handleImageClick(data.nftImg)
                                         }
-                                      />
-                                    )}
+                                      >
+                                        {data.certification}
+                                      </span>
+                                      {data.nftImg && (
+                                        <Image
+                                          src={data.nftImg}
+                                          alt="nftImg"
+                                          width={24}
+                                          height={24}
+                                          className="object-contain cursor-pointer"
+                                          onClick={() =>
+                                            handleImageClick(data.nftImg)
+                                          }
+                                        />
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              </td>
+                                </td>
+                              )}
                               <td className="py-3 px-4 sm:px-6 text-center truncate h-[60px] min-w-0">
                                 <span className="text-[14px] text-[#333333]">
-                                  {data.date}
+                                  {(() => {
+                                    // Try to match the course based on blockchain data
+                                    let matchedCourseId = null;
+                                    let matchedDate = null;
+
+                                    // Get all courses info from blockchain (this should be available from the useEffect)
+                                    // For now, we'll use the certificationDates mapping which contains the real dates
+                                    const availableCourseIds =
+                                      Object.keys(certificationDates).map(
+                                        Number,
+                                      );
+
+                                    // Try to match based on course data
+                                    let tableCourseId = null;
+
+                                    // Try different possible locations for course identifier
+                                    if (data.data?.course_identifier) {
+                                      tableCourseId = parseInt(
+                                        data.data.course_identifier,
+                                        10,
+                                      );
+                                    } else if (data.data?.courseIdentifier) {
+                                      tableCourseId = parseInt(
+                                        data.data.courseIdentifier,
+                                        10,
+                                      );
+                                    } else if (data.courseIdentifier) {
+                                      tableCourseId = parseInt(
+                                        String(data.courseIdentifier),
+                                        10,
+                                      );
+                                    } else if (data.data?.id) {
+                                      tableCourseId = parseInt(
+                                        String(data.data.id),
+                                        10,
+                                      );
+                                    }
+
+                                    if (
+                                      tableCourseId &&
+                                      !isNaN(tableCourseId)
+                                    ) {
+                                      // Check if this course ID exists in our blockchain data
+                                      if (
+                                        availableCourseIds.includes(
+                                          tableCourseId,
+                                        )
+                                      ) {
+                                        matchedCourseId = tableCourseId;
+                                        matchedDate =
+                                          certificationDates[tableCourseId];
+                                      }
+                                    } else {
+                                      // If no direct match, try to find by other criteria
+                                      if (
+                                        !matchedDate &&
+                                        data.type === "CERT_CLAIMED"
+                                      ) {
+                                        // For certification events, try to find the most recent certification
+                                        const certEvents = Object.entries(
+                                          certificationDates,
+                                        )
+                                          .filter(([courseId, date]) => {
+                                            // You might need to add more sophisticated matching logic here
+                                            // based on your specific data structure
+                                            return true; // For now, return all certification dates
+                                          })
+                                          .sort(
+                                            (a, b) =>
+                                              new Date(b[1]).getTime() -
+                                              new Date(a[1]).getTime(),
+                                          );
+
+                                        if (certEvents.length > 0) {
+                                          const [courseId, date] =
+                                            certEvents[0];
+                                          matchedCourseId = parseInt(
+                                            courseId,
+                                            10,
+                                          );
+                                          matchedDate = date;
+                                        }
+                                      }
+                                    }
+
+                                    if (matchedDate) {
+                                      return matchedDate;
+                                    }
+
+                                    // Fallback to original date
+                                    return data.date;
+                                  })()}
                                 </span>
                               </td>
                             </tr>
@@ -284,37 +457,43 @@ const ResultGrid: React.FC<ResultGridProps> = ({
                             <h3 className="text-[14px] text-[#333333] font-medium pr-2">
                               {data.eventName}
                             </h3>
-                            <div
-                              className={`inline-flex p-2 rounded-lg text-xs items-center justify-center shrink-0 ${
-                                data.status === "Course Complete"
-                                  ? "bg-[#C4FFA2] text-[#115E2C]"
-                                  : "bg-[#F6A61C2B] text-[#730404]"
-                              }`}
-                            >
-                              {data.status}
-                            </div>
+                            {hasStatusData && (
+                              <div
+                                className={`inline-flex p-2 rounded-lg text-xs items-center justify-center shrink-0 ${
+                                  data.status === "Course Complete"
+                                    ? "bg-[#C4FFA2] text-[#115E2C]"
+                                    : "bg-[#F6A61C2B] text-[#730404]"
+                                }`}
+                              >
+                                {data.status}
+                              </div>
+                            )}
                           </div>
                         </div>
                         <div className="px-6 py-4">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className="text-[#5801A9] text-sm cursor-pointer"
-                                onClick={() => handleImageClick(data.nftImg)}
-                              >
-                                {data.certification}
-                              </span>
-                              {data.nftImg && (
-                                <Image
-                                  src={data.nftImg}
-                                  alt="nftImg"
-                                  width={24}
-                                  height={24}
-                                  className="object-contain cursor-pointer"
+                            {hasCertificationData && (
+                              <div className="flex items-center gap-2">
+                                <span
+                                  className="text-[#5801A9] text-sm cursor-pointer"
                                   onClick={() => handleImageClick(data.nftImg)}
-                                />
-                              )}
-                            </div>
+                                >
+                                  {data.certification}
+                                </span>
+                                {data.nftImg && (
+                                  <Image
+                                    src={data.nftImg}
+                                    alt="nftImg"
+                                    width={24}
+                                    height={24}
+                                    className="object-contain cursor-pointer"
+                                    onClick={() =>
+                                      handleImageClick(data.nftImg)
+                                    }
+                                  />
+                                )}
+                              </div>
+                            )}
                             <span className="text-[12px] text-[#333333]">
                               {data.date}
                             </span>
