@@ -52,6 +52,8 @@ import { useRouter } from "next/navigation";
 import { generateShareableUrl } from "@/utils/sharing";
 import { markLectureAsWatched, generateCourseId } from "@/utils/courseProgress";
 import { useAuth } from "@/context/AuthContext";
+import VideoQuiz from "./VideoQuiz";
+import { VideoAnalysisResult } from "@/lib/services/aiVideoAnalysis";
 
 interface CourseType {
   data: any;
@@ -1070,8 +1072,38 @@ const LecturePage = (props: any) => {
     });
   };
 
+  // Quiz handlers
+  const handleQuizAnalysisComplete = (result: VideoAnalysisResult) => {
+    setCurrentAnalysis(result);
+    setIsAnalyzing(false);
+    toast.success("Video analysis complete! Quiz is ready.", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+      transition: Bounce,
+    });
+  };
+
+  const handleToggleQuiz = () => {
+    if (!showQuiz && !currentAnalysis) {
+      setIsAnalyzing(true);
+    }
+    setShowQuiz(!showQuiz);
+  };
+
   // Add this near other useState hooks
   const [accessUrls, setAccessUrls] = useState<(string | undefined)[]>([]);
+
+  // Quiz-related state
+  const [showQuiz, setShowQuiz] = useState(false);
+  const [currentAnalysis, setCurrentAnalysis] =
+    useState<VideoAnalysisResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // Fetch all access URLs when courseCurriculum changes
   useEffect(() => {
@@ -1484,6 +1516,48 @@ const LecturePage = (props: any) => {
                 Share
               </ShareButton>
             </div>
+
+            {/* Quiz Section - Only show if user is taking the course */}
+            {isTakingCourse && selectedVideo && selectedLectureName && (
+              <div className="mt-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-[#2D3A4B]">
+                      AI-Generated Quiz
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Test your understanding of this lecture with AI-generated
+                      questions
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleToggleQuiz}
+                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#9B51E0] to-[#5801A9] text-white rounded-lg hover:from-[#5801A9] hover:to-[#9B51E0] transition-all duration-200 font-medium"
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <LoadingSpinner size="sm" colorVariant="white" />
+                        Analyzing...
+                      </>
+                    ) : showQuiz ? (
+                      "Hide Quiz"
+                    ) : (
+                      "Take Quiz"
+                    )}
+                  </button>
+                </div>
+
+                {showQuiz && (
+                  <VideoQuiz
+                    courseId={ultimate_id || ""}
+                    lectureName={selectedLectureName}
+                    courseName={props?.data?.courseName || ""}
+                    videoUrl={selectedVideo}
+                    onAnalysisComplete={handleQuizAnalysisComplete}
+                  />
+                )}
+              </div>
+            )}
           </div>
 
           <div className="bg-[url('/hero_asset.png')] text-white p-10 rounded-xl w-[30%] hidden xl:flex items-center justify-center h-[85px]">
