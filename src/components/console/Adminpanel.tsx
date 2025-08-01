@@ -11,7 +11,7 @@ import { attensysCourseAddress } from "@/deployments/contracts";
 import { Account, Contract } from "starknet";
 import { auth } from "@/lib/firebase/client";
 import { getUserProfile } from "@/lib/userutils";
-import { decryptPrivateKey } from "@/helpers/encrypt";
+import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
 import { provider } from "@/constants";
 import { executeCalls } from "@avnu/gasless-sdk";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
@@ -436,23 +436,26 @@ const Adminpanel = (props: any) => {
       if (user && user.uid) {
         try {
           const profile = await getUserProfile(user.uid);
-          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
           if (profile) {
-            const decryptedPrivateKey = decryptPrivateKey(
-              profile.starknetPrivateKey,
-              encryptionSecret,
-            );
-            if (!decryptedPrivateKey) {
-              // console.error("Failed to decrypt private key");
+            try {
+              const decryptedPrivateKey = await decryptPrivateKeyAsync(
+                profile.starknetPrivateKey,
+              );
+              if (!decryptedPrivateKey) {
+                // console.error("Failed to decrypt private key");
+                setAccount(undefined);
+                return;
+              }
+              const userAccount = new Account(
+                provider,
+                profile.starknetAddress,
+                decryptedPrivateKey,
+              );
+              setAccount(userAccount);
+            } catch (decryptError) {
+              console.error("Error decrypting private key:", decryptError);
               setAccount(undefined);
-              return;
             }
-            const userAccount = new Account(
-              provider,
-              profile.starknetAddress,
-              decryptedPrivateKey,
-            );
-            setAccount(userAccount);
           } else {
             setAccount(undefined);
           }
@@ -647,7 +650,7 @@ const Adminpanel = (props: any) => {
                                 {i + 1}
                               </p>
                             </div>
-                            <div className="w-[145px] h-[94px] rounded-xl border-4 border flex-shrink-0 overflow-hidden">
+                            <div className="w-[145px] h-[94px] rounded-xl border-4 flex-shrink-0 overflow-hidden">
                               {accessUrl === undefined ? (
                                 <div className="flex items-center justify-center w-full h-full">
                                   <LoadingSpinner

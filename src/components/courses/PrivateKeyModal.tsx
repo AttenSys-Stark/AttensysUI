@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { auth } from "@/lib/firebase/client";
 import { getUserProfile } from "@/lib/userutils";
-import { decryptPrivateKey } from "@/helpers/encrypt";
+import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
 import {
   Eye,
   EyeOff,
@@ -59,17 +59,16 @@ const PrivateKeyModal: React.FC<PrivateKeyModalProps> = ({
 
       const profile = await getUserProfile(currentUser.uid);
       if (profile?.starknetPrivateKey) {
-        const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
-        if (!encryptionSecret) {
-          throw new Error("Encryption secret not configured");
+        try {
+          const decryptedKey = await decryptPrivateKeyAsync(
+            profile.starknetPrivateKey,
+          );
+          setPrivateKey(decryptedKey);
+          setIsAuthenticated(true);
+        } catch (decryptError) {
+          console.error("Error decrypting private key:", decryptError);
+          throw new Error("Failed to decrypt private key");
         }
-
-        const decryptedKey = decryptPrivateKey(
-          profile.starknetPrivateKey,
-          encryptionSecret,
-        );
-        setPrivateKey(decryptedKey);
-        setIsAuthenticated(true);
       } else {
         throw new Error("No private key found for this account");
       }
@@ -163,17 +162,16 @@ const PrivateKeyModal: React.FC<PrivateKeyModalProps> = ({
       // If email matches, proceed with private key access
       const userProfile = await getUserProfile(originalUid);
       if (userProfile?.starknetPrivateKey) {
-        const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
-        if (!encryptionSecret) {
-          throw new Error("Encryption secret not configured");
+        try {
+          const decryptedKey = await decryptPrivateKeyAsync(
+            userProfile.starknetPrivateKey,
+          );
+          setPrivateKey(decryptedKey);
+          setIsAuthenticated(true);
+        } catch (decryptError) {
+          console.error("Error decrypting private key:", decryptError);
+          throw new Error("Failed to decrypt private key");
         }
-
-        const decryptedKey = decryptPrivateKey(
-          userProfile.starknetPrivateKey,
-          encryptionSecret,
-        );
-        setPrivateKey(decryptedKey);
-        setIsAuthenticated(true);
       } else {
         throw new Error("No private key found for this account");
       }

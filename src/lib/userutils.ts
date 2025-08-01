@@ -8,7 +8,7 @@ import {
 } from "./firebase/client";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { AccountHandler } from "@/helpers/accounthandler";
-import { encryptPrivateKey } from "@/helpers/encrypt";
+import { encryptPrivateKeyAsync } from "@/helpers/encrypt";
 
 interface UserProfile {
   uid: string;
@@ -26,10 +26,6 @@ export const createUserProfile = async (
   onAccountProgress?: (status: string) => void,
 ) => {
   if (!user || !user.uid) return null;
-  const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
-  if (!encryptionSecret) {
-    throw new Error("Encryption secret is not set");
-  }
 
   const userRef = doc(db, "users", user.uid);
   const userSnapshot = await getDoc(userRef);
@@ -48,10 +44,7 @@ export const createUserProfile = async (
       onAccountProgress?.("Creating Starknet account...");
       const { privateKeyAX, AXcontractFinalAddress } =
         await AccountHandler(onAccountProgress);
-      const encryptedPrivateKey = encryptPrivateKey(
-        privateKeyAX,
-        encryptionSecret,
-      );
+      const encryptedPrivateKey = await encryptPrivateKeyAsync(privateKeyAX);
       accountData = {
         starknetPrivateKey: encryptedPrivateKey,
         starknetAddress: AXcontractFinalAddress,

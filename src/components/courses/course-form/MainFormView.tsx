@@ -22,7 +22,7 @@ import {
 } from "@/state/connectedWalletStarknetkitNext";
 import { auth } from "@/lib/firebase/client";
 import { getUserProfile } from "@/lib/userutils";
-import { decryptPrivateKey } from "@/helpers/encrypt";
+import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
 import { Account } from "starknet";
 import RichTextEditor from "@/components/RichTextEditor";
 
@@ -111,23 +111,26 @@ const MainFormView: React.FC<ChildComponentProps> = ({
         const user = auth.currentUser;
         if (user && user.uid) {
           const profile = await getUserProfile(user.uid);
-          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          
           if (profile) {
-            const decryptedPrivateKey = decryptPrivateKey(
-              profile.starknetPrivateKey,
-              encryptionSecret,
-            );
-            console.log("starknetAddress:", profile.starknetAddress);
-            console.log("starknetPrivateKey:", decryptedPrivateKey);
-            const userAccount = new Account(
-              provider,
-              profile.starknetAddress,
-              decryptedPrivateKey,
-            );
-            console.log("userAccount:", userAccount);
-            setAccount(userAccount);
-            setAddress(profile.starknetAddress);
-            setUsername(profile.displayName);
+            try {
+              const decryptedPrivateKey = await decryptPrivateKeyAsync(profile.starknetPrivateKey);
+              
+              console.log("starknetAddress:", profile.starknetAddress);
+              console.log("starknetPrivateKey:", decryptedPrivateKey);
+              const userAccount = new Account(
+                provider,
+                profile.starknetAddress,
+                decryptedPrivateKey,
+              );
+              console.log("userAccount:", userAccount);
+              setAccount(userAccount);
+              setAddress(profile.starknetAddress);
+              setUsername(profile.displayName);
+            } catch (decryptError) {
+              console.error("Error decrypting private key:", decryptError);
+              return;
+            }
           } else {
             console.log("No user profile found in Firestore.");
           }

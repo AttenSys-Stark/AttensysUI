@@ -15,7 +15,7 @@ import { useSearchParams } from "next/navigation";
 import { MoonLoader } from "react-spinners";
 import { getUserProfile } from "@/lib/userutils";
 import { auth } from "@/lib/firebase/client";
-import { decryptPrivateKey } from "@/helpers/encrypt";
+import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
 
 interface CourseType {
   accessment: boolean;
@@ -162,25 +162,30 @@ const MyCourses = (props: any) => {
         const user = auth.currentUser;
         if (user && user.uid) {
           const profile = await getUserProfile(user.uid);
-          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+
           if (profile) {
-            const decryptedPrivateKey = decryptPrivateKey(
-              profile.starknetPrivateKey,
-              encryptionSecret,
-            );
-            const userAccount = new Account(
-              provider,
-              profile.starknetAddress,
-              decryptedPrivateKey,
-            );
-            console.log("userAccount:", userAccount);
-            setAccount(userAccount);
-            setAddress(profile.starknetAddress);
-            console.log(
-              "Setting address from profile:",
-              profile.starknetAddress,
-            );
-            setUsername(profile.displayName);
+            try {
+              const decryptedPrivateKey = await decryptPrivateKeyAsync(
+                profile.starknetPrivateKey,
+              );
+
+              const userAccount = new Account(
+                provider,
+                profile.starknetAddress,
+                decryptedPrivateKey,
+              );
+              console.log("userAccount:", userAccount);
+              setAccount(userAccount);
+              setAddress(profile.starknetAddress);
+              console.log(
+                "Setting address from profile:",
+                profile.starknetAddress,
+              );
+              setUsername(profile.displayName);
+            } catch (decryptError) {
+              console.error("Error decrypting private key:", decryptError);
+              return;
+            }
           } else {
             console.log("No user profile found in Firestore.");
           }

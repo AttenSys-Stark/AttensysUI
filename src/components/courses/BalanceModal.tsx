@@ -243,6 +243,12 @@ const BalanceModal = ({ account, address }: BalanceModalProps) => {
   useEffect(() => {
     const getCurrentStrkPrice = async () => {
       try {
+        // Check if address is valid before making contract calls
+        if (!address || address === "0x" || address.length < 10) {
+          console.log("Invalid address, skipping contract calls:", address);
+          return;
+        }
+
         const currentPrice = await courseContract?.get_price_of_strk_usd();
         const formattedPrice = Number(currentPrice) / 100000000;
         console.log(address);
