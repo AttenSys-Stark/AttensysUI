@@ -20,7 +20,10 @@ import {
 import { createUserProfile, getUserProfile } from "../userutils";
 import { AccountHandler } from "@/helpers/accounthandler";
 import { Account } from "starknet";
-import { encryptPrivateKey, decryptPrivateKey } from "@/helpers/encrypt";
+import {
+  encryptPrivateKeyAsync,
+  decryptPrivateKeyAsync,
+} from "@/helpers/encrypt";
 import { provider } from "@/constants";
 
 // Use a minimal Firebase config for client-side operations
@@ -317,11 +320,6 @@ const signInWithEmail = async (email: string, password: string) => {
 
     // Get user profile to check if they have a Starknet account
     const userProfile = await getUserProfile(user.uid);
-    const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
-
-    if (!encryptionSecret) {
-      throw new Error("Encryption secret is not set");
-    }
 
     // Check if user needs a Starknet account
     const needsStarknetAccount =
@@ -333,10 +331,7 @@ const signInWithEmail = async (email: string, password: string) => {
       try {
         // Create Starknet account using AccountHandler
         const { privateKeyAX, AXcontractFinalAddress } = await AccountHandler();
-        const encryptedPrivateKey = encryptPrivateKey(
-          privateKeyAX,
-          encryptionSecret,
-        );
+        const encryptedPrivateKey = await encryptPrivateKeyAsync(privateKeyAX);
 
         // Update user profile with Starknet account details
         const userRef = doc(db, "users", user.uid);
@@ -397,9 +392,8 @@ const signInWithEmail = async (email: string, password: string) => {
       }
     } else {
       // User already has a Starknet account, decrypt and create account instance
-      const decryptedPrivateKey = decryptPrivateKey(
+      const decryptedPrivateKey = await decryptPrivateKeyAsync(
         userProfile.starknetPrivateKey,
-        encryptionSecret,
       );
 
       if (!decryptedPrivateKey) {

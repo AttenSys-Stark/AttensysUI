@@ -8,7 +8,7 @@ import { walletStarknetkit } from "@/state/connectedWalletStarknetkit";
 import { useAccount } from "@starknet-react/core";
 import { getUserProfile } from "@/lib/userutils";
 import { auth } from "@/lib/firebase/client";
-import { decryptPrivateKey } from "@/helpers/encrypt";
+import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
 import { Account } from "starknet";
 import { provider } from "@/constants";
 import { useAuth } from "@/context/AuthContext";
@@ -61,19 +61,24 @@ const Coursedropdown = () => {
       try {
         if (user && user.uid) {
           const profile = await getUserProfile(user.uid);
-          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
+          
           if (profile) {
-            const decryptedPrivateKey = decryptPrivateKey(
-              profile.starknetPrivateKey,
-              encryptionSecret,
-            );
-            const userAccount = new Account(
-              provider,
-              profile.starknetAddress,
-              decryptedPrivateKey,
-            );
-            setAccount(userAccount);
-            setAddress(profile.starknetAddress);
+            try {
+              const decryptedPrivateKey = await decryptPrivateKeyAsync(
+                profile.starknetPrivateKey,
+              );
+                          const userAccount = new Account(
+                provider,
+                profile.starknetAddress,
+                decryptedPrivateKey,
+              );
+              setAccount(userAccount);
+              setAddress(profile.starknetAddress);
+            } catch (decryptError) {
+              console.error("Error decrypting private key:", decryptError);
+              setAccount(undefined);
+              setAddress("");
+            }
           } else {
             setAccount(undefined);
             setAddress("");

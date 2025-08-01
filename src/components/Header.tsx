@@ -60,7 +60,7 @@ import { courseSearchTerms as wordList } from "@/utils/searchterms";
 import { setAuthTokenCookie } from "@/lib/firebase/client";
 import { useAuth } from "@/context/AuthContext";
 import { getUserProfile } from "@/lib/userutils";
-import { decryptPrivateKey } from "@/helpers/encrypt";
+import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
 import { Account } from "starknet";
 import { provider } from "@/constants";
 import { useNotifications } from "@/context/NotificationContext";
@@ -302,24 +302,27 @@ const Header = () => {
       if (user && user.uid) {
         try {
           const profile = await getUserProfile(user.uid);
-          const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
           if (profile) {
-            const decryptedPrivateKey = decryptPrivateKey(
-              profile.starknetPrivateKey,
-              encryptionSecret,
-            );
-            if (!decryptedPrivateKey) {
-              console.error("Failed to decrypt private key");
+            try {
+              const decryptedPrivateKey = await decryptPrivateKeyAsync(
+                profile.starknetPrivateKey,
+              );
+              if (!decryptedPrivateKey) {
+                console.error("Failed to decrypt private key");
+                setAccount(undefined);
+                return;
+              }
+              const userAccount = new Account(
+                provider,
+                profile.starknetAddress,
+                decryptedPrivateKey,
+              );
+              setAccount(userAccount);
+              setAddress(profile.starknetAddress);
+            } catch (decryptError) {
+              console.error("Error decrypting private key:", decryptError);
               setAccount(undefined);
-              return;
             }
-            const userAccount = new Account(
-              provider,
-              profile.starknetAddress,
-              decryptedPrivateKey,
-            );
-            setAccount(userAccount);
-            setAddress(profile.starknetAddress);
           } else {
             console.log("No user profile found in Firestore.");
             setAccount(undefined);

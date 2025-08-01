@@ -44,7 +44,7 @@ import { ToastContainer, toast, Bounce } from "react-toastify";
 import { Dialog, DialogBackdrop, DialogPanel, Button } from "@headlessui/react";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserProfile } from "@/lib/userutils";
-import { decryptPrivateKey } from "@/helpers/encrypt";
+import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
 import { executeCalls } from "@avnu/gasless-sdk";
 import { ShareButton, ShareModal, ShareData } from "@/components/sharing";
 import AuthRequiredModal from "../auth/AuthRequiredModal";
@@ -749,27 +749,34 @@ const LecturePage = (props: any) => {
 
           if (profile && profile.starknetAddress && isEmailVerified) {
             // User has complete account setup
-            const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
-            const decryptedPrivateKey = decryptPrivateKey(
-              profile.starknetPrivateKey,
-              encryptionSecret,
-            );
-            if (!decryptedPrivateKey) {
-              console.error("Failed to decrypt private key");
+            
+            try {
+              const decryptedPrivateKey = await decryptPrivateKeyAsync(profile.starknetPrivateKey);
+              
+              if (!decryptedPrivateKey) {
+                console.error("Failed to decrypt private key");
+                setAccount(undefined);
+                setAuthChecked(true);
+                setShowAuthModal(true);
+                return;
+              }
+              
+              const userAccount = new Account(
+                provider,
+                profile.starknetAddress,
+                decryptedPrivateKey,
+              );
+              setAccount(userAccount);
+              setAddress(profile.starknetAddress);
+              setAuthChecked(true);
+              setShowAuthModal(false);
+            } catch (decryptError) {
+              console.error("Error decrypting private key:", decryptError);
               setAccount(undefined);
               setAuthChecked(true);
               setShowAuthModal(true);
               return;
             }
-            const userAccount = new Account(
-              provider,
-              profile.starknetAddress,
-              decryptedPrivateKey,
-            );
-            setAccount(userAccount);
-            setAddress(profile.starknetAddress);
-            setAuthChecked(true);
-            setShowAuthModal(false);
           } else {
             // User is authenticated but doesn't have complete setup yet (still in signup process)
             console.log(
@@ -814,24 +821,26 @@ const LecturePage = (props: any) => {
                   console.log(
                     "Complete account setup detected - email verified and Starknet address created",
                   );
-                  const encryptionSecret =
-                    process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
-                  const decryptedPrivateKey = decryptPrivateKey(
-                    currentProfile.starknetPrivateKey,
-                    encryptionSecret,
-                  );
-                  if (decryptedPrivateKey) {
-                    const userAccount = new Account(
-                      provider,
-                      currentProfile.starknetAddress,
-                      decryptedPrivateKey,
-                    );
-                    setAccount(userAccount);
-                    setAddress(currentProfile.starknetAddress);
-                    setAuthChecked(true);
-                    setShowAuthModal(false);
-                    setAuthLoading(false);
-                    return true;
+                  
+                  try {
+                    const decryptedPrivateKey = await decryptPrivateKeyAsync(currentProfile.starknetPrivateKey);
+                    
+                    if (decryptedPrivateKey) {
+                      const userAccount = new Account(
+                        provider,
+                        currentProfile.starknetAddress,
+                        decryptedPrivateKey,
+                      );
+                      setAccount(userAccount);
+                      setAddress(currentProfile.starknetAddress);
+                      setAuthChecked(true);
+                      setShowAuthModal(false);
+                      setAuthLoading(false);
+                      return true;
+                    }
+                  } catch (decryptError) {
+                    console.error("Error decrypting private key:", decryptError);
+                    return false;
                   }
                 }
                 return false;
@@ -919,24 +928,27 @@ const LecturePage = (props: any) => {
           });
 
           if (profile && profile.starknetAddress && isEmailVerified) {
-            const encryptionSecret = process.env.NEXT_PUBLIC_ENCRYPTION_SECRET;
-            const decryptedPrivateKey = decryptPrivateKey(
-              profile.starknetPrivateKey,
-              encryptionSecret,
-            );
-            if (decryptedPrivateKey) {
-              const userAccount = new Account(
-                provider,
-                profile.starknetAddress,
-                decryptedPrivateKey,
-              );
-              setAccount(userAccount);
-              setAddress(profile.starknetAddress);
-              setAuthChecked(true);
-              setShowAuthModal(false);
-              setAuthLoading(false);
-              console.log("Manual auth check - modal closed");
-              return; // Exit early to prevent further processing
+            
+            try {
+              const decryptedPrivateKey = await decryptPrivateKeyAsync(profile.starknetPrivateKey);
+              
+              if (decryptedPrivateKey) {
+                const userAccount = new Account(
+                  provider,
+                  profile.starknetAddress,
+                  decryptedPrivateKey,
+                );
+                setAccount(userAccount);
+                setAddress(profile.starknetAddress);
+                setAuthChecked(true);
+                setShowAuthModal(false);
+                setAuthLoading(false);
+                console.log("Manual auth check - modal closed");
+                return; // Exit early to prevent further processing
+              }
+            } catch (decryptError) {
+              console.error("Error decrypting private key:", decryptError);
+              return;
             }
           }
           // If we reach here, user is not fully authenticated
@@ -1315,7 +1327,7 @@ const LecturePage = (props: any) => {
                           <p className="font-bold text-[#5801a9]">{i + 1}</p>
                         </div>
                         <div
-                          className="w-[145px] h-[94px] rounded-xl border-4 border flex-shrink-0 overflow-hidden"
+                          className="w-[145px] h-[94px] rounded-xl border-4 flex-shrink-0 overflow-hidden"
                           onContextMenu={(e) => e.preventDefault()}
                         >
                           {accessUrl ? (
@@ -1596,7 +1608,7 @@ const LecturePage = (props: any) => {
                             <p className="font-bold text-[#5801a9]">{i + 1}</p>
                           </div>
                           <div
-                            className="w-[150px] h-[97px] rounded-xl border-4 border flex-shrink-0"
+                            className="w-[150px] h-[97px] rounded-xl border-4 flex-shrink-0"
                             onContextMenu={(e) => e.preventDefault()}
                           >
                             {accessUrl ? (
