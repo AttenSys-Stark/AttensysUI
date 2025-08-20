@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import StarRating from "../bootcamp/StarRating";
 import "react-multi-carousel/lib/styles.css";
 import { RatingDisplay } from "../RatingDisplay";
+import { usePinataImage } from "@/hooks/usePinataImage";
 interface ChildComponentProps {
   wallet: any;
   data: any;
@@ -13,12 +14,18 @@ interface ChildComponentProps {
 // get_all_courses_info
 export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
   const router = useRouter();
+  
+  // Get courseImage from either data structure pattern
+  const courseImage = data?.data?.courseImage || data?.courseImage;
+  console.log('CardWithLink courseImage:', courseImage, 'data:', data);
+  
+  const { imageUrl } = usePinataImage(courseImage);
 
   return (
     <div
       className="mt-6 items-center align-middle justify-center w-[100%] lg:w-[95%] border-2 rounded-xl pb-8"
       onClick={(e) => {
-        localStorage.setItem("courseData", JSON.stringify(data?.data));
+        localStorage.setItem("courseData", JSON.stringify(data?.data || data));
         handleCourse(
           e,
           e.currentTarget.textContent,
@@ -32,7 +39,7 @@ export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
           <Image
             className="object-cover h-full w-full rounded-t-xl"
             alt="image"
-            src={`https://ipfs.io/ipfs/${data?.data.courseImage}`}
+            src={imageUrl || '/hero_asset.png'}
             width={200}
             height={200}
           />
@@ -40,13 +47,22 @@ export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
         <div className="flex sm:flex-col h-16 md:flex-row justify-between mt-6 px-5 ">
           <div className="w-[70%]">
             <p className="mb-2 font-bold lg:text-[14px] leading-[22px] text-[#333333]">
-              {data?.data.courseName.slice(0, 23) +
-                (data?.data.courseName.length > 23 ? "..." : "")}
+              {(() => {
+                const courseName = data?.data?.courseName || data?.courseName;
+                if (courseName) {
+                  return courseName.slice(0, 23) + (courseName.length > 23 ? "..." : "");
+                }
+                return "Course Title";
+              })()}
             </p>
             <p className="text-white text-[12px] font-extrabold items-center gap-2 w-fit  bg-[#5801A9] my-2 rounded p-1">
-              {data?.data.courseCreator?.length > 7
-                ? `${data.data.courseCreator.slice(0, 7)}...`
-                : data?.data.courseCreator}
+              {(() => {
+                const courseCreator = data?.data?.courseCreator || data?.courseCreator;
+                if (courseCreator && courseCreator.length > 7) {
+                  return `${courseCreator.slice(0, 7)}...`;
+                }
+                return courseCreator || "Unknown";
+              })()}
             </p>
           </div>
 
@@ -59,7 +75,7 @@ export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
         <div
           className="text-gray-600 text-[11px] mb-3 px-4 line-clamp-2"
           dangerouslySetInnerHTML={{
-            __html: data?.data?.courseDescription || "No description available",
+            __html: (data?.data?.courseDescription || data?.courseDescription) || "No description available",
           }}
         />
       </div>
@@ -78,7 +94,7 @@ export function CardWithLink({ wallet, data, rating }: ChildComponentProps) {
         <div></div>
         <p className="mt-2 text-[14px] text-[#2D3A4B] leading-[19px] font-light">
           Created by{" "}
-          <span className="underline ">{data?.data.courseCreator}</span>
+          <span className="underline ">{(data?.data?.courseCreator || data?.courseCreator) || "Unknown"}</span>
         </p>
       </div>
       <div />

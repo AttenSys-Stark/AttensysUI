@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
-import { PinataSDK } from "pinata";
 
 export const usePinataAccess = () => {
   const [url, setUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const pinata = new PinataSDK({
-    pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
-    pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL,
-  });
-
   const createAccessLink = async (cid: string, expires: number = 86400) => {
     try {
       setLoading(true);
       setError(null);
-      const accessUrl = await pinata.gateways.private.createAccessLink({
-        cid,
-        expires,
+      
+      const response = await fetch("/api/pinata/access-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cid, expires }),
       });
+
+      if (!response.ok) throw new Error("Failed to create access link");
+      
+      const { url: accessUrl } = await response.json();
       setUrl(accessUrl);
       return accessUrl;
     } catch (err) {

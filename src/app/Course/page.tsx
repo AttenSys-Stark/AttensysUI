@@ -93,14 +93,21 @@ const Index = () => {
           try {
             if (course.is_approved) {
               const detailed = await fetchCIDContent(course.course_ipfs_uri);
+              console.log('Course page: Detailed course data for', course.course_identifier, ':', detailed);
+              console.log('Course page: Detailed data keys:', detailed ? Object.keys(detailed) : 'null');
+              console.log('Course page: courseImage field:', detailed?.courseImage);
+              console.log('Course page: image field:', detailed?.image);
+              console.log('Course page: thumbnail field:', detailed?.thumbnail);
               if (detailed) {
-                return {
+                const result = {
                   ...detailed,
                   course_identifier: course.course_identifier,
                   owner: course.owner,
                   course_ipfs_uri: course.course_ipfs_uri,
                   is_suspended: course.is_suspended,
                 };
+                console.log('Course page: Final course object with courseImage:', result.courseImage);
+                return result;
               }
               return detailed;
             }

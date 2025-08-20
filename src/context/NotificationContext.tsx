@@ -97,11 +97,20 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({
   // Mark notifications as read mutation
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationIds?: string[]) => {
-      if (!canonicalAddress) return;
-      return await api.markNotificationsAsRead(
-        canonicalAddress,
-        notificationIds,
-      );
+      if (!canonicalAddress) {
+        console.warn("markAsReadMutation: No canonical address available");
+        return;
+      }
+      try {
+        return await api.markNotificationsAsRead(
+          canonicalAddress,
+          notificationIds,
+        );
+      } catch (error) {
+        console.warn("markAsReadMutation failed:", error);
+        // Don't throw - let it fail silently to avoid UI crashes
+        return null;
+      }
     },
     onSuccess: () => {
       // Invalidate and refetch notifications

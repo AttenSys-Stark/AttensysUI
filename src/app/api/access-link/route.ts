@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     const date = Math.floor(new Date().getTime() / 1000);
 
     const payload = JSON.stringify({
-      url: `${process.env.NEXT_PUBLIC_GATEWAY_URL}/files/${cid}`,
+      url: `${process.env.GATEWAY_URL}/files/${cid}`,
       expires: 3600, // 1 hour expiration
       date,
       method: "GET",

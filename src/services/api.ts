@@ -1,6 +1,16 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://attensys-1a184d8bebe7.herokuapp.com/api";
+// Get API URL from server-side config
+const getApiBaseUrl = async (): Promise<string> => {
+  try {
+    const response = await fetch("/api/config");
+    const config = await response.json();
+    return config.apiUrl;
+  } catch (error) {
+    console.error("Failed to fetch API config:", error);
+    return "https://attensys-1a184d8bebe7.herokuapp.com/api";
+  }
+};
+
+const API_BASE_URL = "https://attensys-1a184d8bebe7.herokuapp.com/api";
 
 
 export interface Course {
@@ -224,7 +234,19 @@ export const api = {
   ): Promise<void> => {
     // Always use canonicalized address
     const canonicalAddress = toCanonicalAddress(address);
+    
+    // Validate required parameters
+    if (!canonicalAddress) {
+      console.warn("markNotificationsAsRead: No address provided");
+      return;
+    }
+
     try {
+      const requestBody = {
+        address: canonicalAddress,
+        notificationIds: notificationIds || []
+      };
+
       const response = await fetch(
         `${API_BASE_URL}/events/address/${canonicalAddress}/mark-read`,
         {
@@ -232,11 +254,18 @@ export const api = {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ notificationIds }),
+          body: JSON.stringify(requestBody),
         },
       );
+      
+      if (response.status === 400) {
+        console.warn("API returned 400 for mark-read, using fallback");
+        throw new Error("API parameter error");
+      }
+      
       return handleResponse(response);
     } catch (error) {
+      console.warn("Failed to mark notifications as read via API, using localStorage fallback:", error);
       // Fallback: store read status in localStorage for testing
       console.log("Using fallback for marking notifications as read");
       const readStatusKey = `notifications_read_${canonicalAddress}`;
@@ -271,6 +300,14 @@ export const api = {
       const response = await fetch(
         `${API_BASE_URL}/events/address/${canonicalAddress}/read-status`,
       );
+      
+      // Handle 404 gracefully for notification endpoints
+      if (response.status === 404) {
+        console.log("Notification read status endpoint not available, using fallback");
+        const readStatusKey = `notifications_read_${canonicalAddress}`;
+        return JSON.parse(localStorage.getItem(readStatusKey) || "{}");
+      }
+      
       return handleResponse(response);
     } catch (error) {
       // Fallback: get read status from localStorage for testing

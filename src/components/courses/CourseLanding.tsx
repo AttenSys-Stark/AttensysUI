@@ -33,16 +33,24 @@ const CourseLanding = (props: any) => {
         const storedData = courseDataKey
           ? localStorage.getItem(courseDataKey)
           : null;
-        if (storedData) {
-          const parsedData = JSON.parse(storedData);
-          // Validate that the parsed data has the expected structure
-          if (parsedData && typeof parsedData === "object") {
-            console.log("Course data loaded from localStorage");
-            setCourseData(parsedData);
-            setIsLoading(false);
-            return;
-          } else {
-            console.warn("Invalid course data structure in localStorage");
+        if (storedData && storedData !== "undefined" && storedData !== "null") {
+          try {
+            const parsedData = JSON.parse(storedData);
+            // Validate that the parsed data has the expected structure
+            if (parsedData && typeof parsedData === "object") {
+              console.log("Course data loaded from localStorage");
+              setCourseData(parsedData);
+              setIsLoading(false);
+              return;
+            } else {
+              console.warn("Invalid course data structure in localStorage");
+            }
+          } catch (parseError) {
+            console.warn("Failed to parse course data from localStorage:", parseError);
+            // Clear invalid data from localStorage
+            if (courseDataKey) {
+              localStorage.removeItem(courseDataKey);
+            }
           }
         }
 

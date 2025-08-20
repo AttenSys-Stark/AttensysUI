@@ -10,6 +10,7 @@ import { CardWithLink } from "./Cards";
 interface ChildComponentProps {
   wallet: any;
   averagereviewrating: any;
+  courseData?: CourseType[]; // Optional prop to pass course data from parent
 }
 
 interface CourseType {
@@ -51,6 +52,7 @@ const responsive = {
 const CarouselComp: React.FC<ChildComponentProps> = ({
   wallet,
   averagereviewrating,
+  courseData: propCourseData,
 }) => {
   const [courses, setCourses] = useState<CourseType[]>([]);
   const [courseData, setCourseData] = useState<CourseType[]>([]);
@@ -105,11 +107,12 @@ const CarouselComp: React.FC<ChildComponentProps> = ({
           const content = await fetchCIDContent(course.course_ipfs_uri);
           if (content) {
             return {
-              ...content,
+              data: content,
               course_identifier: course.course_identifier,
               owner: course.owner,
               course_ipfs_uri: course.course_ipfs_uri,
               is_suspended: course.is_suspended,
+              courseImage: content.courseImage,
             };
           }
           return null;
@@ -119,30 +122,29 @@ const CarouselComp: React.FC<ChildComponentProps> = ({
 
     // Filter out null values
     const validCourses = resolvedCourses.filter(
-      (course): course is CourseType => course !== null && course !== undefined,
+      (course): course is any => course !== null && course !== undefined,
     );
 
-    // Remove duplicates before updating state
-    setCourseData((prevCourses) => {
-      const uniqueCourses = [
-        ...prevCourses,
-        ...validCourses.filter(
-          (newCourse) =>
-            !prevCourses.some(
-              (prev) => prev?.data?.courseName === newCourse?.data?.courseName,
-            ),
-        ),
-      ];
-      return uniqueCourses;
-    });
+    setCourseData(prevCourses => [
+      ...prevCourses,
+      ...validCourses.filter(newCourse => 
+        !prevCourses.some(prev => prev.course_identifier === newCourse.course_identifier)
+      )
+    ]);
   };
 
   useEffect(() => {
-    getAllCourses();
-  }, [provider]);
+    if (propCourseData && propCourseData.length > 0) {
+      setCourseData(propCourseData);
+    } else {
+      getAllCourses();
+    }
+  }, [propCourseData]);
 
   useEffect(() => {
-    getCourse();
+    if (!propCourseData && courses.length > 0) {
+      getCourse();
+    }
   }, [courses]);
   return (
     <div className="w-full h-full mx-auto lg:flex flex-col justify-center items-center">

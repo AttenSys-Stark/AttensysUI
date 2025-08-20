@@ -7,7 +7,7 @@ const initializeFirebaseAdmin = () => {
   if (!getApps().length) {
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\n/g, "\n");
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
     if (!projectId || !clientEmail || !privateKey) {
       throw new Error(
         "Firebase Admin environment variables are not properly configured",
@@ -197,6 +197,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(redirectUrl.toString());
   } catch (error) {
     console.error("Google callback error:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     const baseUrl = getBaseUrl(request);
     return NextResponse.redirect(`${baseUrl}/?error=callback_failed`);
   }

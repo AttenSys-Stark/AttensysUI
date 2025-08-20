@@ -300,9 +300,10 @@ const AddLecture: React.FC<LectureProps> = ({
     // Automatically use background upload if service worker is ready and it's a video
     if (isServiceWorkerReady && type === "video") {
       try {
+        // Background upload now handled via server endpoint
         const uploadId = await addBackgroundUpload(
           file,
-          process.env.NEXT_PUBLIC_PINATA_JWT || "",
+          "", // JWT handled server-side
           lectureName,
           lectureDescription,
         );
@@ -396,12 +397,9 @@ const AddLecture: React.FC<LectureProps> = ({
       formData.append("network", "private");
 
       const response = await axios.post(
-        "https://uploads.pinata.cloud/v3/files",
+        "/api/pinata/upload",
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
-          },
           cancelToken: cancelToken.token,
           onUploadProgress: (progressEvent) => {
             const progress = progressEvent.total
@@ -428,8 +426,17 @@ const AddLecture: React.FC<LectureProps> = ({
         },
       );
 
-      const ipfsHash = response.data.data.cid;
-      const url = `${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${ipfsHash}`;
+      // Extract CID from response - API returns { data: { cid: "..." } }
+      const ipfsHash = response?.data?.data?.cid;
+      if (!ipfsHash) {
+        console.error("Upload failed: No CID returned from Pinata", response?.data);
+        throw new Error("Upload failed: No CID returned from Pinata");
+      }
+      
+      // Get gateway URL from config
+      const configResponse = await fetch("/api/config");
+      const config = await configResponse.json();
+      const url = `${config.gatewayUrl}/ipfs/${ipfsHash}`;
 
       if (uploadId) {
         // Handle multiple upload completion
@@ -807,8 +814,17 @@ const AddLecture: React.FC<LectureProps> = ({
         if (upload.status === "completed") {
           const result = await getUploadResult(upload.id);
           if (result) {
-            const ipfsHash = result.result.data.cid;
-            const url = `${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${ipfsHash}`;
+            // Safely extract CID from background upload result
+            const ipfsHash = (result as any)?.result?.data?.cid || (result as any)?.result?.cid || (result as any)?.data?.cid || (result as any)?.cid;
+            if (!ipfsHash) {
+              console.error("Background upload failed: No CID in result", result);
+              continue; // Skip this upload and continue with others
+            }
+            
+            // Get gateway URL from config
+            const configResponse = await fetch("/api/config");
+            const config = await configResponse.json();
+            const url = `${config.gatewayUrl}/ipfs/${ipfsHash}`;
 
             // Add to course curriculum
             const completedLecture = {

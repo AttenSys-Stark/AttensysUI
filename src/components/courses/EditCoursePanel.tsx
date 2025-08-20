@@ -6,7 +6,6 @@ import { provider } from "@/constants";
 import { useAccount } from "@starknet-react/core";
 import { usePinataAccess } from "@/hooks/usePinataAccess";
 import ReactPlayer from "react-player/lazy";
-import { PinataSDK } from "pinata";
 import AddLecture from "./course-form/AddLecture";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,7 +15,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
 import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
-import { executeCalls } from "@avnu/gasless-sdk";
+import { executeCallsSecure } from "@/utils/avnuClient";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 
 interface EditCoursePanelProps {
@@ -69,10 +68,6 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
   const explorer = useExplorer();
   const playerRef = useRef<ReactPlayer | null>(null);
 
-  const pinata = new PinataSDK({
-    pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
-    pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL,
-  });
 
   function extractCIDFromUrl(ipfsUrl: string): string {
     // Split the URL by '/' and get the last part
@@ -173,12 +168,8 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
             dataUpload.IpfsHash,
           ],
         );
-        const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-        if (!avnuApiKey) {
-          throw new Error("Missing AVNU API key in environment variables");
-        }
 
-        const callCourseContract = await executeCalls(
+        const callCourseContract = await executeCallsSecure(
           account,
           [
             {
@@ -189,11 +180,7 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
           ],
           {
             gasTokenAddress: STRK_ADDRESS,
-          },
-          {
-            apiKey: avnuApiKey,
-            baseUrl: "https://sepolia.api.avnu.fi",
-          },
+          }
         );
         console.log("result", callCourseContract);
         let tx = await provider.waitForTransaction(
@@ -277,10 +264,22 @@ const EditCoursePanel: React.FC<EditCoursePanelProps> = ({
   const createAccess = async (cid: string, expires: number = 86400) => {
     try {
       let formattedCid = extractCIDFromUrl(cid);
-      const accessUrl = await pinata.gateways.private.createAccessLink({
-        cid: formattedCid,
-        expires,
+      const response = await fetch('/api/pinata/create-access', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cid: formattedCid,
+          expires,
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const accessUrl = await response.json();
       return accessUrl;
     } catch (err) {
       console.error("Error creating access link:", err);
