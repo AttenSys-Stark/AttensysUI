@@ -41,9 +41,14 @@ export async function POST(request: Request) {
     }
 
     const result = await response.json();
+    
+    // Extract CID from Pinata v3 API response
+    const cid = result?.data?.cid || result?.cid || result;
 
     return NextResponse.json({
-      cid: result,
+      data: {
+        cid: cid,
+      },
       private: true,
     });
   } catch (error) {

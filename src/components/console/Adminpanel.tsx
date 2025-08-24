@@ -4,7 +4,6 @@ import ReactPlayer from "react-player";
 import { MoonLoader } from "react-spinners";
 import { pinata } from "../../../utils/config";
 import { usePinataAccess } from "@/hooks/usePinataAccess";
-import { PinataSDK } from "pinata";
 import LoadingSpinner from "../ui/LoadingSpinner";
 import { attensysCourseAbi } from "@/deployments/abi";
 import { attensysCourseAddress } from "@/deployments/contracts";
@@ -13,15 +12,11 @@ import { auth } from "@/lib/firebase/client";
 import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
 import { provider } from "@/constants";
-import { executeCalls } from "@avnu/gasless-sdk";
+import { executeCallsSecure } from "@/utils/avnuClient";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { onAuthStateChanged } from "firebase/auth";
 
-const pinataFetch = new PinataSDK({
-  pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
-  pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL,
-});
 
 const Adminpanel = (props: any) => {
   //   const { fetchCIDContent, getError, isLoading } = useFetchCID();
@@ -69,17 +64,26 @@ const Adminpanel = (props: any) => {
   const createAccess = async (cid: string, expires: number = 86400) => {
     try {
       let formattedCid = extractCIDFromUrl(cid);
-      const accessUrl = await pinataFetch.gateways.private.createAccessLink({
-        cid: formattedCid,
-        expires,
+      const response = await fetch('/api/pinata/create-access', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cid: formattedCid,
+          expires,
+        }),
       });
-      if (accessUrl) {
-        return accessUrl;
-      } else {
-        return null;
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
+
+      const accessUrl = await response.json();
+      return accessUrl;
     } catch (err) {
       // console.error("Error creating access link:", err);
+      return null;
     }
   };
 
@@ -216,20 +220,12 @@ const Adminpanel = (props: any) => {
         },
       ];
       // Use AVNU Gasless SDK
-      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-      if (!avnuApiKey) {
-        throw new Error("Missing AVNU API key in environment variables");
-      }
-      const response = await executeCalls(
+      const response = await executeCallsSecure(
         account,
         calls,
         {
           gasTokenAddress: STRK_ADDRESS,
-        },
-        {
-          apiKey: avnuApiKey,
-          baseUrl: "https://sepolia.api.avnu.fi",
-        },
+        }
       );
       // Wait for transaction confirmation
       let tx = await provider.waitForTransaction(response.transactionHash);
@@ -339,20 +335,12 @@ const Adminpanel = (props: any) => {
         },
       ];
       // Use AVNU Gasless SDK
-      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-      if (!avnuApiKey) {
-        throw new Error("Missing AVNU API key in environment variables");
-      }
-      const response = await executeCalls(
+      const response = await executeCallsSecure(
         account,
         calls,
         {
           gasTokenAddress: STRK_ADDRESS,
-        },
-        {
-          apiKey: avnuApiKey,
-          baseUrl: "https://sepolia.api.avnu.fi",
-        },
+        }
       );
       // Wait for transaction confirmation
       let tx = await provider.waitForTransaction(response.transactionHash);

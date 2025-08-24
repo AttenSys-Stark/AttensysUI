@@ -30,7 +30,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { getUserProfile } from "@/lib/userutils";
 import { auth } from "@/lib/firebase/client";
 import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
-import { executeCalls } from "@avnu/gasless-sdk";
+import { executeCallsSecure } from "@/utils/avnuClient";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -283,11 +283,6 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
     try {
       setIsDeleting(true);
       // // Find the matching course from item.c
-      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-      if (!avnuApiKey) {
-        throw new Error("Missing AVNU API key in environment variables");
-      }
-
       const courseContract = new Contract(
         attensysCourseAbi,
         attensysCourseAddress,
@@ -298,7 +293,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
         Number(courseToDelete),
       ]);
 
-      const callCourseContract = await executeCalls(
+      const callCourseContract = await executeCallsSecure(
         account,
         [
           {
@@ -309,11 +304,7 @@ const CoursesCreated: React.FC<CoursesCreatedProps> = ({
         ],
         {
           gasTokenAddress: STRK_ADDRESS,
-        },
-        {
-          apiKey: avnuApiKey,
-          baseUrl: "https://sepolia.api.avnu.fi",
-        },
+        }
       );
 
       let tx = await provider.waitForTransaction(

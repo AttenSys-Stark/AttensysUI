@@ -5,6 +5,14 @@ const path = require("path");
 const nextConfig = {
   images: {
     domains: ["ipfs.io", "gateway.pinata.cloud", "cloudflare-ipfs.com"], // Add more IPFS gateways if needed
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.mypinata.cloud',
+        port: '',
+        pathname: '/**',
+      },
+    ],
   },
   webpack: (config, { isServer, webpack }) => {
     if (!isServer) {

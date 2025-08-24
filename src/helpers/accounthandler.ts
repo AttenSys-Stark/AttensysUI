@@ -23,100 +23,47 @@ const NODE_URL =
     ? "https://starknet-mainnet.public.blastapi.io"
     : "https://starknet-sepolia.public.blastapi.io/rpc/v0_8";
 
-const privateKey = process.env.NEXT_PUBLIC_MASTER_PRIVATE_KEY;
-const accountAddress = process.env.NEXT_PUBLIC_MASTER_ADDRESS ?? "";
+// This file should no longer access private keys directly
+// Private key operations should be moved to server-side API routes
 const provider = new RpcProvider({ nodeUrl: NODE_URL ?? "" });
-const account0 = new Account(provider, accountAddress, privateKey ?? "");
 
-const erc20Contract = new Contract(Erc20Abi, STRK_ADDRESS, account0);
+// Initialize contract without account (read-only operations)
+// For transactions requiring private key, use server-side API endpoints
+const erc20Contract = new Contract(Erc20Abi, STRK_ADDRESS, provider);
 
 export const AccountHandler = async (
   progressCallback?: (status: string) => void,
 ) => {
-  const provider_r = new RpcProvider({ nodeUrl: NODE_URL ?? "" });
-  const argentXaccountClassHash =
-    "0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f";
-
-  // Generate public and private key pair.
-  progressCallback?.("Generating key pair...");
-
-  const privateKeyAX = stark.randomAddress();
-  const starkKeyPubAX = ec.starkCurve.getStarkKey(privateKeyAX);
-
-  // Calculate future address of the ArgentX account
-  const axSigner = new CairoCustomEnum({ Starknet: { pubkey: starkKeyPubAX } });
-  const axGuardian = new CairoOption<unknown>(CairoOptionVariant.None);
-  const AXConstructorCallData = CallData.compile({
-    owner: axSigner,
-    guardian: axGuardian,
-  });
-  const AXcontractAddress = hash.calculateContractAddressFromHash(
-    starkKeyPubAX,
-    argentXaccountClassHash,
-    AXConstructorCallData,
-    0,
-  );
-
-  progressCallback?.("Crunching numbers...");
-  const { suggestedMaxFee: estimatedFee1 } =
-    await account0.estimateAccountDeployFee(
-      {
-        classHash: argentXaccountClassHash,
-        constructorCalldata: AXConstructorCallData,
-        contractAddress: AXcontractAddress,
-        addressSalt: starkKeyPubAX,
-      },
-      { version: 3 },
-    );
-
-  const toTransferTk: Uint256 = cairo.uint256(0.1 * 10 ** 18);
-  const transferCall: Call = erc20Contract.populate("transfer", {
-    recipient: AXcontractAddress,
-    amount: toTransferTk,
-  });
-
-  const estimateFees = await account0.estimateInvokeFee(transferCall, {
-    version: "0x03",
-  });
-
-  // console.log(estimateFees);
-  const resourceBounds = {
-    ...estimateFees.resourceBounds,
-  };
-  const tx = await account0.execute(transferCall, {
-    version: "0x03",
-    resourceBounds,
-  });
-  const transferTxHash = tx.transaction_hash;
-  await provider.waitForTransaction(transferTxHash, {
-    retryInterval: 2000,
-    successStates: ["ACCEPTED_ON_L2"],
-  });
-  // console.log(tx);
-
-  const accountAX = new Account(provider, AXcontractAddress, privateKeyAX);
-
-  const deployAccountPayload = {
-    classHash: argentXaccountClassHash,
-    constructorCalldata: AXConstructorCallData,
-    contractAddress: AXcontractAddress,
-    addressSalt: starkKeyPubAX,
-  };
-
-  progressCallback?.("Almost there...");
-
-  const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } =
-    await accountAX.deployAccount(deployAccountPayload, {
-      version: "0x03",
-      resourceBounds,
+  // This function previously used a master private key for account operations
+  // For security reasons, these operations have been moved to server-side API endpoints
+  
+  progressCallback?.("Initiating secure account creation...");
+  
+  try {
+    const response = await fetch('/api/blockchain/create-account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        // Add any necessary parameters here
+        progressCallback: true 
+      })
     });
-  await provider.waitForTransaction(AXdAth, {
-    retryInterval: 2000,
-    successStates: ["ACCEPTED_ON_L2"],
-  });
-  progressCallback?.("Account created!");
-  return {
-    privateKeyAX,
-    AXcontractFinalAddress,
-  };
+
+    if (!response.ok) {
+      throw new Error('Account creation failed');
+    }
+
+    const result = await response.json();
+    progressCallback?.("Account created successfully!");
+    
+    return {
+      privateKeyAX: result.privateKey, // Note: This should be handled securely
+      AXcontractFinalAddress: result.contractAddress,
+    };
+  } catch (error) {
+    progressCallback?.("Account creation failed");
+    throw new Error(
+      `Account creation failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
+  }
 };

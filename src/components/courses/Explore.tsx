@@ -14,7 +14,6 @@ import "react-multi-carousel/lib/styles.css";
 import StarRating from "../bootcamp/StarRating";
 import { LuBadgeCheck } from "react-icons/lu";
 import ReactPlayer from "react-player";
-import { PinataSDK } from "pinata";
 import { split } from "lodash-es";
 import { getAverageRatingForVideo } from "@/lib/services/reviewService";
 import { RatingDisplay } from "@/components/RatingDisplay";
@@ -25,6 +24,7 @@ import {
   getFallbackDate,
   CourseLastUpdated,
 } from "@/utils/courseLastUpdated";
+import { usePinataImage } from "@/hooks/usePinataImage";
 
 // Helper function to format duration
 function formatDuration(seconds: number) {
@@ -54,10 +54,6 @@ interface ChildComponentProps {
   unfilteredData: any;
 }
 
-const pinata = new PinataSDK({
-  pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
-  pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL,
-});
 
 function extractCIDFromUrl(ipfsUrl: string): string {
   const parts = ipfsUrl.split("/");
@@ -68,13 +64,26 @@ function extractCIDFromUrl(ipfsUrl: string): string {
 async function createAccess(cid: string, expires: number = 86400) {
   try {
     const formattedCid = extractCIDFromUrl(cid);
-    const accessUrl = await pinata.gateways.private.createAccessLink({
-      cid: formattedCid,
-      expires,
+    const response = await fetch('/api/pinata/access-link', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        cid: formattedCid,
+        expires,
+      }),
     });
-    return accessUrl;
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.url;
   } catch (err) {
     console.error("Error creating access link:", err);
+    return null;
   }
 }
 
@@ -85,9 +94,11 @@ const Explore = ({
   unfilteredData,
 }: ChildComponentProps) => {
   const router = useRouter();
-  const featuredCourse = courseData[courseData.length - 1];
   const [currentPage, setCurrentPage] = useState(1);
   const [videoUrls, setVideoUrls] = useState<{ [key: string]: string }>({});
+  
+  const featuredCourse = unfilteredData[unfilteredData.length - 1];
+  const { imageUrl: featuredImageUrl } = usePinataImage(featuredCourse?.courseImage);
 
   const itemsPerPage = 8;
   // Reset to first page when data changes
@@ -181,7 +192,7 @@ const Explore = ({
             const identifier = course?.course_identifier;
             if (identifier && !(identifier in ratings)) {
               const avg = await getAverageRatingForVideo(
-                (course?.data?.courseName?.toString() ?? "") + identifier,
+                ((course?.data?.courseName || course?.courseName)?.toString() ?? "") + identifier,
               );
               ratings[identifier] = avg;
             }
@@ -228,6 +239,7 @@ const Explore = ({
 
   const renderCourseCard = (course: any, index: any) => {
     const averageRating = averageRatings[course?.course_identifier];
+    
     return (
       <div
         key={index}
@@ -235,8 +247,8 @@ const Explore = ({
       >
         <div className="h-48 relative">
           <Image
-            src={`https://ipfs.io/ipfs/${course?.data?.courseImage}`}
-            alt={course?.data?.courseName || "Course image"}
+            src={course?.courseImage && course.courseImage !== 'undefined' ? `https://ipfs.io/ipfs/${course.courseImage}` : '/hero_asset.png'}
+            alt={course?.data?.courseName || course?.courseName || "Course image"}
             layout="fill"
             objectFit="cover"
             className="w-full h-full object-cover"
@@ -256,10 +268,12 @@ const Explore = ({
           <h3
             className="font-bold text-lg mb-2 cursor-pointer hover:text-[#5801A9]"
             onClick={(e) => {
-              localStorage.setItem(
-                `courseData_${course?.course_identifier}`,
-                JSON.stringify(course?.data),
-              );
+              if (course?.data) {
+                localStorage.setItem(
+                  `courseData_${course?.course_identifier}`,
+                  JSON.stringify(course.data),
+                );
+              }
               handleCourse(
                 e,
                 e.currentTarget.textContent,
@@ -268,9 +282,13 @@ const Explore = ({
               );
             }}
           >
-            {course?.data.courseName.slice(0, 23) +
-              (course?.data.courseName.length > 23 ? "..." : "") ||
-              "Course Title"}
+            {(() => {
+              const courseName = course?.data?.courseName || course?.courseName;
+              if (courseName) {
+                return courseName.slice(0, 23) + (courseName.length > 23 ? "..." : "");
+              }
+              return "Course Title";
+            })()}
           </h3>
 
           <div
@@ -289,10 +307,12 @@ const Explore = ({
         <div className="p-4 border-t">
           <button
             onClick={(e) => {
-              localStorage.setItem(
-                `courseData_${course?.course_identifier}`,
-                JSON.stringify(course?.data),
-              );
+              if (course?.data) {
+                localStorage.setItem(
+                  `courseData_${course?.course_identifier}`,
+                  JSON.stringify(course.data),
+                );
+              }
               handleCourse(
                 e,
                 e.currentTarget.textContent,
@@ -314,7 +334,7 @@ const Explore = ({
     const fetchUrls = async () => {
       const urls: { [key: string]: string } = {};
       for (const item of unfilteredData[unfilteredData.length - 1]?.data
-        .courseCurriculum || []) {
+        ?.courseCurriculum || []) {
         try {
           const url = await createAccess(item.video);
           if (url) {
@@ -480,7 +500,11 @@ const Explore = ({
             </p>
           </div>
 
-          <CarouselComp wallet={wallet} averagereviewrating={averageRatings} />
+          <CarouselComp 
+            wallet={wallet} 
+            averagereviewrating={averageRatings} 
+            courseData={unfilteredData} 
+          />
         </div>
 
         {/* Featured section */}
@@ -500,7 +524,7 @@ const Explore = ({
           <div className="flex flex-col md:flex-row gap-4 sm:gap-5 xl:w-[70%]">
             <div className="h-full w-full rounded-xl">
               <Image
-                src={`https://ipfs.io/ipfs/${unfilteredData[unfilteredData.length - 1]?.data?.courseImage}`}
+                src={featuredImageUrl || '/hero_asset.png'}
                 alt="video"
                 width={700}
                 height={700}
@@ -512,18 +536,17 @@ const Explore = ({
               <div>
                 <div
                   onClick={(e) => {
-                    localStorage.setItem(
-                      `courseData_${unfilteredData[unfilteredData.length - 1]?.course_identifier}`,
-                      JSON.stringify(
-                        unfilteredData[unfilteredData.length - 1]?.data,
-                      ),
-                    );
+                    if (featuredCourse?.data) {
+                      localStorage.setItem(
+                        `courseData_${featuredCourse.course_identifier}`,
+                        JSON.stringify(featuredCourse.data),
+                      );
+                    }
                     handleCourse(
                       e,
                       e.currentTarget.textContent,
                       router,
-                      unfilteredData[unfilteredData.length - 1]
-                        ?.course_identifier,
+                      featuredCourse?.course_identifier,
                     );
                   }}
                 >
@@ -531,29 +554,25 @@ const Explore = ({
                     Get this course
                   </button>
                   <h2 className="font-bold lg:text-[32px] text-[23px] sm:text-4xl text-[#2D3A4B] my-4 cursor-pointer">
-                    {unfilteredData[unfilteredData.length - 1]?.data.courseName}
+                    {featuredCourse?.data?.courseName || featuredCourse?.courseName || "Course Title"}
                   </h2>
                 </div>
                 <p className="text-white font-semibold inline gap-2 text-sm bg-[#5801A9] rounded p-2">
-                  {
-                    unfilteredData[unfilteredData.length - 1]?.data
-                      .courseCreator
-                  }
+                  {featuredCourse?.data?.courseCreator || "Unknown Creator"}
                 </p>
                 <button
                   onClick={(e) => {
-                    localStorage.setItem(
-                      `courseData_${unfilteredData[unfilteredData.length - 1]?.course_identifier}`,
-                      JSON.stringify(
-                        unfilteredData[unfilteredData.length - 1]?.data,
-                      ),
-                    );
+                    if (featuredCourse?.data) {
+                      localStorage.setItem(
+                        `courseData_${featuredCourse.course_identifier}`,
+                        JSON.stringify(featuredCourse.data),
+                      );
+                    }
                     handleCourse(
                       e,
                       e.currentTarget.textContent,
                       router,
-                      unfilteredData[unfilteredData.length - 1]
-                        ?.course_identifier,
+                      featuredCourse?.course_identifier,
                     );
                   }}
                   className="bg-[#5801a9] ml-3 lg:hidden hover:bg-gray-500 text-white gap-2 text-[14px] rounded-md font-bold p-2 cursor-pointer"
@@ -569,10 +588,7 @@ const Explore = ({
                     </p> */}
                     <RatingDisplay
                       rating={
-                        averageRatings[
-                          unfilteredData[unfilteredData.length - 1]
-                            ?.course_identifier
-                        ]
+                        averageRatings[featuredCourse?.course_identifier]
                       }
                       size="sm"
                     />
@@ -589,10 +605,7 @@ const Explore = ({
                   <p className="text-[11px] text-[#2D3A4B] font-medium">
                     Created by:{" "}
                     <span className="underline inline">
-                      {
-                        unfilteredData[unfilteredData.length - 1]?.data
-                          .courseCreator
-                      }
+                      {featuredCourse?.data?.courseCreator || "Unknown Creator"}
                     </span>
                   </p>
                   <span className="flex gap-2 items-center">
@@ -602,11 +615,8 @@ const Explore = ({
                         if (isLoadingLastUpdated) {
                           return "Loading...";
                         }
-                        const featuredCourseId =
-                          unfilteredData[unfilteredData.length - 1]
-                            ?.course_identifier;
-                        const lastUpdated =
-                          coursesLastUpdated[featuredCourseId];
+                        const featuredCourseId = featuredCourse?.course_identifier;
+                        const lastUpdated = coursesLastUpdated[featuredCourseId];
                         if (lastUpdated) {
                           const formattedDate = formatLastUpdated(
                             lastUpdated.lastUpdated,
@@ -626,9 +636,7 @@ const Explore = ({
                       Total play time:{" "}
                       {(() => {
                         const totalPlayTime =
-                          unfilteredData[
-                            unfilteredData.length - 1
-                          ]?.data?.courseCurriculum?.reduce(
+                          featuredCourse?.data?.courseCurriculum?.reduce(
                             (sum: number, lecture: any) =>
                               sum +
                               estimateVideoDuration(lecture.fileSize || 0),
@@ -644,7 +652,7 @@ const Explore = ({
                       Difficulty level:{" "}
                       {
                         unfilteredData[unfilteredData.length - 1]?.data
-                          .difficultyLevel
+                          ?.difficultyLevel || "Not specified"
                       }
                     </p>
                   </span>
@@ -666,14 +674,14 @@ const Explore = ({
                 Lectures (
                 {
                   unfilteredData[unfilteredData.length - 1]?.data
-                    .courseCurriculum.length
+                    ?.courseCurriculum?.length || 0
                 }
                 )
               </h4>
               <IoMdArrowDropdown />
             </div>
             <div>
-              {unfilteredData[unfilteredData.length - 1]?.data.courseCurriculum
+              {unfilteredData[unfilteredData.length - 1]?.data?.courseCurriculum
                 ?.slice()
                 .reverse()
                 ?.map((item: any, i: any) => {
@@ -749,7 +757,11 @@ const Explore = ({
         </div>
 
         <div className="mx-6 lg:mx-auto max-w-screen-2xl">
-          <CarouselComp wallet={wallet} averagereviewrating={averageRatings} />
+          <CarouselComp 
+            wallet={wallet} 
+            averagereviewrating={averageRatings} 
+            courseData={unfilteredData} 
+          />
           <div className="mt-8 sm:mt-24">
             <div className="my-4">
               <h3 className="text-2xl font-bold">You will love this</h3>
@@ -763,6 +775,7 @@ const Explore = ({
             <CarouselComp
               wallet={wallet}
               averagereviewrating={averageRatings}
+              courseData={unfilteredData}
             />
           </div>
         </div>

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import tdesign_video from "../../assets/tdesign_video.svg";
 import ReactPlayer from "react-player";
-import { PinataSDK } from "pinata";
 
 interface Lecture {
   img: string;
@@ -51,20 +50,33 @@ const Lectures = ({
     return cid.split("?")[0].split(".")[0];
   }
 
-  const pinata = new PinataSDK({
-    pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
-    pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL,
-  });
-
   const createAccess = useCallback(
     async (cid: string, expires: number = 86400) => {
       try {
         const formattedCid = extractCIDFromUrl(cid);
-        const accessUrl = await pinata.gateways.private.createAccessLink({
-          cid: formattedCid,
-          expires,
+        
+        const response = await fetch('/api/pinata/access-link', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            cid: formattedCid,
+            expires,
+          }),
         });
-        return accessUrl;
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        return data.url;
       } catch (err) {
         console.error("Error creating access link:", err);
         return null;

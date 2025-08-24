@@ -123,9 +123,7 @@ const Notification = ({ wallet, address }: NotificationProps) => {
       }
 
       try {
-        const apiUrl =
-          process.env.NEXT_PUBLIC_API_URL ||
-          "https://attensys-1a184d8bebe7.herokuapp.com/api";
+        const apiUrl = "https://attensys-1a184d8bebe7.herokuapp.com/api";
 
         // Test if the API is accessible
         const testResponse = await fetch(

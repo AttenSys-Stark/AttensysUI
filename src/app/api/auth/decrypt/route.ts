@@ -19,7 +19,25 @@ function decryptPrivateKey(encrypted: string, secret: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { encryptedData } = await request.json();
+    const body = await request.text();
+    if (!body) {
+      return NextResponse.json(
+        { error: "Request body is empty" },
+        { status: 400 },
+      );
+    }
+
+    let parsedBody;
+    try {
+      parsedBody = JSON.parse(body);
+    } catch (parseError) {
+      return NextResponse.json(
+        { error: "Invalid JSON in request body" },
+        { status: 400 },
+      );
+    }
+
+    const { encryptedData } = parsedBody;
 
     if (!encryptedData) {
       return NextResponse.json(

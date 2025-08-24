@@ -24,7 +24,6 @@ import LoadingSpinner from "../ui/LoadingSpinner";
 import { CardWithLink } from "./Cards";
 import { useAccount, useConnect, useExplorer } from "@starknet-react/core";
 import { usePinataAccess } from "@/hooks/usePinataAccess";
-import { PinataSDK } from "pinata";
 import { RatingDisplay } from "@/components/RatingDisplay";
 import {
   getReviewsForVideo,
@@ -45,7 +44,7 @@ import { Dialog, DialogBackdrop, DialogPanel, Button } from "@headlessui/react";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserProfile } from "@/lib/userutils";
 import { decryptPrivateKeyAsync } from "@/helpers/encrypt";
-import { executeCalls } from "@avnu/gasless-sdk";
+import { executeCallsSecure } from "@/utils/avnuClient";
 import { ShareButton, ShareModal, ShareData } from "@/components/sharing";
 import AuthRequiredModal from "../auth/AuthRequiredModal";
 import { useRouter } from "next/navigation";
@@ -204,7 +203,7 @@ const LecturePage = (props: any) => {
           const content = await fetchCIDContent(course.course_ipfs_uri);
           if (content) {
             return {
-              ...content,
+              data: content,
               course_identifier: course.course_identifier,
               owner: course.owner,
               course_ipfs_uri: course.course_ipfs_uri,
@@ -227,11 +226,14 @@ const LecturePage = (props: any) => {
         ...prevCourses,
         ...validCourses.filter(
           (newCourse) =>
+            newCourse.data?.courseName &&
             !prevCourses.some(
-              (prev) => prev.data.courseName === newCourse.data.courseName,
+              (prev) => prev.data?.courseName === newCourse.data.courseName,
             ),
         ),
       ];
+      console.log("setCourseData - validCourses:", validCourses);
+      console.log("setCourseData - uniqueCourses:", uniqueCourses);
       return uniqueCourses;
     });
   };
@@ -394,12 +396,7 @@ const LecturePage = (props: any) => {
         [Number(ultimate_id)],
       );
 
-      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-      if (!avnuApiKey) {
-        throw new Error("Missing AVNU API key in environment variables");
-      }
-
-      const callCourseContract = await executeCalls(
+      const callCourseContract = await executeCallsSecure(
         account,
         [
           {
@@ -415,11 +412,7 @@ const LecturePage = (props: any) => {
         ],
         {
           gasTokenAddress: STRK_ADDRESS,
-        },
-        {
-          apiKey: avnuApiKey,
-          baseUrl: "https://sepolia.api.avnu.fi",
-        },
+        }
       );
 
       console.log("call returns", callCourseContract);
@@ -548,12 +541,7 @@ const LecturePage = (props: any) => {
       [Number(ultimate_id)],
     );
 
-    const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-    if (!avnuApiKey) {
-      throw new Error("Missing AVNU API key in environment variables");
-    }
-
-    const callCourseContract = await executeCalls(
+    const callCourseContract = await executeCallsSecure(
       account,
       [
         {
@@ -564,11 +552,7 @@ const LecturePage = (props: any) => {
       ],
       {
         gasTokenAddress: STRK_ADDRESS,
-      },
-      {
-        apiKey: avnuApiKey,
-        baseUrl: "https://sepolia.api.avnu.fi",
-      },
+      }
     );
     let tx = await provider.waitForTransaction(
       callCourseContract.transactionHash,
@@ -640,10 +624,6 @@ const LecturePage = (props: any) => {
   };
   console.log("props?.data to watch", props?.data);
 
-  const pinata = new PinataSDK({
-    pinataJwt: process.env.NEXT_PUBLIC_PINATA_JWT,
-    pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL,
-  });
 
   function extractCIDFromUrl(ipfsUrl: string): string {
     // Split the URL by '/' and get the last part
@@ -655,11 +635,25 @@ const LecturePage = (props: any) => {
   const createAccess = async (cid: string, expires: number = 86400) => {
     try {
       let formattedCid = extractCIDFromUrl(cid);
-      const accessUrl = await pinata.gateways.private.createAccessLink({
-        cid: formattedCid,
-        expires,
+      console.log("Creating access for video:", cid, "→ formatted CID:", formattedCid);
+      const response = await fetch('/api/pinata/create-access', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          cid: formattedCid,
+          expires,
+        }),
       });
-      return accessUrl;
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const accessUrl = await response.json();
+      console.log("Access URL response:", accessUrl);
+      return accessUrl.url;
     } catch (err) {
       console.error("Error creating access link:", err);
     }
@@ -673,6 +667,7 @@ const LecturePage = (props: any) => {
   useEffect(() => {
     if (courses.length === 0) return;
     console.log("props data", props?.data);
+    console.log("courses before getCourse:", courses);
     getCourse();
   }, [courses]);
 
@@ -1050,13 +1045,13 @@ const LecturePage = (props: any) => {
       // Generate a professional shareable URL instead of using current page URL
       const shareableUrl = generateShareableUrl(
         ultimate_id,
-        props.data.courseName,
+        props.data?.courseName,
       );
 
       setShareData({
-        title: props.data.courseName || "Course",
+        title: props.data?.courseName || "Course",
         description:
-          props.data.courseDescription || "Check out this amazing course!",
+          props.data?.courseDescription || "Check out this amazing course!",
         url: shareableUrl,
         courseId: ultimate_id,
       });
@@ -1229,7 +1224,8 @@ const LecturePage = (props: any) => {
           </div>
           <span className="text-[#9B51E0]">|</span>{" "}
           <p className="w-full truncate text-[16px] text-[#2D3A4B] font-semibold">
-            {props?.data?.courseName}
+            {props?.data?.courseName || 
+             (props?.data ? "Course title not available" : "Loading course title...")}
           </p>
         </div>
 
@@ -1242,6 +1238,10 @@ const LecturePage = (props: any) => {
                   className="absolute inset-0 overflow-hidden"
                   onContextMenu={(e) => e.preventDefault()}
                 >
+                  {(() => {
+                    console.log("ReactPlayer selectedVideo URL:", selectedVideo);
+                    return null;
+                  })()}
                   <ReactPlayer
                     url={selectedVideo}
                     width="100%"

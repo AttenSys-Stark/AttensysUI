@@ -69,20 +69,13 @@ const BalanceModal = ({ account, address }: BalanceModalProps) => {
           calldata: claim_calldata.calldata,
         },
       ];
-      // Use AVNU Gasless SDK
-      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-      if (!avnuApiKey) {
-        throw new Error("Missing AVNU API key in environment variables");
-      }
-      const response = await executeCalls(
+      // Use secure server-side AVNU proxy
+      const { executeCallsSecure } = await import('@/utils/avnuClient');
+      const response = await executeCallsSecure(
         account,
         calls,
         {
           gasTokenAddress: STRK_ADDRESS,
-        },
-        {
-          apiKey: avnuApiKey,
-          baseUrl: "https://sepolia.api.avnu.fi",
         },
       );
       // Wait for transaction confirmation
@@ -172,20 +165,13 @@ const BalanceModal = ({ account, address }: BalanceModalProps) => {
           calldata: [recipientAddress, toTransferTk.low, toTransferTk.high],
         },
       ];
-      // Use AVNU Gasless SDK
-      const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-      if (!avnuApiKey) {
-        throw new Error("Missing AVNU API key in environment variables");
-      }
-      const response = await executeCalls(
+      // Use secure server-side AVNU proxy
+      const { executeCallsSecure } = await import('@/utils/avnuClient');
+      const response = await executeCallsSecure(
         account,
         calls,
         {
           gasTokenAddress: STRK_ADDRESS,
-        },
-        {
-          apiKey: avnuApiKey,
-          baseUrl: "https://sepolia.api.avnu.fi",
         },
       );
       // Wait for transaction confirmation

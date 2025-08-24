@@ -1,6 +1,5 @@
 import { LRUCache } from "lru-cache";
 import { useCallback, useState } from "react";
-import { pinata } from "../../utils/config";
 /**
  * useFetchCID Hook
  *
@@ -54,10 +53,28 @@ export const useFetchCID = () => {
       try {
         console.log("Fetching CID:", CID);
 
-        // Remove the .catch() and handle errors in the try-catch
-        const response = await pinata.gateways.get(CID);
-        // console.log("Response:", response);
-        return response;
+        const response = await fetch(`/api/pinata/fetch-cid?cid=${encodeURIComponent(CID)}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('useFetchCID: Response status:', response.status, 'for CID:', CID);
+
+        if (!response.ok) {
+          console.error('useFetchCID: Response not OK:', response.status, response.statusText);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        console.log('useFetchCID: Successfully fetched data for CID', CID, ':', data);
+        return data;
       } catch (error: unknown) {
         // Use unknown type for better type safety
         // Normalize the error to an object we can work with
@@ -124,6 +141,7 @@ export const useFetchCID = () => {
         let data = await fetchWithRetry(CID);
         cache.set(CID, data);
 
+        console.log('useFetchCID: Final data being returned for CID', CID, ':', data);
         updateStatus(CID, { loading: false });
         return data;
       } catch (error: any) {

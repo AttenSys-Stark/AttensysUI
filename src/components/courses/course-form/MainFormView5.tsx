@@ -26,7 +26,7 @@ import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { toast, Bounce, ToastContainer } from "react-toastify";
 import { useAccount } from "@starknet-react/core";
 import { STRK_ADDRESS } from "@/deployments/erc20Contract";
-import { executeCalls } from "@avnu/gasless-sdk";
+import { executeCallsSecure } from "@/utils/avnuClient";
 import { provider } from "@/constants";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase/client";
@@ -187,11 +187,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
             ],
           );
 
-          const avnuApiKey = process.env.NEXT_PUBLIC_AVNU_API_KEY;
-          if (!avnuApiKey) {
-            throw new Error("Missing AVNU API key in environment variables");
-          }
-          const callCourseContract = await executeCalls(
+          const callCourseContract = await executeCallsSecure(
             account,
             [
               {
@@ -202,11 +198,7 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
             ],
             {
               gasTokenAddress: STRK_ADDRESS,
-            },
-            {
-              apiKey: avnuApiKey,
-              baseUrl: "https://sepolia.api.avnu.fi",
-            },
+            }
           );
           let tx = await provider.waitForTransaction(
             callCourseContract.transactionHash,
@@ -223,24 +215,17 @@ const MainFormView5: React.FC<ChildComponentProps> = ({
             // Send notifications
             try {
               // Notify admin about new course
-              await fetch(
-                "https://attensys-1a184d8bebe7.herokuapp.com/api/notify-admin-new-course",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                    Origin: window.location.origin,
-                  },
-                  credentials: "include",
-                  mode: "cors",
-                  body: JSON.stringify({
-                    adminEmail: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
-                    creatorName: courseData.courseCreator,
-                    courseName: courseData.courseName,
-                  }),
+              await fetch("/api/course/notify-admin", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
                 },
-              );
+                body: JSON.stringify({
+                  creatorName: courseData.courseCreator,
+                  courseName: courseData.courseName,
+                  message: "New course created",
+                }),
+              });
 
               // Notify course creator
               await fetch(

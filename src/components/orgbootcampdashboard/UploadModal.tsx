@@ -111,27 +111,22 @@ export default function UploadModal(prop: any) {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await axios.post(
-        "https://api.pinata.cloud/pinning/pinFileToIPFS",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_PINATA_JWT}`,
-          },
-          onUploadProgress: (progressEvent) => {
-            const progress = progressEvent.total
-              ? Math.round((progressEvent.loaded / progressEvent.total) * 100)
-              : 0;
-            setUploadStatus((prev) => ({
-              ...prev,
-              [type]: { ...prev[type], progress },
-            }));
-          },
-        },
-      );
+      // First get config for gateway URL
+      const configResponse = await fetch('/api/config');
+      const config = await configResponse.json();
+      
+      const response = await fetch('/api/pinata/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      const ipfsHash = response.data.IpfsHash;
-      const url = `${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${ipfsHash}`;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
+      }
+
+      const result = await response.json();
+      const url = `${config.gatewayUrl}/ipfs/${result.cid}`;
 
       setUploadStatus((prev) => ({
         ...prev,
@@ -155,9 +150,9 @@ export default function UploadModal(prop: any) {
         }));
       }, 5000);
 
-      if (ipfsHash) {
-        console.info(ipfsHash);
-        setUploadHash(ipfsHash);
+      if (result.cid) {
+        console.info(result.cid);
+        setUploadHash(result.cid);
       }
     } catch (error: any) {
       console.error("Upload error:", error);
